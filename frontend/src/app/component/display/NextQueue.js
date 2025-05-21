@@ -12,6 +12,7 @@ const NextQueue = ({verificationData, medicineData, pickupData}) => {
     medicineNonRacik: [],
     pickupRacik: [],
     pickupNonRacik: [],
+    verificationQueue: []
   });
 
   // Refs untuk auto-scroll
@@ -84,8 +85,9 @@ const NextQueue = ({verificationData, medicineData, pickupData}) => {
           }));
           console.log("PICKUP",pickupData);
           setQueues({
-            nextQueueRacik: verificationData.filter(task => task.type === "Racikan"),
-            nextQueueNonRacik: verificationData.filter(task => task.type === "Non - Racikan"),
+            verificationQueue: verificationData,
+            // nextQueueRacik: verificationData.filter(task => task.type === "Racikan"),
+            // nextQueueNonRacik: verificationData.filter(task => task.type === "Non - Racikan"),
             medicineRacik: medicineData.filter(task => task.type === "Racikan"),
             medicineNonRacik: medicineData.filter(task => task.type === "Non - Racikan"),
             pickupRacik: pickupData.filter(task => task.type === "Racikan"),
@@ -93,45 +95,7 @@ const NextQueue = ({verificationData, medicineData, pickupData}) => {
           });
     
         });
-        // const verificationResponse = await VerificationAPI.getAllVerificationTasks()
-        // console.log("Verification Data:", verificationResponse.data);
-
-        // const verificationData = verificationResponse.data
-        // .filter(task => task.status === "waiting_verification")
-        // .map(task => ({
-        //   queueNumber: task.queue_number,
-        //   // type: task.status_medicine === "Tidak ada Racikan" ? "Non - Racikan" : "Racikan",
-        //               type: task.status_medicine ,
-
-        // }));
-        // console.log("VERFIDATA",verificationData);
-
-  
-        // Fetch Medicine (Status: waiting_medicine)
-        // const medicineResponse = await MedicineAPI.getAllMedicineTasks();
-        // const medicineData = medicineResponse.data
-        //   .filter(task => task.status === "waiting_medicine")
-        //   .map(task => ({
-        //     queueNumber: task.queue_number,
-        //     // type: task.status_medicine === "Tidak ada Racikan" ? "Non - Racikan" : "Racikan",
-        //                 type: task.status_medicine ,
-
-        //   }));
-        //   console.log("MEDS",medicineData);
-
-        // Fetch Pickup (Status: waiting_pickup_medicine)
-        // const pickupResponse = await PickupAPI.getAllPickupTasks();
-        // const pickupData = pickupResponse.data
-        //   .filter(task => task.status === "waiting_pickup_medicine")
-        //   .map(task => ({
-        //     queueNumber: task.queue_number,
-        //     // type: task.status_medicine === "Tidak ada Racikan" ? "Non - Racikan" : "Racikan",
-        //     type: task.status_medicine ,
-
-        //   }));
-        //   console.log("PICKUP",pickupData);
-        // Set state with updated data based on `status_medicine`
-      
+       
       } catch (error) {
         console.error("? Error fetching queue data:", error);
       }
@@ -199,6 +163,42 @@ const NextQueue = ({verificationData, medicineData, pickupData}) => {
       </div>
     </div>
   );
+  const QueueSectionVerification = ({ title, queues, innerRef, bgColor }) => (
+    <div className={`p-4 flex-1 min-w-0 ${bgColor} rounded-lg shadow-md`} style={{ minHeight: "180px" }}>
+      <p className="text-2xl font-bold text-white text-center">{title}</p>
+  
+      <div className="flex gap-2 mt-2">
+        {/* Verifikasi */}
+        <div className="flex-1 bg-white rounded-md shadow-md p-2">
+          <p className="text-lg font-semibold text-center text-green-700">Verifikasi</p>
+  
+          <div
+            ref={innerRef}
+            className="overflow-y-auto scrollbar-hide p-2 rounded-md"
+            style={{ maxHeight: "115px" }}
+          >
+            {queues.length > 0 ? (
+              queues.map((queue, index) => (
+                <span
+                  key={index}
+                  className="bg-white text-green-700 text-3xl p-2 shadow text-center font-bold border border-gray-300 rounded block mb-1"
+                >
+                  {queue.queueNumber}
+                </span>
+              ))
+            ) : (
+              <span className="text-green-700 p-2 text-center font-bold text-2xl block">
+                Belum Ada Antrian
+              </span>
+            )}
+          </div>
+        </div>
+  
+        {/* Future "Non-Racikan" section goes here with same `flex-1` */}
+      </div>
+    </div>
+  );
+  
 
   return (
     <div className="bg-white p-4 shadow-lg border border-green-700 w-full">
@@ -207,8 +207,9 @@ const NextQueue = ({verificationData, medicineData, pickupData}) => {
       </div>
 
       <div className="flex w-full gap-4 flex-wrap justify-center">
+        <QueueSectionVerification title="Antean Verifikasi" queues={queues.verificationQueue} innerRef={nextQueueRef} bgColor="bg-green-700"/>
         {/* Antrean Selanjutnya */}
-        <QueueSection title="Antrean Verifikasi" queuesRacik={queues.nextQueueRacik} queuesNonRacik={queues.nextQueueNonRacik} innerRef={nextQueueRef} bgColor="bg-green-700" />
+        {/* <QueueSection title="Antrean Verifikasi" queuesRacik={queues.nextQueueRacik} queuesNonRacik={queues.nextQueueNonRacik} innerRef={nextQueueRef} bgColor="bg-green-700" /> */}
 
         {/* Proses Pembuatan Obat */}
         <QueueSection title="Proses Pembuatan Obat" queuesRacik={queues.medicineRacik} queuesNonRacik={queues.medicineNonRacik} innerRef={medicineRef} bgColor="bg-yellow-600" />

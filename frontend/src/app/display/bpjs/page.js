@@ -17,6 +17,7 @@ const [verificationData,setVerificationData]= useState([]);
 const [pickupData,setPickupData]= useState([]);
 const [medicineData,setMedicineData]= useState([]);
 const [loketData,setLoketData] = useState([]);
+
 const socket = getSocket();
   async function getResponses(){
     setLoading(true);
@@ -72,8 +73,10 @@ const socket = getSocket();
       </div>
 
       {/* Baris pertama: QueueCall, ServingQueue, dan MissedQueue */}
-      <div className="flex flex-row gap-4 mb-4 overflow-auto">
-        <div className="flex-[1] basis-[40%] overflow-auto">
+      <div className="flex flex-row gap-4 mb-4 overflow-auto h-full">
+      <NextQueue lokasi = {"Lantai 1 BPJS"} />
+      <QueueCall lokasi = {"Lantai 1 BPJS"}/>
+        {/* <div className="flex-[1] basis-[40%] overflow-auto">
           <QueueCall lokasi = {"Lantai 1 BPJS"}/>
         </div>
         <div className="flex-[1.2] basis-[20%] overflow-auto">
@@ -81,13 +84,13 @@ const socket = getSocket();
         </div>
         <div className="flex-[1.8] basis-[40%] overflow-auto">
         <MissQueue lokasi = {"Lantai 1 BPJS"}/>
-        </div>
+        </div> */}
       </div>
 
       {/* Baris kedua: NextQueue */}
-      <div className="w-full mb-4 overflow-auto">
+      {/* <div className="w-full mb-4 overflow-auto">
         <NextQueue lokasi = {"Lantai 1 BPJS"} />
-      </div>
+      </div> */}
 
       {/* Footer */}
       <MarqueeFooter />

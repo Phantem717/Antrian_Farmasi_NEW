@@ -135,6 +135,7 @@ const DaftarAntrian = ({ selectedQueueIds, setSelectedQueueIds, setSelectedQueue
         const response = await PickupAPI.getAllPickupTasks();
         console.log("?? Data antrian dari API:", response.data);
         const now = new Date();
+        const dateString = now.toISOString().split('T')[0];
 
         let filteredQueues = response.data.filter((item) => {
           // Handle potential missing properties
@@ -147,9 +148,11 @@ const DaftarAntrian = ({ selectedQueueIds, setSelectedQueueIds, setSelectedQueue
             ? new Date(item.waiting_pickup_medicine_stamp) 
             : item.waiting_pickup_medicine_stamp;
           
+            const verifDateString = verificationStamp.toISOString().split('T')[0];
+
           // Compare with case insensitivity
           return item.status.toLowerCase() === selectedStatus.toLowerCase() && 
-                 verificationStamp <= now;
+                 dateString == verifDateString;
         });
 
          // ? Cek apakah ada nomor antrian yang sedang dipanggil

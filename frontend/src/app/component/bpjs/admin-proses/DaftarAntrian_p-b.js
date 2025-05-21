@@ -20,13 +20,19 @@ export default function DaftarAntrian({ scanResult, setIsDeleted }) {
                     const formattedData = response.data
                         .filter(item => {
                             // Ensure item exists and has required properties
-                            if (!item) return false;
+                            if (!item ) return false;
                             
+                            const medicineStamp = typeof item.waiting_medicine_stamp == "string" ? new Date(item.waiting_medicine_stamp) : item.waiting_medicine_stamp
+                            const medicineDateString = medicineStamp.toISOString().split('T')[0];
+                            const dateString = new Date().toISOString().split('T')[0];
+
                             // Check status and location with null checks
                             const statusMatch = item.status === "waiting_medicine";
                             const locationMatch = item.lokasi === "Lantai 1 BPJS";
+                            const dateMatch = medicineDateString == dateString;
+
                             
-                            return statusMatch && locationMatch;
+                            return statusMatch && locationMatch && dateMatch;
                         }) // ✅ Hanya tampilkan `waiting_medicine`
                         .map((item) => ({
                             booking_id: item.booking_id,

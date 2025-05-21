@@ -4,7 +4,10 @@ import MedicineAPI from "@/app/utils/api/Medicine";
 import PickupAPI from "@/app/utils/api/Pickup";
 import LoketAPI from "@/app/utils/api/Loket";
 import {getSocket} from "@/app/utils/api/socket";
+
+
 const QueueCall = ({lokasi}) => {
+
   const [loading, setLoading] = useState(false);
   const [queueData, setQueueData] = useState(null);
   const [selectedLoket, setSelectedLoket] = useState(null);
@@ -12,7 +15,7 @@ const QueueCall = ({lokasi}) => {
   const [speechQueue,setSpeechQueue]= useState([]);
   const selectedLoketRef = useRef(null);
   const lastProcessedQueue = useRef(null);
-
+  const [visible,setVisible] = useState(false);
   const currentQueue = useRef(null);
   const isSpeaking = useRef(false);
 
@@ -114,11 +117,6 @@ const fetchActiveLoket = async () => {
         console.warn("⚠️ Tidak ada loket aktif.");
       }
     });
-    // const response = await LoketAPI.getAllLokets();
-    // console.log("📡 Loket yang diterima dari API:", response.data);
-    // const activeLoket2 = response.data.filter(loket => loket.status.toLowerCase() === "active");
-    // console.log("LOCKET",activeLoket2);
-    // const activeLoket = response.data.find(loket => loket.status.toLowerCase() === "active");
    
   } catch (error) {
     console.error("❌ Error fetching active loket:", error);
@@ -147,61 +145,11 @@ const fetchActiveLoket = async () => {
       console.log("TRIGGERED");
       setSpeechQueue(data);
 
-      // data.forEach((queue)=>{
-      //   if(isSpeaking.current == false){
-      //     setQueueData({
-      //       queueNumber: queue.queue_number,
-      //       counter: queue.loket,
-      //       name: queue.patient_name,
-      //       });
-
-      //       announceQueue(queue.queue_number, queue.loket, queue.patient_name);
-
-      //   }
-      // });
-    // const nextQueue = data.find(queue => lastProcessedQueue.current !== queue.queue_number);
-    // console.log("NEXTQUQUE",nextQueue);
-    // if(nextQueue){
-    // lastProcessedQueue.current = nextQueue.queue_number;
-    // const loket = nextQueue.status?.includes("verification")
-    // ? nextQueue.loket
-    // : nextQueue.loket2;
-
-    // setTimeout(()=> {
-    //   setQueueData({
-    //     queueNumber: nextQueue.queue_number,
-    //     counter: nextQueue.loket,
-    //     name: nextQueue.patient_name,
-    //     });
-
-    // }, 1000);
-   
-
-    //   setLoading(false);
-
-    // }
-      // data.map((payload)=> {
-      //   console.log("PAYLOAD",payload);
-
-  
-      // // setLoading(true);
-      // // setTimeout(() => setLoading(false), 1000);
-      // // testArray.push(payload);
-      // // console.log("TEST",testArray,payload, testArray.length);
-      // announceQueue(payload.queue_number, loket, payload.patient_name);
-      
-      // });
-
-
-      
-
     };
     socket.on('send_queues_verif_frontend_BPJS', handleQueueUpdate);
   socket.on('send_queues_pickup_frontend_BPJS', handleQueueUpdate);
 
-    // socket.on('update_status_medicine_type', handleQueueUpdate);
-    
-    // socket.on('update_status_type',handleQueueUpdate);
+  
   socket.on('send_queues',(payload) =>{
     console.log("PAYLOAD",payload);
   });
@@ -212,146 +160,55 @@ const fetchActiveLoket = async () => {
       socket.off('send_queues_pickup_frontendBPJS',handleQueueUpdate);
       socket.off('send_queues_verif_frontend_BPJS',handleQueueUpdate);
 
-      // consoo=length.log("SOCKET DISCONNECTED");
       socket.disconnect();
     };
   }, [socket]); // Only runs once
 
   useEffect(() => {
     if (speechQueue.length > 0 && !isSpeaking.current) {
+      setVisible(true);
+
       announceQueue(speechQueue);
+    }
+    else{
+      setVisible(false);
     }
   }, [speechQueue]);
   
-  
-  // ✅ Ambil Data Antrian dengan Semua Status yang Dibutuhkan
-  // 
-  
-  // useEffect(() => {
-  //   console.log("TEST2");
-  //   socket.on("connect", () => {
-  //     console.log("? Connected to socket server");
-  //   });
-  //   socket.onAny((event, ...args) => {
-  //     console.log("?? Received event:", event, args);
-  //   });
-    
-  //   socket.on("update_called", ({ message, data }) => {
-  //     console.log("? Received update_called:");
-  //     console.log("Message:", message);
-  //     console.log("Data:", data);
-    
-  //     if (!data) {
-  //       console.warn("?? No data in update_called payload");
-  //       return;
-  //     }
-    
-  //     announceQueue(data.queue_number, selectedLoket2, data.patient_name);
-  //     setQueueData({
-  //       queueNumber: data.queue_number,
-  //       counter: selectedLoket2,
-  //       name: data.patient_name,
-  //     });
-    
-  //     setLoading(true);
-  //   });
+  if (!visible) return null;
 
-  //    return ()=>{
-  //     socket.disconnect();
-  //     console.log("SOCKET DISC");
-  //    }
-  //   const fetchQueues = async () => {
-  //     setLoading(true);
-  //     try {
-  //       // Ambil semua data antrian dari API
-  //       const [verificationRes, medicineRes, pickupRes] = await Promise.all([
-  //         VerificationAPI.getAllVerificationTasks(),
-  //         MedicineAPI.getAllMedicineTasks(),
-  //         PickupAPI.getAllPickupTasks(),
-  //       ]);
-
-  //       console.log("📡 Data antrian dari API:", {
-  //         verification: verificationRes.data,
-  //         medicine: medicineRes.data,
-  //         pickup: pickupRes.data
-  //       });
-
-  //       // Gabungkan semua antrian dan filter berdasarkan status yang diinginkan
-  //       const validStatuses = [
-  //         "called_verification", "called_medicine", "called_pickup_medicine",
-  //         "recalled_verification", "recalled_medicine", "recalled_pickup_medicine"
-  //       ];
-
-  //       const allQueues = [...verificationRes.data, ...medicineRes.data, ...pickupRes.data]
-  //         .filter(item => validStatuses.includes(item.status));
-
-  //       console.log("✅ Antrian yang memiliki status yang sesuai:", allQueues);
-
-  //       // Pilih antrian pertama yang belum diproses
-  //       const nextQueue = allQueues.find(queue => lastProcessedQueue.current !== queue.queue_number);
-
-  //       if (nextQueue) {
-  //         console.log("queue",nextQueue.patient_name);
-  //         lastProcessedQueue.current = nextQueue.queue_number;
-  //         if(nextQueue.status=="recalled_verification" || nextQueue.status=="called_verification"){
-  //           console.log("VERIF")
-  //           setQueueData({ queueNumber: nextQueue.queue_number, counter: selectedLoket, name: nextQueue.patient_name });
-
-  //         }
-  //         else if(nextQueue.status=="recalled_pickup_medicine" || nextQueue.status=="called_pickup_medicine"){
-  //           console.log("PICKUP")
-  //           setQueueData({ queueNumber: nextQueue.queue_number, counter: selectedLoket2, name: nextQueue.patient_name });
-
-  //         }
-  //         setTimeout(() => {
-  //           if(nextQueue.status=="recalled_verification" || nextQueue.status=="called_verification"){
-  //             console.log("VERIF")
-  //             announceQueue(nextQueue.queue_number, selectedLoket, nextQueue.patient_name);
-
-  //           }
-  //           else if(nextQueue.status=="recalled_pickup_medicine" || nextQueue.status=="called_pickup_medicine"){
-  //             console.log("PICKUP")
-  //             announceQueue(nextQueue.queue_number, selectedLoket2, nextQueue.patient_name);
-
-  //           }
-
-            
-           
-
-  //           setLoading(false);
-           
-
-  //         }, 1000);
-  //       } else {
-  //         setQueueData(null);
-  //         setLoading(false);
-  //       }
-  //     } catch (error) {
-  //       console.error("❌ Error fetching queue data:", error);
-  //       setLoading(false);
-  //     }
-  //   };
-  
-  //   fetchQueues();
-  //   const interval = setInterval(fetchQueues, 10000);
-  //   return () => clearInterval(interval);
-  // }, [selectedLoket]);
-  
-  // ✅ Fungsi untuk pengumuman suara antrian
-  
-
+ 
   return (
-    <div className="h-full bg-blue-700 p-6 rounded-lg shadow-lg flex flex-col justify-center items-center">
+    <>
+
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.7)',
+      backdropFilter: 'blur(5px)',
+      zIndex: 999,
+    }} />
+    <div className="h-75 bg-blue-700 p-10 rounded-lg shadow-lg flex flex-col justify-center items-center" 
+    style={{
+      position: 'fixed',
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)',
+      zIndex: 1000,
+      width: "550px"
+
+    }}
+    >
       <h2 className="text-3xl font-bold text-white mb-4">Pemanggilan Antrian</h2>
       <p className="text-3xl font-bold text-white">Nomor Antrian</p>
       <div className="number text-white -bold text-9xl my-5" style={{ animation: "zoom-in-out 2s infinite" }}>
         {loading ? "Memuat..." : queueData ? queueData.queueNumber : "..." }
         
       </div>
-      {/* <p className="text-3xl my-5 font-bold text-white" style={{ animation: "zoom-in-out 2s infinite" }}>
-        {loading ? "..." : queueData?.name ?? ""}
-        </p> */}
-      
+    
       <p className="text-3xl font-bold text-white">
         {loading ? "Memuat..." : queueData ? queueData.loket : "Loket Tidak Diketahui"}
       </p>
@@ -364,6 +221,7 @@ const fetchActiveLoket = async () => {
       `}</style>
       
     </div>
+    </>
   );
 };
 

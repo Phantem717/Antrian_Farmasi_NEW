@@ -60,6 +60,7 @@ const LoginPage = () => {
         showConfirmButton: true,
         timer: 3000,
         timerProgressBar: true,
+        timer:1500
       });
       throw error;
     }
@@ -164,48 +165,47 @@ const LoginPage = () => {
           Silakan klik <b>MASUK</b> untuk menuju halaman dashboard.
         </Typography>
 
-          <TextField 
-          label ="Username"
-          variant="outlined"
-          type="text"
-          // fullWidth
-          onChange={(e) => setUsername(e.target.value)} 
-          value={username}
-          style={{margin: "15px", width:"320px"}}
+        <form onSubmit={login} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+    <TextField 
+      label="Username"
+      variant="outlined"
+      type="text"
+      onChange={(e) => setUsername(e.target.value)} 
+      value={username}
+      style={{ margin: "15px", width: "320px" }}
+    />       
 
-/>       
+    <TextField
+      label="Password"
+      variant="outlined"
+      type="password"
+      onChange={(e) => setPassword(e.target.value)}
+      value={password}
+      style={{ margin: "15px", width: "320px" }}
+    />
 
-          <TextField
-          label ="Password"
-          variant="outlined"
-          type="password"
-          // fullWidth
-          onChange={(e)=>setPassword(e.target.value)}
-          value={password}
-          style={{margin: "15px", width:"320px"}}
-          />
- {/* Button Masuk */}
-        <Button
-          variant="contained"
-          onClick={login} // ✅ Redirect ke /login/admin-verif
-          sx={{
-            backgroundColor: "#4caf50",
-            color: "#fff",
-            fontWeight: "bold",
-            padding: "14px 28px",
-            borderRadius: "25px",
-            width: "320px",
-            height: "65px",
-            fontSize: "1.3rem",
-            transition: "all 0.3s",
-            "&:hover": {
-              backgroundColor: "#388e3c",
-              transform: "scale(1.05)", // Efek hover lebih interaktif
-            },
-          }}
-        >
-          MASUK
-        </Button>
+    <Button
+      type="submit"  // Changed to submit type
+      variant="contained"
+      sx={{
+        backgroundColor: "#4caf50",
+        color: "#fff",
+        fontWeight: "bold",
+        padding: "14px 28px",
+        borderRadius: "25px",
+        width: "320px",
+        height: "65px",
+        fontSize: "1.3rem",
+        transition: "all 0.3s",
+        "&:hover": {
+          backgroundColor: "#388e3c",
+          transform: "scale(1.05)",
+        },
+      }}
+    >
+      MASUK
+    </Button>
+  </form>
       </Box>
     </Box>
   );

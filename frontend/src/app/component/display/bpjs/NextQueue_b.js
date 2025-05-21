@@ -12,15 +12,21 @@ const NextQueue = ({verificationData, medicineData, pickupData}) => {
     medicineNonRacik: [],
     pickupRacik: [],
     pickupNonRacik: [],
+    verificationQueue: [],
+    pickupQueue: []
+
   });
 
-  
+
   // Refs untuk auto-scroll
   const nextQueueRefRacik = useRef(null);
   const nextQueueRefNonRacik = useRef(null);
 
   const medicineRefRacik = useRef(null);
   const medicineRefNonRacik = useRef(null);
+
+  const verifRef = useRef(null);
+  const pickupRef = useRef(null);
 
   const pickupRefRacik = useRef(null);
   const pickupRefNonRacik = useRef(null);
@@ -31,6 +37,9 @@ const NextQueue = ({verificationData, medicineData, pickupData}) => {
 
     medicineRacik: medicineRefRacik.scrollTop ?? 0,
     medicineNonRacik: medicineRefNonRacik.scrollTop ?? 0,
+
+    verifRef: verifRef.scrollTop ?? 0,
+    pickupRef: pickupRef.scrollTop ?? 0,
 
     pickupRacik: pickupRefRacik.scrollTop ?? 0,
     pickupNonRacik: pickupRefNonRacik.scrollTop ?? 0
@@ -68,6 +77,9 @@ const NextQueue = ({verificationData, medicineData, pickupData}) => {
     autoScroll(medicineRefRacik);
     autoScroll(medicineRefNonRacik);
 
+    autoScroll(verifRef);
+    autoScroll(pickupRef);
+
     autoScroll(pickupRefRacik);
     autoScroll(pickupRefNonRacik);
   }, [queues]);
@@ -79,35 +91,95 @@ const NextQueue = ({verificationData, medicineData, pickupData}) => {
       try {
         // Fetch Verifikasi (Status: waiting_verification)
         socket.on('get_responses',(payload)=>{
+          const dateString = new Date().toISOString().split('T')[0];
+          console.log("PAYLOAD",payload);
 
+          const verificationData = payload.data.verificationData.filter(
+            (task) =>{
+              if (!task || !task.status || task.waiting_verification_stamp === undefined) {
+                return false;
+              }
+              
+              // Convert string timestamps to Date objects if needed
+              const verificationStamp = typeof task.waiting_verification_stamp === 'string' 
+                ? new Date(task.waiting_verification_stamp) 
+                : task.waiting_verification_stamp;
+      
+                const verifDateString = verificationStamp.toISOString().split('T')[0];
 
-          const verificationData = payload.data.verificationData.filter(task => task.status === "waiting_verification")
-          .map(task => ({
+              return task.status.includes("verification") && verifDateString == dateString 
+
+            } ).map(task =>            
+        ({
             queueNumber: task.queue_number,
             // type: task.status_medicine === "Tidak ada Racikan" ? "Non - Racikan" : "Racikan",
-                        type: task.status_medicine ,
-  
-          }));;
+          type: task.status_medicine ,
+          status: task.status 
+          
+          == "waiting_verification" ? "Menunggu" 
+         : task.status == "called_verification" ? "Dipanggil" 
+         : task.status == "pending_verification" ? "Terlewat" 
+         : task.status == "recalled_verification" ? "Dipanggil"
+         : "-" // fallback to original status if no match
+        }));
+        
           console.log("VERFIDATA",verificationData);;
 
-          const medicineData = payload.data.medicineData.filter(task => task.status === "waiting_medicine")
+          const medicineData = payload.data.medicineData.filter((task) =>{
+            if (!task || !task.status || task.waiting_medicine_stamp === undefined) {
+              return false;
+            }
+            
+            // Convert string timestamps to Date objects if needed
+            const medicineStamp = typeof task.waiting_medicine_stamp === 'string' 
+              ? new Date(task.waiting_medicine_stamp) 
+              : task.waiting_medicine_stamp;
+    
+              const medicineDateString = medicineStamp.toISOString().split('T')[0];
+
+            return task.status.includes("waiting_medicine") && medicineDateString == dateString 
+
+          })
           .map(task => ({
             queueNumber: task.queue_number,
             // type: task.status_medicine === "Tidak ada Racikan" ? "Non - Racikan" : "Racikan",
                         type: task.status_medicine ,
+                        status : task.status
 
           }));
           console.log("MEDS",medicineData);
 
-          const pickupData = payload.data.pickupData.filter(task => task.status === "waiting_pickup_medicine")
+          const pickupData = payload.data.pickupData.filter((task) =>{
+            if (!task || !task.status || task.waiting_pickup_medicine_stamp === undefined) {
+              return false;
+            }
+            
+            // Convert string timestamps to Date objects if needed
+            const pickupStamp = typeof task.waiting_pickup_medicine_stamp === 'string' 
+              ? new Date(task.waiting_pickup_medicine_stamp) 
+              : task.waiting_pickup_medicine_stamp;
+    
+              const pickupDateString = pickupStamp.toISOString().split('T')[0];
+
+            return task.status.includes("pickup") && pickupDateString == dateString 
+
+          })
           .map(task => ({
             queueNumber: task.queue_number,
             // type: task.status_medicine === "Tidak ada Racikan" ? "Non - Racikan" : "Racikan",
             type: task.status_medicine ,
+            status : task.status  == "waiting_pickup_medicine" ? "Menunggu" 
+            : task.status == "called_pickup_medicine" ? "Dipanggil" 
+            : task.status == "pending_pickup_medicine" ? "Terlewat" 
+            : task.status == "recalled_pickup_medicine" ? "Dipanggil"
+            : "-"
 
           }));
           console.log("PICKUP",pickupData);
           setQueues({
+            verificationQueue: verificationData,
+            pickupQueue: pickupData,
+
             nextQueueRacik: verificationData.filter(task => task.type === "Racikan"),
             nextQueueNonRacik: verificationData.filter(task => task.type === "Non - Racikan"),
             medicineRacik: medicineData.filter(task => task.type === "Racikan"),
@@ -125,6 +197,9 @@ const NextQueue = ({verificationData, medicineData, pickupData}) => {
           if (medicineRefRacik.current) medicineRefRacik.current.scrollTop = scrollPos.medicineRacik;
           if (medicineRefNonRacik.current) medicineRefNonRacik.current.scrollTop = scrollPos.medicineNonRacik;
 
+          if(verifRef.current) verifRef.current.scrollTop = scrollPos.verifRef;
+          if(pickupRef.current) pickupRef.current.scrollTop = scrollPos.pickupRef;
+
           if (pickupRefRacik.current) pickupRefRacik.current.scrollTop = scrollPos.pickupRacik;
           if (pickupRefNonRacik.current) pickupRefNonRacik.current.scrollTop = scrollPos.pickupNonRacik;
         }, 0); // Wait for React to finish render
@@ -140,7 +215,7 @@ const NextQueue = ({verificationData, medicineData, pickupData}) => {
 
   // Komponen untuk Setiap Kategori Antrian
   const QueueSection = ({ title, queuesRacik, queuesNonRacik, innerRefRacik,innerRefNonRacik, bgColor }) => (
-    <div className={`p-4 flex-1 min-w-0 ${bgColor} rounded-lg shadow-md`} style={{ minHeight: "180px" }}>
+    <div className={`p-4 flex-1 min-w-0 ${bgColor} rounded-lg shadow-md`} style={{ minHeight: "300px" }}>
       <p className="text-2xl font-bold text-white text-center">{title}</p>
 
       <div className="flex gap-2 mt-2">
@@ -150,7 +225,7 @@ const NextQueue = ({verificationData, medicineData, pickupData}) => {
           <div
             className="scrollable-table overflow-y-auto scrollbar-hide bg-white rounded-md p-2"
             ref={innerRefRacik}
-            style={{ maxHeight: "115px" }}
+            style={{ minHeight: "300px" }}
           >
             {queuesRacik.length > 0 ? (
               queuesRacik.map((queue, index) => (
@@ -159,6 +234,7 @@ const NextQueue = ({verificationData, medicineData, pickupData}) => {
                   className="bg-white text-green-700 text-3xl p-2 shadow text-center font-bold border border-gray-300 rounded block mb-1"
                 >
                   {queue.queueNumber}
+                  {/* {queue.type} */}
                 </span>
               ))
             ) : (
@@ -175,7 +251,7 @@ const NextQueue = ({verificationData, medicineData, pickupData}) => {
           <div
             className="scrollable-table overflow-y-auto scrollbar-hide bg-white rounded-md p-2"
             ref={innerRefNonRacik}
-            style={{ maxHeight: "115px" }}
+            style={{ minHeight: "300px" }}
           >
             {queuesNonRacik.length > 0 ? (
               queuesNonRacik.map((queue, index) => (
@@ -184,6 +260,8 @@ const NextQueue = ({verificationData, medicineData, pickupData}) => {
                   className="bg-white text-green-700 text-3xl p-2 shadow text-center font-bold border border-gray-300 rounded block mb-1"
                 >
                   {queue.queueNumber}
+                  {/* {queue.type} */}
+
                 </span>
               ))
             ) : (
@@ -197,6 +275,47 @@ const NextQueue = ({verificationData, medicineData, pickupData}) => {
     </div>
   );
 
+  const QueueSectionVerification = ({ title, queues, innerRef, bgColor }) => (
+    <div
+      className={`p-4 flex-1 min-w-0 ${bgColor} rounded-lg shadow-md`}
+      style={{ minHeight: "300px" }}
+    >
+      <p className="text-2xl font-bold text-white text-center">{title}</p>
+  
+      <div className="flex gap-2 mt-2">
+        {/* Racikan */}
+        <div className="flex-1 bg-white p-2 rounded-md shadow-md">
+          <div
+            className="scrollable-table overflow-y-auto scrollbar-hide bg-white rounded-md p-2"
+            ref={innerRef}
+            style={{ minHeight: "300px" }}
+          >
+            {queues.length > 0 ? (
+              queues.map((queue, index) => (
+                <div
+                  key={index}
+                  className="uppercase bg-white text-green-700 p-2 shadow text-center font-bold border border-gray-300 rounded mb-1 flex items-center"
+                >
+                  <div className="flex-1 text-2xl text-left">{queue.queueNumber}</div>
+                  <div className="flex-1 text-base text-center">{queue.type}</div>
+                 
+                  <div className="flex-1 text-base text-right">{queue.status}</div>
+                </div>
+              ))
+            ) : (
+              <div className="bg-white text-green-700 p-2 shadow text-center font-bold text-2xl">
+                Belum Ada Antrian
+              </div>
+            )}
+          </div>
+        </div>
+  
+        {/* Non-Racikan (add similar layout here) */}
+      </div>
+    </div>
+  );
+  
+
   return (
     <div className="bg-white p-4 shadow-lg border border-green-700 w-full">
       <div className="w-full mb-4">
@@ -205,13 +324,14 @@ const NextQueue = ({verificationData, medicineData, pickupData}) => {
 
       <div className="flex w-full gap-4 flex-wrap justify-center">
         {/* Antrean Selanjutnya */}
-        <QueueSection title="Antrean Verifikasi" queuesRacik={queues.nextQueueRacik} queuesNonRacik={queues.nextQueueNonRacik} innerRefNonRacik={nextQueueRefNonRacik} innerRefRacik={nextQueueRefRacik} bgColor="bg-green-700" />
+        <QueueSectionVerification title="Antrian Verifikasi" queues={queues.verificationQueue} innerRef={verifRef} bgColor="bg-green-700"/>
 
         {/* Proses Pembuatan Obat */}
         <QueueSection title="Proses Pembuatan Obat" queuesRacik={queues.medicineRacik} queuesNonRacik={queues.medicineNonRacik} innerRefNonRacik={medicineRefNonRacik} innerRefRacik={medicineRefRacik} bgColor="bg-yellow-600" />
 
         {/* Antrean Pengambilan Obat */}
-        <QueueSection title="Antrean Pengambilan Obat" queuesRacik={queues.pickupRacik} queuesNonRacik={queues.pickupNonRacik}  innerRefNonRacik={pickupRefNonRacik} innerRefRacik={pickupRefRacik} bgColor="bg-green-700" />
+       
+        <QueueSectionVerification title="Antrian Pengambilan Obat" queues={queues.pickupQueue} innerRef={pickupRef} bgColor="bg-green-700"/>
       </div>
     </div>
   );
