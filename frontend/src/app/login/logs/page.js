@@ -11,8 +11,11 @@ import MovingText from "@/app/component/bpjs/admin-obat/Movingtext";
 import Sidebar from "@/app/component/Sidebar-b";
 import LogsAPI from "../../utils/api/Logs";
 import TableLogs from '@/app/component/logs/tableLogs'
+import BarChart from '@/app/component/logs/barDataPerHour'
 const { Content } = Layout;
 import { useRouter, usePathname } from "next/navigation";
+import MedicineTypeCard from '@/app/component/logs/medicineTypeCard'
+import AvgServiceTime from "@/app/component/logs/avgServiceTime";
 
 export default function Logs() {
   const [collapsed, setCollapsed] = useState(false);
@@ -20,48 +23,86 @@ export default function Logs() {
   const [selectedLoket, setSelectedLoket] = useState("");
   const [selectedQueue, setSelectedQueue] = useState(null); 
   const [selectedQueueIds, setSelectedQueueIds] = useState([]); 
-  const router = useRouter;
-  const token = localStorage.getItem("token");
-   const checkTokenExpired = useCallback(() => {
-         if (!token) return true;
-         try {
-           const payload = JSON.parse(atob(token.split(".")[1]));
-           const currentTime = Math.floor(Date.now() / 1000);
-           return payload.exp < currentTime;
-         } catch (error) {
-           console.error("Token parsing error:", error);
-           return true;
-         }
-       }, [token]);
-   
+  const [medicineType, setMedicineType] = useState([]);
+  const [dataPerHour,setDataPerHour] = useState([]);
+  const [avgTime,setAvgTime]= useState([]);
+  function useTokenCheck() {
+    const [token, setToken] = useState("");
   
+    useEffect(() => {
+      if (typeof window !== 'undefined') {
+        setToken(localStorage.getItem('token'));
+      }
+    }, []);
+  
+    const checkTokenExpired = useCallback(() => {
+      if (!token) return true;
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        return payload.exp < Math.floor(Date.now() / 1000);
+      } catch (error) {
+        console.error('Token error:', error);
+        return true;
+      }
+    }, [token]);
+  
+    return { token, isExpired: checkTokenExpired() };
+  }
   const fetchQueueList = async () => {
     try {
       const response = await LogsAPI.getAllLogs();
-      console.log("?? Data antrian dari API:", response.data);
-
-      // ? Filter berdasarkan status
       
-      console.log("?? Data antrian setelah diurutkan:", response.data);
-      setSelectedQueueIds(response.data);
-      // setQueueList(filteredQueues);
+      let [allLogs,medicineType,dataPerHour,avgTime] = await Promise.all([
+        LogsAPI.getAllLogs(),
+        LogsAPI.getMedicineType(),
+      LogsAPI.getDataPerHour(),
+    LogsAPI.getAvgServiceTime()]
+      );
+      const payload ={
+       racikan : {
+        time: avgTime.data[0]['AVG PROCESSING TIME - RACIKAN (MINUTES)'],
+        type: 'Racikan'
+       },
+       nonracikan : {
+ time: avgTime.data[0]['AVG PROCESSING TIME - NON-RACIKAN (MINUTES)'],
+        type: 'Non - Racikan'
+       }
+      }
+      // ? Filter berdasarkan status
+      console.log("?? Data antrian dari API:", allLogs,"DATA MEDIDICNE:",medicineType, "DATA PER HOUR",dataPerHour, "SERVICE TIME",payload);
+
+      // console.log("?? Data antrian setelah diurutkan:", response.data);
+      setSelectedQueueIds(allLogs.data);
+      setMedicineType(medicineType.data);
+      setDataPerHour(
+        dataPerHour.data.map(item => ({
+          ...item,
+          hour_of_day: item.hour_of_day.toString(), // convert to string
+        }))
+      );   
+      setAvgTime(payload); 
+        // setQueueList(filteredQueues);
     } catch (error) {
       console.error("? Error fetching queue list:", error);
     }
   };
 
+
+  const checkResponse = useTokenCheck();
+  const router = useRouter();
+
   useEffect(() => {
-    if(    checkTokenExpired() == true){
+    if(!checkResponse){
       router.push("/login"); // Arahkan ke halaman login
     }
     else{
       fetchQueueList();
 
     }
-  },[checkTokenExpired,router])
+  },[useTokenCheck,router])
 
   return (
-    <Layout style={{ height: "100vh", overflow: "hidden" }}>
+    <Layout style={{ minheight: "100vh", overflow: "hidden" }}>
       <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
 
       <Layout
@@ -85,7 +126,11 @@ export default function Logs() {
             flexDirection: "column",
           }}
         >
-        <TableLogs  
+      <MedicineTypeCard medicineType={medicineType} />
+      <BarChart dataPerHour={dataPerHour}/>
+      <AvgServiceTime avgTime={avgTime}/>
+          
+                  <TableLogs  
         selectedQueueIds = {selectedQueueIds}// ?? Mengirim daftar nomor yang dipilih
         setSelectedQueueIds= {setSelectedQueueIds}  />
         </Content>

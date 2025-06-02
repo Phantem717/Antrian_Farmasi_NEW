@@ -125,9 +125,7 @@ const tableLogs = ({
             <TableCell align="center"><strong>No. Rekam Medis</strong></TableCell>
             <TableCell align="center"><strong>Status Medicine</strong></TableCell> 
             <TableCell align="center"><strong>Waiting Verification</strong></TableCell> 
-            <TableCell align="center"><strong>Called Verification</strong></TableCell> 
-            <TableCell align="center"><strong>Pending Verification</strong></TableCell> 
-            <TableCell align="center"><strong>Recalled Verification</strong></TableCell> 
+   
 
             <TableCell align="center"><strong>Processed Verification</strong></TableCell> 
             <TableCell align="center"><strong>Completed Verification</strong></TableCell> 
@@ -152,32 +150,8 @@ const tableLogs = ({
               <TableCell align="center">{item.medical_record_no || "-"}</TableCell>
               <TableCell align="center">{item.status_medicine || "-"}</TableCell>
               <TableCell align="center">
-            {item.waiting_verification_stamp 
-                ? new Date(item.waiting_verification_stamp).toLocaleString("id-ID", {
-                    dateStyle: "medium",
-                    timeStyle: "short",
-                })
-                : "-"}
-            </TableCell>
-            <TableCell align="center">
-                {item.called_verification_stamp 
-                    ? new Date(item.called_verification_stamp).toLocaleString("id-ID", {
-                        dateStyle: "medium",
-                        timeStyle: "short",
-                    })
-                : "-"}
-            </TableCell>
-            <TableCell align="center">
-                {item.pending_verification_stamp 
-                    ? new Date(item.pending_verification_stamp).toLocaleString("id-ID", {
-                        dateStyle: "medium",
-                        timeStyle: "short",
-                    })
-                : "-"}
-            </TableCell>
-            <TableCell align="center">
-                {item.recalled_verification_stamp 
-                    ? new Date(item.recalled_verification_stamp).toLocaleString("id-ID", {
+                {item.waiting_verification_stamp 
+                    ? new Date(item.waiting_verification_stamp).toLocaleString("id-ID", {
                         dateStyle: "medium",
                         timeStyle: "short",
                     })

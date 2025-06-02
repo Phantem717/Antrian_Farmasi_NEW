@@ -14,6 +14,39 @@ const LogsAPI = {
         }
     },
 
+    getMedicineType : async () => {
+        try {
+            const response = await axios.get(`${BASE_URL}/api/logs/total-medicine`);
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching Type:', error);
+            throw error;
+        }
+    },
+
+    getDataPerHour : async () => {
+        try {
+            const response = await axios.get(`${BASE_URL}/api/logs/data-per-hour`);
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching Data Per Hour:', error);
+            throw error;
+        }
+    },
+
+    getAvgServiceTime : async () => {
+        try {
+            const response = await axios.get(`${BASE_URL}/api/logs/service-time`);
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching Data Per Hour:', error);
+            throw error;
+        }
+    }
+
+
+    
+
   
       
 };

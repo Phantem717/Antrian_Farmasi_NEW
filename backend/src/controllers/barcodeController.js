@@ -1,5 +1,6 @@
 // backend_farmasi\src\controllers\barcodeController.js
 const { checkQueue, fetchRegistrationData,sendToWA } = require('../services/BarcodeService');
+const {create} = require('../models/apiResponses')
 const DoctorAppointments = require('../models/doctorAppointments');
 const PharmacyTask = require('../models/pharmacyTask');
 const VerificationTask = require('../models/verificationTask'); // Import model baru
@@ -107,21 +108,21 @@ const processQueueAndInsertData = async (req, res) => {
     // Panggil checkQueue untuk mendapatkan data antrian
     const queueResponse = await checkQueue(booking_id);
     let location= "Lantai 1 BPJS";
-    
-    if (!queueResponse || !queueResponse.data || !queueResponse.data.detail) {
+    const queueData = queueResponse.data[0];
+
+    if (!queueData ) {
       return res.status(404).json({ message: 'Data antrian tidak ditemukan.' });
     }
 
    
     
-    const queueData = queueResponse.data.detail;
-    const reservationData = queueResponse.data.reservation ?? {};
+    // const reservationData = queueResponse.data.reservation ?? {};
 
     console.log("Queue Data:", queueData);
-    console.log("Reservation Data:", reservationData);
+    // console.log("Reservation Data:", reservationData);
    
     // Ambil registrationNo dari reservationData, gunakan field registration_no_client
-    const registrationNo = reservationData.registration_no_client;
+    const registrationNo = queueData.registration_no_client;
     if (!registrationNo) {
       return res.status(400).json({ message: 'Parameter registrationNo tidak ditemukan pada data antrian.' });
     }
@@ -136,19 +137,14 @@ const processQueueAndInsertData = async (req, res) => {
     let statusMedicine = null;
     let statusMedAPI = null;
     if (registrationResponse.message) {
-      if(registrationResponse.message == "racikan"){
+      if(registrationResponse.message == "Ada racikan"){
         statusMedicine = "Racikan";
         statusMedAPI = "racikan"
       }
      
-      if(registrationResponse.message == "nonracikan"){
-        statusMedicine = "Non - Racikan";
-        statusMedAPI = "nonracikan"
-
-      }
       else{
-        statusMedicine = "Tidak Ada Resep";
-        statusMedAPI = "nonresep"
+         statusMedicine = "Non - Racikan";
+        statusMedAPI = "nonracikan"
 
       }
     }
@@ -168,7 +164,7 @@ const processQueueAndInsertData = async (req, res) => {
 
     let result = {};
     // Jika Doctor Appointment belum ada, buat baru
-     
+    let payload= {};
 
       if (!existingDoctorAppointment && !existingPharmacyTask && !existingVerificationTask) {
          
@@ -176,30 +172,36 @@ const processQueueAndInsertData = async (req, res) => {
     console.log("ANTRIAN RESp: ",createAntrianResp.data.queue_number);
     
 
-        const payload = {
+       payload = {
           booking_id: queueData.booking_id ?? null,
           sep_no: queueData.sep_no ?? null,
           queue_number: queueData.queue_number ?? null,
-          queue_status: queueData.queue_status ?? null,
-          queue_type: queueData.queue_type ?? null,
+          queue_status: queueData.queue_status ?? "Menunggu",
+          queue_type: queueData.queue_type ?? "Dokter",
           patient_name: queueData.patient_name ?? null,
-          medical_record_no: queueData.medical_record_no ?? null,
-          patient_date_of_birth: reservationData?.patient_date_of_birth ?? null,
+          medical_record_no: queueData.patient_medical_record_no ?? null,
+          patient_date_of_birth: queueData?.patient_date_of_birth ?? null,
           statusMedicine: statusMedicine, // Menggunakan nilai dari response registrasi,
           location:location,
-          phone_number: queueData.phone_number ?? null,
+          phone_number: queueData.patient_mobile_phone ?? null,
           doctor_name: queueData.doctor_name ?? null,
-          nik: queueData.nik ?? "-",
+          nik: queueData.patient_identity_no ?? "-",
           farmasi_queue_number: createAntrianResp.data.queue_number ?? "-"
   
         };
         console.log("INSERT PAYLOAD",payload);
         result = await insertAll(payload);
-        // console.log("RESULT",result);
+        
+        console.log("RESULT",result);
         existingDoctorAppointment = result.doctorAppointment;
         existingPharmacyTask = result.pharmacyData;
         existingVerificationTask = result.verificationData;
-
+        const payloadData = {
+          response: result
+    ,
+          response_type: "Create",
+        }
+        const responseAPI= await create(payloadData);
       }
     
     
@@ -214,7 +216,8 @@ const processQueueAndInsertData = async (req, res) => {
       message: "Data berhasil diproses",
       doctor_appointment: existingDoctorAppointment,
       pharmacy_task: existingPharmacyTask,
-      verification_task: existingVerificationTask
+      verification_task: existingVerificationTask,
+      result: payload
     });
 
   } catch (error) {

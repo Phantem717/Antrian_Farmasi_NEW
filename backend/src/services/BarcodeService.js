@@ -1,14 +1,14 @@
 // src/services/medappService.js
 const axios = require('axios');
-require('dotenv').config()
+require('dotenv').config({ path: './.env' }); // Or just require('dotenv').config();
 
 const generateSignature = require('../utils/signature');
 // const sendWA = require('../services/sendWAService');
 
-
+const {create} = require('../models/apiResponses')
 // Ambil nilai dari environment variables
 const baseUrl = process.env.BASE_URL || "https://app-medapp.eksad.com";   // BASE_URL, bukan BASE-URL atau base_url
-const apiKey = process.env.X_API_KEY || "3af91c651c18b69f37413798ec0f3eee";   // X_API_KEY, bukan X-API-KEY
+const apiKey = process.env.X_API_KEY ;   // X_API_KEY, bukan X-API-KEY
 
 /**
  * Memanggil API untuk mengecek queue berdasarkan booking_id.
@@ -16,20 +16,21 @@ const apiKey = process.env.X_API_KEY || "3af91c651c18b69f37413798ec0f3eee";   //
  * @returns {Promise<Object>} - Response data dari API.
  */
 
-const medinUrl = process.env.MEDIN_URL || "http://192.168.6.85/api/medinfras/compound-info";
-const apiKeyMedin = process.env.X_API_KEY_MEDIN || "AMqey0yAVrqmhR82RMlWB3zqMpvRP0zaaOheEeq2tmmcEtRYNj2";
-const consID = process.env.CONS_ID || "21011919";
-const SecretKey = process.env.SECRETKEY || "BeatoCarloAcutis";
-const password = "e6a637643ca02f19580e14895664d470";
-const consID2 = "39205596";
+const medinUrl = process.env.MEDIN_URL ;
+const apiKeyMedin = process.env.X_API_KEY_MEDIN ;
+const consID = process.env.CONS_ID;
+const SecretKey = process.env.SECRETKEY;
+const  consID2= process.env.CONS_ID_FARMASI;
+const password = process.env.PASSWORD;
 async function checkQueue(bookingId) {
   try {
     if(bookingId.startsWith("FA")){
       return true;
     }
     else{
-      const { timestamp, signature } = generateSignature(consID2, password);
+      console.log("TEST",consID2);
 
+      const { timestamp, signature } = generateSignature(consID2, password);
       const url = `https://rscarolus.com/api/v1/visit/queue/pharmacy/check`;
       const response = await axios.get(url, {
         params: { booking_id: bookingId },
@@ -40,7 +41,14 @@ async function checkQueue(bookingId) {
          }
       });
       console.log("REG DATA2",response.data);
-
+      const payload = {
+        response: response.data
+  ,
+        response_type: "check_queue",
+      }
+      const responseAPI= await create(payload);
+      console.log("RESPONSE: ",responseAPI.data);
+      // createApiResponse("CHECK_TYPE",response.data);
       return response.data;
     }
    
@@ -83,18 +91,28 @@ console.log("PHONE_NUMBER",phone_number);
 
 
 async function fetchRegistrationData(registrationNo) {
-  const { timestamp, signature } = generateSignature(consID, SecretKey);
+  console.log("REGISTRATION NO", consID,consID2);
+  const { timestamp, signature } = generateSignature(consID2, password);
+  // regisNo = registrationNo.trim();
   try {
-    const response = await axios.post(medinUrl, { registrationNo }, {
+    const response = await axios({
+      method: 'get',
+      url: process.env.MEDIN_URL,
+      data: { registrationNo: registrationNo.trim() }, // Body for GET
       headers: {
-        'X-Access-Token': apiKeyMedin,
-        'X-Cons-Id': consID,
+        'X-cons-id': process.env.CONS_ID_FARMASI,
         'X-Timestamp': timestamp,
         'X-Signature': signature,
         'Content-Type': 'application/json'
       }
     });
-    console.log("REG DATA",response.data);
+    const payload = {
+      response: response.data
+,
+      response_type: "Medicine_Type",
+    }
+    const responseAPI= await create(payload);
+    console.log("REG DATA",response.data, responseAPI.data);
     return response.data;
   } catch (error) {
     console.error('Error dalam pemanggilan API:', error);

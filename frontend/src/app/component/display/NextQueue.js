@@ -140,7 +140,7 @@ const NextQueue = ({verificationData, medicineData, pickupData}) => {
         <div className="flex-1 bg-white p-2 rounded-md shadow-md">
           <p className="text-lg font-semibold text-center text-green-700">Non-Racikan</p>
           <div
-            className="scrollable-table overflow-y-auto scrollbar-hide bg-white rounded-md p-2"
+            className="scrollable-table overflow-y-auto scrollbar-hide bg-white rounded-md p-2 "
             ref={innerRef}
             style={{ maxHeight: "115px" }}
           >
@@ -164,7 +164,7 @@ const NextQueue = ({verificationData, medicineData, pickupData}) => {
     </div>
   );
   const QueueSectionVerification = ({ title, queues, innerRef, bgColor }) => (
-    <div className={`p-4 flex-1 min-w-0 ${bgColor} rounded-lg shadow-md`} style={{ minHeight: "180px" }}>
+    <div className={`p-4 flex-1 min-w-0 ${bgColor} rounded-lg shadow-md`} style={{ minHeight: "500px" }}>
       <p className="text-2xl font-bold text-white text-center">{title}</p>
   
       <div className="flex gap-2 mt-2">

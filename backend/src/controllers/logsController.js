@@ -22,6 +22,59 @@ const getAllLogs = async (req, res) => {
   }
 };
 
+const getTotalMedicineType = async (req, res) => {
+  try {
+    const totalMed = await logs.getTotalMedicineType();
+
+    res.status(200).json({ 
+      message: "Total Medicine",
+      data: totalMed
+    });
+  } catch (error) {
+    console.error("Error fetching logs:", error);
+    res.status(500).json({ 
+      message: "Failed to fetch logs", 
+      error: error.message 
+    });
+  }
+};
+const getAvgServiceTime = async (req, res) => {
+  try {
+    const serviceTime = await logs.getAvgServiceTime();
+
+    res.status(200).json({ 
+      message: "Total Service Time",
+      data: serviceTime
+    });
+  } catch (error) {
+    console.error("Error fetching logs:", error);
+    res.status(500).json({ 
+      message: "Failed to fetch logs", 
+      error: error.message 
+    });
+  }
+};
+
+const getDataPerHour = async (req,res)=>{
+  try {
+    const dataPerHour = await logs.getDataPerHour();
+
+    res.status(200).json({ 
+      message: "Total Data Per Hour",
+      data: dataPerHour
+    });
+  } catch (error) {
+    console.error("Error fetching hour logs:", error);
+    res.status(500).json({ 
+      message: "Failed to fetch logs", 
+      error: error.message 
+    });
+  }
+}
+
 module.exports = {
   getAllLogs,
+  getTotalMedicineType,
+  getAvgServiceTime,
+  getDataPerHour
 };

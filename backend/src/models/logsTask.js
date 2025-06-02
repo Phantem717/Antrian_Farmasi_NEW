@@ -27,9 +27,9 @@ class logsTask {
           vt.called_verification_stamp,
           vt.recalled_verification_stamp,
           vt.pending_verification_stamp,
-                    vt.processed_verification_stamp,
-
+          vt.processed_verification_stamp,
           vt.completed_verification_stamp
+
         FROM Doctor_Appointments da
         LEFT JOIN Verification_Task vt ON da.booking_id = vt.booking_id
         LEFT JOIN Pharmacy_Task pt ON da.booking_id = pt.booking_id
@@ -43,6 +43,79 @@ class logsTask {
     } catch (error) {
       throw error;
     }
+  }
+
+  static async getTotalMedicineType(){
+    try {
+      const connection = getDb();
+      const query = `  
+      SELECT 
+    da.status_medicine,
+    COUNT(DISTINCT da.booking_id) as booking_count
+
+FROM Doctor_Appointments da
+LEFT JOIN Verification_Task vt ON da.booking_id = vt.booking_id
+LEFT JOIN Pharmacy_Task pt ON da.booking_id = pt.booking_id
+LEFT JOIN Medicine_Task mt ON da.booking_id = mt.booking_id
+LEFT JOIN Pickup_Task pa ON da.booking_id = pa.booking_id
+WHERE pt.status = 'completed_pickup_medicine'
+GROUP BY da.status_medicine`;
+          const [rows] = await connection.execute(query);
+          return rows;
+    } catch (error) {
+      return error;
+    }
+   
+  }
+
+  static async getAvgServiceTime(){
+    try {
+      const connection = getDb();
+      const query = `SELECT 
+    AVG(CASE WHEN da.status_medicine = 'Racikan' 
+             THEN TIMESTAMPDIFF(MINUTE, vt.waiting_verification_stamp, pa.completed_pickup_medicine_stamp) 
+             ELSE NULL END) AS 'AVG PROCESSING TIME - RACIKAN (MINUTES)',
+    AVG(CASE WHEN da.status_medicine != 'Racikan' OR da.status_medicine IS NULL
+             THEN TIMESTAMPDIFF(MINUTE, vt.waiting_verification_stamp, pa.completed_pickup_medicine_stamp) 
+             ELSE NULL END) AS 'AVG PROCESSING TIME - NON-RACIKAN (MINUTES)'
+    
+FROM Doctor_Appointments da
+LEFT JOIN Verification_Task vt ON da.booking_id = vt.booking_id
+LEFT JOIN Pharmacy_Task pt ON da.booking_id = pt.booking_id
+LEFT JOIN Medicine_Task mt ON da.booking_id = mt.booking_id
+LEFT JOIN Pickup_Task pa ON da.booking_id = pa.booking_id
+WHERE pt.status = 'completed_pickup_medicine'
+  `;
+  
+  const [rows] = await connection.execute(query);
+  return rows;
+    } catch (error) {
+      return error;
+    }
+   
+
+  }
+
+  static async getDataPerHour() {
+    try {
+      const connection = getDb();
+
+
+      const query = `SELECT 
+      HOUR(completed_pickup_medicine_stamp) AS hour_of_day,
+      COUNT(*) AS record_count
+  FROM Pickup_Task
+  WHERE completed_pickup_medicine_stamp IS NOT NULL
+   
+  GROUP BY HOUR(completed_pickup_medicine_stamp)
+  ORDER BY hour_of_day`;
+  const [rows] = await connection.execute(query);
+  return rows;
+    } catch (error) {
+      return error;
+
+    }
+   
   }
 }
 

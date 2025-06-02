@@ -13,32 +13,39 @@ import QueueCall from "@/app/component/display/QueueCall";
 const { Content } = Layout;
 import {getSocket} from "@/app/utils/api/socket";
 import { useRouter, usePathname } from "next/navigation";
+function useTokenCheck() {
+  const [token, setToken] = useState("");
 
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setToken(localStorage.getItem('token'));
+    }
+  }, []);
+
+  const checkTokenExpired = useCallback(() => {
+    if (!token) return true;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.exp < Math.floor(Date.now() / 1000);
+    } catch (error) {
+      console.error('Token error:', error);
+      return true;
+    }
+  }, [token]);
+
+  return { token, isExpired: checkTokenExpired() };
+}
 export default function Admin() {
       const router = useRouter();
-  
-  const token = localStorage.getItem("token");
-  console.log("TOKEN",token)
-   const checkTokenExpired = useCallback(() => {
-         if (!token) return true;
-         try {
-           const payload = JSON.parse(atob(token.split(".")[1]));
-           const currentTime = Math.floor(Date.now() / 1000);
-           return payload.exp < currentTime;
-         } catch (error) {
-           console.error("Token parsing error:", error);
-           return true;
-         }
-       }, [token]);
-   
+      const checkResponse = useTokenCheck();
 
+ 
   useEffect(() => {
     const socket = getSocket();
     console.log("CONNECTNG");
     socket.on('connect', () => {
       console.log("SOCKET CONNECTED");
     });
-    const checkResponse = checkTokenExpired();
     console.log("CHECKRESP",checkResponse);
     if(checkResponse == true){
       router.push("/login"); // Arahkan ke halaman login
@@ -48,7 +55,7 @@ export default function Admin() {
             socket.off('connect');
             socket.off('test_pilih');
           }
-  },[checkTokenExpired,router]);
+  },[useTokenCheck,router]);
 
   const [collapsed, setCollapsed] = useState(false);
   const siderWidth = collapsed ? 80 : 300;

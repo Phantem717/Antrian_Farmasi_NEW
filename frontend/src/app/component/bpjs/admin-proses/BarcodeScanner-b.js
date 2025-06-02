@@ -75,8 +75,8 @@ export default function BarcodeScanner({ onScanResult, daftarAntrian }) {
 
 
                 }
-                const sendResponse = await WA_API.sendWAProses(payload);
-                console.log("WA SENT",sendResponse);
+                // const sendResponse = await WA_API.sendWAProses(payload);
+                // console.log("WA SENT",sendResponse);
 
                 Swal.fire({
                     icon: "success",

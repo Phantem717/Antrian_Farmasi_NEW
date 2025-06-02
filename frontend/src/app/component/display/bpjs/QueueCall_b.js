@@ -65,7 +65,7 @@ const utteranceRef = useRef(null);
       });
   
       const spelledOutQueue = queue_number.split("").filter(char => char !== "-").join("  ");
-      const message = `Nomor antrian ${spelledOutQueue}, dengan nama ${patient_name}, dipersilahkan menuju ke ${loket}`;
+      const message = `Nomor Obat ${spelledOutQueue}, dengan nama ${patient_name}, dipersilahkan menuju ke ${loket}`;
   
       const utterance = new SpeechSynthesisUtterance(message);
       utterance.lang = "id-ID";
@@ -198,12 +198,12 @@ const fetchActiveLoket = async () => {
       left: '50%',
       transform: 'translate(-50%, -50%)',
       zIndex: 1000,
-      width: "550px"
+      width: "600px"
 
     }}
     >
-      <h2 className="text-3xl font-bold text-white mb-4">Pemanggilan Antrian</h2>
-      <p className="text-3xl font-bold text-white">Nomor Antrian</p>
+      <h2 className="text-3xl font-bold text-white mb-4">Pemanggilan Obat</h2>
+      <p className="text-3xl font-bold text-white">Nomor Obat</p>
       <div className="number text-white -bold text-9xl my-5" style={{ animation: "zoom-in-out 2s infinite" }}>
         {loading ? "Memuat..." : queueData ? queueData.queueNumber : "..." }
         

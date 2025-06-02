@@ -1,5 +1,5 @@
 const axios = require('axios');
-require('dotenv').config()
+require('dotenv').config({ path: './.env' }); // Or just require('dotenv').config();
 
 const BASE_URL= process.env.API_URL
 async function login(username,password){
@@ -17,5 +17,7 @@ async function login(username,password){
 
 
 }
+
+
 
 module.exports = {login};

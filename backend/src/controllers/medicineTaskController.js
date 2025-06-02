@@ -131,8 +131,15 @@ const updateMedicineTaskInternal = async (booking_id, updateData) => {
   };
 
   // 3. Dapatkan timestamp saat ini dalam format MySQL "YYYY-MM-DD HH:mm:ss"
-  const now = new Date().toISOString().slice(0, 19).replace('T', ' ');
-
+  const nowUTC = new Date();
+  const offsetMs = 7 * 60 * 60 * 1000; // UTC+7 in milliseconds
+  const now = new Date(nowUTC.getTime() + offsetMs)
+    .toISOString()
+    .slice(0, 19)
+    .replace('T', ' ');
+  
+  // console.log(now); // ? WIB time
+    console.log("NOW",now);
   // 4. Update field target berdasarkan updateData.status (hanya jika nilainya masih null)
   switch (updateData.status) {
     case "waiting_medicine":
@@ -163,6 +170,7 @@ const updateMedicineTaskInternal = async (booking_id, updateData) => {
     case "completed_medicine":
       if (!existingData.completed_medicine_stamp) {
         updatedData.completed_medicine_stamp = now;
+        console.log("UPDATED MEDICINE",updateData.completed_medicine_stamp,now)
       }
       break;
     default:

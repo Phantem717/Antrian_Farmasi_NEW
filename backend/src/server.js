@@ -5,9 +5,11 @@ const socketIo = require('socket.io');
 const cors = require("cors"); // 🔥 Tambahkan CORS
 const { initDb } = require('./config/db');
 const { setupDatabase } = require('./setupDatabase');
+require('dotenv').config({ path: './.env' }); // Or just require('dotenv').config();
 
 const app = express();
 const server = http.createServer(app);
+// console.log("ENV",process.env.CONS_ID_FARMASI); // Works!
 
 //SOCKET
 const socketConfig = require('./config/socket'); // ? Import socket setup
@@ -29,6 +31,7 @@ const waRoutes = require('./routes/WaRoutes');
 const printRoutes = require('./routes/printRoutes');
 const queueRoutes = require('./routes/createAntrianRoute');
 const loginRoutes = require('../src/routes/loginRoutes');
+const apiRoutes = require('../src/routes/apiResponseRoute');
 (async function startServer() {
   try {
     await initDb();
@@ -57,6 +60,7 @@ const loginRoutes = require('../src/routes/loginRoutes');
   app.use('/api/print',printRoutes);
   app.use('/api/queue',queueRoutes);
 app.use('/api/login',loginRoutes);
+app.use('api/APIResposne',apiRoutes);
   // Menjalankan server pada semua network interfaces
   const HOST = process.env.HOST || '172.16.21.214'; // 🔥 Pastikan server bisa diakses dari IP lain
   const PORT = process.env.PORT || 5000;

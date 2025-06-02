@@ -59,6 +59,7 @@ const [daftarAntrian,setDaftarAntrian] = useState([]);
                       status: "waiting_medicine",
                       medicine_type: foundItem.status_medicine,
                     });
+
                       await MedicineAPI.createMedicineTask({
                                 booking_id: foundItem.booking_id,
                                 Executor: null,
@@ -83,7 +84,8 @@ const [daftarAntrian,setDaftarAntrian] = useState([]);
         
         
                 }
-                const sendResponse = await WA_API.sendWAProses(payload);
+                const sendResponse = await WA_API.sendWAVerif(payload);
+
                 console.log("WA SENT",sendResponse);
 
                 Swal.fire({

@@ -3,6 +3,7 @@ import VerificationAPI from "@/app/utils/api/Verification";
 import MedicineAPI from "@/app/utils/api/Medicine";
 import PickupAPI from "@/app/utils/api/Pickup";
 import {getSocket} from "@/app/utils/api/socket";
+import { TaskSharp } from "@mui/icons-material";
 const NextQueue = ({verificationData, medicineData, pickupData}) => {
   // State untuk menyimpan antrian dari API
   const [queues, setQueues] = useState({
@@ -120,6 +121,7 @@ const NextQueue = ({verificationData, medicineData, pickupData}) => {
          : task.status == "called_verification" ? "Dipanggil" 
          : task.status == "pending_verification" ? "Terlewat" 
          : task.status == "recalled_verification" ? "Dipanggil"
+        : task.status == "processed_verification" ? "Verifikasi"
          : "-" // fallback to original status if no match
         }));
         
@@ -161,7 +163,7 @@ const NextQueue = ({verificationData, medicineData, pickupData}) => {
     
               const pickupDateString = pickupStamp.toISOString().split('T')[0];
 
-            return task.status.includes("pickup") && pickupDateString == dateString 
+            return task.status.includes("pickup") && task.status != "completed_pickup_medicine" && pickupDateString == dateString 
 
           })
           .map(task => ({
@@ -216,29 +218,31 @@ const NextQueue = ({verificationData, medicineData, pickupData}) => {
   // Komponen untuk Setiap Kategori Antrian
   const QueueSection = ({ title, queuesRacik, queuesNonRacik, innerRefRacik,innerRefNonRacik, bgColor }) => (
     <div className={`p-4 flex-1 min-w-0 ${bgColor} rounded-lg shadow-md`} style={{ minHeight: "300px" }}>
-      <p className="text-2xl font-bold text-white text-center">{title}</p>
+      <p className="text-2xl font-bold text-white text-center uppercase">{title}</p>
 
       <div className="flex gap-2 mt-2">
         {/* Racikan */}
         <div className="flex-1 bg-white p-2 rounded-md shadow-md">
-          <p className="text-lg font-semibold text-center text-green-700">Racikan</p>
+        <p className="text-2xl font-extrabold text-center text-green-700 uppercase">Racikan</p>
           <div
             className="scrollable-table overflow-y-auto scrollbar-hide bg-white rounded-md p-2"
             ref={innerRefRacik}
-            style={{ minHeight: "300px" }}
+            style={{ minHeight: "800px" }}
           >
             {queuesRacik.length > 0 ? (
               queuesRacik.map((queue, index) => (
                 <span
                   key={index}
-                  className="bg-white text-green-700 text-3xl p-2 shadow text-center font-bold border border-gray-300 rounded block mb-1"
-                >
+                  className="flex items-center  justify-center bg-white text-green-700 text-5xl p-2 shadow text-center font-bold border border-gray-300 rounded block mb-1"
+                  style={{height: "80px"}}
+
+               >
                   {queue.queueNumber}
                   {/* {queue.type} */}
                 </span>
               ))
             ) : (
-              <span className="bg-white text-green-700 p-2 shadow text-center font-bold text-2xl block">
+              <span className="bg-white text-black p-2 shadow text-center font-bold text-2xl block">
                 Belum Ada Antrian
               </span>
             )}
@@ -247,7 +251,7 @@ const NextQueue = ({verificationData, medicineData, pickupData}) => {
 
         {/* Non-Racikan */}
         <div className="flex-1 bg-white p-2 rounded-md shadow-md">
-          <p className="text-lg font-semibold text-center text-green-700">Non-Racikan</p>
+          <p className="text-2xl font-extrabold text-center text-green-700 uppercase">Non-Racikan</p>
           <div
             className="scrollable-table overflow-y-auto scrollbar-hide bg-white rounded-md p-2"
             ref={innerRefNonRacik}
@@ -257,15 +261,17 @@ const NextQueue = ({verificationData, medicineData, pickupData}) => {
               queuesNonRacik.map((queue, index) => (
                 <span
                   key={index}
-                  className="bg-white text-green-700 text-3xl p-2 shadow text-center font-bold border border-gray-300 rounded block mb-1"
-                >
+                  className="flex items-center  justify-center bg-white text-green-700 text-5xl p-2 shadow text-center font-bold border border-gray-300 rounded block mb-1"
+                  style={{height: "80px"}}
+
+               >
                   {queue.queueNumber}
                   {/* {queue.type} */}
 
                 </span>
               ))
             ) : (
-              <span className="bg-white text-green-700 p-2 shadow text-center font-bold text-2xl block">
+              <span className="bg-white text-black p-2 shadow text-center font-bold text-2xl block">
                 Belum Ada Antrian
               </span>
             )}
@@ -275,63 +281,93 @@ const NextQueue = ({verificationData, medicineData, pickupData}) => {
     </div>
   );
 
-  const QueueSectionVerification = ({ title, queues, innerRef, bgColor }) => (
-    <div
-      className={`p-4 flex-1 min-w-0 ${bgColor} rounded-lg shadow-md`}
-      style={{ minHeight: "300px" }}
-    >
-      <p className="text-2xl font-bold text-white text-center">{title}</p>
+  const QueueSectionVerification = ({ title, queues, innerRef, bgColor }) => {
+    // Define status-color mapping
+    const getStatusColor = (status) => {
+      switch(status) {
+        case 'Menunggu': return 'text-yellow-600'; // Yellow for waiting
+        case 'Dipanggil': return 'text-green-600'; // Green for called
+        case 'Terlewat': return 'text-red-600';
+        case 'Verifikasi': return 'text-blue-600'    // Red for missed
+        // Gray for completed
+        default: return 'text-black';              // Default color
+      }
+    };
+
+    const getStatusColourBorder = (status) => {
+      switch(status){
+        case 'Menunggu': return 'border-2 border-yellow-500'; // Yellow for waiting
+        case 'Dipanggil': return 'border-2 border-green-500'; // Green for called
+        case 'Terlewat': return 'border-2 border-red-500'; 
+        case 'Verifikasi': return 'border-2 border-blue-500'    // Red for missed
+
+      }
+    }
   
-      <div className="flex gap-2 mt-2">
-        {/* Racikan */}
-        <div className="flex-1 bg-white p-2 rounded-md shadow-md">
-          <div
-            className="scrollable-table overflow-y-auto scrollbar-hide bg-white rounded-md p-2"
-            ref={innerRef}
-            style={{ minHeight: "300px" }}
-          >
-            {queues.length > 0 ? (
-              queues.map((queue, index) => (
-                <div
-                  key={index}
-                  className="uppercase bg-white text-green-700 p-2 shadow text-center font-bold border border-gray-300 rounded mb-1 flex items-center"
-                >
-                  <div className="flex-1 text-2xl text-left">{queue.queueNumber}</div>
-                  <div className="flex-1 text-base text-center">{queue.type}</div>
-                 
-                  <div className="flex-1 text-base text-right">{queue.status}</div>
+    return (
+      <div
+        className={`p-4 flex-1 min-w-0 ${bgColor} rounded-lg shadow-md`}
+        style={{ minHeight: "300px" }}
+      >
+        <p className="text-2xl font-bold text-white text-center uppercase">{title}</p>
+    
+        <div className="flex gap-2 mt-2">
+          {/* Racikan */}
+          <div className="flex-1 bg-white p-2 rounded-md shadow-md">
+            <div
+              className="scrollable-table  overflow-y-auto scrollbar-hide bg-white rounded-md p-2 "
+              ref={innerRef}
+              style={{ height: "825px" }}
+            >
+              {queues.length > 0 ? (
+                queues.map((queue, index) => (
+                  <div
+                    key={index}
+                    className={`uppercase bg-white p-2 shadow text-center font-extrabold border border-gray-300 rounded mb-1 flex items-center ${getStatusColourBorder(queue.status)}` }
+                    style={{height: "120px"}}
+                  >
+                    <div className={`flex-1 text-4xl text-left ${getStatusColor(queue.status)}`}>
+                      {queue.queueNumber}
+                    </div>
+                    <div className={`flex-1 text-3xl text-center ${getStatusColor(queue.status)}`}>
+                      {queue.type}
+                    </div>
+                    <div className={`flex-1 text-3xl text-right ${getStatusColor(queue.status)}`}>
+                      {queue.status}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="bg-white text-black p-2 shadow text-center font-bold text-2xl">
+                  Belum Ada Antrian
                 </div>
-              ))
-            ) : (
-              <div className="bg-white text-green-700 p-2 shadow text-center font-bold text-2xl">
-                Belum Ada Antrian
-              </div>
-            )}
+              )}
+            </div>
           </div>
+    
+          {/* Non-Racikan (add similar layout here) */}
         </div>
-  
-        {/* Non-Racikan (add similar layout here) */}
       </div>
-    </div>
-  );
+    );
+  };
   
 
   return (
-    <div className="bg-white p-4 shadow-lg border border-green-700 w-full">
+    <div className="bg-white p-4 shadow-lg border border-green-700 w-full ">
       <div className="w-full mb-4">
-        <h2 className="text-3xl font-bold text-green-700 text-center">Antrian Selanjutnya</h2>
+        {/* <h2 className="text-3xl font-bold text-green-700 text-center">Antrian Selanjutnya</h2> */}
       </div>
 
       <div className="flex w-full gap-4 flex-wrap justify-center">
         {/* Antrean Selanjutnya */}
-        <QueueSectionVerification title="Antrian Verifikasi" queues={queues.verificationQueue} innerRef={verifRef} bgColor="bg-green-700"/>
+        <QueueSectionVerification title="Proses Verifikasi" queues={queues.verificationQueue} innerRef={verifRef} bgColor="bg-green-700"/>
 
         {/* Proses Pembuatan Obat */}
         <QueueSection title="Proses Pembuatan Obat" queuesRacik={queues.medicineRacik} queuesNonRacik={queues.medicineNonRacik} innerRefNonRacik={medicineRefNonRacik} innerRefRacik={medicineRefRacik} bgColor="bg-yellow-600" />
 
         {/* Antrean Pengambilan Obat */}
        
-        <QueueSectionVerification title="Antrian Pengambilan Obat" queues={queues.pickupQueue} innerRef={pickupRef} bgColor="bg-green-700"/>
+        <QueueSectionVerification title="Obat Telah Selesai" queues={queues.pickupQueue} innerRef={pickupRef} bgColor="bg-green-700"/>
       </div>
     </div>
   );

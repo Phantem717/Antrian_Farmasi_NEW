@@ -35,7 +35,7 @@ const MarqueeFooter_b = () => {
 
   return (
     <footer className="bg-blue-700 text-white p-2 mt-4">
-      <marquee behavior="scroll" direction="left" className="font-bold text-1xl">
+      <marquee behavior="scroll" direction="left" className="font-bold text-1xl ">
         {messages[currentMessageIndex]}
       </marquee>
     </footer>

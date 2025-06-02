@@ -13,7 +13,28 @@ import PharmacyAPI from "@/app/utils/api/Pharmacy";
 import { useRouter, usePathname } from "next/navigation";
 
 const { Content } = Layout;
+function useTokenCheck() {
+  const [token, setToken] = useState("");
 
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setToken(localStorage.getItem('token'));
+    }
+  }, []);
+
+  const checkTokenExpired = useCallback(() => {
+    if (!token) return true;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.exp < Math.floor(Date.now() / 1000);
+    } catch (error) {
+      console.error('Token error:', error);
+      return true;
+    }
+  }, [token]);
+
+  return { token, isExpired: checkTokenExpired() };
+}
 export default function Admin() {
   const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
@@ -21,25 +42,12 @@ export default function Admin() {
   const [scanResult, setScanResult] = useState("");
   const [isDeleted, setIsDeleted] = useState(false);
   const [daftarAntrian, setDaftarAntrian] = useState([]);
-  const token = localStorage.getItem("token");
-
-  // Memoize the token check function with useCallback
-  const checkTokenExpired = useCallback(() => {
-    if (!token) return true;
-    try {
-      const payload = JSON.parse(atob(token.split(".")[1]));
-      const currentTime = Math.floor(Date.now() / 1000);
-      return payload.exp < currentTime;
-    } catch (error) {
-      console.error("Token parsing error:", error);
-      return true;
-    }
-  }, [token]); // Only recreate when token changes
+  const checkResponse = useTokenCheck();
 
   // Fetch queue list
   useEffect(() => {
     const fetchQueueList = async () => {
-      if (checkTokenExpired()) {
+      if (!checkResponse) {
         router.push("/login");
         return;
       }
@@ -56,7 +64,7 @@ export default function Admin() {
     fetchQueueList();
     const interval = setInterval(fetchQueueList, 10000);
     return () => clearInterval(interval);
-  }, [checkTokenExpired, router]); // Now stable dependencies
+  }, [useTokenCheck, router]); // Now stable dependencies
 
   const handleScanResult = (data) => {
     console.log("?? Hasil Scan diterima:", data);

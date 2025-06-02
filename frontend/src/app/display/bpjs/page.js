@@ -65,35 +65,21 @@ const socket = getSocket();
       // }
             
     },[]);
-  return (
-    <div className="bg-white min-h-screen min-w-screen flex flex-col p-4 overflow-auto">
-      {/* Kontainer Utama */}
-      <div className="w-full mb-4 overflow-auto">
-        <InfoBar />
-      </div>
-
-      {/* Baris pertama: QueueCall, ServingQueue, dan MissedQueue */}
-      <div className="flex flex-row gap-4 mb-4 overflow-auto h-full">
-      <NextQueue lokasi = {"Lantai 1 BPJS"} />
-      <QueueCall lokasi = {"Lantai 1 BPJS"}/>
-        {/* <div className="flex-[1] basis-[40%] overflow-auto">
-          <QueueCall lokasi = {"Lantai 1 BPJS"}/>
+    return (
+      <div className="bg-white h-screen min-w-screen flex flex-col">
+        {/* Header and content - use flex-1 to allow footer space */}
+        <div className="flex-1 overflow-auto p-4">
+          <InfoBar />
+          <div className="flex flex-row gap-4 mb-4 h-[calc(100%-3rem)]">
+            <NextQueue lokasi="Lantai 1 BPJS" />
+            <QueueCall lokasi="Lantai 1 BPJS" />
+          </div>
         </div>
-        <div className="flex-[1.2] basis-[20%] overflow-auto">
-          <ServingQueue lokasi = {"Lantai 1 BPJS"} />
+        
+        {/* Footer - will stick to bottom */}
+        <div className="w-full">
+          <MarqueeFooter />
         </div>
-        <div className="flex-[1.8] basis-[40%] overflow-auto">
-        <MissQueue lokasi = {"Lantai 1 BPJS"}/>
-        </div> */}
       </div>
-
-      {/* Baris kedua: NextQueue */}
-      {/* <div className="w-full mb-4 overflow-auto">
-        <NextQueue lokasi = {"Lantai 1 BPJS"} />
-      </div> */}
-
-      {/* Footer */}
-      <MarqueeFooter />
-    </div>
-  );
+    );
 }

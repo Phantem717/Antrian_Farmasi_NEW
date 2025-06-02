@@ -1,9 +1,9 @@
 const axios = require('axios');
-require('dotenv').config()
+require('dotenv').config({ path: './.env' }); // Or just require('dotenv').config();
 
 const generateSignature = require('../utils/signature');
-const password = "e6a637643ca02f19580e14895664d470";
-const consID2 = "39205596";
+const password = process.env.PASSWORD ;
+const consID2 = process.env.CONS_ID_FARMASI;
 
 async function createAntrianFarmasi(medicine_type){
     

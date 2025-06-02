@@ -250,7 +250,8 @@ console.log("PILIH TOMBOL CONNECTED");
 
         }
           const sendResponse = await WA_API.sendWAVerif(payload);
-          console.log("WA SENT",sendResponse);        })
+          console.log("WA SENT",sendResponse);    
+            })
       );
   
       Swal.fire({
