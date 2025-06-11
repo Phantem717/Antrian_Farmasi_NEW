@@ -1,7 +1,7 @@
 //src\app\component\admin-verif\DaftarAntrian_v.js
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,useRef } from "react";
 import {
   Box,
   Button,
@@ -15,25 +15,35 @@ import {
   Paper,
   Typography,
   Checkbox,
+  Input,
+  TextField
 } from "@mui/material";
+import SearchIcon from '@mui/icons-material/Search';
+import AddIcon from '@mui/icons-material/Add';
+
 import Swal from "sweetalert2";
 import DeleteIcon from "@mui/icons-material/Delete";
 import RefreshIcon from "@mui/icons-material/Refresh";
+import CreateInstanceForm from "@/app/component/bpjs/admin-verif/createInstanceForm";
 import VerificationAPI from "@/app/utils/api/Verification";
 import LoketAPI from "@/app/utils/api/Loket";
 import DoctorAppointmentAPI from "@/app/utils/api/Doctor_Appoinment";
 import PharmacyAPI from "@/app/utils/api/Pharmacy";
 import {getSocket} from "@/app/utils/api/socket";
+import $ from 'jquery';
+
 
 const DaftarAntrian = ({ selectedQueueIds, setSelectedQueueIds, onSelectQueue, setSelectedLoket,setSelectedQueue2,selectedQueue2 }) => {  
   const [queueList, setQueueList] = useState([]);
+  const [rawQueueList,setRawQueueList]= useState([]);
+      const [searchText, setSearchText] = useState('');
+  const [visible,setVisible]=useState(false);
   const [lokets, setLokets] = useState([]);
   const [selectedLoketLocal, setSelectedLoketLocal] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
   const socket = getSocket();
   // ? Loket yang diizinkan untuk admin verifikasi
   const allowedLokets = ["Loket 1", "Loket 2"];
-
   // ? Fetch Loket dari API
   useEffect(() => {
     const fetchLokets = async () => {
@@ -55,51 +65,31 @@ const DaftarAntrian = ({ selectedQueueIds, setSelectedQueueIds, onSelectQueue, s
 
   // ? Fetch Daftar Antrian setelah memilih Loket
   useEffect(() => {
-  if (!selectedLoketLocal && !selectedStatus) {console.log("INVALID", selectedLoketLocal, selectedStatus); return;}
+  if (!selectedLoketLocal && !selectedStatus) return;
 
   const fetchQueueList = async () => {
     try {
       const response = await VerificationAPI.getAllVerificationTasks();
-      console.log("?? Data antrian dari API:", response.data);
       const now = new Date();
       const dateString = now.toISOString().split('T')[0];
+      
       let filteredQueues = response.data.filter((item) => {
-        // Handle potential missing properties
         if (!item || !item.status || item.waiting_verification_stamp === undefined) {
           return false;
         }
         
-        // Convert string timestamps to Date objects if needed
         const verificationStamp = typeof item.waiting_verification_stamp === 'string' 
           ? new Date(item.waiting_verification_stamp) 
           : item.waiting_verification_stamp;
 
-          const verifDateString = verificationStamp.toISOString().split('T')[0];
-        
-        // Compare with case insensitivity
+        const verifDateString = verificationStamp.toISOString().split('T')[0];
+      
         return item.status.toLowerCase() === selectedStatus.toLowerCase() && 
-               dateString == verifDateString
+               dateString == verifDateString;
       });
 
-      // ? Cek apakah ada nomor antrian yang sedang dipanggil
-      const activeQueue = response.data.find(
-        (item) => item.status === "called_verification"
-      );
-
-      // ? Jika ada dan belum punya loket, simpan loket yang memanggil
-      if (activeQueue && !activeQueue.loket && selectedLoketLocal) {
-        console.log(`??? Mengupdate loket ${selectedLoketLocal} untuk antrian ${activeQueue.queue_number}`);
-      
-        await VerificationAPI.updateVerificationTask(activeQueue.booking_id, {
-          loket: selectedLoketLocal,
-        });
-      
-        console.log(`? Berhasil menyimpan loket ${selectedLoketLocal} untuk antrian ${activeQueue.queue_number}`);
-      }
-      
-
-      // ? Urutkan berdasarkan timestamp yang paling lama
-      const getEarliestTimestamp = (item) => {
+      // Changed to get LATEST timestamp
+      const getLatestTimestamp = (item) => {
         const timestamps = [
           item.waiting_verification_stamp,
           item.called_verification_stamp,
@@ -111,17 +101,27 @@ const DaftarAntrian = ({ selectedQueueIds, setSelectedQueueIds, onSelectQueue, s
           .filter(Boolean)
           .map((ts) => new Date(ts).getTime());
 
-        return timestamps.length > 0 ? Math.min(...timestamps) : Infinity;
+        return timestamps.length > 0 ? Math.max(...timestamps) : 0; // 0 as fallback
       };
 
+      // Sort by LATEST timestamp (descending)
       filteredQueues = filteredQueues.sort(
-        (a, b) => getEarliestTimestamp(a) - getEarliestTimestamp(b)
+        (a, b) => getLatestTimestamp(b) - getLatestTimestamp(a) // Reversed order
       );
 
-      console.log("?? Data antrian setelah diurutkan:", filteredQueues);
-      setQueueList(filteredQueues);
+      setRawQueueList(filteredQueues);
+
+      if (!searchText) {
+        setQueueList(filteredQueues);
+      } else {
+        const filtered = filteredQueues.filter(item =>
+          item.patient_name?.toLowerCase().includes(searchText.toLowerCase())
+        );
+        setQueueList(filtered);
+      }
+
     } catch (error) {
-      console.error("? Error fetching queue list:", error);
+      console.error("Error fetching queue list:", error);
     }
   };
 
@@ -129,6 +129,7 @@ const DaftarAntrian = ({ selectedQueueIds, setSelectedQueueIds, onSelectQueue, s
   const interval = setInterval(fetchQueueList, 10000);
   return () => clearInterval(interval);
 }, [selectedStatus, selectedLoketLocal]);
+
 
 const handleLoketChange = async (loketName) => {
   setSelectedLoket(loketName);
@@ -162,7 +163,7 @@ const handleLoketChange = async (loketName) => {
 
   // ? Fungsi memilih / membatalkan pilihan nomor antrian
   const handleSelectQueue = (queueId) => {
-    const selected = queueList.find((item) => item.booking_id === queueId);
+    const selected = queueList.find((item) => item.NOP === queueId);
     console.log("SELECTED", selected);
     onSelectQueue(selected || null);
   
@@ -174,7 +175,7 @@ const handleLoketChange = async (loketName) => {
   
       // After updating selectedQueueIds, update selectedQueue2 based on it
       const updatedObjects = queueList.filter((item) =>
-        updatedIds.includes(item.booking_id)
+        updatedIds.includes(item.NOP)
       );
       setSelectedQueue2(updatedObjects);
   
@@ -192,10 +193,10 @@ const handleLoketChange = async (loketName) => {
     }
   
     try {
-      for (const bookingId of selectedQueueIds) {
-        await DoctorAppointmentAPI.deleteAppointment(bookingId);
-        await VerificationAPI.deleteVerificationTask(bookingId);
-        await PharmacyAPI.deletePharmacyTask(bookingId);
+      for (const NOP of selectedQueueIds) {
+        await DoctorAppointmentAPI.deleteAppointment(NOP);
+        await VerificationAPI.deleteVerificationTask(NOP);
+        await PharmacyAPI.deletePharmacyTask(NOP);
       }
   
       // Clear selection after successful deletion
@@ -213,10 +214,37 @@ const handleLoketChange = async (loketName) => {
       console.error("Error deleting tasks:", error);
     }
   }
-  
 
+  useEffect(() => {
+  if (!searchText) {
+    setQueueList(rawQueueList);
+  } else {
+    const filtered = rawQueueList.filter(item =>
+      item.patient_name?.toLowerCase().includes(searchText.toLowerCase())
+    );
+    setQueueList(filtered);
+  }
+}, [searchText, rawQueueList]);
+const handleSearch = (searchText) => {
+  setSearchText(searchText);
+  // No need to manually filter here - the useEffect will handle it
+};
+
+const handleSearchClear = () => {
+  setSearchText('');
+  // The useEffect will automatically reset to rawQueueList
+};
+
+ const handleCloseBarcodeScanner = () => {
+    setVisible(false);
+  };
   return (
     <Box sx={{ padding: "10px" }}>
+      {visible &&
+                    <CreateInstanceForm  visible={visible} 
+        onClose={handleCloseBarcodeScanner} />
+      
+      }
       <Typography variant="h4" align="center" sx={{ marginBottom: "20px" }}>
         Daftar Antrian
       </Typography>
@@ -256,14 +284,46 @@ const handleLoketChange = async (loketName) => {
           <Button variant="contained" color="error" startIcon={<DeleteIcon />} sx={{ fontSize: "0.9rem", padding: "10px 15px" }} disabled={!selectedQueueIds.length} onClick={()=>deleteAction()}>
             Hapus Antrian
           </Button>
-          <Button variant="contained" color="success" startIcon={<RefreshIcon />} sx={{ fontSize: "0.9rem", padding: "10px 15px" }} onClick={()=>window.location.reload()}>
-            Refresh Antrian
+          <Button variant="contained" color="success" startIcon={<AddIcon />} sx={{ fontSize: "0.9rem", padding: "10px 15px" }} onClick={()=>setVisible(true)}>
+            Tambah Antrian
           </Button>
         </Box>
       </Box>
 
-      <Paper elevation={3} sx={{ padding: "10px", maxHeight: "400px", overflow: "auto" }}>
-        <Table stickyHeader>
+      <Paper elevation={3} sx={{ padding: "10px", maxHeight: "900px", overflow: "auto" }}>
+   <div className="w-full flex items-center gap-2 mb-2">
+  <form
+    onSubmit={(e) => {
+      e.preventDefault();
+      handleSearch(searchText);
+    }}
+    className="w-full flex items-center gap-2"
+  >
+    <TextField
+      placeholder="Search patients"
+      variant="outlined"
+      size="small"
+      value={searchText}
+      onChange={(e) => setSearchText(e.target.value)}
+      sx={{ flexGrow: 1 }}
+    />
+
+    <Button
+      type="button"
+      variant="outlined"
+      onClick={handleSearchClear}
+      sx={{ whiteSpace: 'nowrap' }}
+    >
+      Clear
+    </Button>
+  </form>
+</div>
+
+     
+      {queueList.length > 0 && (
+        
+    <Table stickyHeader>
+
           <TableHead>
             <TableRow>
               <TableCell align="center"><strong>Pilih</strong></TableCell>
@@ -286,13 +346,13 @@ const handleLoketChange = async (loketName) => {
               // console.log("VERIFKEY",item.booking_id);
 return (
               
-  <TableRow key={item.booking_id} hover>
+  <TableRow key={item.NOP} hover>
     <TableCell align="center">
-      <Checkbox checked={selectedQueueIds.includes(item.booking_id)} onChange={() => handleSelectQueue(item.booking_id)} />
+      <Checkbox checked={selectedQueueIds.includes(item.NOP)} onChange={() => handleSelectQueue(item.NOP)} />
     </TableCell>
    
     <TableCell align="center">{item.queue_number}</TableCell>
-    <TableCell align="center">{item.booking_id}</TableCell>
+    <TableCell align="center">{item.NOP}</TableCell>
     <TableCell align="center">{item.patient_name}</TableCell>
     <TableCell align="center">{item.sep_no}</TableCell>
     <TableCell align="center">{item.medical_record_no || "-"}</TableCell>
@@ -317,7 +377,10 @@ return (
            
           </TableBody>
         </Table>
-      </Paper>
+)}
+
+</Paper>
+
     </Box>
   );
 };

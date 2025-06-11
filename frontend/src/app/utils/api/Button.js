@@ -1,9 +1,9 @@
 // /src\app\utils\api\Button.js
 const BASE_URL = 'http://172.16.21.214:5000'; // Base URL API
 
-export const updateButtonStatus = async (booking_id, status, name) => {
+export const updateButtonStatus = async (NOP, status, name) => {
     try {
-        console.log("📡 Mengirim data ke backend:", { booking_id, status, name });
+        console.log("📡 Mengirim data ke backend:", { NOP, status, name });
 
         // if(status == "processed_verification"){
             // const response = await fetch(`${BASE_URL}/api`)
@@ -12,7 +12,7 @@ export const updateButtonStatus = async (booking_id, status, name) => {
         const response = await fetch(`${BASE_URL}/api/button/update/medicine-type`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ booking_id, status, user_id: null, name }),
+            body: JSON.stringify({ NOP, status, user_id: null, name }),
         });
 
         console.log("✅ Status Code dari Backend:", response.status);

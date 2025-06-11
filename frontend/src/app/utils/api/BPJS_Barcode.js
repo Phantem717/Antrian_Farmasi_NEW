@@ -4,43 +4,41 @@ const BASE_URL = 'http://172.16.21.214:5000'; // Base URL API
 
 const BPJSBarcodeAPI = {
     // 1. Check Queue by Booking ID
-    checkQueue: async (bookingId) => {
+    checkQueue: async (NOP) => {
         try {
             const response = await axios.get(`${BASE_URL}/api/bpjs/barcode/check`, {
-                params: { booking_id: bookingId },
+                params: { NOP: NOP },
             });
 
             // ✅ Ambil registration_no_client dari response API
             const registrationNo = response.data?.data?.detail?.registration_no_client || null;
             return { ...response.data, registrationNo };
         } catch (error) {
-            console.error(`❌ Error checking queue for Booking ID ${bookingId}:`, error.response?.data || error.message);
+            console.error(`❌ Error checking queue for Booking ID ${NOP}:`, error.response?.data || error.message);
             throw error;
         }
     },
 
     // 2. Insert Queue and Process Data by Booking ID
-    processQueueAndInsertData: async (bookingId) => {
+    processQueueAndInsertData: async (NOP) => {
         try {
             const response = await axios.post(`${BASE_URL}/api/bpjs/barcode/insert`, null, {
-                params: { booking_id: bookingId }
+                params: { NOP: NOP }
             });
             return response.data;
         } catch (error) {
-            console.error(`❌ Error processing queue and inserting data for Booking ID ${bookingId}:`, error.response?.data || error.message);
+            console.error(`❌ Error processing queue and inserting data for Booking ID ${NOP}:`, error.response?.data || error.message);
             throw error;
         }
     },
 
     // 3. Switch Medicine to Pickup by Booking ID
-    switchMedicineToPickup: async (bookingId) => {
+    switchMedicineToPickup: async (NOP) => {
         try {
-            const response = await axios.post(`${BASE_URL}/api/bpjs/barcode/insert`, null, {
-                params: { booking_id: bookingId }
-            });
+            const response = await axios.post(`${BASE_URL}/api/bpjs/barcode/update/`, + encodeURIComponent(NOP));
             return response.data;
         } catch (error) {
-            console.error(`❌ Error switching medicine to pickup for Booking ID ${bookingId}:`, error.response?.data || error.message);
+            console.error(`❌ Error switching medicine to pickup for Booking ID ${NOP}:`, error.response?.data || error.message);
             throw error;
         }
     },

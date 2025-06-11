@@ -15,12 +15,12 @@ const PickupAPI = {
     },
 
     // 2. Get Pickup Task by Booking ID
-    getPickupTaskByBookingId: async (bookingId) => {
+    getPickupTaskByNOP: async (NOP) => {
         try {
-            const response = await axios.get(`${BASE_URL}/api/pickup-task/${bookingId}`);
+            const response = await axios.get(`${BASE_URL}/api/pickup-task/`,+ encodeURIComponent(NOP));
             return response.data;
         } catch (error) {
-            console.error(`Error fetching pickup task with Booking ID ${bookingId}:`, error);
+            console.error(`Error fetching pickup task with Booking ID ${NOP}:`, error);
             throw error;
         }
     },
@@ -39,25 +39,25 @@ const PickupAPI = {
     },
 
     // ✅ Update Pickup Task dengan format body yang benar
-    updatePickupTask: async (bookingId, updatedData) => {
+    updatePickupTask: async (NOP, updatedData) => {
         try {
-            const response = await axios.put(`${BASE_URL}/api/pickup-task/${bookingId}`, updatedData, {
+            const response = await axios.put(`${BASE_URL}/api/pickup-task//${encodeURIComponent(NOP)}`, updatedData, {
                 headers: { 'Content-Type': 'application/json' }
             });
             return response.data;
         } catch (error) {
-            console.error(`❌ Error updating pickup task with Booking ID ${bookingId}:`, error.response?.data || error.message);
+            console.error(`❌ Error updating pickup task with Booking ID ${NOP}:`, error.response?.data || error.message);
             throw error;
         }
     },
 
     // 5. Delete Pickup Task by Booking ID
-    deletePickupTask: async (bookingId) => {
+    deletePickupTask: async (NOP) => {
         try {
-            const response = await axios.delete(`${BASE_URL}/api/pickup-task/${bookingId}`);
+            const response = await axios.delete(`${BASE_URL}/api/pickup-task/${encodeURIComponent(NOP)}`);
             return response.data;
         } catch (error) {
-            console.error(`Error deleting pickup task with Booking ID ${bookingId}:`, error);
+            console.error(`Error deleting pickup task with Booking ID ${NOP}:`, error);
             throw error;
         }
     },

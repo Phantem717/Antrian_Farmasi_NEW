@@ -3,6 +3,7 @@ import VerificationAPI from "@/app/utils/api/Verification";
 import MedicineAPI from "@/app/utils/api/Medicine";
 import PickupAPI from "@/app/utils/api/Pickup";
 import { getSocket } from "@/app/utils/api/socket";
+import Marquee from "react-fast-marquee";
 
 const NextQueue = ({ verificationData, medicineData, pickupData }) => {
   const [queues, setQueues] = useState({
@@ -46,8 +47,8 @@ const NextQueue = ({ verificationData, medicineData, pickupData }) => {
     if (!ref.current || isScrolling[key]) return;
 
     setIsScrolling(prev => ({ ...prev, [key]: true }));
-    const scrollSpeed = 5;
-    const delayBeforeReset = 5000;
+    const scrollSpeed = 25;
+    const delayBeforeReset = 500000;
 
     const scroll = () => {
       if (!ref.current) return;
@@ -66,7 +67,7 @@ const NextQueue = ({ verificationData, medicineData, pickupData }) => {
               if (ref.current.scrollHeight === maxScroll + scrollSpeed) {
                 autoScroll(ref, key);
               }
-            }, 1000);
+            }, 10000);
           }
         }, delayBeforeReset);
       }
@@ -228,20 +229,44 @@ const NextQueue = ({ verificationData, medicineData, pickupData }) => {
       <p className="text-2xl font-bold text-white text-center uppercase">{title}</p>
       <div className="flex gap-2 mt-2">
         {/* Racikan */}
-        <div className="flex-1 bg-white p-2 rounded-md shadow-md">
-          <p className="text-2xl font-extrabold text-center text-green-700 uppercase">Racikan</p>
-          <div className="overflow-y-auto scrollbar-hide bg-white rounded-md p-2" ref={innerRefRacik} style={{ minHeight: "800px" }}>
-            {queuesRacik.length > 0 ? (
-              queuesRacik.map((queue, index) => (
-                <div key={index} className="flex items-center justify-center bg-white text-green-700 text-5xl p-2 shadow text-center font-bold border border-gray-300 rounded block mb-1" style={{ height: "80px" }}>
-                  {queue.queueNumber}
-                </div>
-              ))
-            ) : (
-              <div className="bg-white text-black p-2 shadow text-center font-bold text-2xl">Belum Ada Antrian</div>
-            )}
+<div className="flex-1 bg-white p-2 rounded-md shadow-md">
+  <p className="text-2xl font-extrabold text-center text-green-500 uppercase">Racikan</p>
+
+  <Marquee
+    direction="up"
+    pauseOnHover
+    gradient={false}
+    style={{
+      width: '100%',         // Ambil seluruh lebar parent
+      height: 500,           // Tinggi tampilan marquee
+      overflow: 'hidden',
+      marginTop: 20,
+      marginBottom: 10,
+    }}
+  >
+    <div className="w-full flex flex-col items-center">
+      {queuesRacik.length > 0 ? (
+        queuesRacik.map((queue, index) => (
+          <div
+            key={index}
+            className="flex items-center justify-center bg-white text-green-700 text-6xl font-extrabold p-4 shadow text-center border border-gray-300 rounded w-[95%]"
+            style={{
+              height: '120px',
+              marginBottom: '8px',
+            }}
+          >
+            {queue.queueNumber}
           </div>
+        ))
+      ) : (
+        <div className="bg-white text-black p-4 shadow text-center font-bold text-2xl w-full">
+          Belum Ada Antrian
         </div>
+      )}
+    </div>
+  </Marquee>
+</div>
+
         
         {/* Non-Racikan */}
         <div className="flex-1 bg-white p-2 rounded-md shadow-md">

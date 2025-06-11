@@ -2,7 +2,7 @@
 import QueueCall from '@/app/component/display/bpjs/QueueCall_b';
 import ServingQueue from '@/app/component/display/bpjs/ServingQueue_b';
 import MissQueue from '@/app/component/display/bpjs/MissQueue_b';
-import NextQueue from '@/app/component/display/bpjs/NextQueue_b';
+import NextQueue from '@/app/component/display/NextQueue';
 import InfoBar from '@/app/component/display/bpjs/InfoBar_b';
 import MarqueeFooter from '@/app/component/display/bpjs/MarqueeFooter_b';
 import React, { useState,useEffect } from "react";
@@ -19,52 +19,52 @@ const [medicineData,setMedicineData]= useState([]);
 const [loketData,setLoketData] = useState([]);
 
 const socket = getSocket();
-  // async function getResponses(){
-  //   setLoading(true);
-  //   try {
-  //     const response = await responses.getAllResponses("Lantai 1 BPJS");
-  //     console.log(response.data);
-  //       console.log("VERIFDATA2",verificationData);
-  //       setVerificationData(response.data.verificationData);
-  //       setPickupData(response.data.pickupData);
-  //       setMedicineData(response.data.medicineData);
-  //       setLoketData(response.data.loketData);
+  async function getResponses(){
+    setLoading(true);
+    try {
+      const response = await responses.getAllResponses("Lantai 1 BPJS");
+      console.log(response.data);
+        console.log("VERIFDATA2",verificationData);
+        setVerificationData(response.data.verificationData);
+        setPickupData(response.data.pickupData);
+        setMedicineData(response.data.medicineData);
+        setLoketData(response.data.loketData);
       
-  //   } catch (error) {
-  //     console.log("ERROR GETTIGN RESPONSES: ",error)
-  //     throw error;
-  //   }
-  //   setLoading(false);
-  // }
-  // useEffect(()=>{
-  //   const socket = getSocket();
-  //   socket.on('test_ping2', (message) => {
-  //     console.log("?? Received test_ping:", message);
-  //     socket.emit("test_pong", { message: "? Server is alive!" });
-  //   });
+    } catch (error) {
+      console.log("ERROR GETTIGN RESPONSES: ",error)
+      throw error;
+    }
+    setLoading(false);
+  }
+  useEffect(()=>{
+    const socket = getSocket();
+    socket.on('test_ping2', (message) => {
+      console.log("?? Received test_ping:", message);
+      socket.emit("test_pong", { message: "? Server is alive!" });
+    });
 
 
-  //   socket.on('update_status_medicine_type',(payload)=>{
-  //     console.log("PILIH TOMBOL CONNECTED2",payload.message, payload.data);
-  //         });
+    socket.on('update_status_medicine_type',(payload)=>{
+      console.log("PILIH TOMBOL CONNECTED2",payload.message, payload.data);
+          });
     
-  // },[socket])
-  //  useEffect(()=>{
+  },[socket])
+   useEffect(()=>{
     
-  //     getResponses();
-  //     const interval = setInterval(()=>{
-  //       if (!loading) {
-  //         getResponses();
-  //       }
-  //     }, 5000); // Refresh setiap 10 detik
-  //     return () => clearInterval(interval);
+      getResponses();
+      const interval = setInterval(()=>{
+        if (!loading) {
+          getResponses();
+        }
+      }, 5000); // Refresh setiap 10 detik
+      return () => clearInterval(interval);
 
-  //     // return () => {
-  //     //   socket.off('test_ping2');
-  //     //   socket.off('test_pilih');
-  //     // }
+      // return () => {
+      //   socket.off('test_ping2');
+      //   socket.off('test_pilih');
+      // }
             
-  //   },[]);
+    },[]);
     return (
       <div className="bg-white h-screen min-w-screen flex flex-col">
         {/* Header and content - use flex-1 to allow footer space */}

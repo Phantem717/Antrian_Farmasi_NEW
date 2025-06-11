@@ -8,16 +8,16 @@ const { generateFourDigitNumber } = require('../handler/generate'); // Import fu
  */
 const createPharmacyTask = async (req, res) => {
   try {
-    const { booking_id, status, medicine_type,lokasi } = req.body;
+    const { NOP, status, medicine_type,lokasi } = req.body;
 
     // Validasi input
-    if (!booking_id || !status || !medicine_type) {
+    if (!NOP || !status || !medicine_type) {
       return res.status(400).json({ message: "Booking ID, status, dan medicine_type wajib diisi." });
     }
 
     // 🔹 Buat task baru
     const taskData = {
-      booking_id,
+      NOP,
       status,
       medicine_type,
       lokasi
@@ -52,10 +52,10 @@ const createPharmacyTask = async (req, res) => {
 /**
  * Controller untuk mengambil Pharmacy Task berdasarkan Booking ID.
  */
-const getPharmacyTaskByBookingId = async (req, res) => {
+const getPharmacyTaskByNOP = async (req, res) => {
   try {
-    const { booking_id } = req.params;
-    const task = await PharmacyTask.findByBookingId(booking_id);
+    const { NOP } = req.params;
+    const task = await PharmacyTask.findByNOP(NOP);
     if (!task) {
       return res.status(404).json({ message: 'Pharmacy Task not found' });
     }
@@ -90,18 +90,18 @@ const getAllPharmacyTasks = async (req, res) => {
  */
 const updatePharmacyTask = async (req, res) => {
   try {
-    const { booking_id } = req.params;
+    const { NOP } = req.params;
     const taskData = req.body;
 
     // Cek apakah task ada sebelum update
-    const existingTask = await PharmacyTask.findByBookingId(booking_id);
+    const existingTask = await PharmacyTask.findByNOP(NOP);
     if (!existingTask) {
       return res.status(404).json({ message: 'Pharmacy Task not found' });
     }
     const io = req.app.get('socketio');
 
-    const result = await PharmacyTask.update(booking_id, taskData);
-    const verificationData = await VerificationTask.findById(booking_id);
+    const result = await PharmacyTask.update(NOP, taskData);
+    const verificationData = await VerificationTask.findByNOP(NOP);
     console.log("TASKDATA",taskData, verificationData);
 
     if(taskData.status == "recalled_verification" || taskData.status == "called_pickup_medicine" || taskData.status == "recalled_pickup_medicine"){
@@ -110,7 +110,7 @@ const updatePharmacyTask = async (req, res) => {
       io.emit('update_status_type', {
         message: "Update Status Medicine Type Succesful",
         data: allPharmacyTasks,
-        // bookingId: booking_id,
+        // NOP: NOP,
       });
     }
     res.status(200).json({
@@ -131,16 +131,16 @@ const updatePharmacyTask = async (req, res) => {
  */
 const deletePharmacyTask = async (req, res) => {
   try {
-    const { booking_id } = req.params;
+    const { NOP } = req.params;
 
     // Cek apakah task ada sebelum dihapus
-    // const existingTask = await PharmacyTask.findByBookingId(booking_id);
+    // const existingTask = await PharmacyTask.findByNOP(NOP);
     // if (!existingTask) {
     //   return res.status(404).json({ message: 'Pharmacy Task not found' });
     // }
     const io = req.app.get('socketio');
 
-    const result = await PharmacyTask.delete(booking_id);
+    const result = await PharmacyTask.delete(NOP);
     io.emit('Delete_pharmacy',{
       message: "Update Pharmacy",
       
@@ -161,7 +161,7 @@ const deletePharmacyTask = async (req, res) => {
 
 module.exports = {
   createPharmacyTask,
-  getPharmacyTaskByBookingId,
+  getPharmacyTaskByNOP,
   getAllPharmacyTasks,
   updatePharmacyTask,
   deletePharmacyTask,

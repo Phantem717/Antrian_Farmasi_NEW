@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const {
   createPharmacyTask,
-  getPharmacyTaskByBookingId,
+  getPharmacyTaskByNOP,
   getAllPharmacyTasks,
   updatePharmacyTask,
   deletePharmacyTask
@@ -15,12 +15,12 @@ router.post("/", createPharmacyTask);
 router.get("/", getAllPharmacyTasks);
 
 // 🔹 Endpoint untuk mengambil Pharmacy Task berdasarkan Booking ID
-router.get("/:booking_id", getPharmacyTaskByBookingId);
+router.get("/:NOP", getPharmacyTaskByNOP);
 
 // 🔹 Endpoint untuk memperbarui Pharmacy Task berdasarkan ID
-router.put("/:booking_id", updatePharmacyTask);
+router.put("/:NOP", updatePharmacyTask);
 
 // 🔹 Endpoint untuk menghapus Pharmacy Task berdasarkan ID
-router.delete("/:booking_id", deletePharmacyTask);
+router.delete("/:NOP", deletePharmacyTask);
 
 module.exports = router;

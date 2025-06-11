@@ -4,16 +4,16 @@ const router = express.Router();
 
 const {
   createVerificationTask,
-  getVerificationTaskById,
+  getVerificationTaskByNOP,
   getAllVerificationTasks,
   updateVerificationTask,
   deleteVerificationTask,
 } = require('../controllers/verificationTaskController');
 
 router.post('/', createVerificationTask);
-router.get('/:booking_id', getVerificationTaskById);
+router.get('/:NOP', getVerificationTaskByNOP);
 router.get('/', getAllVerificationTasks);
-router.put('/:booking_id', updateVerificationTask);
-router.delete('/:booking_id', deleteVerificationTask);
+router.put('/:NOP', updateVerificationTask);
+router.delete('/:NOP', deleteVerificationTask);
 
 module.exports = router;

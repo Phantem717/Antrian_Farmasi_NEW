@@ -10,11 +10,11 @@ class PharmacyTask {
     try {
       const connection = getDb();
       const query = `
-        INSERT INTO Pharmacy_Task (booking_id, status, medicine_type,lokasi)
+        INSERT INTO Pharmacy_Task (NOP, status, medicine_type,lokasi)
         VALUES ( ?, ?, ?,?)
       `;
       const values = [
-        taskData.booking_id, // booking_id digunakan sebagai referensi
+        taskData.NOP, // NOP digunakan sebagai referensi
         taskData.status,
         taskData.medicine_type,
         taskData.lokasi
@@ -27,15 +27,15 @@ class PharmacyTask {
   }
 
   /**
-   * Mengambil record task berdasarkan booking_id.
-   * @param {number|string} booking_id - booking_id task farmasi.
+   * Mengambil record task berdasarkan NOP.
+   * @param {number|string} NOP - NOP task farmasi.
    */
-  static async findByBookingId(booking_id) {
+  static async findByNOP(NOP) {
     try {
       const connection = getDb();
       const query = `
       SELECT 
-        da.booking_id,
+        da.NOP,
         da.sep_no,
         da.patient_name,
         da.medical_record_no,
@@ -44,10 +44,10 @@ class PharmacyTask {
         pt.status,
         pt.medicine_type
       FROM Pharmacy_Task pt
-      JOIN Doctor_Appointments da ON pt.booking_id = da.booking_id
-      WHERE da.booking_id = ?
+      JOIN Doctor_Appointments da ON pt.NOP = da.NOP
+      WHERE da.NOP = ?
       `;
-      const [rows] = await connection.execute(query, [booking_id]);
+      const [rows] = await connection.execute(query, [NOP]);
       return rows[0];
     } catch (error) {
       throw error;
@@ -62,7 +62,7 @@ class PharmacyTask {
       const connection = getDb();
       const query = `
       SELECT 
-        da.booking_id,
+        da.NOP,
         da.sep_no,
         da.patient_name,
         da.medical_record_no,
@@ -71,8 +71,8 @@ class PharmacyTask {
         pt.status,
         pt.medicine_type
       FROM Pharmacy_Task pt
-      JOIN Doctor_Appointments da ON pt.booking_id = da.booking_id
-      ORDER BY da.booking_id DESC;
+      JOIN Doctor_Appointments da ON pt.NOP = da.NOP
+      ORDER BY da.NOP DESC;
       `;
       const [rows] = await connection.execute(query);
       return rows;
@@ -82,22 +82,22 @@ class PharmacyTask {
   }
 
   /**
-   * Memperbarui record task berdasarkan booking_id.
-   * @param {number|string} booking_id - booking_id task farmasi.
+   * Memperbarui record task berdasarkan NOP.
+   * @param {number|string} NOP - NOP task farmasi.
    * @param {Object} taskData - Data task yang akan diupdate.
    */
-  static async update(booking_id, taskData) {
+  static async update(NOP, taskData) {
     try {
       const connection = getDb();
       const query = `
         UPDATE Pharmacy_Task
         SET status = ?, medicine_type = ?
-        WHERE booking_id = ?
+        WHERE NOP = ?
       `;
       const values = [
         taskData.status,
         taskData.medicine_type,
-        booking_id
+        NOP
       ];
       const [result] = await connection.execute(query, values);
       return result;
@@ -107,14 +107,14 @@ class PharmacyTask {
   }
 
   /**
-   * Menghapus record task berdasarkan booking_id.
-   * @param {number|string} booking_id - booking_id task farmasi.
+   * Menghapus record task berdasarkan NOP.
+   * @param {number|string} NOP - NOP task farmasi.
    */
-  static async delete(booking_id) {
+  static async delete(NOP) {
     try {
       const connection = getDb();
-      const query = `DELETE FROM Pharmacy_Task WHERE booking_id = ?`;
-      const [result] = await connection.execute(query, [booking_id]);
+      const query = `DELETE FROM Pharmacy_Task WHERE NOP = ?`;
+      const [result] = await connection.execute(query, [NOP]);
       return result;
     } catch (error) {
       throw error;

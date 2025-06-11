@@ -58,12 +58,12 @@ const getAllAppointments = async (req, res) => {
 
 
 /**
- * Controller untuk mendapatkan appointment berdasarkan booking_id.
+ * Controller untuk mendapatkan appointment berdasarkan NOP.
  */
 const getAppointment = async (req, res) => {
   try {
-    const bookingId = req.params.bookingId;
-    const appointment = await DoctorAppointment.findByBookingId(bookingId);
+    const NOP = req.params.NOP;
+    const appointment = await DoctorAppointment.findByNOP(NOP);
     if (!appointment) {
       return res.status(404).json({ message: 'Appointment not found' });
     }
@@ -78,19 +78,19 @@ const getAppointment = async (req, res) => {
 };
 
 /**
- * Controller untuk memperbarui appointment berdasarkan booking_id.
+ * Controller untuk memperbarui appointment berdasarkan NOP.
  */
 const updateAppointment = async (req, res) => {
   try {
-    const bookingId = req.params.bookingId;
+    const NOP = req.params.NOP;
     const appointmentData = req.body;
-    const result = await DoctorAppointment.update(bookingId, appointmentData);
+    const result = await DoctorAppointment.update(NOP, appointmentData);
     const io = req.app.get('socketio');
 
     // const io = req.app.get('socketio')
     io.emit('doctor_appointment_updated', {
       message: "Updated Data",
-      bookingId: bookingId,
+      NOP: NOP,
       appointmentData: appointmentData,
       data : result,
     });
@@ -109,26 +109,53 @@ const updateAppointment = async (req, res) => {
 };
 const updateStatusMedicine = async (req, res) => {
   try {
-    const bookingId = req.params.bookingId;
+    const NOP = req.params.NOP;
     const { status_medicine } = req.body;
 
     if (!status_medicine) {
       return res.status(400).json({ message: "status_medicine is required" });
     }
 
-    const result = await DoctorAppointment.updateStatusMedicine(bookingId, status_medicine);
+    const result = await DoctorAppointment.updateStatusMedicine(NOP, status_medicine);
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: 'Appointment not found or no changes made' });
     }
     const io = req.app.get('socketio');
 
     // const io = require('socketio');
-    io.emit('update_status_medicine',{
-      message:"Update Status Medicine Succesful",
-      data:result,
-      bookingId: bookingId,
-      status_medicine: status_medicine
-    })    
+    
+
+    res.status(200).json({
+      message: 'Status medicine updated successfully',
+      data: result
+    });
+  } catch (error) {
+    console.error('Error updating status medicine:', error);
+    res.status(500).json({ 
+      message: 'Failed to update status medicine', 
+      error: error.message 
+    });
+  }
+};
+
+const updateMedicineType = async (req, res) => {
+  try {
+    const NOP = req.params.NOP;
+    const { status_medicine,farmasi_queue_number } = req.body;
+
+    console.log("DATA UPDATE TYPE", status_medicine,NOP,farmasi_queue_number);
+    if (!status_medicine || !status_medicine || !farmasi_queue_number) {
+      return res.status(400).json({ message: "status_medicine is required" });
+    }
+
+    const result = await DoctorAppointment.updateMedicineType(NOP, status_medicine,farmasi_queue_number);
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: 'Appointment not found or no changes made' });
+    }
+    const io = req.app.get('socketio');
+
+    // const io = require('socketio');
+    
 
     res.status(200).json({
       message: 'Status medicine updated successfully',
@@ -144,12 +171,12 @@ const updateStatusMedicine = async (req, res) => {
 };
 
 /**
- * Controller untuk menghapus appointment berdasarkan booking_id.
+ * Controller untuk menghapus appointment berdasarkan NOP.
  */
 const deleteAppointment = async (req, res) => {
   try {
-    const bookingId = req.params.bookingId;
-    const result = await DoctorAppointment.delete(bookingId);
+    const NOP = req.params.NOP;
+    const result = await DoctorAppointment.delete(NOP);
     const io = req.app.get('socketio');
 
     io.emit('delete_doctor_appointment',{
@@ -192,5 +219,6 @@ module.exports = {
   updateAppointment,
   updateStatusMedicine,
   deleteAppointment,
-  getLatestAntrian
+  getLatestAntrian,
+  updateMedicineType
 };

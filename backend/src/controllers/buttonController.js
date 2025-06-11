@@ -24,27 +24,28 @@ class ButtonController {
    */
   static async updateStatusMedicineType(req, res) {
     try {
-      const { booking_id, status, user_id, name } = req.body;
-      if (!booking_id || !status) {
+      const { NOP, status, user_id, name } = req.body;
+      if (!NOP || !status) {
         return res.status(400).json({ message: 'booking_id dan status wajib diisi.' });
       }
     
       // 1. Update status pada Pharmacy_Task (pertahankan medicine_type yang sudah ada)
-      const pharmacyData = await PharmacyTask.findByBookingId(booking_id);
+      const pharmacyData = await PharmacyTask.findByNOP(NOP);
       if (!pharmacyData) {
         return res.status(404).json({ message: 'Pharmacy Task tidak ditemukan.' });
       }
       
-      await PharmacyTask.update(booking_id, {
+      await PharmacyTask.update(NOP, {
         status: status, // misalnya "waiting_verification"
         medicine_type: pharmacyData.medicine_type,
       });
       
       // 2. Update stamp pada Verification_Task sesuai dengan status yang dikirim
-      const verificationData = await VerificationTask.findById(booking_id);
+      const verificationData = await VerificationTask.findByNOP(NOP);
       if (!verificationData) {
         return res.status(404).json({ message: 'Verification Task tidak ditemukan.' });
       }
+      
       
       // Mapping status ke field stamp yang sesuai
       const stampMapping = {
@@ -78,7 +79,7 @@ class ButtonController {
       const stampField = stampMapping[status];
       updatedVerificationData[stampField] = getCurrentTimestamp();
       
-      await VerificationTask.update(booking_id, updatedVerificationData);
+      await VerificationTask.update(NOP, updatedVerificationData);
       const io = req.app.get('socketio');
 
       io.on('send_queues', (selectedQueue2) => {
@@ -92,7 +93,7 @@ class ButtonController {
         io.emit('update_status_medicine_type', {
           message: "Update Status Medicine Type Succesful",
           data: verificationData,
-          bookingId: booking_id,
+          NOP: NOP,
         });
       }
       

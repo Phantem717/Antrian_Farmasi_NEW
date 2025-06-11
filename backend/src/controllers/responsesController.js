@@ -29,7 +29,8 @@ const getAllResponses = async (req, res) => {
     ]);
 
     const data = {
-      verificationData: verificationResp.filter(item => item.lokasi == location),
+      verificationData: verificationResp.filter(item => item.lokasi == location).sort((a, b) => a.queue_number.localeCompare(b.queue_number, undefined, { numeric: true }))
+,
       medicineData : medicineResp.filter(item => item.lokasi == location),
       pickupData: pickupResp.filter(item => item.lokasi == location),
       loketData: loketResp,

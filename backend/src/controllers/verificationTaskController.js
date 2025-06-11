@@ -2,10 +2,10 @@
 const VerificationTask = require('../models/verificationTask');
 // const io = req.app.get('socketio');
 // ✅ Fungsi internal yang bisa dipanggil oleh processQueueAndInsertData
-const createVerificationTaskInternal = async (booking_id, Executor = null, Executor_Names = null, status = "waiting_verification",lokasi) => {
+const createVerificationTaskInternal = async (NOP, Executor = null, Executor_Names = null, status = "waiting_verification",lokasi) => {
   try {
     const data = {
-      booking_id,
+      NOP,
       Executor,
       Executor_Names,
       status,
@@ -14,8 +14,8 @@ const createVerificationTaskInternal = async (booking_id, Executor = null, Execu
 
     console.log("Creating Verification Task Internally with:", data);
 
-    // 🔹 Pastikan tidak ada Verification Task duplikat
-    const existingVerificationTask = await VerificationTask.findById(booking_id);
+    // 🔹 Pastikan tNOPak ada Verification Task duplikat
+    const existingVerificationTask = await VerificationTask.findByNOP(NOP);
     if (existingVerificationTask) {
       console.log("Verification Task already exists, skipping creation.");
       return existingVerificationTask;
@@ -33,9 +33,9 @@ const createVerificationTaskInternal = async (booking_id, Executor = null, Execu
 // ✅ Fungsi yang tetap menangani request API secara langsung
 const createVerificationTask = async (req, res) => {
   try {
-    const { booking_id, Executor, Executor_Names, status,location  } = req.body;
+    const { NOP, Executor, Executor_Names, status,location  } = req.body;
 
-    const result = await createVerificationTaskInternal(booking_id, Executor, Executor_Names, status, location);
+    const result = await createVerificationTaskInternal(NOP, Executor, Executor_Names, status, location);
     const io = req.app.get('socketio');
 
     io.emit('create_verification', {
@@ -50,12 +50,12 @@ const createVerificationTask = async (req, res) => {
 };
 
 /**
- * Controller untuk mengambil Verification_Task berdasarkan booking_id.
+ * Controller untuk mengambil Verification_Task berdasarkan NOP.
  */
-const getVerificationTaskById = async (req, res) => {
+const getVerificationTaskByNOP = async (req, res) => {
   try {
-    const { booking_id } = req.params;
-    const task = await VerificationTask.findById(booking_id);
+    const { NOP } = req.params;
+    const task = await VerificationTask.findByNOP(NOP);
     if (!task) {
       return res.status(404).json({ message: 'Verification Task not found' });
     }
@@ -93,17 +93,17 @@ const getAllVerificationTasks = async (req, res) => {
 };
 
 /**
- * Controller untuk memperbarui Verification_Task berdasarkan booking_id.
+ * Controller untuk memperbarui Verification_Task berdasarkan NOP.
  * Hanya field target (berdasarkan status) yang akan di-update dengan timestamp baru
  * jika field tersebut masih null (belum pernah terisi).
  */
 const updateVerificationTask = async (req, res) => {
   try {
-    const { booking_id } = req.params;
+    const { NOP } = req.params;
     const { Executor, Executor_Names, status, loket } = req.body;
 
     // 1. Ambil data lama dari database
-    const existingData = await VerificationTask.findById(booking_id);
+    const existingData = await VerificationTask.findByNOP(NOP);
     if (!existingData) {
       return res.status(404).json({ message: "Verification Task not found" });
     }
@@ -163,7 +163,7 @@ const updateVerificationTask = async (req, res) => {
     const io = req.app.get('socketio');
 
     // 5. Simpan perubahan ke database
-    const result = await VerificationTask.update(booking_id, updatedData);
+    const result = await VerificationTask.update(NOP, updatedData);
     io.emit('update_verification', {
       message: "Update Verification",
       data: result,
@@ -183,12 +183,12 @@ const updateVerificationTask = async (req, res) => {
 };
 
 /**
- * Controller untuk menghapus Verification_Task berdasarkan booking_id.
+ * Controller untuk menghapus Verification_Task berdasarkan NOP.
  */
 const deleteVerificationTask = async (req, res) => {
   try {
-    const { booking_id } = req.params;
-    const result = await VerificationTask.delete(booking_id);
+    const { NOP } = req.params;
+    const result = await VerificationTask.delete(NOP);
     const io = req.app.get('socketio');
 
     io.emit('delete_verification', {
@@ -207,7 +207,7 @@ const deleteVerificationTask = async (req, res) => {
 module.exports = {
   createVerificationTask,
   createVerificationTaskInternal,
-  getVerificationTaskById,
+  getVerificationTaskByNOP,
   getAllVerificationTasks,
   updateVerificationTask,
   deleteVerificationTask,

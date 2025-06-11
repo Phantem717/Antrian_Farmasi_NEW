@@ -11,7 +11,7 @@ class MedicineTask {
       const connection = getDb();
       const query = `
         INSERT INTO Medicine_Task (
-          booking_id, Executor, Executor_Names,
+          NOP, Executor, Executor_Names,
           waiting_medicine_stamp, called_medicine_stamp,
           recalled_medicine_stamp, pending_medicine_stamp,
           processed_medicine_stamp, completed_medicine_stamp,
@@ -29,7 +29,7 @@ class MedicineTask {
     const activeLoket = loket[0].loket_name;
 
       const values = [
-        data.booking_id,
+        data.NOP,
         data.Executor || null,
         data.Executor_Names || null,
         // waiting_medicine_stamp diisi oleh SQL menggunakan NOW()
@@ -49,10 +49,10 @@ class MedicineTask {
   }
 
   /**
-   * Mengambil record Medicine_Task berdasarkan booking_id.
-   * @param {number} booking_id - ID task.
+   * Mengambil record Medicine_Task berdasarkan NOP.
+   * @param {number} NOP - ID task.
    */
-  static async findById(booking_id) {
+  static async findByNOP(NOP) {
     try {
       const connection = getDb();
       const query = `
@@ -66,11 +66,11 @@ class MedicineTask {
           pt.status,
           pt.medicine_type
         FROM Medicine_Task mt
-        LEFT JOIN Doctor_Appointments da ON mt.booking_id = da.booking_id
-        LEFT JOIN Pharmacy_Task pt ON mt.booking_id = pt.booking_id
-        WHERE mt.booking_id = ?
+        LEFT JOIN Doctor_Appointments da ON mt.NOP = da.NOP
+        LEFT JOIN Pharmacy_Task pt ON mt.NOP = pt.NOP
+        WHERE mt.NOP = ?
       `;
-      const [rows] = await connection.execute(query, [booking_id]);
+      const [rows] = await connection.execute(query, [NOP]);
       return rows[0];
     } catch (error) {
       throw error;
@@ -94,8 +94,10 @@ class MedicineTask {
           pt.status,
           pt.medicine_type
         FROM Medicine_Task mt
-        LEFT JOIN Doctor_Appointments da ON mt.booking_id = da.booking_id
-        LEFT JOIN Pharmacy_Task pt ON mt.booking_id = pt.booking_id
+        LEFT JOIN Doctor_Appointments da ON mt.NOP = da.NOP
+         LEFT JOIN Pharmacy_Task pt ON mt.NOP = pt.NOP
+         ORDER BY 
+    da.queue_number;
       `;
       const [rows] = await connection.execute(query);
       return rows;
@@ -105,11 +107,11 @@ class MedicineTask {
   }
 
   /**
-   * Memperbarui record Medicine_Task berdasarkan booking_id.
-   * @param {number} booking_id - ID task.
+   * Memperbarui record Medicine_Task berdasarkan NOP.
+   * @param {number} NOP - ID task.
    * @param {Object} data - Data baru untuk update.
    */
-  static async update(booking_id, data) {
+  static async update(NOP, data) {
     try {
       const connection = getDb();
       const query = `
@@ -124,7 +126,7 @@ class MedicineTask {
             completed_medicine_stamp = ?,
           loket = ?
 
-        WHERE booking_id = ?
+        WHERE NOP = ?
       `;
     //   const [loket] = await connection.execute(`
     //     SELECT loket_name 
@@ -147,7 +149,7 @@ class MedicineTask {
         data.loket || null,
         // data.status || null,
 
-        booking_id,
+        NOP,
       ];
       const [result] = await connection.execute(query, values);
       return result;
@@ -157,14 +159,14 @@ class MedicineTask {
   }
 
   /**
-   * Menghapus record Medicine_Task berdasarkan booking_id.
-   * @param {number} booking_id - ID task.
+   * Menghapus record Medicine_Task berdasarkan NOP.
+   * @param {number} NOP - ID task.
    */
-  static async delete(booking_id) {
+  static async delete(NOP) {
     try {
       const connection = getDb();
-      const query = `DELETE FROM Medicine_Task WHERE booking_id = ?`;
-      const [result] = await connection.execute(query, [booking_id]);
+      const query = `DELETE FROM Medicine_Task WHERE NOP = ?`;
+      const [result] = await connection.execute(query, [NOP]);
       return result;
     } catch (error) {
       throw error;

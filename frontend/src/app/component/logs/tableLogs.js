@@ -119,34 +119,30 @@ const tableLogs = ({
         <TableHead>
           <TableRow>
     
-            <TableCell align="center"><strong>ID Booking</strong></TableCell>
+            <TableCell align="center"><strong>NOP</strong></TableCell>
             <TableCell align="center"><strong>Nama Pasien</strong></TableCell>
-            {/* <TableCell align="center"><strong>Nomor SEP</strong></TableCell> */}
             <TableCell align="center"><strong>No. Rekam Medis</strong></TableCell>
             <TableCell align="center"><strong>Status Medicine</strong></TableCell> 
             <TableCell align="center"><strong>Waiting Verification</strong></TableCell> 
    
 
-            <TableCell align="center"><strong>Processed Verification</strong></TableCell> 
             <TableCell align="center"><strong>Completed Verification</strong></TableCell> 
             <TableCell align="center"><strong>Waiting Medicine</strong></TableCell> 
             <TableCell align="center"><strong>Completed Medicine</strong></TableCell> 
             <TableCell align="center"><strong>Waiting Pickup Medicine</strong></TableCell> 
             <TableCell align="center"><strong>Called Pickup Medicine</strong></TableCell> 
-            <TableCell align="center"><strong>Pending Pickup Medicine</strong></TableCell> 
-            <TableCell align="center"><strong>Recalled Pickup Medicine</strong></TableCell> 
             <TableCell align="center"><strong>Completed Pickup Medicine</strong></TableCell> 
+            <TableCell align="center"><strong>Duration</strong></TableCell> 
 
           </TableRow>
         </TableHead>
         <TableBody>
           {filteredData.map((item, index) => (
-            <TableRow key={item.booking_id} hover>
+            <TableRow key={item.NOP} hover>
             
              
-              <TableCell align="center">{item.booking_id}</TableCell>
+              <TableCell align="center">{item.NOP}</TableCell>
               <TableCell align="center">{item.patient_name}</TableCell>
-              {/* <TableCell align="center">{item.sep_no}</TableCell> */}
               <TableCell align="center">{item.medical_record_no || "-"}</TableCell>
               <TableCell align="center">{item.status_medicine || "-"}</TableCell>
               <TableCell align="center">
@@ -157,14 +153,7 @@ const tableLogs = ({
                     })
                 : "-"}
             </TableCell>
-            <TableCell align="center">
-                {item.processed_verification_stamp 
-                    ? new Date(item.processed_verification_stamp).toLocaleString("id-ID", {
-                        dateStyle: "medium",
-                        timeStyle: "short",
-                    })
-                : "-"}
-            </TableCell>
+       
             <TableCell align="center">
                 {item.completed_verification_stamp 
                     ? new Date(item.completed_verification_stamp).toLocaleString("id-ID", {
@@ -205,22 +194,8 @@ const tableLogs = ({
                     })
                 : "-"}
             </TableCell>
-            <TableCell align="center">
-                {item.pending_pickup_medicine_stamp 
-                    ? new Date(item.pending_pickup_medicine_stamp).toLocaleString("id-ID", {
-                        dateStyle: "medium",
-                        timeStyle: "short",
-                    })
-                : "-"}
-            </TableCell>
-            <TableCell align="center">
-                {item.recalled_pickup_medicine_stamp 
-                    ? new Date(item.recalled_pickup_medicine_stamp).toLocaleString("id-ID", {
-                        dateStyle: "medium",
-                        timeStyle: "short",
-                    })
-                : "-"}
-            </TableCell>
+      
+        
             <TableCell align="center">
                 {item.completed_pickup_medicine_stamp 
                     ? new Date(item.completed_pickup_medicine_stamp).toLocaleString("id-ID", {
@@ -228,6 +203,19 @@ const tableLogs = ({
                         timeStyle: "short",
                     })
                 : "-"}
+            </TableCell>
+             <TableCell align="center">
+              <div className="d-flex flex-row gap-2">
+                <div>
+                {item.verification_to_pickup_minutes} 
+
+                </div>
+                <div>
+                                  Menit
+
+                  </div>
+              </div>
+                
             </TableCell>
             </TableRow>
           ))}

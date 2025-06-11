@@ -13,16 +13,16 @@ const {createAntrianFarmasi} = require('../services/createFarmasiQueueService');
 const {getAppointment} = require('../controllers/doctorAppointmentsController')
 // const io = req.app.get('socketio');
 /**
- * Controller untuk mengecek queue berdasarkan booking_id.
- * Mengambil booking_id dari query parameter.
+ * Controller untuk mengecek queue berdasarkan NOP.
+ * Mengambil NOP dari query parameter.
  */
 const checkQueueController = async (req, res) => {
   try {
-    const { booking_id } = req.query;
-    if (!booking_id) {
-      return res.status(400).json({ message: 'Parameter booking_id wajib diisi.' });
+    const { NOP } = req.query;
+    if (!NOP) {
+      return res.status(400).json({ message: 'Parameter NOP wajib diisi.' });
     }
-    const data = await checkQueue(booking_id);
+    const data = await checkQueue(NOP);
 
    
     res.status(200).json({ data });
@@ -35,28 +35,29 @@ const checkQueueController = async (req, res) => {
  async function insertAll(payload){
   // Jika Doctor Appointment belum ada, buat baru
   
-   const doctorAppointmentData = {
-      booking_id: payload.booking_id || null,
-      sep_no: payload.sep_no || null,
-      queue_number: payload.queue_number || null,
-      queue_status: payload.queue_status || null,
-      queue_type: payload.queue_type || null,
-      patient_name: payload.patient_name || null,
-      medical_record_no: payload.medical_record_no || null,
-      patient_date_of_birth: payload.patient_date_of_birth || null,
-      status_medicine: payload.statusMedicine, // Menggunakan nilai dari response registrasi,
-      lokasi:payload.location || null,
-      phone_number: payload.phone_number || null,
-      doctor_name: payload.doctor_name || null,
-      nik: payload.nik || "-",
-      farmasi_queue_number: payload.farmasi_queue_number || "-"
+  const doctorAppointmentData = {
+    sep_no: payload.sep_no || null,
+    queue_number: payload.queue_number || null,
+    queue_status: payload.queue_status || null,
+    queue_type: payload.queue_type || null,
+    patient_name: payload.patient_name || null,
+    medical_record_no: payload.medical_record_no || null,
+    patient_date_of_birth: payload.patient_date_of_birth || null,
+    status_medicine: payload.statusMedicine, // Menggunakan nilai dari response registrasi,
+    lokasi:payload.location || null,
+    phone_number: payload.phone_number || null,
+    doctor_name: payload.doctor_name || null,
+    nik: payload.nik || "-",
+    farmasi_queue_number: payload.farmasi_queue_number || "-",
+    NOP: payload.NOP || null,
 
-    };
+
+  };
     console.log("Doctor Appointment Data Before Insert:", doctorAppointmentData);
    
 
     const pharmacyPayload = {
-      booking_id: payload.booking_id,
+      NOP: payload.NOP,
       status: "waiting_verification",
       medicine_type: payload.statusMedicine,
       lokasi:payload.location
@@ -64,7 +65,7 @@ const checkQueueController = async (req, res) => {
     };
     // Pastikan Verification Task dibuat setelah Pharmacy Task ada
     let [doctorAppointment,verificationData,pharmacyData] = await Promise.all([
-      DoctorAppointments.create(doctorAppointmentData),createVerificationTaskInternal(payload.booking_id,null,null, "waiting_verification",payload.location),PharmacyTask.create(pharmacyPayload)
+      DoctorAppointments.create(doctorAppointmentData),createVerificationTaskInternal(payload.NOP,null,null, "waiting_verification",payload.location),PharmacyTask.create(pharmacyPayload)
     ]);
 
     return { doctorAppointment, pharmacyData, verificationData };
@@ -93,20 +94,20 @@ const sendToWAController = async(req,res) =>{
  
 }
 /**
- * Controller untuk mengecek queue berdasarkan booking_id dan langsung memasukkan data ke database.
+ * Controller untuk mengecek queue berdasarkan NOP dan langsung memasukkan data ke database.
  */
 
 const processQueueAndInsertData = async (req, res) => {
   try {
-    const { booking_id } = req.query;
+    const { NOP } = req.query;
 
     // Validasi input
-    if (!booking_id) {
-      return res.status(400).json({ message: 'Parameter booking_id wajib diisi.' });
+    if (!NOP) {
+      return res.status(400).json({ message: 'Parameter NOP wajib diisi.' });
     }
 
     // Panggil checkQueue untuk mendapatkan data antrian
-    const queueResponse = await checkQueue(booking_id);
+    const queueResponse = await checkQueue(NOP);
     let location= "Lantai 1 BPJS";
     const queueData = queueResponse.data[0];
 
@@ -159,7 +160,7 @@ const processQueueAndInsertData = async (req, res) => {
 
 
     // Cek apakah data sudah ada di database untuk menghindari duplikasi
-   let [existingDoctorAppointment,existingPharmacyTask,existingVerificationTask ]  = await Promise.all([DoctorAppointments.findByBookingId(booking_id),await PharmacyTask.findByBookingId(booking_id),await VerificationTask.findById(booking_id)]) ;
+   let [existingDoctorAppointment,existingPharmacyTask,existingVerificationTask ]  = await Promise.all([DoctorAppointments.findByNOP(NOP),await PharmacyTask.findByNOP(NOP),await VerificationTask.findByNOP(NOP)]) ;
   
 
     let result = {};
@@ -173,7 +174,6 @@ const processQueueAndInsertData = async (req, res) => {
     
 
        payload = {
-          booking_id: queueData.booking_id ?? null,
           sep_no: queueData.sep_no ?? null,
           queue_number: queueData.queue_number ?? null,
           queue_status: queueData.queue_status ?? "Menunggu",
@@ -186,7 +186,9 @@ const processQueueAndInsertData = async (req, res) => {
           phone_number: queueData.patient_mobile_phone ?? null,
           doctor_name: queueData.doctor_name ?? null,
           nik: queueData.patient_identity_no ?? "-",
-          farmasi_queue_number: createAntrianResp.data.queue_number ?? "-"
+          farmasi_queue_number: createAntrianResp.data.queue_number ?? "-",
+          NOP: queueData.NOP ?? null,
+
   
         };
         console.log("INSERT PAYLOAD",payload);
@@ -232,12 +234,12 @@ const processQueueAndInsertData = async (req, res) => {
 
 const updateBarcodeTask = async (req, res) => {
   try {
-    // Misal booking_id dikirim melalui parameter URL dan data user melalui body request.
-    const { booking_id } = req.params;
+    // Misal NOP dikirim melalui parameter URL dan data user melalui body request.
+    const { NOP } = req.params;
     const { user_id, name } = req.body;
-    
-    // 1. Ambil data Medicine_Task berdasarkan booking_id
-    const medicineData = await MedicineTask.findById(booking_id);
+    console.log("UPDATE",NOP,user_id,name);
+    // 1. Ambil data Medicine_Task berdasarkan NOP
+    const medicineData = await MedicineTask.findByNOP(NOP);
     if (!medicineData) {
       return res.status(404).json({ message: "Medicine Task not found" });
     }
@@ -255,13 +257,13 @@ const updateBarcodeTask = async (req, res) => {
       completed_medicine_stamp: getCurrentTimestamp(), // Catat waktu update
       loket: medicineData.loket,
     };
-    await MedicineTask.update(booking_id, updatedMedicineData);
+    await MedicineTask.update(NOP, updatedMedicineData);
     console.log("MEDICINEDATA",medicineData);
 
     // 3. Update Pharmacy_Task status menjadi "waiting_pickup_medicine"
-    const pharmacyData = await PharmacyTask.findByBookingId(booking_id);
+    const pharmacyData = await PharmacyTask.findByNOP(NOP);
     if (pharmacyData) {
-      await PharmacyTask.update(booking_id, {
+      await PharmacyTask.update(NOP, {
         status: "waiting_pickup_medicine",
         medicine_type: pharmacyData.medicine_type, // mempertahankan nilai medicine_type
       });
@@ -269,7 +271,6 @@ const updateBarcodeTask = async (req, res) => {
     
     // 4. Buat record baru pada Pickup_Task
     await PickupTask.create({
-      booking_id,
       Executor: user_id || null,
       Executor_Names: name || null,
       waiting_pickup_medicine_stamp: getCurrentTimestamp(),
@@ -278,7 +279,9 @@ const updateBarcodeTask = async (req, res) => {
       pending_pickup_medicine_stamp: null,
       processed_pickup_medicine_stamp: null,
       completed_pickup_medicine_stamp: null,
-      lokasi: "Lantai 1 BPJS"
+      lokasi: "Lantai 1 BPJS",
+      NOP: NOP
+
     });
     
     return res.status(200).json({ message: "Barcode task updated successfully" });

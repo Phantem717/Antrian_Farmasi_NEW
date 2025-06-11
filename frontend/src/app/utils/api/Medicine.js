@@ -16,12 +16,12 @@ const MedicineAPI = {
     },
 
     // 2. Get Medicine Task by Booking ID
-    getMedicineTaskByBookingId: async (bookingId) => {
+    getMedicineTaskByNOP: async (NOP) => {
         try {
-            const response = await axios.get(`${BASE_URL}/api/medicine-task/${bookingId}`);
+            const response = await axios.get(`${BASE_URL}/api/medicine-task/${encodeURIComponent(NOP)}`);
             return response.data;
         } catch (error) {
-            console.error(`Error fetching medicine task with Booking ID ${bookingId}:`, error);
+            console.error(`Error fetching medicine task with Booking ID ${NOP}:`, error);
             throw error;
         }
     },
@@ -40,26 +40,26 @@ const MedicineAPI = {
     },
 
     // 4. Update Medicine Task
-    updateMedicineTask: async (bookingId, updatedData) => {
+    updateMedicineTask: async (NOP, updatedData) => {
         try {
             console.log("MEDICINEDATA",updatedData);
-            const response = await axios.put(`${BASE_URL}/api/medicine-task/${bookingId}`, updatedData, {
+            const response = await axios.put(`${BASE_URL}/api/medicine-task/${encodeURIComponent(NOP)}`, updatedData, {
                 headers: { 'Content-Type': 'application/json' }
             });
             return response.data;
         } catch (error) {
-            console.error(`Error updating medicine task with Booking ID ${bookingId}:`, error);
+            console.error(`Error updating medicine task with Booking ID ${NOP}:`, error);
             throw error;
         }
     },
 
     // 5. Delete Medicine Task
-    deleteMedicineTask: async (bookingId) => {
+    deleteMedicineTask: async (NOP) => {
         try {
-            const response = await axios.delete(`${BASE_URL}/api/medicine-task/${bookingId}`);
+            const response = await axios.delete(`${BASE_URL}/api/medicine-task/${encodeURIComponent(NOP)}`);
             return response.data;
         } catch (error) {
-            console.error(`Error deleting medicine task with Booking ID ${bookingId}:`, error);
+            console.error(`Error deleting medicine task with Booking ID ${NOP}:`, error);
             throw error;
         }
     },

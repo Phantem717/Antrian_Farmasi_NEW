@@ -3,8 +3,9 @@ import VerificationAPI from "../../utils/api/Verification";
 import MedicineAPI from "../../utils/api/Medicine";
 import PickupAPI from "../../utils/api/Pickup";
 import {getSocket} from "@/app/utils/api/socket";
-const NextQueue = ({verificationData, medicineData, pickupData}) => {
-  // State untuk menyimpan antrian dari API
+import Marquee from "react-fast-marquee";
+
+const NextQueue = ({ verificationData, medicineData, pickupData }) => {
   const [queues, setQueues] = useState({
     nextQueueRacik: [],
     nextQueueNonRacik: [],
@@ -15,41 +16,60 @@ const NextQueue = ({verificationData, medicineData, pickupData}) => {
     verificationQueue: []
   });
 
-  // Refs untuk auto-scroll
-  const nextQueueRef = useRef(null);
-  const medicineRef = useRef(null);
-  const pickupRef = useRef(null);
+  const [isScrolling, setIsScrolling] = useState(false);
+//   const nextQueueRef = useRef(null);
+//   const medicineRef = useRef(null);
+//   const pickupRef = useRef(null);
 
-  // Fungsi Auto-scroll
-  const autoScroll = (ref) => {
-    if (!ref.current) return;
-    const scrollSpeed = 1;
-    const delayBeforeReset = 2000;
+//   // Enhanced auto-scroll function
+//   const autoScroll = (ref, queueLength) => {
+//     if (!ref.current || queueLength === 0 || isScrolling) return;
+    
+//     setIsScrolling(true);
+// const scrollSpeed = Math.min(2, Math.max(1, Math.floor(queueLength / 10)));
+//     const itemHeight = 60; // Approximate height of each queue item
+//     const delayBeforeReset = Math.max(2000, queueLength * 500); // Dynamic delay based on queue length
 
-    const scroll = () => {
-      if (!ref.current) return;
-      const maxScroll = ref.current.scrollHeight - ref.current.clientHeight;
+//     const scroll = () => {
+//       if (!ref.current) return;
+//       const maxScroll = ref.current.scrollHeight - ref.current.clientHeight;
+//       const currentScroll = ref.current.scrollTop;
 
-      if (ref.current.scrollTop < maxScroll) {
-        ref.current.scrollBy({ top: scrollSpeed, behavior: "smooth" });
-        requestAnimationFrame(scroll);
-      } else {
-        setTimeout(() => {
-          ref.current.scrollTo({ top: 0, behavior: "smooth" });
-          setTimeout(() => requestAnimationFrame(scroll), delayBeforeReset);
-        }, delayBeforeReset);
-      }
-    };
+//       if (currentScroll < maxScroll - 5) { // 5px buffer
+//         ref.current.scrollBy({ top: scrollSpeed, behavior: "smooth" });
+//         requestAnimationFrame(scroll);
+//       } else {
+//         // Only reset if we've actually scrolled to the bottom
+//         setTimeout(() => {
+//           if (ref.current) {
+//             ref.current.scrollTo({ top: 0, behavior: "smooth" });
+//             setTimeout(() => {
+//               setIsScrolling(false);
+//               // Restart scroll only if data hasn't changed
+//               if (ref.current && ref.current.scrollHeight === maxScroll) {
+//                 autoScroll(ref, queueLength);
+//               }
+//             }, 1000);
+//           }
+//         }, delayBeforeReset);
+//       }
+//     };
 
-    requestAnimationFrame(scroll);
-  };
+//     requestAnimationFrame(scroll);
+//   };
 
-  // Efek Scroll Otomatis untuk Semua Antrian
-  useEffect(() => {
-    autoScroll(nextQueueRef);
-    autoScroll(medicineRef);
-    autoScroll(pickupRef);
-  }, [queues]);
+//   // Update scroll effects to include queue length
+//   useEffect(() => {
+//     if (queues.verificationQueue.length > 0) {
+//       autoScroll(nextQueueRef, queues.verificationQueue.length);
+//     }
+//     if (queues.medicineRacik.length > 0 || queues.medicineNonRacik.length > 0) {
+//       autoScroll(medicineRef, Math.max(queues.medicineRacik.length, queues.medicineNonRacik.length));
+//     }
+//     if (queues.pickupRacik.length > 0 || queues.pickupNonRacik.length > 0) {
+//       autoScroll(pickupRef, Math.max(queues.pickupRacik.length, queues.pickupNonRacik.length));
+//     }
+//   }, [queues]);
 
   // 🔄 Ambil data antrian dari API saat komponen pertama kali di-load
   useEffect(() => {
@@ -61,39 +81,32 @@ const NextQueue = ({verificationData, medicineData, pickupData}) => {
           const verificationData = payload.data.verificationData.filter(task => task.status === "waiting_verification")
           .map(task => ({
             queueNumber: task.queue_number,
-            // type: task.status_medicine === "Tidak ada Racikan" ? "Non - Racikan" : "Racikan",
-                        type: task.status_medicine ,
-  
-          }));;
+            type: task.status_medicine ,
+          }));
           console.log("VERFIDATA",verificationData);;
 
           const medicineData = payload.data.medicineData.filter(task => task.status === "waiting_medicine")
           .map(task => ({
             queueNumber: task.queue_number,
-            // type: task.status_medicine === "Tidak ada Racikan" ? "Non - Racikan" : "Racikan",
-                        type: task.status_medicine ,
-
+            type: task.status_medicine ,
           }));
           console.log("MEDS",medicineData);
 
           const pickupData = payload.data.pickupData.filter(task => task.status === "waiting_pickup_medicine")
           .map(task => ({
             queueNumber: task.queue_number,
-            // type: task.status_medicine === "Tidak ada Racikan" ? "Non - Racikan" : "Racikan",
             type: task.status_medicine ,
-
           }));
+
           console.log("PICKUP",pickupData);
+
           setQueues({
             verificationQueue: verificationData,
-            // nextQueueRacik: verificationData.filter(task => task.type === "Racikan"),
-            // nextQueueNonRacik: verificationData.filter(task => task.type === "Non - Racikan"),
             medicineRacik: medicineData.filter(task => task.type === "Racikan"),
             medicineNonRacik: medicineData.filter(task => task.type === "Non - Racikan"),
             pickupRacik: pickupData.filter(task => task.type === "Racikan"),
             pickupNonRacik: pickupData.filter(task => task.type === "Non - Racikan"),
           });
-    
         });
        
       } catch (error) {
@@ -106,64 +119,58 @@ const NextQueue = ({verificationData, medicineData, pickupData}) => {
   
 
   // Komponen untuk Setiap Kategori Antrian
-  const QueueSection = ({ title, queuesRacik, queuesNonRacik, innerRef, bgColor }) => (
-    <div className={`p-4 flex-1 min-w-0 ${bgColor} rounded-lg shadow-md`} style={{ minHeight: "180px" }}>
-      <p className="text-2xl font-bold text-white text-center">{title}</p>
-
-      <div className="flex gap-2 mt-2">
-        {/* Racikan */}
-        <div className="flex-1 bg-white p-2 rounded-md shadow-md">
-          <p className="text-lg font-semibold text-center text-green-700">Racikan</p>
-          <div
-            className="scrollable-table overflow-y-auto scrollbar-hide bg-white rounded-md p-2"
-            ref={innerRef}
-            style={{ maxHeight: "115px" }}
-          >
-            {queuesRacik.length > 0 ? (
-              queuesRacik.map((queue, index) => (
-                <span
-                  key={index}
-                  className="bg-white text-green-700 text-3xl p-2 shadow text-center font-bold border border-gray-300 rounded block mb-1"
-                >
+  const QueueSection = ({ title, queuesRacik, queuesNonRacik, bgColor }) => (
+  <div className={`p-4 flex-1 min-w-0 ${bgColor} rounded-lg shadow-md`} style={{ minHeight: "180px" }}>
+    <p className="text-2xl font-bold text-white text-center">{title}</p>
+    
+    <div className="flex gap-2 mt-2">
+      {/* Racikan */}
+      <div className="flex-1 bg-white p-2 rounded-md shadow-md">
+        <p className="text-lg font-semibold text-center text-green-700">Racikan</p>
+        <div className="bg-white rounded-md p-2 overflow-hidden" style={{ height: "115px" }}>
+          {queuesRacik.length > 0 ? (
+            <Marquee direction="up" speed={50} height={115} pauseOnHover>
+              {queuesRacik.map((queue, index) => (
+                <div key={index} className="bg-white text-green-700 text-3xl p-2 text-center font-bold border border-gray-300 rounded mb-1">
                   {queue.queueNumber}
-                </span>
-              ))
-            ) : (
-              <span className="bg-white text-green-700 p-2 shadow text-center font-bold text-2xl block">
+                </div>
+              ))}
+            </Marquee>
+          ) : (
+            <div className="flex items-center justify-center h-full">
+              <div className="text-green-700 text-2xl font-bold">
                 Belum Ada Antrian
-              </span>
-            )}
-          </div>
+              </div>
+            </div>
+          )}
         </div>
+      </div>
 
-        {/* Non-Racikan */}
-        <div className="flex-1 bg-white p-2 rounded-md shadow-md">
-          <p className="text-lg font-semibold text-center text-green-700">Non-Racikan</p>
-          <div
-            className="scrollable-table overflow-y-auto scrollbar-hide bg-white rounded-md p-2 "
-            ref={innerRef}
-            style={{ maxHeight: "115px" }}
-          >
-            {queuesNonRacik.length > 0 ? (
-              queuesNonRacik.map((queue, index) => (
-                <span
-                  key={index}
-                  className="bg-white text-green-700 text-3xl p-2 shadow text-center font-bold border border-gray-300 rounded block mb-1"
-                >
+      {/* Non-Racikan */}
+      <div className="flex-1 bg-white p-2 rounded-md shadow-md">
+        <p className="text-lg font-semibold text-center text-green-700">Non-Racikan</p>
+        <div className="bg-white rounded-md p-2 overflow-hidden" style={{ height: "115px" }}>
+          {queuesNonRacik.length > 0 ? (
+            <Marquee direction="up" speed={50} width={200} height={115} pauseOnHover>
+              {queuesNonRacik.map((queue, index) => (
+                <div key={index} className="bg-white text-green-700 text-3xl p-2 text-center font-bold border border-gray-300 rounded mb-1">
                   {queue.queueNumber}
-                </span>
-              ))
-            ) : (
-              <span className="bg-white text-green-700 p-2 shadow text-center font-bold text-2xl block">
+                </div>
+              ))}
+            </Marquee>
+          ) : (
+            <div className="flex items-center justify-center h-full">
+              <div className="text-green-700 text-2xl font-bold">
                 Belum Ada Antrian
-              </span>
-            )}
-          </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
-  );
-  const QueueSectionVerification = ({ title, queues, innerRef, bgColor }) => (
+  </div>
+);
+  const QueueSectionVerification = ({ title, queues, bgColor }) => (
     <div className={`p-4 flex-1 min-w-0 ${bgColor} rounded-lg shadow-md`} style={{ minHeight: "500px" }}>
       <p className="text-2xl font-bold text-white text-center">{title}</p>
   
@@ -173,10 +180,10 @@ const NextQueue = ({verificationData, medicineData, pickupData}) => {
           <p className="text-lg font-semibold text-center text-green-700">Verifikasi</p>
   
           <div
-            ref={innerRef}
             className="overflow-y-auto scrollbar-hide p-2 rounded-md"
             style={{ maxHeight: "115px" }}
           >
+
             {queues.length > 0 ? (
               queues.map((queue, index) => (
                 <span
@@ -191,6 +198,7 @@ const NextQueue = ({verificationData, medicineData, pickupData}) => {
                 Belum Ada Antrian
               </span>
             )}
+
           </div>
         </div>
   
@@ -207,15 +215,15 @@ const NextQueue = ({verificationData, medicineData, pickupData}) => {
       </div>
 
       <div className="flex w-full gap-4 flex-wrap justify-center">
-        <QueueSectionVerification title="Antean Verifikasi" queues={queues.verificationQueue} innerRef={nextQueueRef} bgColor="bg-green-700"/>
+        <QueueSectionVerification title="Antean Verifikasi" queues={queues.verificationQueue}  bgColor="bg-green-700"/>
         {/* Antrean Selanjutnya */}
         {/* <QueueSection title="Antrean Verifikasi" queuesRacik={queues.nextQueueRacik} queuesNonRacik={queues.nextQueueNonRacik} innerRef={nextQueueRef} bgColor="bg-green-700" /> */}
 
         {/* Proses Pembuatan Obat */}
-        <QueueSection title="Proses Pembuatan Obat" queuesRacik={queues.medicineRacik} queuesNonRacik={queues.medicineNonRacik} innerRef={medicineRef} bgColor="bg-yellow-600" />
+        <QueueSection title="Proses Pembuatan Obat" queuesRacik={queues.medicineRacik} queuesNonRacik={queues.medicineNonRacik}  bgColor="bg-yellow-600" />
 
         {/* Antrean Pengambilan Obat */}
-        <QueueSection title="Antrean Pengambilan Obat" queuesRacik={queues.pickupRacik} queuesNonRacik={queues.pickupNonRacik} innerRef={pickupRef} bgColor="bg-green-700" />
+        <QueueSection title="Antrean Pengambilan Obat" queuesRacik={queues.pickupRacik} queuesNonRacik={queues.pickupNonRacik}  bgColor="bg-green-700" />
       </div>
     </div>
   );

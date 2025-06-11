@@ -24,12 +24,12 @@ const createMedicineTask = async (req, res) => {
 };
 
 /**
- * Controller untuk mengambil Medicine Task berdasarkan booking_id.
+ * Controller untuk mengambil Medicine Task berdasarkan NOP.
  */
-const getMedicineTaskById = async (req, res) => {
+const getMedicineTaskByNOP = async (req, res) => {
   try {
-    const { booking_id } = req.params;
-    const task = await MedicineTask.findById(booking_id);
+    const { NOP } = req.params;
+    const task = await MedicineTask.findByNOP(NOP);
     if (!task) {
       return res.status(404).json({ message: 'Medicine Task not found' });
     }
@@ -54,22 +54,22 @@ const getAllMedicineTasks = async (req, res) => {
 };
 
 /**
- * Controller untuk memperbarui Medicine Task berdasarkan booking_id.
+ * Controller untuk memperbarui Medicine Task berdasarkan NOP.
  * Hanya field target (berdasarkan status) yang akan di-update dengan timestamp baru
  * jika field tersebut masih null (belum pernah terisi).
  */
 // Fungsi updateMedicineTask (controller) tetap menggunakan fungsi internal di atas
 const updateMedicineTask = async (req, res) => {
   try {
-    const { booking_id } = req.params;
+    const { NOP } = req.params;
     console.log("BODY",req.body);
     const { Executor, Executor_Names, status, loket } = req.body;
-    const result = await updateMedicineTaskInternal(booking_id, { Executor, Executor_Names, status, loket });
+    const result = await updateMedicineTaskInternal(NOP, { Executor, Executor_Names, status, loket });
     const io = req.app.get('socketio');
 
     io.emit('create_medicine',{
       message: "medicine created",
-      booking_id:booking_id,
+      NOP:NOP,
       data: result,
     });
 
@@ -88,12 +88,12 @@ const updateMedicineTask = async (req, res) => {
 
 
 /**
- * Controller untuk menghapus Medicine Task berdasarkan booking_id.
+ * Controller untuk menghapus Medicine Task berdasarkan NOP.
  */
 const deleteMedicineTask = async (req, res) => {
   try {
-    const { booking_id } = req.params;
-    const result = await MedicineTask.delete(booking_id);
+    const { NOP } = req.params;
+    const result = await MedicineTask.delete(NOP);
     const io = req.app.get('socketio');
 
     io.emit('delete_medicine',{
@@ -110,9 +110,9 @@ const deleteMedicineTask = async (req, res) => {
 
 
 // Tambahkan fungsi internal updateMedicineTaskInternal
-const updateMedicineTaskInternal = async (booking_id, updateData) => {
+const updateMedicineTaskInternal = async (NOP, updateData) => {
   // 1. Ambil data lama dari database
-  const existingData = await MedicineTask.findById(booking_id);
+  const existingData = await MedicineTask.findByNOP(NOP);
   if (!existingData) {
     throw new Error("Medicine Task not found");
   }
@@ -179,13 +179,13 @@ const updateMedicineTaskInternal = async (booking_id, updateData) => {
   }
 
   // 5. Simpan perubahan ke database dan kembalikan hasilnya
-  const result = await MedicineTask.update(booking_id, updatedData);
+  const result = await MedicineTask.update(NOP, updatedData);
   return result;
 };
 
 module.exports = {
   createMedicineTask,
-  getMedicineTaskById,
+  getMedicineTaskByNOP,
   getAllMedicineTasks,
   updateMedicineTask,
   deleteMedicineTask,

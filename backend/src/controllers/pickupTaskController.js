@@ -24,12 +24,12 @@ const createPickupTask = async (req, res) => {
 };
 
 /**
- * Controller untuk mengambil Pickup Task berdasarkan booking_id.
+ * Controller untuk mengambil Pickup Task berdasarkan NOP.
  */
-const getPickupTaskById = async (req, res) => {
+const getPickupTaskByNOP = async (req, res) => {
   try {
-    const { booking_id } = req.params;
-    const task = await PickupTask.findById(booking_id);
+    const { NOP } = req.params;
+    const task = await PickupTask.findByNOP(NOP);
     if (!task) {
       return res.status(404).json({ message: 'Pickup Task not found' });
     }
@@ -54,7 +54,7 @@ const getAllPickupTasks = async (req, res) => {
 };
 
 /**
- * Controller untuk memperbarui Pickup Task berdasarkan booking_id.
+ * Controller untuk memperbarui Pickup Task berdasarkan NOP.
  * Hanya field target (berdasarkan status) yang akan di-update dengan timestamp baru
  * jika field tersebut masih null (belum pernah terisi).
  *
@@ -68,11 +68,11 @@ const getAllPickupTasks = async (req, res) => {
  */
 const updatePickupTask = async (req, res) => {
   try {
-    const { booking_id } = req.params;
+    const { NOP } = req.params;
     const { Executor, Executor_Names, status, loket } = req.body;
 
     // 1. Ambil data lama dari database
-    const existingData = await PickupTask.findById(booking_id);
+    const existingData = await PickupTask.findByNOP(NOP);
     if (!existingData) {
       return res.status(404).json({ message: "Pickup Task not found" });
     }
@@ -131,7 +131,7 @@ const updatePickupTask = async (req, res) => {
     }
 
     // 5. Simpan perubahan ke database
-    const result = await PickupTask.update(booking_id, updatedData);
+    const result = await PickupTask.update(NOP, updatedData);
     const io = req.app.get('socketio');
 
     io.emit('update_pickup',{
@@ -152,12 +152,12 @@ const updatePickupTask = async (req, res) => {
 };
 
 /**
- * Controller untuk menghapus Pickup Task berdasarkan booking_id.
+ * Controller untuk menghapus Pickup Task berdasarkan NOP.
  */
 const deletePickupTask = async (req, res) => {
   try {
-    const { booking_id } = req.params;
-    const result = await PickupTask.delete(booking_id);
+    const { NOP } = req.params;
+    const result = await PickupTask.delete(NOP);
     const io = req.app.get('socketio');
 
     io.emit('delete_pickup',{
@@ -173,7 +173,7 @@ const deletePickupTask = async (req, res) => {
 
 module.exports = {
   createPickupTask,
-  getPickupTaskById,
+  getPickupTaskByNOP,
   getAllPickupTasks,
   updatePickupTask,
   deletePickupTask,

@@ -9,7 +9,7 @@ export const getSocket = () => {
       reconnection: true,
       transports: ['websocket'],
       pingTimeout: 20000,
-      pingInterval: 5000,
+      pingInterval: 50000,
     });
   }
   return socket;

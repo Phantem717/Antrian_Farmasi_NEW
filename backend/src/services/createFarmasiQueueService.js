@@ -8,6 +8,7 @@ const consID2 = process.env.CONS_ID_FARMASI;
 async function createAntrianFarmasi(medicine_type){
     
 try {
+ 
     const { timestamp, signature } = generateSignature(consID2, password);
  const url = `https://rscarolus.com/api/v1/visit/queue/pharmacy/create-queue`;
  console.log("medicine_type",medicine_type)
@@ -16,7 +17,7 @@ try {
       url,
       {
         queue: {
-            sub_facility:medicine_type.trim(), 
+            sub_facility: medicine_type, 
             location_id: "farmasi-bpjs"
         }
         

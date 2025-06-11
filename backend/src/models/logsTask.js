@@ -3,14 +3,14 @@ const { getDb } = require('../config/db');
 
 class logsTask {
   /**
-   * Mengambil semua data log lengkap dari berbagai task berdasarkan booking_id.
+   * Mengambil semua data log lengkap dari berbagai task berdasarkan NOP.
    */
   static async getAll() {
     try {
       const connection = getDb();
       const query = `
         SELECT 
-        da.booking_id,
+        da.NOP,
           da.patient_name,
           da.sep_no,
           da.medical_record_no,
@@ -28,13 +28,18 @@ class logsTask {
           vt.recalled_verification_stamp,
           vt.pending_verification_stamp,
           vt.processed_verification_stamp,
-          vt.completed_verification_stamp
+          vt.completed_verification_stamp,
+            TIMESTAMPDIFF(
+    MINUTE, 
+    vt.completed_verification_stamp, 
+    pa.called_pickup_medicine_stamp
+  ) AS verification_to_pickup_minutes
 
         FROM Doctor_Appointments da
-        LEFT JOIN Verification_Task vt ON da.booking_id = vt.booking_id
-        LEFT JOIN Pharmacy_Task pt ON da.booking_id = pt.booking_id
-        LEFT JOIN Medicine_Task mt ON da.booking_id = mt.booking_id
-        LEFT JOIN Pickup_Task pa ON da.booking_id = pa.booking_id
+        LEFT JOIN Verification_Task vt ON da.NOP = vt.NOP
+        LEFT JOIN Pharmacy_Task pt ON da.NOP = pt.NOP
+        LEFT JOIN Medicine_Task mt ON da.NOP = mt.NOP
+        LEFT JOIN Pickup_Task pa ON da.NOP = pa.NOP
         WHERE pt.status = 'completed_pickup_medicine'
       `;
 
@@ -51,13 +56,13 @@ class logsTask {
       const query = `  
       SELECT 
     da.status_medicine,
-    COUNT(DISTINCT da.booking_id) as booking_count
+    COUNT(DISTINCT da.NOP) as booking_count
 
 FROM Doctor_Appointments da
-LEFT JOIN Verification_Task vt ON da.booking_id = vt.booking_id
-LEFT JOIN Pharmacy_Task pt ON da.booking_id = pt.booking_id
-LEFT JOIN Medicine_Task mt ON da.booking_id = mt.booking_id
-LEFT JOIN Pickup_Task pa ON da.booking_id = pa.booking_id
+LEFT JOIN Verification_Task vt ON da.NOP = vt.NOP
+LEFT JOIN Pharmacy_Task pt ON da.NOP = pt.NOP
+LEFT JOIN Medicine_Task mt ON da.NOP = mt.NOP
+LEFT JOIN Pickup_Task pa ON da.NOP = pa.NOP
 WHERE pt.status = 'completed_pickup_medicine'
 GROUP BY da.status_medicine`;
           const [rows] = await connection.execute(query);
@@ -80,10 +85,10 @@ GROUP BY da.status_medicine`;
              ELSE NULL END) AS 'AVG PROCESSING TIME - NON-RACIKAN (MINUTES)'
     
 FROM Doctor_Appointments da
-LEFT JOIN Verification_Task vt ON da.booking_id = vt.booking_id
-LEFT JOIN Pharmacy_Task pt ON da.booking_id = pt.booking_id
-LEFT JOIN Medicine_Task mt ON da.booking_id = mt.booking_id
-LEFT JOIN Pickup_Task pa ON da.booking_id = pa.booking_id
+LEFT JOIN Verification_Task vt ON da.NOP = vt.NOP
+LEFT JOIN Pharmacy_Task pt ON da.NOP = pt.NOP
+LEFT JOIN Medicine_Task mt ON da.NOP = mt.NOP
+LEFT JOIN Pickup_Task pa ON da.NOP = pa.NOP
 WHERE pt.status = 'completed_pickup_medicine'
   `;
   

@@ -32,6 +32,8 @@ const printRoutes = require('./routes/printRoutes');
 const queueRoutes = require('./routes/createAntrianRoute');
 const loginRoutes = require('../src/routes/loginRoutes');
 const apiRoutes = require('../src/routes/apiResponseRoute');
+const retrieveRoutes = require('../src/routes/getFarmasiListRoute');
+const createFarmasiRoute = require('./routes/createAntrianRoute');
 (async function startServer() {
   try {
     await initDb();
@@ -60,7 +62,9 @@ const apiRoutes = require('../src/routes/apiResponseRoute');
   app.use('/api/print',printRoutes);
   app.use('/api/queue',queueRoutes);
 app.use('/api/login',loginRoutes);
-app.use('api/APIResposne',apiRoutes);
+app.use('api/APIResponse',apiRoutes);
+app.use('/api/retrieve',retrieveRoutes);
+app.use('/api/create-farmasi',createFarmasiRoute);
   // Menjalankan server pada semua network interfaces
   const HOST = process.env.HOST || '172.16.21.214'; // 🔥 Pastikan server bisa diakses dari IP lain
   const PORT = process.env.PORT || 5000;

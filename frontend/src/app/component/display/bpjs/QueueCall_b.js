@@ -70,7 +70,7 @@ const utteranceRef = useRef(null);
       const utterance = new SpeechSynthesisUtterance(message);
       utterance.lang = "id-ID";
       utterance.rate = 1;
-  
+      utterance.volume = 1;
       utterance.onstart = () => {
         isSpeaking.current = true;
         setLoading(true);

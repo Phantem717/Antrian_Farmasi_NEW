@@ -17,12 +17,12 @@ const VerificationAPI = {
     },
 
     // 2. Get Verification Task by Booking ID
-    getVerificationTaskByBookingId: async (bookingId) => {
+    getVerificationTaskByNOP: async (NOP) => {
         try {
-            const response = await axios.get(`${BASE_URL}/api/verification-task/${bookingId}`);
+            const response = await axios.get(`${BASE_URL}/api/verification-task/`,+ encodeURIComponent(NOP));
             return response.data;
         } catch (error) {
-            console.error(`Error fetching verification task with Booking ID ${bookingId}:`, error);
+            console.error(`Error fetching verification task with Booking ID ${NOP}:`, error);
             throw error;
         }
     },
@@ -41,25 +41,25 @@ const VerificationAPI = {
     },
 
     // 4. Update Verification Task by Booking ID
-    updateVerificationTask: async (bookingId, updatedData) => {
+    updateVerificationTask: async (NOP, updatedData) => {
         try {
-            const response = await axios.put(`${BASE_URL}/api/verification-task/${bookingId}`, updatedData, {
+            const response = await axios.put(`${BASE_URL}/api/verification-task/`,+ encodeURIComponent(NOP), updatedData, {
                 headers: { 'Content-Type': 'application/json' }
             });
             return response.data;
         } catch (error) {
-            console.error(`Error updating verification task with Booking ID ${bookingId}:`, error);
+            console.error(`Error updating verification task with Booking ID ${NOP}:`, error);
             throw error;
         }
     },
 
     // 5. Delete Verification Task by Booking ID
-    deleteVerificationTask: async (bookingId) => {
+    deleteVerificationTask: async (NOP) => {
         try {
-            const response = await axios.delete(`${BASE_URL}/api/verification-task/${bookingId}`);
+            const response = await axios.delete(`${BASE_URL}/api/verification-task/${encodeURIComponent(NOP)}`,);
             return response.data;
         } catch (error) {
-            console.error(`Error deleting verification task with Booking ID ${bookingId}:`, error);
+            console.error(`Error deleting verification task with Booking ID ${NOP}:`, error);
             throw error;
         }
     },

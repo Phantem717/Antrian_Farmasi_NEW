@@ -32,8 +32,8 @@ const [daftarAntrian,setDaftarAntrian] = useState([]);
       }, []);
     const handleKeyDown = async (event) => {
         if (event.key === "Enter") {
-            const bookingId = event.target.value.trim();
-            if (!bookingId) {
+            const NOP = event.target.value.trim();
+            if (!NOP) {
                 Swal.fire({
                     icon: "warning",
                     title: "Input Kosong!",
@@ -44,24 +44,26 @@ const [daftarAntrian,setDaftarAntrian] = useState([]);
                 return;
             }
 
-            console.log("📡 Booking ID yang di-scan:", bookingId);
+            console.log("📡 Booking ID yang di-scan:", NOP);
 
             try {
                 // 🔹 STEP 1: Switch Medicine to Pickup di BPJS
                
-                // 🔹 Ambil medicine_type dari daftar antrian berdasarkan booking_id
-                const foundItem = daftarAntrian.find(item => item.booking_id === bookingId);
+                // 🔹 Ambil medicine_type dari daftar antrian berdasarkan NOP
+                const foundItem = daftarAntrian.find(item => item.NOP === NOP);
                 console.log("FOUND ITEM",foundItem);
-                    await updateButtonStatus(bookingId, "completed_verification");
+                    await updateButtonStatus(NOP, "completed_verification");
 
                     await handleBulkPharmacyUpdate(foundItem.status_medicine);
-                    await PharmacyAPI.updatePharmacyTask(foundItem.booking_id, {
+                    const pharResp= await PharmacyAPI.updatePharmacyTask(foundItem.NOP, {
                       status: "waiting_medicine",
                       medicine_type: foundItem.status_medicine,
                     });
 
+                    console.log("PHARMACY RESP",pharResp);
+                    
                       await MedicineAPI.createMedicineTask({
-                                booking_id: foundItem.booking_id,
+                                NOP: foundItem.NOP,
                                 Executor: null,
                                 Executor_Names: null,
                                 status: "waiting_medicine",
@@ -69,20 +71,18 @@ const [daftarAntrian,setDaftarAntrian] = useState([]);
                               });
                   
                  
-                  const doctorResponse = await DoctorAppointmentAPI.getAppointmentByBookingId(bookingId);
+                  const doctorResponse = await DoctorAppointmentAPI.getAppointmentByNOP(NOP);
                   console.log("DOCRESP",doctorResponse);
                   const payload = {
                     phone_number: doctorResponse.data.phone_number,
                     patient_name: doctorResponse.data.patient_name,
-                    booking_id: doctorResponse.data.booking_id,
+                    NOP: doctorResponse.data.NOP,
                     queue_number: doctorResponse.data.queue_number,
                     medicine_type : doctorResponse.data.status_medicine,
                     sep: doctorResponse.data.sep_no,
                     rm: doctorResponse.data.medical_record_no,
                     docter: doctorResponse.data.doctor_name,
-                    nik: doctorResponse.data.nik
-        
-        
+                    nik: doctorResponse.data.nik,
                 }
                 const sendResponse = await WA_API.sendWAVerif(payload);
 
@@ -91,12 +91,12 @@ const [daftarAntrian,setDaftarAntrian] = useState([]);
                 Swal.fire({
                     icon: "success",
                     title: "Proses Berhasil!",
-                    text: `Booking ID ${bookingId} berhasil diproses.`,
+                    text: `Booking ID ${NOP} berhasil diproses.`,
                     timer: 2000,
                     showConfirmButton: false,
                 });
             
-                onScanResult(bookingId);
+                onScanResult(NOP);
                 setInputValue("");
                 inputRef.current.focus();
             } catch (error) {
@@ -106,7 +106,7 @@ const [daftarAntrian,setDaftarAntrian] = useState([]);
                 Swal.fire({
                     icon: "error",
                     title: "Gagal Memproses!",
-                    text: `Terjadi kesalahan saat memproses Booking ID ${bookingId}.`,
+                    text: `Terjadi kesalahan saat memproses Booking ID ${NOP}.`,
                     timer: 2000,
                     showConfirmButton: false,
                 });

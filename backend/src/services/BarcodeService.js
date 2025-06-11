@@ -12,7 +12,7 @@ const apiKey = process.env.X_API_KEY ;   // X_API_KEY, bukan X-API-KEY
 
 /**
  * Memanggil API untuk mengecek queue berdasarkan booking_id.
- * @param {string} bookingId - ID booking yang ingin dicek.
+ * @param {string} NOP - ID booking yang ingin dicek.
  * @returns {Promise<Object>} - Response data dari API.
  */
 
@@ -22,18 +22,17 @@ const consID = process.env.CONS_ID;
 const SecretKey = process.env.SECRETKEY;
 const  consID2= process.env.CONS_ID_FARMASI;
 const password = process.env.PASSWORD;
-async function checkQueue(bookingId) {
+
+async function checkQueue(NOP) {
   try {
-    if(bookingId.startsWith("FA")){
-      return true;
-    }
-    else{
+    
       console.log("TEST",consID2);
 
       const { timestamp, signature } = generateSignature(consID2, password);
       const url = `https://rscarolus.com/api/v1/visit/queue/pharmacy/check`;
+
       const response = await axios.get(url, {
-        params: { booking_id: bookingId },
+        params: { NOP: NOP },
         headers:
          { 'X-cons-id': consID2,
            'X-timestamp': timestamp,
@@ -46,11 +45,8 @@ async function checkQueue(bookingId) {
   ,
         response_type: "check_queue",
       }
-      const responseAPI= await create(payload);
-      console.log("RESPONSE: ",responseAPI.data);
-      // createApiResponse("CHECK_TYPE",response.data);
-      return response.data;
-    }
+    
+    
    
   } catch (error) {
     console.error('Error calling checkQueue API:', error.message);

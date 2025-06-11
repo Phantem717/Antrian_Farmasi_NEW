@@ -15,12 +15,12 @@ const DoctorAppointmentAPI = {
     },
 
     // 2. Get Single Appointment by Booking ID
-    getAppointmentByBookingId: async (bookingId) => {
+    getAppointmentByNOP: async (NOP) => {
         try {
-            const response = await axios.get(`${BASE_URL}/api/doctor-appointments/${bookingId}`);
+            const response = await axios.get(`${BASE_URL}/api/doctor-appointments/${encodeURIComponent(NOP)}`);
             return response.data;
         } catch (error) {
-            console.error(`Error fetching appointment with Booking ID ${bookingId}:`, error);
+            console.error(`Error fetching appointment with Booking ID ${NOP}:`, error);
             throw error;
         }
     },
@@ -31,7 +31,7 @@ const DoctorAppointmentAPI = {
             return response.data;
 
         } catch (error) {
-            console.error(`Error fetching appointment with Booking ID ${bookingId}:`, error);
+            console.error(`Error fetching appointment with Booking ID ${NOP}:`, error);
             throw error;
         }
     },
@@ -48,40 +48,53 @@ const DoctorAppointmentAPI = {
     },
 
     // 4. Update Appointment
-    updateAppointment: async (bookingId, updatedData) => {
+    updateAppointment: async (NOP, updatedData) => {
         try {
-            const response = await axios.put(`${BASE_URL}/api/doctor-appointments/${bookingId}`, updatedData);
+            const response = await axios.put(`${BASE_URL}/api/doctor-appointments/`,+ encodeURIComponent(NOP), updatedData);
             return response.data;
         } catch (error) {
-            console.error(`Error updating appointment with Booking ID ${bookingId}:`, error);
+            console.error(`Error updating appointment with Booking ID ${NOP}:`, error);
             throw error;
         }
     },
 
     // 5. Delete Appointment
-    deleteAppointment: async (bookingId) => {
+    deleteAppointment: async (NOP) => {
         try {
-            const response = await axios.delete(`${BASE_URL}/api/doctor-appointments/${bookingId}`);
+            const response = await axios.delete(`${BASE_URL}/api/doctor-appointments/${encodeURIComponent(NOP)}`);
             return response.data;
         } catch (error) {
-            console.error(`Error deleting appointment with Booking ID ${bookingId}:`, error);
+            console.error(`Error deleting appointment with Booking ID ${NOP}:`, error);
             throw error;
         }
         
     },
-     updateStatusMedicine : async (bookingId, status_medicine) => {
+     updateStatusMedicine : async (NOP, status_medicine) => {
         try {
           const response = await axios.patch(
-            `${BASE_URL}/api/doctor-appointments/${bookingId}/status_medicine`,
+            `${BASE_URL}/api/doctor-appointments/${encodeURIComponent(NOP)}/status_medicine`,
             { status_medicine }  // The status should be sent as a body parameter
           );
           return response.data;
         } catch (error) {
-          console.error(`Error updating status medicine for appointment with Booking ID ${bookingId}:`, error);
+          console.error(`Error updating status medicine for appointment with Booking ID ${NOP}:`, error);
           throw error;
         }
       },
-      
+    
+      updateMedicineType : async(NOP,status_medicine,farmasi_queue_number) => {
+        try {
+            const response = await axios.put(
+                `${BASE_URL}/api/doctor-appointments/type/${encodeURIComponent(NOP)}`,
+                { status_medicine,farmasi_queue_number }  // The status should be sent as a body parameter
+              );
+              return response.data;
+        } catch (error) {
+            console.error(`Error updating MedicinetType for appointment with Booking ID ${NOP}:`, error);
+            throw error;
+        }
+       
+      }
 };
 
 export default DoctorAppointmentAPI;

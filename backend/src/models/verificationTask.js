@@ -6,7 +6,7 @@ class VerificationTask {
    * Membuat record Verification_Task baru.
    * @param {Object} data - Data Verification_Task yang akan disimpan.
    *        Data diharapkan berisi:
-   *          - booking_id
+   *          - NOP
    *          - Executor (opsional)
    *          - Executor_Names (opsional)
    *          - called_verification_stamp (opsional, dengan format MySQL TIMESTAMP)
@@ -21,7 +21,7 @@ class VerificationTask {
       const connection = getDb();
       const query = `
         INSERT INTO Verification_Task (
-          booking_id, Executor, Executor_Names,
+          NOP, Executor, Executor_Names,
           waiting_verification_stamp, called_verification_stamp,
           recalled_verification_stamp, pending_verification_stamp,
           processed_verification_stamp, completed_verification_stamp,
@@ -38,7 +38,7 @@ class VerificationTask {
     `);
     const activeLoket = loket[0].loket_name;
       const values = [
-        data.booking_id,
+        data.NOP,
         data.Executor || null,
         data.Executor_Names || null,
         // waiting_verification_stamp di-set otomatis menggunakan NOW()
@@ -58,11 +58,11 @@ class VerificationTask {
   }
 
   /**
-   * Mengambil record Verification_Task berdasarkan booking_id.
-   * @param {number} booking_id - ID task.
+   * Mengambil record Verification_Task berdasarkan NOP.
+   * @param {number} NOP - ID task.
    * @returns {Promise<Object>} - Record Verification_Task.
    */
-  static async findById(booking_id) {
+  static async findByNOP(NOP) {
     try {
       const connection = getDb();
       const query = `
@@ -72,17 +72,21 @@ class VerificationTask {
           da.sep_no,
           da.medical_record_no,
           da.queue_number,
+                    da.farmasi_queue_number,
+          da.phone_number,
+
           da.status_medicine,
+          da.patient_date_of_birth,
           pt.status,
           pt.medicine_type,
           mt.loket as 'loket2'
         FROM Verification_Task vt
-        LEFT JOIN Doctor_Appointments da ON vt.booking_id = da.booking_id
-        LEFT JOIN Pharmacy_Task pt ON vt.booking_id = pt.booking_id
-        LEFT JOIN Medicine_Task mt ON vt.booking_id = mt.booking_id
-        WHERE vt.booking_id = ?
+        LEFT JOIN Doctor_Appointments da ON vt.NOP = da.NOP
+        LEFT JOIN Pharmacy_Task pt ON vt.NOP = pt.NOP
+        LEFT JOIN Medicine_Task mt ON vt.NOP = mt.NOP
+        WHERE vt.NOP = ?
       `;
-      const [rows] = await connection.execute(query, [booking_id]);
+      const [rows] = await connection.execute(query, [NOP]);
       return rows[0];
     } catch (error) {
       throw error;
@@ -103,12 +107,21 @@ class VerificationTask {
           da.sep_no,
           da.medical_record_no,
           da.queue_number,
+          da.farmasi_queue_number,
+          da.patient_date_of_birth,
           da.status_medicine,
+          da.phone_number,
           pt.status,
           pt.medicine_type
         FROM Verification_Task vt
-        LEFT JOIN Doctor_Appointments da ON vt.booking_id = da.booking_id
-        LEFT JOIN Pharmacy_Task pt ON vt.booking_id = pt.booking_id
+
+        LEFT JOIN Doctor_Appointments da ON vt.NOP = da.NOP
+        LEFT JOIN Pharmacy_Task pt ON vt.NOP = pt.NOP
+        WHERE da.queue_number LIKE 'RC%' OR da.queue_number LIKE 'NR%'
+
+        ORDER BY 
+        vt.waiting_verification_stamp
+        ASC;
       `;
 
       const [rows] = await connection.execute(query);
@@ -119,8 +132,8 @@ class VerificationTask {
   }
   
   /**
-   * Memperbarui record Verification_Task berdasarkan booking_id.
-   * @param {number} booking_id - ID task.
+   * Memperbarui record Verification_Task berdasarkan NOP.
+   * @param {number} NOP - ID task.
    * @param {Object} data - Data baru untuk update.
    *        Data diharapkan berisi:
    *          - Executor (opsional)
@@ -132,7 +145,7 @@ class VerificationTask {
    *          - completed_verification_stamp (opsional)
    * @returns {Promise<Object>} - Hasil query update.
    */
-  static async update(booking_id, data) {
+  static async update(NOP, data) {
     try {
       const connection = getDb();
       const query = `
@@ -146,7 +159,7 @@ class VerificationTask {
             processed_verification_stamp = ?,
             completed_verification_stamp = ?,
             loket = ?
-        WHERE booking_id = ?
+        WHERE NOP = ?
       `;
       const [loket] = await connection.execute(`
         SELECT loket_name 
@@ -166,7 +179,7 @@ class VerificationTask {
         data.processed_verification_stamp || null,
         data.completed_verification_stamp || null,
         activeLoket || null,
-        booking_id,
+        NOP,
       ];
       const [result] = await connection.execute(query, values);
       return result;
@@ -176,15 +189,15 @@ class VerificationTask {
   }
 
   /**
-   * Menghapus record Verification_Task berdasarkan booking_id.
-   * @param {number} booking_id - ID task.
+   * Menghapus record Verification_Task berdasarkan NOP.
+   * @param {number} NOP - ID task.
    * @returns {Promise<Object>} - Hasil query delete.
    */
-  static async delete(booking_id) {
+  static async delete(NOP) {
     try {
       const connection = getDb();
-      const query = `DELETE FROM Verification_Task WHERE booking_id = ?`;
-      const [result] = await connection.execute(query, [booking_id]);
+      const query = `DELETE FROM Verification_Task WHERE NOP = ?`;
+      const [result] = await connection.execute(query, [NOP]);
       return result;
     } catch (error) {
       throw error;

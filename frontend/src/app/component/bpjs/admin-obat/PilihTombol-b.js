@@ -40,8 +40,8 @@ const socket = getSocket();
       
 
       // await Promise.all([
-      //   PickupAPI.updatePickupTask(selectedQueue.booking_id, requestBody),
-      //   PharmacyAPI.updatePharmacyTask(selectedQueue.booking_id, requestBody),
+      //   PickupAPI.updatePickupTask(selectedQueue.NOP, requestBody),
+      //   PharmacyAPI.updatePharmacyTask(selectedQueue.NOP, requestBody),
       // ]);
       if(statusType == "call" || statusType === "recall"){
         socket.emit('call_queues_pickup', {
@@ -56,30 +56,32 @@ const socket = getSocket();
           };
     
           console.log("📡 Mengirim data ke API Pickup & Pharmacy:", {
-            booking_id: selectedQueue.booking_id,
+            NOP: selectedQueue.NOP,
             body: requestBody,
           });
       
           await Promise.all([
-            PickupAPI.updatePickupTask(queue.booking_id, requestBody),
-            PharmacyAPI.updatePharmacyTask(queue.booking_id, requestBody),
+            PickupAPI.updatePickupTask(queue.NOP, requestBody),
+            PharmacyAPI.updatePharmacyTask(queue.NOP, requestBody),
           ]);
           if(statusType == "call"){
-            const doctorResponse = await DoctorAppointmentAPI.getAppointmentByBookingId(queue.booking_id);
+            const doctorResponse = await DoctorAppointmentAPI.getAppointmentByNOP(queue.NOP);
             console.log("DOCRESP",doctorResponse);
+          
+
             const payload = {
               phone_number: doctorResponse.data.phone_number,
               patient_name: doctorResponse.data.patient_name,
-              booking_id: doctorResponse.data.booking_id,
-              queue_number: doctorResponse.data.queue_number,
               medicine_type : doctorResponse.data.status_medicine,
               sep: doctorResponse.data.sep_no,
               rm: doctorResponse.data.medical_record_no,
               docter: doctorResponse.data.doctor_name,
-              nik: doctorResponse.data.nik
-
+              nik: doctorResponse.data.nik,
+              queue_number: doctorResponse.data.queue_number,
+              NOP : doctorResponse.data.NOP
 
           }
+          console.log("PAYLOAD PICKUP",payload)
             const sendResponse = await WA_API.sendWAPickup(payload);
             console.log("WA SENT",sendResponse);   
           }
@@ -131,6 +133,7 @@ const socket = getSocket();
         gap: "15px",
         maxWidth: "500px",
         margin: "auto",
+        marginTop:"0"
       }}
     >
       {/* ✅ PANGGIL NOMOR */}

@@ -11,47 +11,54 @@ try {
     const { timestamp, signature } = generateSignature(consID2, password);
  const url = `https://rscarolus.com/api/v1/visit/queue/pharmacy/cetak`;
 let message = "";
+let urlprinter = "";
  if(payload.medicine_type == "Racikan"){
- message = "Mohon Menunggu Karena Obat Anda Adalah Racikan"
+ message = "Mohon Menunggu 30 menit sampai 1 jam Karena Obat Anda Adalah Racikan";
+ urlprinter="172.16.31.4";
  }
 
  else if(payload.medicine_type == "Non - Racikan"){
-    message = "Obat Anda Siap Diambil"
+    message = "Mohon Menunggu Bentar Obat anda adalah Non - Racikan"
+    urlprinter="172.16.26.78";
+
  }
 
  else{
     message = "Obat Anda Tidak Ada Resepnya"
+        urlprinter="172.16.26.78";
+
  }
 // console.log("PHONE_NUMBER",phone_number);
     const response = await axios.post(
       url,
       {
         printer: {
-          printerIp: "172.16.31.4",
+          printerIp: urlprinter,
           printerPort: 9100
         },
         htmlContent: {
           judul: {
             judultext: "Farmasi BPJS",
+            queuenumber: payload.queue_number
           },
           content: {
             // nama: payload.patient_name,
             // no_telp: payload.phone_number,
             // id: payload.farmasi_queue_number,
             // qrcodedata:payload.barcode
-            "Antrian Farmasi": payload.farmasi_queue_number,
+            // "Antrian Farmasi": payload.farmasi_queue_number,
             "Tanggal lahir": payload.tanggal_lahir,
             "No SEP": payload.SEP,
             "Tipe Obat" : payload.medicine_type,
             Nama : payload.patient_name,
-            "No Antrian" : payload.queue_number,
+            // "No Antrian" : payload.queue_number,
             "Kode Reservasi" : payload.barcode,
             qrcodedata:payload.barcode
     //   base64Barcode: payload.barcode
           },
-          Note: {
-            remarks_info: message
-          },
+          // Note: {
+          //   remarks_info: message
+          // },
           footer: {
             footer_info: "Melayani dari Hati membangkitkan harapan"
           }

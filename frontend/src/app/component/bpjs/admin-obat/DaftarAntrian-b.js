@@ -2,7 +2,7 @@
 "use client";
 import { io } from 'socket.io-client';
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,useRef } from "react";
 import {
   Box,
   Button,
@@ -16,6 +16,7 @@ import {
   Paper,
   Typography,
   Checkbox,
+  TextField
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import RefreshIcon from "@mui/icons-material/Refresh";
@@ -26,14 +27,21 @@ import PharmacyAPI from '@/app/utils/api/Pharmacy';
 import VerificationAPI from '@/app/utils/api/Verification';
 import MedicineAPI from '@/app/utils/api/Medicine';
 import Swal from 'sweetalert2';
+import DataTable from "datatables.net-dt";
+import $ from 'jquery';
+
+import "datatables.net-dt/css/dataTables.dataTables.css";
+
 const DaftarAntrian = ({ selectedQueueIds, setSelectedQueueIds, setSelectedQueue, setSelectedLoket,setSelectedQueue2,selectedQueue2 }) => {
+    const [searchText, setSearchText] = useState('');
 
-
+  const [rawQueueList,setRawQueueList]= useState([]);
   const [queueList, setQueueList] = useState([]);
   const [lokets, setLokets] = useState([]);
   const [selectedLoketLocal, setSelectedLoketLocal] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
 
+  // Run this whenever queueList changes
   // ? Loket yang diizinkan untuk admin obat
   const allowedLokets = ["Loket 3", "Loket 4"];
   async function deleteAction() {
@@ -43,12 +51,12 @@ const DaftarAntrian = ({ selectedQueueIds, setSelectedQueueIds, setSelectedQueue
     }
   
     try {
-      for (const bookingId of selectedQueueIds) {
-        await DoctorAppointmentAPI.deleteAppointment(bookingId);
-        await VerificationAPI.deleteVerificationTask(bookingId);
-        await PharmacyAPI.deletePharmacyTask(bookingId);
-        await MedicineAPI.deleteMedicineTask(bookingId);
-        await PickupAPI.deletePickupTask(bookingId);
+      for (const NOP of selectedQueueIds) {
+        await DoctorAppointmentAPI.deleteAppointment(NOP);
+        await VerificationAPI.deleteVerificationTask(NOP);
+        await PharmacyAPI.deletePharmacyTask(NOP);
+        await MedicineAPI.deleteMedicineTask(NOP);
+        await PickupAPI.deletePickupTask(NOP);
       }
   
       // Clear selection after successful deletion
@@ -128,83 +136,73 @@ const DaftarAntrian = ({ selectedQueueIds, setSelectedQueueIds, setSelectedQueue
   
   // ? Fetch Daftar Antrian setelah memilih Loket
   useEffect(() => {
-    if (!selectedLoketLocal) return;
+  if (!selectedLoketLocal && !selectedStatus) return;
 
-    const fetchQueueList = async () => {
-      try {
-        const response = await PickupAPI.getAllPickupTasks();
-        console.log("?? Data antrian dari API:", response.data);
-        const now = new Date();
-        const dateString = now.toISOString().split('T')[0];
-
-        let filteredQueues = response.data.filter((item) => {
-          // Handle potential missing properties
-          if (!item || !item.status || item.waiting_pickup_medicine_stamp === undefined) {
-            return false;
-          }
-          
-          // Convert string timestamps to Date objects if needed
-          const verificationStamp = typeof item.waiting_pickup_medicine_stamp === 'string' 
-            ? new Date(item.waiting_pickup_medicine_stamp) 
-            : item.waiting_pickup_medicine_stamp;
-          
-            const verifDateString = verificationStamp.toISOString().split('T')[0];
-
-          // Compare with case insensitivity
-          return item.status.toLowerCase() === selectedStatus.toLowerCase() && 
-                 dateString == verifDateString;
-        });
-
-         // ? Cek apakah ada nomor antrian yang sedang dipanggil
-              const activeQueue = response.data.find(
-                (item) => item.status === "called_verification"
-              );
+  const fetchQueueList = async () => {
+    try {
+      const response = await PickupAPI.getAllPickupTasks();
+      const now = new Date();
+      const dateString = now.toISOString().split('T')[0];
+      
+      let filteredQueues = response.data.filter((item) => {
+        if (!item || !item.status || item.waiting_pickup_medicine_stamp === undefined) {
+          return false;
+        }
         
-              // ? Jika ada dan belum punya loket, simpan loket yang memanggil
-              if (activeQueue && !activeQueue.loket && selectedLoketLocal) {
-                console.log(`??? Mengupdate loket ${selectedLoketLocal} untuk antrian ${activeQueue.queue_number}`);
-              
-                await VerificationAPI.updateVerificationTask(activeQueue.booking_id, {
-                  loket: selectedLoketLocal,
-                });
-              
-                console.log(`? Berhasil menyimpan loket ${selectedLoketLocal} untuk antrian ${activeQueue.queue_number}`);
-              }
-              
-        // ? Urutkan berdasarkan timestamp yang paling lama
-        const getEarliestTimestamp = (item) => {
-          const timestamps = [
-            item.waiting_pickup_stamp,
-            item.called_pickup_stamp,
-            item.recalled_pickup_stamp,
-            item.pending_pickup_stamp,
-            item.processed_pickup_stamp,
-            item.completed_pickup_stamp,
-          ]
-            .filter(Boolean)
-            .map((ts) => new Date(ts).getTime());
+        const verificationStamp = typeof item.waiting_pickup_medicine_stamp === 'string' 
+          ? new Date(item.waiting_pickup_medicine_stamp) 
+          : item.waiting_pickup_medicine_stamp;
 
-          return timestamps.length > 0 ? Math.min(...timestamps) : Infinity;
-        };
+        const verifDateString = verificationStamp.toISOString().split('T')[0];
+      
+        return item.status.toLowerCase() === selectedStatus.toLowerCase() && 
+               dateString == verifDateString;
+      });
+const getEarliestTimestamp = (item) => {
+        const timestamps = [
+          item.waiting_pickup_medicine_stamp,
+          item.called_pickup_medicine_stamp,
+          item.recalled_pickup_medicine_stamp,
+          item.pending_pickup_medicine_stamp,
+          item.completed_pickup_medicine_stamp,
+        ]
+          .filter(Boolean)
+          .map((ts) => new Date(ts).getTime());
 
-        filteredQueues = filteredQueues.sort(
-          (a, b) => getEarliestTimestamp(a) - getEarliestTimestamp(b)
-        );
+        return timestamps.length > 0 ? Math.min(...timestamps) : Infinity;
+      };
+      // Sort logic remains the same...
+      filteredQueues = filteredQueues.sort(
+        (a, b) => getEarliestTimestamp(b) - getEarliestTimestamp(a)
+      );
 
-        console.log("?? Data antrian setelah diurutkan:", filteredQueues);
+      // Always update rawQueueList
+      setRawQueueList(filteredQueues);
+
+      // Only update queueList if not searching or search is empty
+      if (!searchText) {
         setQueueList(filteredQueues);
-      } catch (error) {
-        console.error("? Error fetching queue list:", error);
+      } else {
+        // Reapply current search filter to new data
+        const filtered = filteredQueues.filter(item =>
+          item.patient_name?.toLowerCase().includes(searchText.toLowerCase())
+        );
+        setQueueList(filtered);
       }
-    };
 
-    fetchQueueList();
-    const interval = setInterval(fetchQueueList, 10000);
-    return () => clearInterval(interval);
-  }, [selectedStatus, selectedLoketLocal]);
+    } catch (error) {
+      console.error("Error fetching queue list:", error);
+    }
+  };
+
+  fetchQueueList();
+  const interval = setInterval(fetchQueueList, 10000);
+  return () => clearInterval(interval);
+}, [selectedStatus, selectedLoketLocal]);
 
   // ? Fungsi memilih / membatalkan pilihan nomor antrian
   const handleSelectQueue = (queueId, queueData) => {
+    console.log("SELECTED",queueId,queueData)
     setSelectedQueueIds((prevSelected) => {
       const newSelection = prevSelected.includes(queueId)
         ? prevSelected.filter((id) => id !== queueId)
@@ -221,10 +219,10 @@ const DaftarAntrian = ({ selectedQueueIds, setSelectedQueueIds, setSelectedQueue
     });
 
     setSelectedQueue2((prevSelected) => {
-      const exists = prevSelected.some((item) => item.id === queueId); // adjust if the key isn't 'id'
+      const exists = prevSelected.some((item) => item.NOP === queueId); // adjust if the key isn't 'id'
     
       const newSelection = exists
-        ? prevSelected.filter((item) => item.id !== queueId)
+        ? prevSelected.filter((item) => item.NOP !== queueId)
         : [...prevSelected, queueData]; // push the whole object
     
       if (newSelection.length > 0) {
@@ -238,6 +236,26 @@ const DaftarAntrian = ({ selectedQueueIds, setSelectedQueueIds, setSelectedQueue
     
   };
   
+
+  useEffect(() => {
+  if (!searchText) {
+    setQueueList(rawQueueList);
+  } else {
+    const filtered = rawQueueList.filter(item =>
+      item.patient_name?.toLowerCase().includes(searchText.toLowerCase())
+    );
+    setQueueList(filtered);
+  }
+}, [searchText, rawQueueList]);
+const handleSearch = (searchText) => {
+  setSearchText(searchText);
+  // No need to manually filter here - the useEffect will handle it
+};
+
+const handleSearchClear = () => {
+  setSearchText('');
+  // The useEffect will automatically reset to rawQueueList
+};
 
   return (
     <Box sx={{ padding: "10px" }}>
@@ -309,9 +327,37 @@ const DaftarAntrian = ({ selectedQueueIds, setSelectedQueueIds, setSelectedQueue
 
       <Paper
         elevation={3}
-        sx={{ padding: "10px", maxHeight: "400px", overflow: "auto" }}
+        sx={{ padding: "10px", maxHeight: "900px", overflow: "auto" }}
       >
-        <Table stickyHeader>
+         <div className="w-full flex items-center gap-2 mb-2">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSearch(searchText);
+            }}
+            className="w-full flex items-center gap-2"
+          >
+            <TextField
+              placeholder="Search patients"
+              variant="outlined"
+              size="small"
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              sx={{ flexGrow: 1 }}
+            />
+        
+            <Button
+              type="button"
+              variant="outlined"
+              onClick={handleSearchClear}
+              sx={{ whiteSpace: 'nowrap' }}
+            >
+              Clear
+            </Button>
+          </form>
+        </div>
+       {queueList.length > 0 && (
+         <Table stickyHeader>
           <TableHead>
             <TableRow>
               <TableCell align="center">
@@ -343,17 +389,17 @@ const DaftarAntrian = ({ selectedQueueIds, setSelectedQueueIds, setSelectedQueue
 
         <TableBody>
       {queueList.map((item) => (
-                  // console.log("KEY2",item.booking_id),
+                  // console.log("KEY2",item.NOP),
 
-        <TableRow key={item.booking_id} hover>
+        <TableRow key={item.NOP} hover>
           <TableCell align="center">
             <Checkbox
-              checked={selectedQueueIds.includes(item.booking_id)}
-              onChange={() => handleSelectQueue(item.booking_id, item)}
+              checked={selectedQueueIds.includes(item.NOP)}
+              onChange={() => handleSelectQueue(item.NOP, item)}
             />
           </TableCell>
                 <TableCell align="center">{item.queue_number}</TableCell>
-                <TableCell align="center">{item.booking_id}</TableCell>
+                <TableCell align="center">{item.NOP}</TableCell>
                 <TableCell align="center">{item.patient_name}</TableCell>
                 <TableCell align="center">{item.sep_no}</TableCell>
                 <TableCell align="center">
@@ -369,6 +415,7 @@ const DaftarAntrian = ({ selectedQueueIds, setSelectedQueueIds, setSelectedQueue
             ))}
           </TableBody>
         </Table>
+       )}
       </Paper>
     </Box>
   );

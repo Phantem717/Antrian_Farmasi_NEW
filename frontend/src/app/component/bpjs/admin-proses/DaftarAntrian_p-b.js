@@ -1,12 +1,15 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Swal from "sweetalert2";
-import { Box, Typography, Table, TableBody, TableCell, TableHead, TableRow, Paper } from "@mui/material";
+import { Box, Typography, Table, TableBody, TableCell, TableHead, TableRow, Paper,TextField } from "@mui/material";
 import MedicineAPI from "@/app/utils/api/Medicine"; // ✅ Gunakan API Medicine
+
 export default function DaftarAntrian({ scanResult, setIsDeleted }) {
     const [queueList, setQueueList] = useState([]); // Data antrian dari API
     const [loading, setLoading] = useState(true);
+  const [rawQueueList,setRawQueueList]= useState([]);
+      const [searchText, setSearchText] = useState('');
 
     // 🔄 Ambil daftar antrian dari `MedicineAPI` dan hanya tampilkan yang `waiting_medicine`
     useEffect(() => {
@@ -31,17 +34,17 @@ export default function DaftarAntrian({ scanResult, setIsDeleted }) {
                             const locationMatch = item.lokasi === "Lantai 1 BPJS";
                             const dateMatch = medicineDateString == dateString;
 
-                            
+                            console.log(statusMatch,locationMatch,dateMatch);
                             return statusMatch && locationMatch && dateMatch;
                         }) // ✅ Hanya tampilkan `waiting_medicine`
                         .map((item) => ({
-                            booking_id: item.booking_id,
+                            NOP: item.NOP,
                             patient_name: item.patient_name || "Tidak Diketahui",
                             medical_record_no: item.medical_record_no || "Tidak Diketahui",
                             status: item.status || "Menunggu",
                             medicine_type: item.medicine_type !== "Empty" ? item.medicine_type : "Belum Ditentukan",
                         }));
-
+                        console.log("FORMAT",formattedData);
                     setQueueList(formattedData);
                 } else {
                     console.error("❌ Respons tidak valid atau tidak memiliki properti data");
@@ -62,13 +65,13 @@ export default function DaftarAntrian({ scanResult, setIsDeleted }) {
         if (scanResult) {
             console.log("📡 Scan Result diterima:", scanResult);
 
-            const isExist = queueList.some((item) => item.booking_id === scanResult);
+            const isExist = queueList.some((item) => item.NOP === scanResult);
 
             if (isExist) {
                 console.log(`✅ Booking ID ${scanResult} ditemukan, menghapus dari antrian.`);
 
                 // ✅ Hapus hanya antrean yang diproses dan update daftar
-                setQueueList((prevList) => prevList.filter((item) => item.booking_id !== scanResult));
+                setQueueList((prevList) => prevList.filter((item) => item.NOP !== scanResult));
 
                 Swal.fire({
                     icon: "success",
@@ -93,14 +96,15 @@ export default function DaftarAntrian({ scanResult, setIsDeleted }) {
     }, [scanResult]);
 
     return (
-        <Box sx={{ padding: "10px" }}>
+        <Box sx={{ padding: "10px", overflow: "auto"  }}>
             <Typography variant="h4" align="center" sx={{ marginBottom: "20px" }}>
                 Daftar Antrian Farmasi (Waiting Medicine)
             </Typography>
 
             <Paper elevation={3} sx={{ padding: "10px" }}>
-                <Box sx={{ maxHeight: "650px", overflowY: "auto" }}>
-                    <Table stickyHeader>
+                <Box sx={{ maxHeight: "900px", overflowY: "auto" }}>
+                    {queueList.length > 0 &&(
+                         <Table stickyHeader>
                         <TableHead>
                             <TableRow>
                                 <TableCell align="center"><strong>Booking ID</strong></TableCell>
@@ -117,8 +121,9 @@ export default function DaftarAntrian({ scanResult, setIsDeleted }) {
                                 </TableRow>
                             ) : queueList.length > 0 ? (
                                 queueList.map((item, index) => (
+                                    console.log(queueList),
                                     <TableRow key={index}>
-                                        <TableCell align="center">{item.booking_id}</TableCell>
+                                        <TableCell align="center">{item.NOP}</TableCell>
                                         <TableCell align="center">{item.patient_name}</TableCell>
                                         <TableCell align="center">{item.medical_record_no}</TableCell>
                                         <TableCell align="center">{item.status}</TableCell>
@@ -131,7 +136,10 @@ export default function DaftarAntrian({ scanResult, setIsDeleted }) {
                                 </TableRow>
                             )}
                         </TableBody>
-                    </Table>
+                    </Table> 
+                    )}
+                
+                  
                 </Box>
             </Paper>
         </Box>

@@ -2,16 +2,15 @@ const {printAntrianFarmasi} = require('../services/printAntrianService')
 
 const printFarmasiController = async (req,res) =>{
 try {
-    const {phone_number,barcode,patient_name,farmasi_queue_number,medicine_type, SEP, tanggal_lahir,queue_number} = req.body
-   
-    if(!phone_number|| !barcode || !patient_name || !farmasi_queue_number || !medicine_type || !SEP || !tanggal_lahir || !queue_number){
+    const data = req.body
+    console.log("PRINT DATA",data);
+
+    if(!data.phone_number|| !data.barcode || !data.patient_name || !data.farmasi_queue_number || !data.medicine_type || !data.SEP || !data.tanggal_lahir || !data.queue_number){
         return res.status(400).json({ message: "Payload incomplete. Required: phone_number, booking_id, queue_number, patient_name." });
 
     }
-    
-    const payload = {phone_number,barcode,patient_name,farmasi_queue_number,medicine_type, SEP, tanggal_lahir,queue_number};
-    const data = await printAntrianFarmasi(payload);
-    res.status(200).json({ data });
+    const dataPrint = await printAntrianFarmasi(data);
+    res.status(200).json({ dataPrint });
 
 
 } catch (error) {

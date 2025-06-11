@@ -167,31 +167,31 @@ const fetchActiveLoket = async () => {
   
   
 
-  // return (
-  //   <div className="h-full bg-blue-700 p-6 rounded-lg shadow-lg flex flex-col justify-center items-center">
-  //     <h2 className="text-3xl font-bold text-white mb-4">Pemanggilan Antrian</h2>
-  //     <p className="text-3xl font-bold text-white">Nomor Antrian</p>
-  //     <div className="number text-white -bold text-9xl my-5" style={{ animation: "zoom-in-out 2s infinite" }}>
-  //       {loading ? "Memuat..." : queueData ? queueData.queueNumber : "..." }
+  return (
+    <div className="h-full bg-blue-700 p-6 rounded-lg shadow-lg flex flex-col justify-center items-center">
+      <h2 className="text-3xl font-bold text-white mb-4">Pemanggilan Antrian</h2>
+      <p className="text-3xl font-bold text-white">Nomor Antrian</p>
+      <div className="number text-white -bold text-9xl my-5" style={{ animation: "zoom-in-out 2s infinite" }}>
+        {loading ? "Memuat..." : queueData ? queueData.queueNumber : "..." }
         
-  //     </div>
-  //     <p className="text-3xl my-5 font-bold text-white" style={{ animation: "zoom-in-out 2s infinite" }}>
-  //       {loading ? "..." : queueData?.name ?? ""}
-  //       </p>
+      </div>
+      <p className="text-3xl my-5 font-bold text-white" style={{ animation: "zoom-in-out 2s infinite" }}>
+        {loading ? "..." : queueData?.name ?? ""}
+        </p>
       
-  //     <p className="text-3xl font-bold text-white">
-  //       {loading ? "Memuat..." : queueData ? queueData.loket : "Loket Tidak Diketahui"}
-  //     </p>
-  //     <style jsx>{`
-  //       @keyframes zoom-in-out {
-  //         0% { transform: scale(1); }
-  //         50% { transform: scale(1.2); }
-  //         100% { transform: scale(1); }
-  //       }
-  //     `}</style>
+      <p className="text-3xl font-bold text-white">
+        {loading ? "Memuat..." : queueData ? queueData.loket : "Loket Tidak Diketahui"}
+      </p>
+      <style jsx>{`
+        @keyframes zoom-in-out {
+          0% { transform: scale(1); }
+          50% { transform: scale(1.2); }
+          100% { transform: scale(1); }
+        }
+      `}</style>
       
-  //   </div>
-  // );
+    </div>
+  );
   
   return { queueData, isSpeaking }; // Expose data only
 

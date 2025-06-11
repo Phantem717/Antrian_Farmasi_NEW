@@ -4,16 +4,16 @@ const router = express.Router();
 
 const {
   createPickupTask,
-  getPickupTaskById,
+  getPickupTaskByNOP,
   getAllPickupTasks,
   updatePickupTask,
   deletePickupTask,
 } = require('../controllers/pickupTaskController');
 
 router.post('/', createPickupTask);
-router.get('/:booking_id', getPickupTaskById);
+router.get('/:NOP', getPickupTaskByNOP);
 router.get('/', getAllPickupTasks);
-router.put('/:booking_id', updatePickupTask);
-router.delete('/:booking_id', deletePickupTask);
+router.put('/:NOP', updatePickupTask);
+router.delete('/:NOP', deletePickupTask);
 
 module.exports = router;

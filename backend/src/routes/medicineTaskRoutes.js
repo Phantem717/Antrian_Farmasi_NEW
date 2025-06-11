@@ -4,16 +4,16 @@ const router = express.Router();
 
 const {
   createMedicineTask,
-  getMedicineTaskById,
+  getMedicineTaskByNOP,
   getAllMedicineTasks,
   updateMedicineTask,
   deleteMedicineTask,
 } = require('../controllers/medicineTaskController');
 
 router.post('/', createMedicineTask);
-router.get('/:booking_id', getMedicineTaskById);
+router.get('/:NOP', getMedicineTaskByNOP);
 router.get('/', getAllMedicineTasks);
-router.put('/:booking_id', updateMedicineTask);
-router.delete('/:booking_id', deleteMedicineTask);
+router.put('/:NOP', updateMedicineTask);
+router.delete('/:NOP', deleteMedicineTask);
 
 module.exports = router;

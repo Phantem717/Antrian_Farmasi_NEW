@@ -15,8 +15,8 @@ export default function BarcodeScanner({ onScanResult, daftarAntrian }) {
 
     const handleKeyDown = async (event) => {
         if (event.key === "Enter") {
-            const bookingId = event.target.value.trim();
-            if (!bookingId) {
+            const NOP = event.target.value.trim();
+            if (!NOP) {
                 Swal.fire({
                     icon: "warning",
                     title: "Input Kosong!",
@@ -27,25 +27,25 @@ export default function BarcodeScanner({ onScanResult, daftarAntrian }) {
                 return;
             }
 
-            console.log("📡 Booking ID yang di-scan:", bookingId);
+            console.log("📡 Booking ID yang di-scan:", NOP);
 
             try {
                 // 🔹 STEP 1: Switch Medicine to Pickup di BPJS
-                await BPJSBarcodeAPI.switchMedicineToPickup(bookingId);
-                console.log("✅ BPJS Switch Medicine berhasil.");
+                // await BPJSBarcodeAPI.switchMedicineToPickup(NOP);
+                // console.log("✅ BPJS Switch Medicine berhasil.");
             
-                // 🔹 Ambil medicine_type dari daftar antrian berdasarkan booking_id
-                const foundItem = daftarAntrian.find(item => item.booking_id === bookingId);
+                // 🔹 Ambil medicine_type dari daftar antrian berdasarkan NOP
+                const foundItem = daftarAntrian.find(item => item.NOP === NOP);
                 const medicineType = foundItem ? foundItem.medicine_type : "Non - Racikan"; // Default jika tidak ditemukan
                 
-                MedicineAPI.updateMedicineTask(bookingId, { Executor: null,
+                MedicineAPI.updateMedicineTask(NOP, { Executor: null,
                     Executor_Names: null,
                     status: "completed_medicine", 
                     loket: "Loket 3"});
                     
                 // 🔹 STEP 2: Create Pickup Task
                 const pickupResponse = await PickupAPI.createPickupTask({
-                    booking_id: bookingId,
+                    NOP: NOP,
                     Executor: null,
                     Executor_Names: null,
                     status: "waiting_pickup_medicine",
@@ -54,18 +54,18 @@ export default function BarcodeScanner({ onScanResult, daftarAntrian }) {
                 console.log("✅ Pickup Task berhasil dibuat:", pickupResponse);
             
                 // 🔹 STEP 3: Update Pharmacy Task dengan status dan medicine_type
-                const pharmacyResponse = await PharmacyAPI.updatePharmacyTask(bookingId, {
+                const pharmacyResponse = await PharmacyAPI.updatePharmacyTask(NOP, {
                     status: "waiting_pickup_medicine",
                     medicine_type: medicineType
                 });
                 console.log("✅ Pharmacy Task berhasil diperbarui:", pharmacyResponse);
                 
-                const doctorResponse = await DoctorAppointmentAPI.getAppointmentByBookingId(bookingId);
+                const doctorResponse = await DoctorAppointmentAPI.getAppointmentByNOP(NOP);
                 console.log("DOCRESP",doctorResponse);
                 const payload = {
                     phone_number: doctorResponse.data.phone_number,
                     patient_name: doctorResponse.data.patient_name,
-                    booking_id: doctorResponse.data.booking_id,
+                    NOP: doctorResponse.data.NOP,
                     queue_number: doctorResponse.data.queue_number,
                     medicine_type : doctorResponse.data.status_medicine,
                     sep: doctorResponse.data.sep_no,
@@ -75,18 +75,18 @@ export default function BarcodeScanner({ onScanResult, daftarAntrian }) {
 
 
                 }
-                // const sendResponse = await WA_API.sendWAProses(payload);
-                // console.log("WA SENT",sendResponse);
+                const sendResponse = await WA_API.sendWAProses(payload);
+                console.log("WA SENT",sendResponse);
 
                 Swal.fire({
                     icon: "success",
                     title: "Proses Berhasil!",
-                    text: `Booking ID ${bookingId} berhasil diproses.`,
+                    text: `Booking ID ${NOP} berhasil diproses.`,
                     timer: 2000,
                     showConfirmButton: false,
                 });
             
-                onScanResult(bookingId);
+                onScanResult(NOP);
                 setInputValue("");
                 inputRef.current.focus();
             } catch (error) {
@@ -96,7 +96,7 @@ export default function BarcodeScanner({ onScanResult, daftarAntrian }) {
                 Swal.fire({
                     icon: "error",
                     title: "Gagal Memproses!",
-                    text: `Terjadi kesalahan saat memproses Booking ID ${bookingId}.`,
+                    text: `Terjadi kesalahan saat memproses Booking ID ${NOP}.`,
                     timer: 2000,
                     showConfirmButton: false,
                 });
