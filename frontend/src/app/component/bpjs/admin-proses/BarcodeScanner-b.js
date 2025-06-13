@@ -27,7 +27,7 @@ export default function BarcodeScanner({ onScanResult, daftarAntrian }) {
                 return;
             }
 
-            console.log("📡 Booking ID yang di-scan:", NOP);
+            console.log("📡 Booking ID yang di-scan:", inputValue);
 
             try {
                 // 🔹 STEP 1: Switch Medicine to Pickup di BPJS
@@ -99,7 +99,11 @@ export default function BarcodeScanner({ onScanResult, daftarAntrian }) {
                     text: `Terjadi kesalahan saat memproses Booking ID ${NOP}.`,
                     timer: 2000,
                     showConfirmButton: false,
+                }).then(()=>{
+    onScanResult(NOP);
+                setInputValue("");
                 });
+                
             }
             
         }

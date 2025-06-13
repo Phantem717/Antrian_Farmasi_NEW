@@ -8,11 +8,10 @@ const checkLoginController = async  (req,res) => {
         }
     
         const data = await login(username,password);
-    
         return res.status(200).json(data);
     } catch (error) {
         console.error("Login Failed: ",error);
-        throw error;
+    res.status(500).json({ message: 'Failed to Login', error: error.message });
     }
  
 }

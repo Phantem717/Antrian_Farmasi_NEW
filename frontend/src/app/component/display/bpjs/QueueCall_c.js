@@ -144,6 +144,10 @@ const QueueCall = ({ lokasi }) => {
         <div className="number text-white font-bold text-9xl my-5" style={{ animation: "zoom-in-out 2s infinite" }}>
           {queueData.queueNumber}
         </div>
+        <div className="text-xl mt-2">
+          {queueData.patient_name}
+
+        </div>
         <p className="text-3xl font-bold text-white">{queueData.loket}</p>
         <style jsx>{`
           @keyframes zoom-in-out {

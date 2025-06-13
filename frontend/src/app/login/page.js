@@ -13,58 +13,66 @@ const LoginPage = () => {
   const router = useRouter(); // ✅ Inisialisasi useRouter
   const [username,setUsername] = useState("");
   const [password,setPassword] = useState("");
-  
-  async function login(event){
-    event.preventDefault();
+  async function login(event) {
+  event.preventDefault();
 
-    try {
-
-      if(username == "" || password == ""){
-        Swal.fire({
-          icon: "error",
-          title: "Username dan Password Harus Diisi!",
-          showConfirmButton: true,
-          timer: 3000,
-          timerProgressBar: true,
-        });
-        return;
-        
-      }
-      console.log("DATA",username,password);
-      const loginResponse = await loginAPI.checkLogin(username,password);
-      console.log("RESPONSE LOGIN",loginResponse);
-      if(loginResponse){
-        localStorage.setItem('token',loginResponse.data.token);
-        localStorage.setItem("refresh_token",loginResponse.data.refresh_token);
-        Swal.fire({
-          icon: "success",
-          title: "Login Berhasil",
-          showConfirmButton: true,
-          // timer: 3000,
-          timerProgressBar: true,
-        }).then((result) => {
-          if(result.isConfirmed){
-            router.push("/login/bpjs/admin-verif-b"); // 🔀 Pindah ke halaman admin-verif
-            // localStorage.setItem()
-          }
-        }
-      )
-        
-        return;
-      }
-      
-    } catch (error) {
-      Swal.fire({
+  try {
+    if (!username || !password) {
+      await Swal.fire({
         icon: "error",
-        title: "Terjadi Kesalahan Pas Login",
+        title: "Username dan Password Harus Diisi!",
         showConfirmButton: true,
         timer: 3000,
         timerProgressBar: true,
-        timer:1500
       });
-      throw error;
+      return;
     }
+
+    const loginResponse = await loginAPI.checkLogin(username, password);
+    
+    if (loginResponse) {
+      localStorage.setItem('token', loginResponse.data.token);
+      localStorage.setItem("refresh_token", loginResponse.data.refresh_token);
+      
+      await Swal.fire({
+        icon: "success",
+        title: "Login Berhasil",
+        showConfirmButton: true,
+        timerProgressBar: true,
+      });
+      
+      router.push("/login/bpjs/admin-verif-b");
+    }
+    
+  } catch (error) {
+    console.error("Login error:", error);
+    
+    // Clear password field on error
+    setPassword("");
+    
+    let errorMessage = "Terjadi Kesalahan Saat Login";
+    
+    // Handle specific error cases
+    if (error.response) {
+      if (error.response.status === 401) {
+        errorMessage = "Username atau Password Salah";
+      } else if (error.response.status === 500) {
+        errorMessage = "Server Error, Silakan Coba Lagi Nanti";
+      }
+    }
+    
+    await Swal.fire({
+      icon: "error",
+      title: errorMessage,
+      showConfirmButton: true,
+      timer: 3000,
+      timerProgressBar: true,
+    });
+    
+    // Refocus on username field
+    document.getElementById("username-field")?.focus();
   }
+}
 
   // ✅ Redirect ke halaman /login/admin-verif
  

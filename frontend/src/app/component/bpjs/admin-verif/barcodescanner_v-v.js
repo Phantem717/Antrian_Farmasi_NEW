@@ -109,6 +109,9 @@ const [daftarAntrian,setDaftarAntrian] = useState([]);
                     text: `Terjadi kesalahan saat memproses Booking ID ${NOP}.`,
                     timer: 2000,
                     showConfirmButton: false,
+                }).then(()=>{
+    onScanResult(NOP);
+                setInputValue("");
                 });
             }
             

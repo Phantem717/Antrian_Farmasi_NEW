@@ -40,6 +40,7 @@ export default function DaftarAntrian({ scanResult, setIsDeleted }) {
                         .map((item) => ({
                             NOP: item.NOP,
                             patient_name: item.patient_name || "Tidak Diketahui",
+                            queue_number: item.queue_number || '-',
                             medical_record_no: item.medical_record_no || "Tidak Diketahui",
                             status: item.status || "Menunggu",
                             medicine_type: item.medicine_type !== "Empty" ? item.medicine_type : "Belum Ditentukan",
@@ -107,7 +108,9 @@ export default function DaftarAntrian({ scanResult, setIsDeleted }) {
                          <Table stickyHeader>
                         <TableHead>
                             <TableRow>
-                                <TableCell align="center"><strong>Booking ID</strong></TableCell>
+                                <TableCell align="center"><strong>NOP</strong></TableCell>
+                                                                <TableCell align="center"><strong>Nomor Antrian</strong></TableCell>
+
                                 <TableCell align="center"><strong>Nama Pasien</strong></TableCell>
                                 <TableCell align="center"><strong>No. Rekam Medis</strong></TableCell>
                                 <TableCell align="center"><strong>Status</strong></TableCell>
@@ -124,6 +127,8 @@ export default function DaftarAntrian({ scanResult, setIsDeleted }) {
                                     console.log(queueList),
                                     <TableRow key={index}>
                                         <TableCell align="center">{item.NOP}</TableCell>
+                                        <TableCell align="center">{item.queue_number}</TableCell>
+
                                         <TableCell align="center">{item.patient_name}</TableCell>
                                         <TableCell align="center">{item.medical_record_no}</TableCell>
                                         <TableCell align="center">{item.status}</TableCell>

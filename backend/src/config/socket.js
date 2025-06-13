@@ -1,5 +1,5 @@
 let io;
-
+const responseControl = require('../controllers/responsesController');
 module.exports = {
   init: (server) => {
     const { Server } = require('socket.io');
@@ -17,7 +17,7 @@ module.exports = {
     console.log('? Socket.IO initialized');
 
     // ? Tambahkan listener untuk koneksi baru
-    io.on('connection', (socket) => {
+    io.on('connection', async (socket) => {
       console.log('?? Client connected:', socket.id);
 
       // Listener uji coba
@@ -65,6 +65,21 @@ module.exports = {
         queueDataGMCB = [];
 
       });
+      const defaultLocation = "Lantai 1 BPJS";
+
+  try {
+    const data = await responseControl.getAllResponses(defaultLocation);
+    socket.emit('get_responses', {
+      message: '? Initial data fetched',
+      data: data
+    });
+  } catch (err) {
+    console.error('? Error fetching responses:', err.message);
+    socket.emit('get_responses', {
+      message: '? Failed to fetch data',
+      error: err.message
+    });
+  }
       
       socket.on('call_queues_pickup', (payload) => {
         if(payload.lokasi == "Lantai 1 BPJS"){

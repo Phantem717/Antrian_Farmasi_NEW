@@ -6,8 +6,12 @@ const router = express.Router();
 
 const {
   getAllResponses,
+  getMedicineResponses,getPickupResponses,getVerificationResponses
 } = require('../controllers/responsesController');
 
 router.get('/:location', getAllResponses);
+router.get('/verify/:location',getVerificationResponses);
+router.get('/medicine/:location',getMedicineResponses);
+router.get('/pickup/:location',getPickupResponses);
 
 module.exports = router;
