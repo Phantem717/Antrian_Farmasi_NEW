@@ -24,8 +24,9 @@ class DoctorAppointment {
           doctor_name,
           nik,
           farmasi_queue_number,
-          NOP
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?)
+          NOP,
+          PRB
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?)
       `;
       const values = [
         appointmentData.sep_no,
@@ -42,6 +43,7 @@ class DoctorAppointment {
         appointmentData.nik,
         appointmentData.farmasi_queue_number,
         appointmentData.NOP,
+        appointmentData.PRB
 
       ];
       const [result] = await connection.execute(query, values);
@@ -98,6 +100,23 @@ ORDER BY da.queue_number`;
         WHERE NOP = ?
       `;
       const values = [status_medicine, NOP];
+
+      const [result] = await connection.execute(query, values);
+      return result;
+    } catch (error) {
+      throw error;
+    }
+}
+
+ static async updatePhoneNumber(NOP,phone_number) {
+    try {
+      const connection = getDb();
+      const query = `
+        UPDATE Doctor_Appointments 
+        SET phone_number = ?
+        WHERE NOP = ?
+      `;
+      const values = [phone_number, NOP];
 
       const [result] = await connection.execute(query, values);
       return result;

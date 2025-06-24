@@ -20,7 +20,7 @@ import {
 } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
-
+import EditIcon from '@mui/icons-material/Edit';
 import Swal from "sweetalert2";
 import DeleteIcon from "@mui/icons-material/Delete";
 import RefreshIcon from "@mui/icons-material/Refresh";
@@ -31,17 +31,23 @@ import DoctorAppointmentAPI from "@/app/utils/api/Doctor_Appoinment";
 import PharmacyAPI from "@/app/utils/api/Pharmacy";
 import {getSocket} from "@/app/utils/api/socket";
 import $ from 'jquery';
-
+import PhoneEditForm from "@/app/component/bpjs/admin-verif/phoneEditForm";
+import DatePicker from '@/app/component/datepicker';
 
 const DaftarAntrian = ({ selectedQueueIds, setSelectedQueueIds, onSelectQueue, setSelectedLoket,setSelectedQueue2,selectedQueue2 }) => {  
   const [queueList, setQueueList] = useState([]);
   const [rawQueueList,setRawQueueList]= useState([]);
       const [searchText, setSearchText] = useState('');
   const [visible,setVisible]=useState(false);
+  const [phoneVisible,setPhoneVisible] = useState(false);
   const [lokets, setLokets] = useState([]);
   const [selectedLoketLocal, setSelectedLoketLocal] = useState("");
+  const [selectedFilter, setSelectedFilter] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
+  const [phoneQueue, setPhoneQueue] =useState(null);
   const socket = getSocket();
+    const [date,setDate]= useState("");
+  
   // ? Loket yang diizinkan untuk admin verifikasi
   const allowedLokets = ["Loket 1", "Loket 2"];
   // ? Fetch Loket dari API
@@ -62,16 +68,12 @@ const DaftarAntrian = ({ selectedQueueIds, setSelectedQueueIds, onSelectQueue, s
     const interval = setInterval(fetchLokets, 5000);
     return () => clearInterval(interval);
   }, []);
-
-  // ? Fetch Daftar Antrian setelah memilih Loket
-  useEffect(() => {
+useEffect(() => {
   if (!selectedLoketLocal && !selectedStatus) return;
 
   const fetchQueueList = async () => {
     try {
       const response = await VerificationAPI.getAllVerificationTasks();
-      const now = new Date();
-      const dateString = now.toISOString().split('T')[0];
       
       let filteredQueues = response.data.filter((item) => {
         if (!item || !item.status || item.waiting_verification_stamp === undefined) {
@@ -83,34 +85,42 @@ const DaftarAntrian = ({ selectedQueueIds, setSelectedQueueIds, onSelectQueue, s
           : item.waiting_verification_stamp;
 
         const verifDateString = verificationStamp.toISOString().split('T')[0];
-      
+        
+        // If date filter is applied, check against it
+        if (date) {
+          const filterDateString = new Date(date).toISOString().split('T')[0];
+          return item.status.toLowerCase() === selectedStatus.toLowerCase() && 
+                 verifDateString === filterDateString;
+        }
+        
+        // If no date filter, use today's date
+        const todayString = new Date().toISOString().split('T')[0];
         return item.status.toLowerCase() === selectedStatus.toLowerCase() && 
-               dateString == verifDateString;
+               verifDateString === todayString;
       });
 
-      // Changed to get LATEST timestamp
-      const getLatestTimestamp = (item) => {
+      // Use EARLIEST timestamp like the pickup version
+      const getEarliestTimestamp = (item) => {
         const timestamps = [
           item.waiting_verification_stamp,
           item.called_verification_stamp,
           item.recalled_verification_stamp,
           item.pending_verification_stamp,
           item.processed_verification_stamp,
-          item.completed_verification_stamp,
         ]
           .filter(Boolean)
           .map((ts) => new Date(ts).getTime());
 
-        return timestamps.length > 0 ? Math.max(...timestamps) : 0; // 0 as fallback
+        return timestamps.length > 0 ? Math.min(...timestamps) : Infinity;
       };
 
-      // Sort by LATEST timestamp (descending)
+      // Sort by earliest timestamp (ascending) like pickup version
       filteredQueues = filteredQueues.sort(
-        (a, b) => getLatestTimestamp(b) - getLatestTimestamp(a) // Reversed order
+        (a, b) => getEarliestTimestamp(a) - getEarliestTimestamp(b)
       );
 
       setRawQueueList(filteredQueues);
-
+      
       if (!searchText) {
         setQueueList(filteredQueues);
       } else {
@@ -126,10 +136,10 @@ const DaftarAntrian = ({ selectedQueueIds, setSelectedQueueIds, onSelectQueue, s
   };
 
   fetchQueueList();
+  
   const interval = setInterval(fetchQueueList, 10000);
   return () => clearInterval(interval);
-}, [selectedStatus, selectedLoketLocal]);
-
+}, [selectedStatus, selectedLoketLocal, date]);
 
 const handleLoketChange = async (loketName) => {
   setSelectedLoket(loketName);
@@ -215,6 +225,7 @@ const handleLoketChange = async (loketName) => {
     }
   }
 
+
   useEffect(() => {
   if (!searchText) {
     setQueueList(rawQueueList);
@@ -238,12 +249,39 @@ const handleSearchClear = () => {
  const handleCloseBarcodeScanner = () => {
     setVisible(false);
   };
+
+  
+ const handleClosePhoneForm = () => {
+    setPhoneVisible(false);
+  };
+// Add a clear date function
+const handleClearDate = () => {
+  setDate(null);
+};
+
+console.log("DATe",date);
+  async function handleUpdatePhone(selectedQueue){
+    try {
+      console.log(selectedQueue);
+      setPhoneVisible(true);
+      setPhoneQueue(selectedQueue);
+      
+    } catch (error) {
+            console.error("Error Updating tasks:", error);
+
+    }
+  }
   return (
     <Box sx={{ padding: "10px" }}>
       {visible &&
                     <CreateInstanceForm  visible={visible} 
         onClose={handleCloseBarcodeScanner} />
       
+      }
+
+      {phoneVisible &&
+      <PhoneEditForm visible={phoneVisible} onClose={handleClosePhoneForm} selectedQueue={phoneQueue}/>
+
       }
       <Typography variant="h4" align="center" sx={{ marginBottom: "20px" }}>
         Daftar Antrian
@@ -280,6 +318,21 @@ const handleSearchClear = () => {
           <MenuItem value="processed_verification">Proses Verifikasi</MenuItem>
         </Select>
 
+        <Box sx={{ display: "flex", alignItems: "center", gap: "10px", zIndex:"100"}}  >
+          <div className="w-[200px]">
+            <DatePicker date={date} setDate={setDate} selectedStatus={selectedStatus}/>
+          </div>
+          {date && (
+            <Button
+              variant="outlined"
+              onClick={handleClearDate}
+              sx={{ height: '40px' }}
+            >
+              Clear
+            </Button>
+          )}
+        </Box>
+
         <Box sx={{ display: "flex", gap: "10px" }}>
           <Button variant="contained" color="error" startIcon={<DeleteIcon />} sx={{ fontSize: "0.9rem", padding: "10px 15px" }} disabled={!selectedQueueIds.length} onClick={()=>deleteAction()}>
             Hapus Antrian
@@ -290,7 +343,7 @@ const handleSearchClear = () => {
         </Box>
       </Box>
 
-      <Paper elevation={3} sx={{ padding: "10px", maxHeight: "900px", overflow: "auto" }}>
+      <Paper elevation={3} sx={{ padding: "10px", maxHeight: "600px", overflow: "auto" }}>
    <div className="w-full flex items-center gap-2 mb-2">
   <form
     onSubmit={(e) => {
@@ -322,7 +375,7 @@ const handleSearchClear = () => {
      
       {queueList.length > 0 && (
         
-    <Table stickyHeader>
+    <Table stickyHeader className="z-0 overflow-hidden"  >
 
           <TableHead>
             <TableRow>
@@ -335,6 +388,7 @@ const handleSearchClear = () => {
               <TableCell align="center"><strong>No. Rekam Medis</strong></TableCell>
               <TableCell align="center"><strong>Status</strong></TableCell>
               <TableCell align="center"><strong>Status Medicine</strong></TableCell> 
+              <TableCell align="center"><strong>Phone Number</strong></TableCell>
                <TableCell align="center">
                                Timestamp
                               </TableCell>
@@ -361,6 +415,13 @@ return (
     </TableCell>
     <TableCell align="center">
     {item.status_medicine === "Tidak ada Resep" ? "Tidak ada Resep" : item.status_medicine === "Racikan" ? "Racikan" : item.status_medicine}
+    </TableCell>
+     <TableCell align="center" className="flex flex-row items-center " style={{gap:"1px"}}>
+     <Button onClick={(e)=>handleUpdatePhone(item)} className="p-0 m-0">
+            <EditIcon className="p-0 m-0"></EditIcon>
+
+     </Button>
+    {item.phone_number}
     </TableCell>
      <TableCell align="center">
      {item.waiting_verification_stamp 

@@ -13,7 +13,14 @@
     --foreground: #ededed;
   }
 }
+.swal2-container {
+  z-index: 9999 !important;
+}
 
+/* Optional: If you want to target just the popup box itself */
+.swal2-popup {
+  z-index: 10000 !important;
+}
 body {
   color: var(--foreground);
   background: var(--background);

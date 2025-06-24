@@ -1,6 +1,6 @@
 //src\components\admin\DisplayAntrian.js
 import React, { useState, useEffect } from "react";
-
+import DatePicker from "@/app/component/datepicker";
 import {
   Box,
   Button,
@@ -19,67 +19,98 @@ const tableLogs = ({
     selectedQueueIds,// ?? Mengirim daftar nomor yang dipilih
     setSelectedQueueIds, // ?? Agar bisa diperbarui dari DaftarAntrian
 }) => {
-    useEffect(() => {
-        setFilteredData(selectedQueueIds);
-      }, [selectedQueueIds]);
-      
-    const [queueList, setQueueList] = useState([]);
+   const [queueList, setQueueList] = useState([]);
       const [lokets, setLokets] = useState([]);
       const [selectedFilter, setSelectedFilter] = useState("");
       const [selectedStatus, setSelectedStatus] = useState("");
       const [filteredData,setFilteredData]= useState([]);
-      const handleFilterChange = (value) => {
-        setSelectedFilter(value);
-      
-        const today = new Date();
-        let startDate;
-      
-        switch (value) {
-          case "hari_ini":
-            startDate = new Date(today);
-            startDate.setHours(0, 0, 0, 0);
-            break;
-          case "minggu_ini":
-            startDate = new Date(today);
-            startDate.setDate(today.getDate() - today.getDay()); // Sunday (start of the week)
-            startDate.setHours(0, 0, 0, 0);
-            break;
-          case "bulan_ini":
-            startDate = new Date(today.getFullYear(), today.getMonth(), 1);
-            break;
-          case "3_bulan":
-            startDate = new Date(today);
-            startDate.setMonth(today.getMonth() - 3);
-            break;
-          case "6_bulan":
-            startDate = new Date(today);
-            startDate.setMonth(today.getMonth() - 6);
-            break;
-          case "tahun_ini":
-            startDate = new Date(today.getFullYear(), 0, 1); // Jan 1st this year
-            break;
-          default:
-            setFilteredData(selectedQueueIds);
-            return;
-        }
-      
-        const filtered = selectedQueueIds.filter((queue) => {
-          if (!queue.completed_pickup_medicine_stamp) return false;
-      
-          const completedDate = new Date(queue.completed_pickup_medicine_stamp);
-          return completedDate >= startDate;
-        });
-      
-        setFilteredData(filtered);
-      };
-      
+     const [type, setType] = useState("");
+const [date, setDate] = useState(null);
+
+     useEffect(() => {
+  let filtered = [...selectedQueueIds];
+
+  // Filter by type
+  if (type === 'racikan') {
+    filtered = filtered.filter(item => item.status_medicine === 'Racikan');
+  } else if (type === 'nonracikan') {
+    filtered = filtered.filter(item => item.status_medicine === 'Non - Racikan');
+  }
+
+  // Filter by fixed range (hari_ini, minggu_ini, etc.)
+  if (selectedFilter) {
+    const today = new Date();
+    let startDate;
+
+    switch (selectedFilter) {
+      case "hari_ini":
+        startDate = new Date(today);
+        startDate.setHours(0, 0, 0, 0);
+        break;
+      case "minggu_ini":
+        startDate = new Date(today);
+        startDate.setDate(today.getDate() - today.getDay());
+        startDate.setHours(0, 0, 0, 0);
+        break;
+      case "bulan_ini":
+        startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+        break;
+      case "3_bulan":
+        startDate = new Date(today);
+        startDate.setMonth(today.getMonth() - 3);
+        break;
+      case "6_bulan":
+        startDate = new Date(today);
+        startDate.setMonth(today.getMonth() - 6);
+        break;
+      case "tahun_ini":
+        startDate = new Date(today.getFullYear(), 0, 1);
+        break;
+    }
+
+    if (startDate) {
+      filtered = filtered.filter(item => {
+        if (!item.completed_pickup_medicine_stamp) return false;
+        const completedDate = new Date(item.completed_pickup_medicine_stamp);
+        return completedDate >= startDate;
+      });
+    }
+  }
+
+  // Filter by exact date picker
+  if (date) {
+    const selectedDay = new Date(date);
+    selectedDay.setHours(0, 0, 0, 0);
+
+    filtered = filtered.filter(item => {
+      if (!item.completed_pickup_medicine_stamp) return false;
+      const completedDate = new Date(item.completed_pickup_medicine_stamp);
+      completedDate.setHours(0, 0, 0, 0);
+      return completedDate.toDateString() === selectedDay.toDateString();
+    });
+  }
+
+  setFilteredData(filtered);
+}, [selectedQueueIds, type, selectedFilter, date]);
+
+
+const handleFilterType = (value) => {
+  setType(value); // No filtering logic here
+};
+
+const handleFilterChange = (value) => {
+  setSelectedFilter(value); // No filtering logic here
+};
+      const handleClearDate = () => {
+  setDate(null);
+};
   return (
     <Box sx={{ padding: "10px" }}>
     <Typography variant="h4" align="center" sx={{ marginBottom: "20px" }}>
       Table Logs
     </Typography>
 
-    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+    <Box sx={{ display: "flex", alignItems: "center", marginBottom: "20px" }}>
     <Select
   value={selectedFilter}
   onChange={(e) => handleFilterChange(e.target.value)}
@@ -110,12 +141,56 @@ const tableLogs = ({
   <MenuItem value="tahun_ini">Tahun Ini</MenuItem>
 </Select>
 
+<Box sx={{ display: "flex", alignItems: "center", gap: "10px" }}>
+  <div className="w-[200px]">
+    <DatePicker date={date} setDate={setDate} />
+  </div>
+  {date && (
+    <Button
+      variant="outlined"
+      onClick={handleClearDate}
+      sx={{ height: '40px' }}
+    >
+      Clear
+    </Button>
+  )}
+</Box>
+
+<Box sx={{ display: "flex", alignItems: "center", gap: "10px" }}>
+  <div className="w-[200px]">
+  <Select
+  value={type}
+  onChange={(e) => handleFilterType(e.target.value)}
+  displayEmpty
+  renderValue={(selected) => {
+    if (!selected) {
+      return <em>Pilih Opsi</em>;
+    }
+    // Optionally make this prettier if needed
+     const labelMap = {
+      racikan: "Racikan",
+      nonracikan: "Non - Racikan",
+      
+    };
+    return labelMap[selected] || selected;
+  }}
+  sx={{ width: "200px", marginRight: "10px" }}
+>
+
+  <MenuItem value=""><em>Pilih Opsi</em></MenuItem>
+  <MenuItem value="racikan">Racikan</MenuItem>
+  <MenuItem value="nonracikan">Non - Racikan</MenuItem>
+  
+</Select>
+  </div>
+ 
+</Box>
     </Box>
 
     <Paper elevation={3} sx={{ padding: "10px", maxHeight: "700px", overflow: "auto" }}>
     <Box sx={{ minWidth: "1500px" }}>
 
-      <Table stickyHeader >
+      <Table stickyHeader className="z-0" >
         <TableHead>
           <TableRow>
     

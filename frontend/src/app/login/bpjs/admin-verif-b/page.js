@@ -14,49 +14,52 @@ import QueueCall from "@/app/component/display/QueueCall";
 const { Content } = Layout;
 import {getSocket} from "@/app/utils/api/socket";
 import { useRouter, usePathname } from "next/navigation";
+import CircularProgress from '@mui/material/CircularProgress';
+import Box from '@mui/material/Box';
+
 function useTokenCheck() {
-  const [token, setToken] = useState("");
+  const [token, setToken] = useState(null);
+  const [isExpired, setIsExpired] = useState(true);
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setToken(localStorage.getItem('token'));
+    const token = localStorage.getItem('token');
+    setToken(token);
+    
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        setIsExpired(payload.exp < Math.floor(Date.now() / 1000));
+      } catch (error) {
+        console.error('Token error:', error);
+        setIsExpired(true);
+      }
+    } else {
+      setIsExpired(true);
     }
   }, []);
 
-  const checkTokenExpired = useCallback(() => {
-    if (!token) return true;
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      return payload.exp < Math.floor(Date.now() / 1000);
-    } catch (error) {
-      console.error('Token error:', error);
-      return true;
-    }
-  }, [token]);
-
-  return { token, isExpired: checkTokenExpired() };
+  return { token, isExpired };
 }
 export default function Admin() {
-      const router = useRouter();
-      const checkResponse = useTokenCheck();
+    const [isLoading, setIsLoading] = useState(false);
+  const checkResponse = useTokenCheck();
+  const router = useRouter();
 
- 
   useEffect(() => {
-    const socket = getSocket();
-    console.log("CONNECTNG");
-    socket.on('connect', () => {
-      console.log("SOCKET CONNECTED");
-    });
-    console.log("CHECKRESP",checkResponse);
-    if(checkResponse == true){
-      router.push("/login"); // Arahkan ke halaman login
+    if (checkResponse.token !== null) { // Only check after we've tried to load the token
+      setIsLoading(false);
+      if (checkResponse.isExpired) {
+        router.push("/login");
+      }
     }
+  }, [checkResponse, router]);
 
-          return () => {
-            socket.off('connect');
-            socket.off('test_pilih');
-          }
-  },[useTokenCheck,router]);
+  if(isLoading){
+    return    <Box sx={{ display: 'flex' }}>
+      <CircularProgress />
+    </Box>
+  }
+ 
 
   const [collapsed, setCollapsed] = useState(false);
   const siderWidth = collapsed ? 80 : 300;

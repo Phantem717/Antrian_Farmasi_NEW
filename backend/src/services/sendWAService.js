@@ -11,11 +11,15 @@ async function sendWAVerif(payload){
       let duration = "";
 
       if (payload?.medicine_type?.trim() === "Racikan") {
-        duration = "Obat anda akan siap dalam 60 menit"
+        duration = "60 Menit"
       }
       else{
-        duration = "Obat anda akan siap dalam 30 menit"
+        duration = "30 Menit"
 
+      }
+      let change_queue_message;
+      if(payload?.prev_queue_number?.trim() != "-" || payload?.prev_queue_number?.trim() != null){
+        change_queue_message= `_Nomor Antrian anda telah berubah/diganti dari *${payload.prev_queue_number}* menjadi *${payload.queue_number}*_`
       }
   const url = `https://rscarolus.com/api/v1/integration/whatsappweb/hello/send-text`;
 console.log("PHONE_NUMBER",payload.phone_number);
@@ -25,23 +29,24 @@ console.log("PHONE_NUMBER",payload.phone_number);
       phone: "081286968913",
       // phone: payload.phone_number,
 
-      message : `Notifikasi Sistem Otomatis
-Terimakasih telah memilih RS St. Carolus sebagai Rumah Sakit pilihan Anda.
-Kami dari Farmasi Rawat Jalan BPJS RS St. Carolus menginformasikan bahwa:
-      
-Nama Pasien : ${payload.patient_name}
-No SEP      : ${payload.sep}
-NIK         : ${payload.nik}
-Dokter      : ${payload.docter}
-Nomor RM    : ${payload.rm}
-OBAT        : ${payload.medicine_type}
-NOMOR ANTRIAN: ${payload.queue_number}
-      
-STATUS:
-*2. RESEP MULAI DIKERJAKAN*
-*${duration}*
+      message : `*Notifikasi Sistem Otomatis*
 
-`    },
+Terimakasih telah menunggu.
+Kami dari Farmasi Rawat Jalan BPJS RS St. Carolus menginformasikan bahwa:    
+
+Nama Pasien : *${payload.patient_name}*
+No Registrasi : *${payload.NOP}*        
+Dokter : *${payload.docter}*      
+Obat : *${payload.medicine_type}*
+No. Antrian : *${payload.queue_number}*
+${change_queue_message ? '\n' + change_queue_message + '\n' : ''}
+Saat ini sedang dilakukan *_Proses Penyiapan_* obat
+Obat anda akan siap dalam +/- ${duration}.
+
+Mohon menunggu informasi selanjutnya. 
+Terima kasih. 
+
+*_pesan otomatis dari sistem, mohon tidak membalas_*`    },
     {
       headers: {
         'X-cons-id': consID2,
@@ -77,14 +82,12 @@ console.log("PHONE_NUMBER",payload.phone_number);
 
 Terimakasih telah memilih RS St. Carolus sebagai Rumah Sakit pilihan anda.
 Kami dari Farmasi Rawat Jalan BPJS RS St. Carolus menginformasikan bahwa : 
-        
-Nama Pasien : ${payload.patient_name}
-No SEP: ${payload.sep}
-NIK: ${payload.nik}
-Dokter : ${payload.docter}
-Nomor RM : ${payload.rm} 
-OBAT ${payload.medicine_type}
-NOMOR ANTRIAN: ${payload.queue_number}
+    
+Nama Pasien : *${payload.patient_name}*
+No Registrasi : *${payload.NOP}*        
+Dokter : *${payload.doctor_name}*      
+Obat : *${payload.medicine_type}*
+No. Antrian : *${payload.queue_number}*
 
 STATUS :
 *3. OBAT SELESAI DIKEMAS*
@@ -137,19 +140,23 @@ console.log("PHONE_NUMBER",payload.phone_number);
         // phone: payload.phone_number,
 
         message : `
-??????????
-Informasi RS St Carolus Jakarta ?
+Notifikasi Sistem Otomatis
 
-Hallo Sahabat Sehat RS St Carolus Jakarta, *${payload.patient_name}*,
-Resep Anda dengan nomor registrasi *${payload.NOP}*, dan nomor antrian ${payload.queue_number}
- telah dibuat oleh Dokter. 
-Petugas farmasi kami akan memverifikasi resepnya terlebih dahulu ya. 
+Kami dari Farmasi Rawat Jalan BPJS RS St. Carolus menginformasikan bahwa :        
 
-Mohon menunggu informasi selanjutnya 
+Nama Pasien : *${payload.patient_name}*
+No Registrasi : *${payload.NOP}*        
+Dokter : *${payload.doctor_name}*      
+Obat : *${payload.medicine_type}*
+No. Antrian : *${payload.queue_number}*   
 
+*Saat ini sedang dilakukan _Pengecekan Ketersediaan_ obatnya, apakah obat tersedia atau ada hal lain.*
+
+Mohon menunggu informasi selanjutnya. 
 Terima kasih. 
 
-pesan otomatis dari sistem mohon tidak membalas
+*pesan otomatis dari sistem, mohon tidak membalas*
+
 `    },
       {
         headers: {
@@ -180,23 +187,24 @@ console.log("PHONE_NUMBER_PICKUP",payload.phone_number);
       {
         phone: "081286968913",
         // phone: payload.phone_number,
-        message : `Notifikasi Sistem Otomatis
+        message : `*Notifikasi Sistem Otomatis*
 
-Terimakasih telah memilih RS St. Carolus sebagai Rumah Sakit pilihan Anda.
-Kami dari Farmasi Rawat Jalan BPJS RS St. Carolus menginformasikan bahwa:
+Terima kasih telah menunggu.
+Kami dari Farmasi Rawat Jalan BPJS RS St. Carolus menginformasikan bahwa :        
 
-Nama Pasien : ${payload.patient_name}
-No SEP      : ${payload.sep}
-NIK         : ${payload.nik}
-Dokter      : ${payload.docter}
-Nomor RM    : ${payload.rm}
-OBAT        : ${payload.medicine_type}
-NOMOR ANTRIAN: ${payload.queue_number}
+Nama Pasien : *${payload.patient_name}*
+No Registrasi : *${payload.NOP}*        
+Dokter : *${payload.docter}*      
+Obat : *${payload.medicine_type}*
+No. Antrian : *${payload.queue_number}*
 
+*Saat ini _Obat Telah Selesai_ disiapkan, dan dapat diambil di Loket 3.*
 
-STATUS:
-*4. OBAT SIAP DISERAHKAN*
-`
+*Mohon menunjukkan WA ini untuk mengambil obat.*
+
+Terima kasih. 
+
+*pesan otomatis dari sistem, mohon tidak membalas*`
 
     },
       {

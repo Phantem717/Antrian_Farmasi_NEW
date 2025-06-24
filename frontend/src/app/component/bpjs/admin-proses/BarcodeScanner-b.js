@@ -9,10 +9,12 @@ import PharmacyAPI from "@/app/utils/api/Pharmacy"; // ✅ Import API Pharmacy
 import MedicineAPI from "@/app/utils/api/Medicine"; // ✅ Gunakan API Medicine
 import DoctorAppointmentAPI from "@/app/utils/api/Doctor_Appoinment";
 import WA_API from "@/app/utils/api/WA";
+import {getSocket} from "@/app/utils/api/socket";
+
 export default function BarcodeScanner({ onScanResult, daftarAntrian }) {
     const [inputValue, setInputValue] = useState("");
     const inputRef = useRef(null);
-
+    const socket = getSocket();
     const handleKeyDown = async (event) => {
         if (event.key === "Enter") {
             const NOP = event.target.value.trim();
@@ -38,10 +40,12 @@ export default function BarcodeScanner({ onScanResult, daftarAntrian }) {
                 const foundItem = daftarAntrian.find(item => item.NOP === NOP);
                 const medicineType = foundItem ? foundItem.medicine_type : "Non - Racikan"; // Default jika tidak ditemukan
                 
-                MedicineAPI.updateMedicineTask(NOP, { Executor: null,
+                const medResp = await MedicineAPI.updateMedicineTask(NOP, { Executor: null,
                     Executor_Names: null,
                     status: "completed_medicine", 
                     loket: "Loket 3"});
+                
+                    console.log("MEDRESP",medResp);
                     
                 // 🔹 STEP 2: Create Pickup Task
                 const pickupResponse = await PickupAPI.createPickupTask({
@@ -75,8 +79,9 @@ export default function BarcodeScanner({ onScanResult, daftarAntrian }) {
 
 
                 }
-                const sendResponse = await WA_API.sendWAProses(payload);
-                console.log("WA SENT",sendResponse);
+                // const sendResponse = await WA_API.sendWAProses(payload);
+                // console.log("WA SENT",sendResponse);
+                socket.emit('update_display', console.log("EMIT UPDATE"));
 
                 Swal.fire({
                     icon: "success",

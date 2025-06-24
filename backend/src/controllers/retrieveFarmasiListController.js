@@ -8,20 +8,26 @@ const { getCurrentTimestamp, convertToJakartaTime } = require('../handler/timeHa
 const { createAntrianFarmasi } = require('../services/createFarmasiQueueService');
 const { createVerificationTaskInternal } = require('./verificationTaskController');
 const { printAntrianFarmasi } = require('../services/printAntrianService');
-
-function formatPhoneNumber(phoneNumber) {
-  if (!phoneNumber) return null;
+async function retryOperation(operation, maxRetries = 3, delayMs = 1000) {
+  let lastError;
   
-  // Remove all non-digit characters
-  let cleaned = phoneNumber.replace(/\D/g, '');
-  
-  // Replace leading 62 or +62 with 0
-  if (cleaned.startsWith('0')) {
-    cleaned = '62' + cleaned.substring(2);
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const result = await operation();
+      return result;
+    } catch (error) {
+      lastError = error;
+      console.warn(`Attempt ${attempt} failed:`, error.message);
+      
+      if (attempt < maxRetries) {
+        await new Promise(resolve => setTimeout(resolve, delayMs * attempt));
+      }
+    }
   }
-  console.log("CLEANED",cleaned);
-  return cleaned;
+  
+  throw lastError;
 }
+
 
 async function insertAll(payload) {
   const doctorAppointmentData = {
@@ -39,6 +45,8 @@ async function insertAll(payload) {
     nik: payload.nik || "-",
     farmasi_queue_number: payload.farmasi_queue_number || "-",
     NOP: payload.NOP || "-",
+            PRB: payload.PRB || null
+
   };
 
   const pharmacyPayload = {
@@ -58,6 +66,7 @@ async function insertAll(payload) {
 }
 
 const getFarmasiList = async (req, res) => {
+  console.log("GETLIST");
   try {
     if (!req.body || typeof req.body !== 'object' || Object.keys(req.body).length === 0) {
       return res.status(400).json({ message: "Body Is Empty" });
@@ -65,6 +74,7 @@ const getFarmasiList = async (req, res) => {
 
     const farmasiArray = req.body;
     const NOP = farmasiArray.payload.NOP;
+    console.log("FARM",farmasiArray);
     
     if (!NOP) {
       return res.status(400).json({ message: "NOP NOT FOUND" });
@@ -103,6 +113,7 @@ const getFarmasiList = async (req, res) => {
         nik: farmasiArray.payload.nik ?? "-",
         farmasi_queue_number: farmasiArray.payload.farmasi_queue_number ?? "-",
         NOP: farmasiArray.payload.NOP ?? null,
+        PRB: farmasiArray.payload.PRB ?? null
       };
 
       result = await insertAll(payload);
@@ -110,15 +121,6 @@ const getFarmasiList = async (req, res) => {
       existingPharmacyTask = result.pharmacyData;
       existingVerificationTask = result.verificationData;
 
-      const WAPayload = {
-        sep: farmasiArray.payload.sep_no ?? "-",
-        patient_name: farmasiArray.payload.patient_name ?? "-",
-        rm: farmasiArray.payload.medical_record_no ?? "-",
-        nik: farmasiArray.payload.nik ?? "-",
-        docter: farmasiArray.payload.doctor_name ?? "-",
-        phone_number: farmasiArray.payload.phone_number ?? "-",
-        medicine_type: statusMedicine ?? "-"
-      };
 
       const printPayload = {
         phone_number: farmasiArray.payload.phone_number ?? "-",
@@ -126,12 +128,21 @@ const getFarmasiList = async (req, res) => {
         patient_name: farmasiArray.payload.patient_name ?? "-",
         farmasi_queue_number: farmasiArray.payload.farmasi_queue_number ?? "-",
         medicine_type: statusMedicine ?? "-",
+        
         SEP: farmasiArray.payload.sep_no ?? "-",
         tanggal_lahir: farmasiArray.payload?.patient_date_of_birth ?? null,
         queue_number: farmasiArray.payload.farmasi_queue_number ?? null,
-      }
+        PRB: farmasiArray.payload.PRB ?? null
 
-      const print = await printAntrianFarmasi(printPayload);
+      }
+const print = await retryOperation(
+    () => printAntrianFarmasi(printPayload),
+    3, // max retries
+    1000 // initial delay (will increase exponentially)
+  );
+      // const print = await printAntrianFarmasi(printPayload);
+      await new Promise(resolve => setTimeout(resolve, 2000)); // 1-second delay
+
       const io = req.app.get('socketio');
       
       if (print.success == false) {
@@ -140,7 +151,7 @@ const getFarmasiList = async (req, res) => {
         });
       }
     }
-
+       
     return res.status(201).json({
       message: "Data berhasil diproses",
       doctor_appointment: existingDoctorAppointment,

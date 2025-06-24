@@ -112,19 +112,19 @@ const fetchActiveLoket = async () => {
       if (activeLoket2) {
         setSelectedLoket(activeLoket2[0].loket_name);
         setSelectedLoket2(activeLoket2[1].loket_name);
-        console.log("✅ Loket aktif ditemukan:", activeLoket2[0].loket_name,activeLoket2[1].loket_name);
+        console.log("? Loket aktif ditemukan:", activeLoket2[0].loket_name,activeLoket2[1].loket_name);
       } else {
-        console.warn("⚠️ Tidak ada loket aktif.");
+        console.warn("?? Tidak ada loket aktif.");
       }
     });
    
   } catch (error) {
-    console.error("❌ Error fetching active loket:", error);
+    console.error("? Error fetching active loket:", error);
   }
 };
 
 
-  // ✅ Ambil Loket Aktif dari API
+  // ? Ambil Loket Aktif dari API
   useEffect(() => {
    
     
@@ -198,7 +198,7 @@ const fetchActiveLoket = async () => {
       left: '50%',
       transform: 'translate(-50%, -50%)',
       zIndex: 1000,
-      width: "600px"
+      width: "800px"
 
     }}
     >
@@ -207,6 +207,9 @@ const fetchActiveLoket = async () => {
       <div className="number text-white -bold text-9xl my-5" style={{ animation: "zoom-in-out 2s infinite" }}>
         {loading ? "Memuat..." : queueData ? queueData.queueNumber : "..." }
         
+      </div>
+      <div className="text-white w-full font-extrabold text-5xl mb-5 mt-3 text-center truncate whitespace-nowrap overflow-hidden leading-tight">
+        {queueData ? queueData.name : "..."}
       </div>
     
       <p className="text-3xl font-bold text-white">

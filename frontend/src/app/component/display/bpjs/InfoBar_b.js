@@ -39,7 +39,7 @@ const InfoBar_b = () => {
       </div>
 
       {/* Nama Layanan */}
-      <div style={{ textAlign: "center", fontWeight: "bold", fontSize: "1.8rem" }}>
+      <div style={{color:"black", textAlign: "center", fontWeight: "bold", fontSize: "1.8rem" }}>
         Layanan<br />Farmasi
       </div>
 

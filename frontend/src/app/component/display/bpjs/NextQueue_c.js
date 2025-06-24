@@ -155,17 +155,18 @@ const NextQueue = ({ verificationData, medicineData, pickupData }) => {
           <div className="w-full">
             {queuesRacik.length > 0 ? (
               queuesRacik.map((queue, index) => (
-                <div
-                  key={index}
-                  className="flex items-center flex-col justify-center bg-white text-green-700 text-6xl font-extrabold p-4 shadow border border-gray-300 rounded w-full"
-                  style={{ height: '120px', marginBottom: '8px' }}
-                >
- <div className="text-center">
-                      {queue.queueNumber}
-
-            </div>                                    <div className={`flex-1 text-2xl bg-green-400 w-full p-1  text-black`}>{queue.patient_name}</div>
-
-                </div>
+                  <div
+  key={index}
+  className="bg-white text-green-700 text-6xl font-extrabold p-4 shadow border border-gray-300 rounded w-full"
+  style={{ height: '140px', marginBottom: '8px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}
+>
+  <div className="text-center text-6xl w-full leading-none">
+    {queue.queueNumber}
+  </div>
+  <div className="mt-2 w-full bg-green-400 px-4 py-2 text-black text-xl truncate whitespace-nowrap overflow-hidden leading-tight">
+    {queue.patient_name}
+  </div>
+</div>
               ))
             ) : (
               <div className="bg-white text-black p-4 shadow text-center font-bold text-2xl w-full">
@@ -198,20 +199,18 @@ const NextQueue = ({ verificationData, medicineData, pickupData }) => {
   <div className="w-full flex flex-start items-start flex-col items-end">
     {queuesNonRacik.length > 0 ? (
       queuesNonRacik.map((queue, index) => (
-        <div
-          key={index}
-          className="flex items-start flex-col justify-center bg-white text-green-700 text-6xl font-extrabold p-4 shadow border border-gray-300 rounded w-full"
-          style={{ height: '120px', marginBottom: '8px'
-            , width:'310px'
-           }}
-        >
-          <div className="text-center flex justify-center items-middle w-full">
-                      {queue.queueNumber}
-
-            </div>
-              <div className={`flex-1 text-lg mt-2 bg-green-400 w-full p-1  text-black truncate ` }>{queue.patient_name}</div>
-
-        </div>
+       <div
+  key={index}
+  className="bg-white text-green-700 text-6xl font-extrabold p-4 shadow border border-gray-300 rounded w-full"
+  style={{ height: '140px', width:'305px', marginBottom: '8px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}
+>
+  <div className="text-center  text-6xl w-full leading-none">
+    {queue.queueNumber}
+  </div>
+  <div className="mt-2 w-full bg-green-400 px-4 py-2 text-black text-center text-xl truncate whitespace-nowrap overflow-hidden leading-tight">
+    {queue.patient_name}
+  </div>
+</div>
       ))
     ) : (
       <div className="bg-white text-black p-4 shadow text-center font-bold text-2xl w-full">
@@ -247,7 +246,7 @@ className="gap-[3rem] [--duration:260s]" innerClassName="gap-[3rem] [--gap:3rem]
                   <div className={`flex-1 text-3xl text-center ${getStatusColor(queue.status)}`}>{queue.type}</div>
                   <div className={`flex-1 text-3xl text-right ${getStatusColor(queue.status)}`}>{queue.status}</div>
                 </div>
-                  <div className={`flex-1 text-4xl bg-green-400 mt-2 w-full p-1  text-black`}>{queue.patient_name}</div>
+                  <div className={`flex-1 text-4xl text-center bg-green-400 mt-2 w-full p-1  text-black`}>{queue.patient_name}</div>
                 </div>
               ))
               
@@ -276,13 +275,14 @@ const QueueSectionPickup = ({ title, queuesRacik, queuesNonRacik, bgColor }) => 
                   <div
                     key={index}
                     className={`uppercase bg-white p-4 shadow font-extrabold rounded mb-1 flex flex-col items-center justify-center text-center ${getStatusColourBorder(queue.status)}`}
-                    style={{ minHeight: "120px" }}
+                    style={{ minHeight: "140px" }}
                   >
-                    <div className="flex flex-col">
+                    <div className="flex flex-col font-extrabold">
                       <div className={`text-4xl ${getStatusColor(queue.status)}`}>{queue.queueNumber}</div>
                     <div className={`text-3xl ${getStatusColor(queue.status)}`}>{queue.status}</div>
                     </div>
-                    <div className={`flex-1 text-2xl bg-green-400 w-full p-1  text-black`}>{queue.patient_name}</div>
+                      <div className="text-center mt-2 w-full bg-green-400 px-4 py-2 text-black text-xl truncate whitespace-nowrap overflow-hidden leading-tight">
+{queue.patient_name}</div>
                     
                   </div>
                 ))}
@@ -310,13 +310,14 @@ const QueueSectionPickup = ({ title, queuesRacik, queuesNonRacik, bgColor }) => 
                   <div
                     key={index}
                     className={`uppercase bg-white p-4 shadow font-extrabold rounded mb-1 flex flex-col items-center justify-center text-center ${getStatusColourBorder(queue.status)}`}
-                    style={{ minHeight: "120px" }}
+                    style={{ minHeight: "140px" }}
                   >
-                   <div className="flex flex-col">
+                   <div className="flex flex-col font-extrabold">
                       <div className={`text-4xl ${getStatusColor(queue.status)}`}>{queue.queueNumber}</div>
                     <div className={`text-3xl ${getStatusColor(queue.status)}`}>{queue.status}</div>
                     </div>
-                    <div className={`flex-1 text-2xl bg-green-400 w-full p-1  text-black`}>{queue.patient_name}</div>
+                      <div className="text-center text-bold mt-2 w-full bg-green-400 px-4 py-2 text-black text-xl truncate whitespace-nowrap overflow-hidden leading-tight">
+{queue.patient_name}</div>
                     
                   </div>
                 ))}

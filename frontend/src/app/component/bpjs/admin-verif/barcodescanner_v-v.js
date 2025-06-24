@@ -10,11 +10,32 @@ import PharmacyAPI from "@/app/utils/api/Pharmacy"; // ✅ Import API Pharmacy
 import MedicineAPI from "@/app/utils/api/Medicine"; // ✅ Gunakan API Medicine
 import DoctorAppointmentAPI from "@/app/utils/api/Doctor_Appoinment";
 import WA_API from "@/app/utils/api/WA";
+import {getSocket} from "@/app/utils/api/socket";
+
 export default function BarcodeScanner({ onScanResult , handleBulkPharmacyUpdate}) {
     const [inputValue, setInputValue] = useState("");
-   
+   const socket = getSocket();
     const inputRef = useRef(null);
 const [daftarAntrian,setDaftarAntrian] = useState([]);
+async function retryOperation(operation, maxRetries = 3, delayMs = 1000) {
+  let lastError;
+  
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const result = await operation();
+      return result;
+    } catch (error) {
+      lastError = error;
+      console.warn(`Attempt ${attempt} failed:`, error.message);
+      
+      if (attempt < maxRetries) {
+        await new Promise(resolve => setTimeout(resolve, delayMs * attempt));
+      }
+    }
+  }
+  
+  throw lastError;
+}
     useEffect(() => {
         const fetchQueueList = async () => {
           try {
@@ -32,6 +53,7 @@ const [daftarAntrian,setDaftarAntrian] = useState([]);
       }, []);
     const handleKeyDown = async (event) => {
         if (event.key === "Enter") {
+           
             const NOP = event.target.value.trim();
             if (!NOP) {
                 Swal.fire({
@@ -48,7 +70,7 @@ const [daftarAntrian,setDaftarAntrian] = useState([]);
 
             try {
                 // 🔹 STEP 1: Switch Medicine to Pickup di BPJS
-               
+                 
                 // 🔹 Ambil medicine_type dari daftar antrian berdasarkan NOP
                 const foundItem = daftarAntrian.find(item => item.NOP === NOP);
                 console.log("FOUND ITEM",foundItem);
@@ -62,13 +84,14 @@ const [daftarAntrian,setDaftarAntrian] = useState([]);
 
                     console.log("PHARMACY RESP",pharResp);
                     
-                      await MedicineAPI.createMedicineTask({
+                    const medResp=  await MedicineAPI.createMedicineTask({
                                 NOP: foundItem.NOP,
                                 Executor: null,
                                 Executor_Names: null,
                                 status: "waiting_medicine",
                                 lokasi: "Lantai 1 BPJS"
                               });
+                              console.log("MEDRESP",medResp);
                   
                  
                   const doctorResponse = await DoctorAppointmentAPI.getAppointmentByNOP(NOP);
@@ -83,8 +106,20 @@ const [daftarAntrian,setDaftarAntrian] = useState([]);
                     rm: doctorResponse.data.medical_record_no,
                     docter: doctorResponse.data.doctor_name,
                     nik: doctorResponse.data.nik,
+                    prev_queue_number: "-"
                 }
-                const sendResponse = await WA_API.sendWAVerif(payload);
+                const sendResponse = await retryOperation(
+    () => WA_API.sendWAVerif(payload),
+    3, // max retries
+    1000 // initial delay (will increase exponentially)
+  );
+                // const print = await retryOperation(
+//     () => printAntrianFarmasi(printPayload),
+//     3, // max retries
+//     1000 // initial delay (will increase exponentially)
+//   );
+
+                socket.emit('update_display', console.log("EMIT UPDATE"));
 
                 console.log("WA SENT",sendResponse);
 

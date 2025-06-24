@@ -1,91 +1,104 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import Swal from "sweetalert2";
-import { Box, Typography, Table, TableBody, TableCell, TableHead, TableRow, Paper,TextField } from "@mui/material";
-import MedicineAPI from "@/app/utils/api/Medicine"; // ✅ Gunakan API Medicine
+import { Box, Typography, Table, TableBody, TableCell, TableHead, TableRow, Paper,TextField,Button } from "@mui/material";
+import MedicineAPI from "@/app/utils/api/Medicine";
 
 export default function DaftarAntrian({ scanResult, setIsDeleted }) {
-    const [queueList, setQueueList] = useState([]); // Data antrian dari API
+    const [queueList, setQueueList] = useState([]);
+        const [rawQueueList, setRawQueueList] = useState([]);
+
     const [loading, setLoading] = useState(true);
-  const [rawQueueList,setRawQueueList]= useState([]);
       const [searchText, setSearchText] = useState('');
+const handleSearch = (searchText) => {
+  setSearchText(searchText);
+  // No need to manually filter here - the useEffect will handle it
+};
 
-    // 🔄 Ambil daftar antrian dari `MedicineAPI` dan hanya tampilkan yang `waiting_medicine`
-    useEffect(() => {
-        const fetchQueue = async () => {
-            setLoading(true);
-            try {
-                const response = await MedicineAPI.getAllMedicineTasks();
-                console.log("📡 Data dari API:", response);
+const handleSearchClear = () => {
+  setSearchText('');
+  // The useEffect will automatically reset to rawQueueList
+};
+    const fetchQueue = async () => {
+        setLoading(true);
+        try {
+            const response = await MedicineAPI.getAllMedicineTasks();
+            
+            if (response && Array.isArray(response.data)) {
+                const formattedData = response.data
+                    .filter(item => {
+                        if (!item) return false;
+                        
+                        const medicineStamp = typeof item.waiting_medicine_stamp === "string" 
+                            ? new Date(item.waiting_medicine_stamp) 
+                            : item.waiting_medicine_stamp;
+                        const medicineDateString = medicineStamp.toISOString().split('T')[0];
+                        const dateString = new Date().toISOString().split('T')[0];
 
-                if (response && Array.isArray(response.data)) {
-                    const formattedData = response.data
-                        .filter(item => {
-                            // Ensure item exists and has required properties
-                            if (!item ) return false;
-                            
-                            const medicineStamp = typeof item.waiting_medicine_stamp == "string" ? new Date(item.waiting_medicine_stamp) : item.waiting_medicine_stamp
-                            const medicineDateString = medicineStamp.toISOString().split('T')[0];
-                            const dateString = new Date().toISOString().split('T')[0];
+                        return item.status === "waiting_medicine" && 
+                               item.lokasi === "Lantai 1 BPJS" && 
+                               medicineDateString === dateString;
+                    })
+                    .map((item) => ({
+                        NOP: item.NOP,
+                        patient_name: item.patient_name || "Tidak Diketahui",
+                        queue_number: item.queue_number || '-',
+                        medical_record_no: item.medical_record_no || "Tidak Diketahui",
+                        status: item.status || "Menunggu",
+                        medicine_type: item.medicine_type !== "Empty" ? item.medicine_type : "Belum Ditentukan",
+                        timestamp: item.waiting_medicine_stamp
+                    }))
+                    .sort((a, b) => {
+                        const getTimestamp = (item) => {
+                            if (!item.timestamp) return Infinity;
+                            return new Date(item.timestamp).getTime();
+                        };
+                        return getTimestamp(a) - getTimestamp(b);
+                    });
 
-                            // Check status and location with null checks
-                            const statusMatch = item.status === "waiting_medicine";
-                            const locationMatch = item.lokasi === "Lantai 1 BPJS";
-                            const dateMatch = medicineDateString == dateString;
-
-                            console.log(statusMatch,locationMatch,dateMatch);
-                            return statusMatch && locationMatch && dateMatch;
-                        }) // ✅ Hanya tampilkan `waiting_medicine`
-                        .map((item) => ({
-                            NOP: item.NOP,
-                            patient_name: item.patient_name || "Tidak Diketahui",
-                            queue_number: item.queue_number || '-',
-                            medical_record_no: item.medical_record_no || "Tidak Diketahui",
-                            status: item.status || "Menunggu",
-                            medicine_type: item.medicine_type !== "Empty" ? item.medicine_type : "Belum Ditentukan",
-                        }));
-                        console.log("FORMAT",formattedData);
-                    setQueueList(formattedData);
-                } else {
-                    console.error("❌ Respons tidak valid atau tidak memiliki properti data");
-                    setQueueList([]);
-                }
-            } catch (error) {
-                console.error("❌ Gagal mengambil data antrian:", error);
+                setRawQueueList(formattedData);
+    if (!searchText) {
+        setQueueList(formattedData);
+      } else {
+        const filtered = formattedData.filter(item =>
+          item.patient_name?.toLowerCase().includes(searchText.toLowerCase())
+        );
+        setQueueList(filtered);
+      }
+            } else {
                 setQueueList([]);
             }
+        } catch (error) {
+            console.error("Gagal mengambil data antrian:", error);
+            setQueueList([]);
+        } finally {
             setLoading(false);
-        };
+        }
+    };
 
+    useEffect(() => {
         fetchQueue();
     }, []);
 
-    // 🔄 Perbarui daftar antrean setelah scan berhasil
     useEffect(() => {
-        if (scanResult) {
-            console.log("📡 Scan Result diterima:", scanResult);
+        if (!scanResult) return;
 
+        const showAlertAndUpdate = async () => {
             const isExist = queueList.some((item) => item.NOP === scanResult);
 
             if (isExist) {
-                console.log(`✅ Booking ID ${scanResult} ditemukan, menghapus dari antrian.`);
-
-                // ✅ Hapus hanya antrean yang diproses dan update daftar
-                setQueueList((prevList) => prevList.filter((item) => item.NOP !== scanResult));
-
-                Swal.fire({
+                setQueueList(prevList => prevList.filter(item => item.NOP !== scanResult));
+                setIsDeleted(true);
+                await Swal.fire({
                     icon: "success",
                     title: "Antrian Dihapus",
                     text: `Booking ID ${scanResult} telah diproses.`,
                     timer: 1500,
                     showConfirmButton: false,
                 });
-
-                setIsDeleted(true);
             } else {
-                console.log(`❌ Booking ID ${scanResult} tidak ditemukan.`);
-                Swal.fire({
+                await Swal.fire({
                     icon: "error",
                     title: "Nomor Tidak Ditemukan",
                     text: `Booking ID ${scanResult} tidak ada dalam daftar.`,
@@ -93,58 +106,97 @@ export default function DaftarAntrian({ scanResult, setIsDeleted }) {
                     showConfirmButton: false,
                 });
             }
-        }
+        };
+
+        showAlertAndUpdate();
     }, [scanResult]);
 
+  useEffect(() => {
+  if (!searchText) {
+    setQueueList(rawQueueList);
+  } else {
+    const filtered = rawQueueList.filter(item =>
+      item.patient_name?.toLowerCase().includes(searchText.toLowerCase())
+    );
+    setQueueList(filtered);
+  }
+}, [searchText, rawQueueList]);
     return (
-        <Box sx={{ padding: "10px", overflow: "auto"  }}>
+        <Box sx={{ padding: "10px", overflow: "auto" }}>
             <Typography variant="h4" align="center" sx={{ marginBottom: "20px" }}>
                 Daftar Antrian Farmasi (Waiting Medicine)
             </Typography>
 
             <Paper elevation={3} sx={{ padding: "10px" }}>
-                <Box sx={{ maxHeight: "900px", overflowY: "auto" }}>
-                    {queueList.length > 0 &&(
-                         <Table stickyHeader>
+                 <div className="w-full flex items-center gap-2 mb-2">
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      handleSearch(searchText);
+                    }}
+                    className="w-full flex items-center gap-2"
+                  >
+                    <TextField
+                      placeholder="Search patients"
+                      variant="outlined"
+                      size="small"
+                      value={searchText}
+                      onChange={(e) => setSearchText(e.target.value)}
+                      sx={{ flexGrow: 1 }}
+                    />
+                
+                    <Button
+                      type="button"
+                      variant="outlined"
+                      onClick={handleSearchClear}
+                      sx={{ whiteSpace: 'nowrap' }}
+                    >
+                      Clear
+                    </Button>
+                  </form>
+                </div>s
+                <Box sx={{ maxHeight: "600px", overflowY: "auto" }}>
+                    <Table stickyHeader>
                         <TableHead>
                             <TableRow>
                                 <TableCell align="center"><strong>NOP</strong></TableCell>
-                                                                <TableCell align="center"><strong>Nomor Antrian</strong></TableCell>
-
+                                <TableCell align="center"><strong>Nomor Antrian</strong></TableCell>
                                 <TableCell align="center"><strong>Nama Pasien</strong></TableCell>
                                 <TableCell align="center"><strong>No. Rekam Medis</strong></TableCell>
                                 <TableCell align="center"><strong>Status</strong></TableCell>
                                 <TableCell align="center"><strong>Jenis Obat</strong></TableCell>
+                                <TableCell align="center"><strong>Timestamp</strong></TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
                             {loading ? (
                                 <TableRow>
-                                    <TableCell colSpan={5} align="center">Loading...</TableCell>
+                                    <TableCell colSpan={7} align="center">Loading...</TableCell>
                                 </TableRow>
                             ) : queueList.length > 0 ? (
                                 queueList.map((item, index) => (
-                                    console.log(queueList),
                                     <TableRow key={index}>
                                         <TableCell align="center">{item.NOP}</TableCell>
                                         <TableCell align="center">{item.queue_number}</TableCell>
-
                                         <TableCell align="center">{item.patient_name}</TableCell>
                                         <TableCell align="center">{item.medical_record_no}</TableCell>
                                         <TableCell align="center">{item.status}</TableCell>
                                         <TableCell align="center">{item.medicine_type}</TableCell>
+                                        <TableCell align="center">
+                                            {item.timestamp ? new Date(item.timestamp).toLocaleString("id-ID", {
+                                                dateStyle: "medium",
+                                                timeStyle: "short",
+                                            }) : "-"}
+                                        </TableCell>
                                     </TableRow>
                                 ))
                             ) : (
                                 <TableRow>
-                                    <TableCell colSpan={5} align="center">🚫 Tidak ada antrean waiting_medicine.</TableCell>
+                                    <TableCell colSpan={7} align="center">Tidak ada antrean waiting_medicine.</TableCell>
                                 </TableRow>
                             )}
                         </TableBody>
-                    </Table> 
-                    )}
-                
-                  
+                    </Table>
                 </Box>
             </Paper>
         </Box>

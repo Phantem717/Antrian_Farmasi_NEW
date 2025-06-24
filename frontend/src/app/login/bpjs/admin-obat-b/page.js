@@ -101,7 +101,7 @@ export default function Admin() {
             </div>
 
             {/* Bagian Kanan - Daftar Antrian */}
-            <div style={{ flex: "2", overflowY: "auto", maxHeight: "100%" }}>
+            <div style={{ flex: "2", overflowY: "auto", maxHeight: "100%", marginBottom:"100px"}}>
             <DaftarAntrian 
               selectedQueueIds={selectedQueueIds} 
               setSelectedQueueIds={setSelectedQueueIds} 

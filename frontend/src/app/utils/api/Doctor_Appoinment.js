@@ -94,6 +94,19 @@ const DoctorAppointmentAPI = {
             throw error;
         }
        
+      },
+      updatePhoneNumber: async(NOP,phone_number) => {
+          try {
+            const response = await axios.put(
+                `${BASE_URL}/api/doctor-appointments/${encodeURIComponent(NOP)}/phone_number`,
+                { phone_number }  // The status should be sent as a body parameter
+              );
+              return response.data;
+        } catch (error) {
+            console.error(`Error updating MedicinetType for appointment with Booking ID ${NOP}:`, error);
+            throw error;
+        }
+       
       }
 };
 

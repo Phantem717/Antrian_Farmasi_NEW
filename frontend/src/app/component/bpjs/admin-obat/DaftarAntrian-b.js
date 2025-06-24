@@ -29,7 +29,7 @@ import MedicineAPI from '@/app/utils/api/Medicine';
 import Swal from 'sweetalert2';
 import DataTable from "datatables.net-dt";
 import $ from 'jquery';
-
+import DatePicker from '@/app/component/datepicker';
 import "datatables.net-dt/css/dataTables.dataTables.css";
 
 const DaftarAntrian = ({ selectedQueueIds, setSelectedQueueIds, setSelectedQueue, setSelectedLoket,setSelectedQueue2,selectedQueue2 }) => {
@@ -40,7 +40,7 @@ const DaftarAntrian = ({ selectedQueueIds, setSelectedQueueIds, setSelectedQueue
   const [lokets, setLokets] = useState([]);
   const [selectedLoketLocal, setSelectedLoketLocal] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
-
+  const [date,setDate]= useState("");
   // Run this whenever queueList changes
   // ? Loket yang diizinkan untuk admin obat
   const allowedLokets = ["Loket 3", "Loket 4"];
@@ -135,14 +135,16 @@ const DaftarAntrian = ({ selectedQueueIds, setSelectedQueueIds, setSelectedQueue
 
   
   // ? Fetch Daftar Antrian setelah memilih Loket
-  useEffect(() => {
+  
+// In your DaftarAntrian.js component
+
+// Update your useEffect that fetches queue list
+useEffect(() => {
   if (!selectedLoketLocal && !selectedStatus) return;
 
   const fetchQueueList = async () => {
     try {
       const response = await PickupAPI.getAllPickupTasks();
-      const now = new Date();
-      const dateString = now.toISOString().split('T')[0];
       
       let filteredQueues = response.data.filter((item) => {
         if (!item || !item.status || item.waiting_pickup_medicine_stamp === undefined) {
@@ -154,9 +156,18 @@ const DaftarAntrian = ({ selectedQueueIds, setSelectedQueueIds, setSelectedQueue
           : item.waiting_pickup_medicine_stamp;
 
         const verifDateString = verificationStamp.toISOString().split('T')[0];
-      
+        
+        // If date filter is applied, check against it
+        if (date) {
+          const filterDateString = new Date(date).toISOString().split('T')[0];
+          return item.status.toLowerCase() === selectedStatus.toLowerCase() && 
+                 verifDateString === filterDateString;
+        }
+        
+        // If no date filter, use today's date
+        const todayString = new Date().toISOString().split('T')[0];
         return item.status.toLowerCase() === selectedStatus.toLowerCase() && 
-               dateString == verifDateString;
+               verifDateString === todayString;
       });
 const getEarliestTimestamp = (item) => {
         const timestamps = [
@@ -171,19 +182,18 @@ const getEarliestTimestamp = (item) => {
 
         return timestamps.length > 0 ? Math.min(...timestamps) : Infinity;
       };
-      // Sort logic remains the same...
+      // Sort l
+      // Rest of your sorting logic...
       filteredQueues = filteredQueues.sort(
-        (a, b) => getEarliestTimestamp(b) - getEarliestTimestamp(a)
+        (a, b) => getEarliestTimestamp(a) - getEarliestTimestamp(b)
       );
 
-      // Always update rawQueueList
+      console.log("QUEUELIST",filteredQueues);
       setRawQueueList(filteredQueues);
-
-      // Only update queueList if not searching or search is empty
+      
       if (!searchText) {
         setQueueList(filteredQueues);
       } else {
-        // Reapply current search filter to new data
         const filtered = filteredQueues.filter(item =>
           item.patient_name?.toLowerCase().includes(searchText.toLowerCase())
         );
@@ -198,8 +208,12 @@ const getEarliestTimestamp = (item) => {
   fetchQueueList();
   const interval = setInterval(fetchQueueList, 10000);
   return () => clearInterval(interval);
-}, [selectedStatus, selectedLoketLocal]);
+}, [selectedStatus, selectedLoketLocal, date]); // Add date to dependencies
 
+// Add a clear date function
+const handleClearDate = () => {
+  setDate(null);
+};
   // ? Fungsi memilih / membatalkan pilihan nomor antrian
   const handleSelectQueue = (queueId, queueData) => {
     console.log("SELECTED",queueId,queueData)
@@ -301,7 +315,22 @@ const handleSearchClear = () => {
           {/* <MenuItem value="processed_pickup_medicine">Processed Pickup</MenuItem> */}
         </Select>
 
-        <Box sx={{ display: "flex", gap: "10px" }}>
+  <Box sx={{ display: "flex", alignItems: "center", gap: "10px" }}>
+  <div className="w-[200px] z-10">
+    <DatePicker date={date} setDate={setDate} selectedStatus={selectedStatus} />
+  </div>
+  {date && (
+    <Button
+      variant="outlined"
+      onClick={handleClearDate}
+      sx={{ height: '40px' }}
+    >
+      Clear
+    </Button>
+  )}
+</Box>
+
+        <Box sx={{ display: "flex", gap: "10px", zIndex:"0"}}>
         <Button
           variant="contained"
           color="error"
@@ -327,7 +356,7 @@ const handleSearchClear = () => {
 
       <Paper
         elevation={3}
-        sx={{ padding: "10px", maxHeight: "900px", overflow: "auto" }}
+        sx={{ padding: "10px", maxHeight: "600px", overflow: "auto" }}
       >
          <div className="w-full flex items-center gap-2 mb-2">
           <form
@@ -384,6 +413,9 @@ const handleSearchClear = () => {
               <TableCell align="center">
                 <strong>Status Medicine</strong>
               </TableCell>
+                <TableCell align="center">
+                <strong>Timestamp</strong>
+              </TableCell>
             </TableRow>
           </TableHead>
 
@@ -411,6 +443,12 @@ const handleSearchClear = () => {
                     ? "Racikan"
                     : item.status_medicine === "Non - Racikan" ? "Non - Racikan" : "Tidak Ada Resep"}
                 </TableCell>
+                 <TableCell align="center">
+                                                            {item.waiting_pickup_medicine_stamp ? new Date(item.waiting_pickup_medicine_stamp).toLocaleString("id-ID", {
+                                                                dateStyle: "medium",
+                                                                timeStyle: "short",
+                                                            }) : "-"}
+                                                        </TableCell>
               </TableRow>
             ))}
           </TableBody>

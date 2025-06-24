@@ -12,22 +12,27 @@ try {
  const url = `https://rscarolus.com/api/v1/visit/queue/pharmacy/cetak`;
 let message = "";
 let urlprinter = "";
- if(payload.medicine_type == "Racikan"){
+ if(payload.medicine_type == "Racikan" || payload.medicine_type == "racikan" || payload.queue_number.startsWith("RC")){
  message = "Mohon Menunggu 30 menit sampai 1 jam Karena Obat Anda Adalah Racikan";
  urlprinter="172.16.31.4";
  }
 
- else if(payload.medicine_type == "Non - Racikan"){
+ else if(payload.medicine_type == "Non - Racikan" || payload.medicine_type == "nonracikan"  || payload.queue_number.startsWith("NR")){
     message = "Mohon Menunggu Bentar Obat anda adalah Non - Racikan"
     urlprinter="172.16.26.78";
 
  }
-
+ 
  else{
     message = "Obat Anda Tidak Ada Resepnya"
         urlprinter="172.16.26.78";
 
  }
+ let PRB= "";
+ if(payload.PRB != null){
+  PRB = "PRB";
+ }
+ 
 // console.log("PHONE_NUMBER",phone_number);
     const response = await axios.post(
       url,
@@ -53,12 +58,12 @@ let urlprinter = "";
             Nama : payload.patient_name,
             // "No Antrian" : payload.queue_number,
             "Kode Reservasi" : payload.barcode,
-            qrcodedata:payload.barcode
+            qrcodedata:payload.barcode,
     //   base64Barcode: payload.barcode
           },
-          // Note: {
-          //   remarks_info: message
-          // },
+          Note: {
+            remarks_info: PRB
+          },
           footer: {
             footer_info: "Melayani dari Hati membangkitkan harapan"
           }

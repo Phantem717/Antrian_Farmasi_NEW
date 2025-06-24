@@ -28,6 +28,14 @@ const LoginPage = () => {
       return;
     }
 
+        Swal.fire({
+      title: "Memproses...",
+      html: "Sedang melakukan autentikasi",
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    });
     const loginResponse = await loginAPI.checkLogin(username, password);
     
     if (loginResponse) {
@@ -39,6 +47,8 @@ const LoginPage = () => {
         title: "Login Berhasil",
         showConfirmButton: true,
         timerProgressBar: true,
+        allowOutsideClick: false,
+
       });
       
       router.push("/login/bpjs/admin-verif-b");

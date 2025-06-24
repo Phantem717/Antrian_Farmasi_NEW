@@ -16,9 +16,44 @@ module.exports = {
 
     console.log('? Socket.IO initialized');
 
+    
     // ? Tambahkan listener untuk koneksi baru
     io.on('connection', async (socket) => {
-      console.log('?? Client connected:', socket.id);
+     const getData = async () => {
+    try {
+      const data = await responseControl.getAllResponses("Lantai 1 BPJS");
+      socket.emit('get_responses', {
+        message: '? Initial data fetched',
+        data: data
+      });
+            console.log("GET RESPONSE");
+
+    } catch (err) {
+      console.error('? Error fetching responses:', err.message);
+      socket.emit('get_responses', {
+        message: '? Failed to fetch data',
+        error: err.message
+      });
+    }
+  };
+      getData();
+socket.on('update_display', async () => {
+  console.log("ON UPDATE"); // ?? Pastikan handler dipanggil
+try {
+      const data = await responseControl.getAllResponses("Lantai 1 BPJS");
+      io.emit('get_responses', {
+        message: '? Initial data fetched',
+        data: data
+      });
+            console.log("GET RESPONSE");
+
+    } catch (err) {
+      console.error('? Error fetching responses:', err.message);
+      io.emit('get_responses', {
+        message: '? Failed to fetch data',
+        error: err.message
+      });
+    }});      console.log('?? Client connected:', socket.id);
 
       // Listener uji coba
         socket.emit("test_ping", { message: "? Server is alive!" });
@@ -67,19 +102,10 @@ module.exports = {
       });
       const defaultLocation = "Lantai 1 BPJS";
 
-  try {
-    const data = await responseControl.getAllResponses(defaultLocation);
-    socket.emit('get_responses', {
-      message: '? Initial data fetched',
-      data: data
-    });
-  } catch (err) {
-    console.error('? Error fetching responses:', err.message);
-    socket.emit('get_responses', {
-      message: '? Failed to fetch data',
-      error: err.message
-    });
-  }
+
+         
+     
+ 
       
       socket.on('call_queues_pickup', (payload) => {
         if(payload.lokasi == "Lantai 1 BPJS"){

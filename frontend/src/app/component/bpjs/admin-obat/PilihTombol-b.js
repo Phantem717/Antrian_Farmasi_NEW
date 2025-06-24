@@ -83,13 +83,16 @@ const socket = getSocket();
           }
           console.log("PAYLOAD PICKUP",payload)
             const sendResponse = await WA_API.sendWAPickup(payload);
+                              await new Promise(resolve => setTimeout(resolve, 1000)); // 1-second delay
+
             console.log("WA SENT",sendResponse);   
           }
         })
 
        
       );
-      
+                                      socket.emit('update_display', console.log("EMIT UPDATE"));
+
       Swal.fire({
         icon: "success",
         title: `Status berhasil diperbarui menjadi ${status.replace("_", " ")}`,
