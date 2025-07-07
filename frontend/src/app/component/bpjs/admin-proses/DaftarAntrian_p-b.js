@@ -5,6 +5,9 @@ import Swal from "sweetalert2";
 import { Box, Typography, Table, TableBody, TableCell, TableHead, TableRow, Paper,TextField,Button } from "@mui/material";
 import MedicineAPI from "@/app/utils/api/Medicine";
 import { getSocket } from "@/app/utils/api/socket";
+import { Form } from "antd";
+import { SearchOutlined, CloseOutlined } from '@ant-design/icons';
+
 export default function DaftarAntrian({ scanResult, setIsDeleted }) {
     const socket = getSocket();
     const [queueList, setQueueList] = useState([]);
@@ -149,33 +152,50 @@ try {
             </Typography>
 
             <Paper elevation={3} sx={{ padding: "10px" }}>
-                 <div className="w-full flex items-center gap-2 mb-2">
-                  <form
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      handleSearch(searchText);
-                    }}
-                    className="w-full flex items-center gap-2"
-                  >
-                    <TextField
-                      placeholder="Search patients"
-                      variant="outlined"
-                      size="small"
-                      value={searchText}
-                      onChange={(e) => setSearchText(e.target.value)}
-                      sx={{ flexGrow: 1 }}
-                    />
-                
-                    <Button
-                      type="button"
-                      variant="outlined"
-                      onClick={handleSearchClear}
-                      sx={{ whiteSpace: 'nowrap' }}
-                    >
-                      Clear
-                    </Button>
-                  </form>
-                </div>
+                <div style={{ width: '100%', display: 'flex' }}>
+  <Form
+    layout="inline"
+    onFinish={() => handleSearch(searchText)}
+    style={{
+      width: '100%',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '8px',
+      flexWrap: 'nowrap'
+    }}
+  >
+    <Form.Item 
+      style={{ 
+        flex: '1',
+        margin: 0,
+        minWidth: 0, // Crucial for proper flex behavior
+      }}
+    >
+      <Input
+        placeholder="Search patients"
+        value={searchText}
+        onChange={(e) => setSearchText(e.target.value)}
+        suffix={<SearchOutlined />}
+        style={{ width: '100%' }}
+      />
+    </Form.Item>
+
+    <Form.Item style={{ 
+      margin: 0,
+      flex: '0 0 auto' // Prevents shrinking
+    }}>
+      <Button
+        type="default"
+        onClick={handleSearchClear}
+        icon={<CloseOutlined />}
+        style={{ whiteSpace: 'nowrap' }}
+      >
+        Clear
+      </Button>
+    </Form.Item>
+  </Form>
+</div>
+
                 <Box sx={{ maxHeight: "600px", overflowY: "auto" }}>
                     <Table stickyHeader>
                         <TableHead>

@@ -7,7 +7,7 @@ import Image from "next/image";
 
 export default function CustomDatePicker({ date, setDate, selectedStatus }) {
   const [selectedDate, setSelectedDate] = useState(date ? new Date(date).setHours(7, 0, 0, 0) :  new Date().setHours(7,0,0,0,0));
-  console.log("DATEPCIKER",date,selectedDate);
+  // console.log("DATEPCIKER",date,selectedDate);
   useEffect(() => {
     if (date) {
       setSelectedDate(new Date(date).setHours(7, 0, 0, 0));

@@ -16,6 +16,7 @@ import {
   Paper,
   Typography,
   Checkbox,
+  Input,
   TextField
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -29,12 +30,18 @@ import MedicineAPI from '@/app/utils/api/Medicine';
 import Swal from 'sweetalert2';
 import DataTable from "datatables.net-dt";
 import $ from 'jquery';
-import DatePicker from '@/app/component/datepicker';
+import { DatePicker } from "antd";
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
 import "datatables.net-dt/css/dataTables.dataTables.css";
+import { Form } from "antd";
+import { SearchOutlined, CloseOutlined } from '@ant-design/icons';
+
 import { getSocket } from '@/app/utils/api/socket';
 const DaftarAntrian = ({ selectedQueueIds, setSelectedQueueIds, setSelectedQueue, setSelectedLoket,setSelectedQueue2,selectedQueue2 }) => {
     const [searchText, setSearchText] = useState('');
-
+ dayjs.extend(customParseFormat);
+  const dateFormat="YYYY-MM-DD"
   const [rawQueueList,setRawQueueList]= useState([]);
   const [queueList, setQueueList] = useState([]);
   const [lokets, setLokets] = useState([]);
@@ -215,6 +222,11 @@ useEffect(() => {
 const handleClearDate = () => {
   setDate(null);
 };
+
+const changeDate = (date,dateString) => {
+  console.log("date",date,dateString);
+  setDate(dateString);
+}
   // ? Fungsi memilih / membatalkan pilihan nomor antrian
   const handleSelectQueue = (queueId, queueData) => {
     console.log("SELECTED",queueId,queueData)
@@ -318,8 +330,15 @@ const handleSearchClear = () => {
 
   <Box sx={{ display: "flex", alignItems: "center", gap: "10px" }}>
   <div className="w-[200px] z-10">
-    <DatePicker date={date} setDate={setDate} selectedStatus={selectedStatus} />
-  </div>
+  <DatePicker 
+              size="large"
+
+            onChange={changeDate} 
+            disabled={!selectedStatus}
+                maxDate={dayjs(new Date().toISOString(), dateFormat)}
+                defaultValue={dayjs(new Date().toISOString(), dateFormat)}
+
+            />  </div>
   {date && (
     <Button
       variant="outlined"
@@ -359,33 +378,50 @@ const handleSearchClear = () => {
         elevation={3}
         sx={{ padding: "10px", maxHeight: "600px", overflow: "auto" }}
       >
-         <div className="w-full flex items-center gap-2 mb-2">
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              handleSearch(searchText);
+        <div style={{ width: '100%', display: 'flex' }}>
+          <Form
+            layout="inline"
+            onFinish={() => handleSearch(searchText)}
+            style={{
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              flexWrap: 'nowrap'
             }}
-            className="w-full flex items-center gap-2"
           >
-            <TextField
-              placeholder="Search patients"
-              variant="outlined"
-              size="small"
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-              sx={{ flexGrow: 1 }}
-            />
-        
-            <Button
-              type="button"
-              variant="outlined"
-              onClick={handleSearchClear}
-              sx={{ whiteSpace: 'nowrap' }}
+            <Form.Item 
+              style={{ 
+                flex: '1',
+                margin: 0,
+                minWidth: 0, // Crucial for proper flex behavior
+              }}
             >
-              Clear
-            </Button>
-          </form>
+              <Input
+                placeholder="Search patients"
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+                suffix={<SearchOutlined />}
+                style={{ width: '100%' }}
+              />
+            </Form.Item>
+        
+            <Form.Item style={{ 
+              margin: 0,
+              flex: '0 0 auto' // Prevents shrinking
+            }}>
+              <Button
+                type="default"
+                onClick={handleSearchClear}
+                icon={<CloseOutlined />}
+                style={{ whiteSpace: 'nowrap' }}
+              >
+                Clear
+              </Button>
+            </Form.Item>
+          </Form>
         </div>
+        
        {queueList.length > 0 && (
          <Table stickyHeader>
           <TableHead>

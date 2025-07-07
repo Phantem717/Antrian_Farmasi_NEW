@@ -16,8 +16,11 @@ import {
   Typography,
   Checkbox,
   Input,
-  TextField
+  TextField,
 } from "@mui/material";
+import { Form } from "antd";
+import { SearchOutlined, CloseOutlined } from '@ant-design/icons';
+import { DatePicker } from "antd";
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
@@ -32,11 +35,14 @@ import PharmacyAPI from "@/app/utils/api/Pharmacy";
 import {getSocket} from "@/app/utils/api/socket";
 import $ from 'jquery';
 import PhoneEditForm from "@/app/component/bpjs/admin-verif/phoneEditForm";
-import DatePicker from '@/app/component/datepicker';
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
 import PrintIcon from '@mui/icons-material/Print';
 import PrintAntrian from "@/app/utils/api/printAntrian";
 
 const DaftarAntrian = ({ selectedQueueIds, setSelectedQueueIds, onSelectQueue, setSelectedLoket,setSelectedQueue2,selectedQueue2 }) => {  
+  dayjs.extend(customParseFormat);
+  const dateFormat="YYYY-MM-DD"
   const [queueList, setQueueList] = useState([]);
   const [rawQueueList,setRawQueueList]= useState([]);
       const [searchText, setSearchText] = useState('');
@@ -266,7 +272,12 @@ const handleClearDate = () => {
   setDate(null);
 };
 
-console.log("DATe",date);
+const changeDate = (date,dateString) => {
+  console.log("date",date,dateString);
+  setDate(dateString);
+}
+
+// console.log("DATe",date);
   async function handleUpdatePhone(selectedQueue){
     try {
       console.log(selectedQueue);
@@ -388,9 +399,16 @@ Swal.fire({
         </Select>
 
         <Box sx={{ display: "flex", alignItems: "center", gap: "10px", zIndex:"100"}}  >
-          <div className="w-[200px]">
-            <DatePicker date={date} setDate={setDate} selectedStatus={selectedStatus}/>
-          </div>
+            <DatePicker 
+            size="large"
+         
+            onChange={changeDate} 
+            disabled={!selectedStatus}
+                maxDate={dayjs(new Date().toISOString(), dateFormat)}
+                defaultValue={dayjs(new Date().toISOString(), dateFormat)}
+
+            />
+            {/* <DatePicker2 date={date} setDate={setDate} selectedStatus={selectedStatus}/> */}
           {date && (
             <Button
               variant="outlined"
@@ -413,32 +431,48 @@ Swal.fire({
       </Box>
 
       <Paper elevation={3} sx={{ padding: "10px", maxHeight: "600px", overflow: "auto" }}>
-   <div className="w-full flex items-center gap-2 mb-2">
-  <form
-    onSubmit={(e) => {
-      e.preventDefault();
-      handleSearch(searchText);
+  <div style={{ width: '100%', display: 'flex' }}>
+  <Form
+    layout="inline"
+    onFinish={() => handleSearch(searchText)}
+    style={{
+      width: '100%',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '8px',
+      flexWrap: 'nowrap'
     }}
-    className="w-full flex items-center gap-2"
   >
-    <TextField
-      placeholder="Search patients"
-      variant="outlined"
-      size="small"
-      value={searchText}
-      onChange={(e) => setSearchText(e.target.value)}
-      sx={{ flexGrow: 1 }}
-    />
-
-    <Button
-      type="button"
-      variant="outlined"
-      onClick={handleSearchClear}
-      sx={{ whiteSpace: 'nowrap' }}
+    <Form.Item 
+      style={{ 
+        flex: '1',
+        margin: 0,
+        minWidth: 0, // Crucial for proper flex behavior
+      }}
     >
-      Clear
-    </Button>
-  </form>
+      <Input
+        placeholder="Search patients"
+        value={searchText}
+        onChange={(e) => setSearchText(e.target.value)}
+        suffix={<SearchOutlined />}
+        style={{ width: '100%' }}
+      />
+    </Form.Item>
+
+    <Form.Item style={{ 
+      margin: 0,
+      flex: '0 0 auto' // Prevents shrinking
+    }}>
+      <Button
+        type="default"
+        onClick={handleSearchClear}
+        icon={<CloseOutlined />}
+        style={{ whiteSpace: 'nowrap' }}
+      >
+        Clear
+      </Button>
+    </Form.Item>
+  </Form>
 </div>
 
      

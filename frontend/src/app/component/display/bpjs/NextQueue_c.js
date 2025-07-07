@@ -1,12 +1,14 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import { Card, Col, Row, Typography, Divider } from "antd";
 import VerificationAPI from "@/app/utils/api/Verification";
 import MedicineAPI from "@/app/utils/api/Medicine";
 import PickupAPI from "@/app/utils/api/Pickup";
 import { getSocket } from "@/app/utils/api/socket";
-import { Marquee } from "@devnomic/marquee";
-import "@devnomic/marquee/dist/index.css";
+import Marquee from "react-fast-marquee";
 
-const NextQueue = ({ verificationData, medicineData, pickupData }) => {
+const { Title, Text } = Typography;
+
+const NextQueue = () => {
   const [queues, setQueues] = useState({
     nextQueueRacik: [],
     nextQueueNonRacik: [],
@@ -17,347 +19,208 @@ const NextQueue = ({ verificationData, medicineData, pickupData }) => {
     verificationQueue: [],
     pickupQueue: []
   });
-  // Fetch queue data
-    const socket = getSocket();
 
-    useEffect(()=>{
- socket.on('get_responses', (payload) => {
-          const dateString = new Date().toISOString().split('T')[0];
-        console.log("GOT RESP");
+  const socket = getSocket();
 
-        console.log("ORIGINAL DATA",payload.data);
-          // Process verification data
-          const verificationData = payload.data.verificationData
-  .filter(task => task && task.status && task.waiting_verification_stamp)
-  .filter(task => {
-    const stamp = typeof task.waiting_verification_stamp === 'string' 
-      ? new Date(task.waiting_verification_stamp) 
-      : task.waiting_verification_stamp;
+  useEffect(() => {
+    const handleSocketResponse = (payload) => {
+      const dateString = new Date().toISOString().split('T')[0];
+      
+      // Process verification data
+      const verificationData = payload.data.verificationData
+        .filter(task => task?.status && task.waiting_verification_stamp)
+        .filter(task => {
+          const stamp = typeof task.waiting_verification_stamp === 'string' 
+            ? new Date(task.waiting_verification_stamp) 
+            : task.waiting_verification_stamp;
+          return (task.queue_number?.startsWith("RC") || task.queue_number?.startsWith("NR")) && 
+            task.status.includes("verification") && 
+            stamp.toISOString().split('T')[0] === dateString;
+        })
+        .map(task => ({
+          queueNumber: task.queue_number,
+          type: task.status_medicine,
+          status: task.status === "waiting_verification" ? "Menunggu" 
+            : task.status === "called_verification" ? "Dipanggil" 
+            : task.status === "pending_verification" ? "Terlewat" 
+            : task.status === "recalled_verification" ? "Dipanggil"
+            : task.status === "processed_verification" ? "Verifikasi"
+            : "-",
+          patient_name: task.patient_name
+        }));
 
-    // Filter for tasks where the queue_number starts with "RC" or "NR"
-    return (task.queue_number.startsWith("RC") || task.queue_number.startsWith("NR")) && 
-      task.status.includes("verification") && 
-      stamp.toISOString().split('T')[0] === dateString;
-  })
-  .map(task => ({
-    queueNumber: task.queue_number,
-    type: task.status_medicine,
-    status: task.status === "waiting_verification" ? "Menunggu" 
-      : task.status === "called_verification" ? "Dipanggil" 
-      : task.status === "pending_verification" ? "Terlewat" 
-      : task.status === "recalled_verification" ? "Dipanggil"
-      : task.status === "processed_verification" ? "Verifikasi"
-      : "-",
-                    patient_name: task.patient_name
+      // Process medicine data
+      const medicineData = payload.data.medicineData
+        .filter(task => task?.status && task.waiting_medicine_stamp)
+        .filter(task => {
+          const stamp = typeof task.waiting_medicine_stamp === 'string' 
+            ? new Date(task.waiting_medicine_stamp) 
+            : task.waiting_medicine_stamp;
+          return task.status.includes("waiting_medicine") && 
+            stamp.toISOString().split('T')[0] === dateString;
+        })
+        .map(task => ({
+          queueNumber: task.queue_number,
+          type: task.status_medicine,
+          status: task.status,
+          patient_name: task.patient_name
+        }));
 
-  }));
+      // Process pickup data
+      const pickupData = payload.data.pickupData
+        .filter(task => task?.status && task.waiting_pickup_medicine_stamp)
+        .filter(task => {
+          const stamp = typeof task.waiting_pickup_medicine_stamp === 'string' 
+            ? new Date(task.waiting_pickup_medicine_stamp) 
+            : task.waiting_pickup_medicine_stamp;
+          return task.status.includes("pickup") && 
+            task.status !== "completed_pickup_medicine" && 
+            stamp.toISOString().split('T')[0] === dateString;
+        })
+        .map(task => ({
+          queueNumber: task.queue_number,
+          type: task.status_medicine,
+          patient_name: task.patient_name,
+          status: task.status === "waiting_pickup_medicine" ? "Menunggu" 
+            : task.status === "called_pickup_medicine" ? "Dipanggil" 
+            : task.status === "pending_pickup_medicine" ? "Terlewat" 
+            : task.status === "recalled_pickup_medicine" ? "Dipanggil"
+            : "-"
+        }));
 
-          const medicineData = payload.data.medicineData
-            .filter(task => task && task.status && task.waiting_medicine_stamp)
-            .filter(task => {
-              const stamp = typeof task.waiting_medicine_stamp === 'string' 
-                ? new Date(task.waiting_medicine_stamp) 
-                : task.waiting_medicine_stamp;
-              return task.status.includes("waiting_medicine") && 
-                stamp.toISOString().split('T')[0] === dateString;
-            })
-            .map(task => ({
-              queueNumber: task.queue_number,
-              type: task.status_medicine,
-              status: task.status,
-              patient_name: task.patient_name
-            }));
+      setQueues({
+        verificationQueue: verificationData,
+        pickupQueue: pickupData,
+        nextQueueRacik: verificationData.filter(task => task.type === "Racikan"),
+        nextQueueNonRacik: verificationData.filter(task => task.type === "Non - Racikan"),
+        medicineRacik: medicineData.filter(task => task.type === "Racikan"),
+        medicineNonRacik: medicineData.filter(task => task.type === "Non - Racikan"),
+        pickupRacik: pickupData.filter(task => task.type === "Racikan"),
+        pickupNonRacik: pickupData.filter(task => task.type === "Non - Racikan"),
+      });
+    };
 
-          // Process pickup data
-          const pickupData = payload.data.pickupData
-            .filter(task => task && task.status && task.waiting_pickup_medicine_stamp)
-            .filter(task => {
-              const stamp = typeof task.waiting_pickup_medicine_stamp === 'string' 
-                ? new Date(task.waiting_pickup_medicine_stamp) 
-                : task.waiting_pickup_medicine_stamp;
-              return task.status.includes("pickup") && 
-                task.status !== "completed_pickup_medicine" && 
-                stamp.toISOString().split('T')[0] === dateString;
-            })
-            .map(task => ({
-              queueNumber: task.queue_number,
-              type: task.status_medicine,
-                            patient_name: task.patient_name,
+    socket.on('get_responses', handleSocketResponse);
+    return () => socket.off('get_responses', handleSocketResponse);
+  }, []);
 
-              status: task.status === "waiting_pickup_medicine" ? "Menunggu" 
-                : task.status === "called_pickup_medicine" ? "Dipanggil" 
-                : task.status === "pending_pickup_medicine" ? "Terlewat" 
-                : task.status === "recalled_pickup_medicine" ? "Dipanggil"
-                : "-"
-            }));
-
-            console.log("DATA",pickupData,verificationData,medicineData)
-          setQueues({
-            verificationQueue: verificationData,
-            pickupQueue: pickupData,
-            nextQueueRacik: verificationData.filter(task => task.type === "Racikan"),
-            nextQueueNonRacik: verificationData.filter(task => task.type === "Non - Racikan"),
-            medicineRacik: medicineData.filter(task => task.type === "Racikan"),
-            medicineNonRacik: medicineData.filter(task => task.type === "Non - Racikan"),
-            pickupRacik: pickupData.filter(task => task.type === "Racikan"),
-            pickupNonRacik: pickupData.filter(task => task.type === "Non - Racikan"),
-          });
-        });
-    },[socket]);
-    
-
-
-  // Status color helpers
   const getStatusColor = (status) => {
     switch(status) {
-      case 'Menunggu': return 'text-yellow-600';
-      case 'Dipanggil': return 'text-green-600';
-      case 'Terlewat': return 'text-red-600';
-      case 'Verifikasi': return 'text-blue-600';
-      default: return 'text-black';
+      case 'Menunggu': return 'gold';
+      case 'Dipanggil': return 'green';
+      case 'Terlewat': return 'red';
+      case 'Verifikasi': return 'blue';
+      default: return 'black';
     }
   };
 
-  const getStatusColourBorder = (status) => {
-    switch(status) {
-      case 'Menunggu': return 'border-2 border-yellow-500';
-      case 'Dipanggil': return 'border-2 border-green-500';
-      case 'Terlewat': return 'border-2 border-red-500';
-      case 'Verifikasi': return 'border-2 border-blue-500';
-      default: return '';
-    }
-  };
-
-  // Queue section components
-  const QueueSection = ({ title, queuesRacik, queuesNonRacik, bgColor }) => (
-  <div className={`p-4 flex-1 min-w-0 ${bgColor} rounded-lg shadow-md overflow-hidden`} style={{ minHeight: "300px" }}>
-    <p className="text-2xl font-bold text-white text-center uppercase">{title}</p>
-    
-    <div className="flex gap-4 mt-4 flex-wrap">
-      
-      {/* Racikan Section */}
-      <div className="flex-1 min-w-[300px] bg-white p-2 rounded-md shadow-md overflow-hidden">
-        <p className="text-2xl font-extrabold text-center text-green-500 uppercase">Racikan</p>
-
-        <Marquee
-          direction="up"
-          pauseOnHover
-          // gradient={false}
-          className="overflow-hidden"
-          style={{
-            height: 700,
-            width:'100%',
-            marginTop: 20,
-            marginBottom: 10,
-           
-          }}
-        >
-          <div className="w-full">
-            {queuesRacik.length > 0 ? (
-              queuesRacik.map((queue, index) => (
-                  <div
-  key={index}
-  className="bg-white text-green-700 text-6xl font-extrabold p-4 shadow border border-gray-300 rounded w-full"
-  style={{ height: '140px', marginBottom: '8px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}
->
-  <div className="text-center text-6xl w-full leading-none">
-    {queue.queueNumber}
-  </div>
-  <div className="mt-2 w-full bg-green-400 px-4 py-2 text-black text-xl truncate whitespace-nowrap overflow-hidden leading-tight">
-    {queue.patient_name}
-  </div>
-</div>
-              ))
-            ) : (
-              <div className="bg-white text-black p-4 shadow text-center font-bold text-2xl w-full">
-                Belum Ada Antrian
-              </div>
-            )}
+  const QueueCard = ({ title, queuesRacik, queuesNonRacik, color }) => (
+    <Card 
+      title={<Title level={4} className="text-center">{title}</Title>}
+      headStyle={{ backgroundColor: color, color: 'white' }}
+      style={{ height: '100%' }}
+    >
+      <Row gutter={16}>
+        <Col span={12}>
+          <Divider orientation="left" style={{ color: 'green' }}>Racikan</Divider>
+          <div style={{ height: 500, overflow: 'hidden' }}>
+            <Marquee direction="up" speed={50}>
+              {queuesRacik.length > 0 ? (
+                queuesRacik.map((queue, index) => (
+                  <Card key={index} style={{ marginBottom: 16 }}>
+                    <Title level={3}>{queue.queueNumber}</Title>
+                    <Text type="secondary">{queue.patient_name}</Text>
+                  </Card>
+                ))
+              ) : (
+                <Text>Belum Ada Antrian</Text>
+              )}
+            </Marquee>
           </div>
+        </Col>
+        <Col span={12}>
+          <Divider orientation="left" style={{ color: 'green' }}>Non-Racikan</Divider>
+          <div style={{ height: 500, overflow: 'hidden' }}>
+            <Marquee direction="up" speed={50}>
+              {queuesNonRacik.length > 0 ? (
+                queuesNonRacik.map((queue, index) => (
+                  <Card key={index} style={{ marginBottom: 16 }}>
+                    <Title level={3}>{queue.queueNumber}</Title>
+                    <Text type="secondary">{queue.patient_name}</Text>
+                  </Card>
+                ))
+              ) : (
+                <Text>Belum Ada Antrian</Text>
+              )}
+            </Marquee>
+          </div>
+        </Col>
+      </Row>
+    </Card>
+  );
+
+  const VerificationCard = ({ queues, color }) => (
+    <Card 
+      title={<Title level={4} className="text-center">Proses Verifikasi</Title>}
+      headStyle={{ backgroundColor: color, color: 'white' }}
+      style={{ height: '100%' }}
+    >
+      <div style={{ height: 500, overflow: 'hidden' }}>
+        <Marquee direction="up" speed={50}>
+          {queues.length > 0 ? (
+            queues.map((queue, index) => (
+              <Card key={index} style={{ marginBottom: 16 }}>
+                <Row gutter={8}>
+                  <Col span={8}>
+                    <Text strong>{queue.queueNumber}</Text>
+                  </Col>
+                  <Col span={8}>
+                    <Text>{queue.type}</Text>
+                  </Col>
+                  <Col span={8}>
+                    <Text style={{ color: getStatusColor(queue.status) }}>
+                      {queue.status}
+                    </Text>
+                  </Col>
+                </Row>
+                <Text>{queue.patient_name}</Text>
+              </Card>
+            ))
+          ) : (
+            <Text>Belum Ada Antrian</Text>
+          )}
         </Marquee>
       </div>
-
-      {/* Non-Racikan Section */}
-      <div className="flex-1 bg-white p-2 rounded-md shadow-md overflow-hidden ">
-        <p className="text-2xl font-extrabold text-center text-green-700 uppercase">Non-Racikan</p>
-
-       <Marquee
-  direction="up"
-  pauseOnHover
-  // gradient={false}
-  style={{
-            width:700,
-           
-    marginTop: 20,
-    marginBottom: 10,
-    display:'flex',
-    justifyContent:'flex-start',
-    alignItems:'flex-start',
-    alignSelf:'flex-start',
-  }}
->
-  <div className="w-full flex flex-start items-start flex-col items-end">
-    {queuesNonRacik.length > 0 ? (
-      queuesNonRacik.map((queue, index) => (
-       <div
-  key={index}
-  className="bg-white text-green-700 text-6xl font-extrabold p-4 shadow border border-gray-300 rounded w-full"
-  style={{ height: '140px', width:'305px', marginBottom: '8px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}
->
-  <div className="text-center  text-6xl w-full leading-none">
-    {queue.queueNumber}
-  </div>
-  <div className="mt-2 w-full bg-green-400 px-4 py-2 text-black text-center text-xl truncate whitespace-nowrap overflow-hidden leading-tight">
-    {queue.patient_name}
-  </div>
-</div>
-      ))
-    ) : (
-      <div className="bg-white text-black p-4 shadow text-center font-bold text-2xl w-full">
-        Belum Ada Antrian
-      </div>
-    )}
-  </div>
-</Marquee>
-
-      </div>
-    </div>
-  </div>
-);
-
-
-  const QueueSectionVerification = ({ title, queues,bgColor }) => (
-    <div className={`p-4 flex-1 min-w-0 ${bgColor} rounded-lg shadow-md`} style={{ minHeight: "300px" }}>
-      <p className="text-2xl font-bold text-white text-center uppercase">{title}</p>
-      <div className="flex gap-2 mt-2">
-        <div className="bg-white p-2 rounded-md shadow-md w-full h-full">
-        <Marquee fade={false} direction="up" 
-className="gap-[3rem] [--duration:260s]" innerClassName="gap-[3rem] [--gap:3rem]" >
-
-    <div className="w-full ">
-           
-            {queues.length > 0 ? (
-              queues.map((queue, index) => (
-                <div key={index}            
-                 className="flex items-center flex-col justify-start bg-white text-green-700 text-6xl font-extrabold p-4 shadow text-center border border-gray-300 rounded w-full"
->
-                <div className="flex flex-row">
-                   <div className={`flex-1 text-4xl text-left items-middle ${getStatusColor(queue.status)}`}>{queue.queueNumber}</div>
-                  <div className={`flex-1 text-3xl text-center ${getStatusColor(queue.status)}`}>{queue.type}</div>
-                  <div className={`flex-1 text-3xl text-right ${getStatusColor(queue.status)}`}>{queue.status}</div>
-                </div>
-                  <div className={`flex-1 text-4xl text-center bg-green-400 mt-2 w-full p-1  text-black`}>{queue.patient_name}</div>
-                </div>
-              ))
-              
-            ) : (
-              <div className="bg-white text-black p-2 shadow text-center font-bold text-2xl">Belum Ada Antrian</div>
-            )}
-            
-          </div>
-          </Marquee>
-        </div>
-      </div>
-    </div>
+    </Card>
   );
-const QueueSectionPickup = ({ title, queuesRacik, queuesNonRacik, bgColor }) => (
-  <div className={`p-4 flex-1 min-w-0 ${bgColor} rounded-lg shadow-md`} style={{ minHeight: "300px" }}>
-    <p className="text-2xl font-bold text-white text-center uppercase">{title}</p>
-    <div className="flex flex-wrap gap-2 mt-2 overflow-x-hidden">
-      {/* Racikan */}
-      <div className="flex-1 min-w-[300px] bg-white p-2 rounded-md shadow-md">
-        <p className="text-2xl font-extrabold text-center text-green-700 uppercase">Racikan</p>
-        <div className="bg-white rounded-md p-2" style={{ height: "800px" }}>
-          {queuesRacik.length > 0 ? (
-              <Marquee fade={true} direction="up" className="gap-[3rem] [--duration:5s]" innerClassName="gap-[3rem] [--gap:3rem]" >
-              <div className="flex flex-col gap-2">
-                {queuesRacik.map((queue, index) => (
-                  <div
-                    key={index}
-                    className={`uppercase bg-white p-4 shadow font-extrabold rounded mb-1 flex flex-col items-center justify-center text-center ${getStatusColourBorder(queue.status)}`}
-                    style={{ minHeight: "140px" }}
-                  >
-                    <div className="flex flex-col font-extrabold">
-                      <div className={`text-4xl ${getStatusColor(queue.status)}`}>{queue.queueNumber}</div>
-                    <div className={`text-3xl ${getStatusColor(queue.status)}`}>{queue.status}</div>
-                    </div>
-                      <div className="text-center mt-2 w-full bg-green-400 px-4 py-2 text-black text-xl truncate whitespace-nowrap overflow-hidden leading-tight">
-{queue.patient_name}</div>
-                    
-                  </div>
-                ))}
-              </div>
-            </Marquee>
-          ) : (
-            <div className="bg-white text-black p-2 shadow text-center font-bold text-2xl h-full flex items-center justify-center">
-              Belum Ada Antrian
-            </div>
-          )}
-        </div>
-      </div>
 
-      {/* Non-Racikan */}
-      <div className="flex-1 min-w-[300px] bg-white p-2 rounded-md shadow-md">
-        <p className="text-2xl font-extrabold text-center text-green-700 uppercase">Non-Racikan</p>
-        <div className="bg-white rounded-md p-2" style={{ height: "800px" }}>
-          {queuesNonRacik.length > 0 ? (
-            <Marquee
-              direction="up"
-             className="gap-[3rem] [--duration:20s]" innerClassName="gap-[3rem] [--gap:3rem]" 
-            >
-              <div className="flex flex-col gap-2">
-                {queuesNonRacik.map((queue, index) => (
-                  <div
-                    key={index}
-                    className={`uppercase bg-white p-4 shadow font-extrabold rounded mb-1 flex flex-col items-center justify-center text-center ${getStatusColourBorder(queue.status)}`}
-                    style={{ minHeight: "140px" }}
-                  >
-                   <div className="flex flex-col font-extrabold">
-                      <div className={`text-4xl ${getStatusColor(queue.status)}`}>{queue.queueNumber}</div>
-                    <div className={`text-3xl ${getStatusColor(queue.status)}`}>{queue.status}</div>
-                    </div>
-                      <div className="text-center text-bold mt-2 w-full bg-green-400 px-4 py-2 text-black text-xl truncate whitespace-nowrap overflow-hidden leading-tight">
-{queue.patient_name}</div>
-                    
-                  </div>
-                ))}
-              </div>
-            </Marquee>
-          ) : (
-            <div className="bg-white text-black p-2 shadow text-center font-bold text-2xl h-full flex items-center justify-center">
-              Belum Ada Antrian
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  </div>
-);
   return (
-   <div className="bg-white p-4 shadow-lg border border-green-700 w-full">
-      <div className="flex w-full gap-4 flex-wrap justify-center">
-        <QueueSectionVerification 
-          title="Proses Verifikasi" 
-          queues={queues.verificationQueue} 
-          bgColor="bg-green-700"
-        />
+    <div style={{ padding: 24 }}>
+      <Row gutter={[24, 24]}>
+        <Col xs={24} md={8}>
+          <VerificationCard 
+            queues={queues.verificationQueue} 
+            color="#52c41a" // green
+          />
+        </Col>
+        <Col xs={24} md={8}>
+          <QueueCard 
+            title="Proses Pembuatan Obat"
+            queuesRacik={queues.medicineRacik}
+            queuesNonRacik={queues.medicineNonRacik}
+            color="#faad14" // yellow
+          />
+        </Col>
 
-        <QueueSection 
-          title="Proses Pembuatan Obat" 
-          queuesRacik={queues.medicineRacik} 
-          queuesNonRacik={queues.medicineNonRacik} 
-       
-          bgColor="bg-yellow-600" 
-        />
-
-        <QueueSectionPickup 
-          title="Obat Telah Selesai" 
-          queuesRacik={queues.pickupRacik} 
-          queuesNonRacik={queues.pickupNonRacik} 
-      
-          bgColor="bg-green-700" 
-        />
-      </div>
+        <Col xs={24} md={8}>
+          <QueueCard 
+            title="Obat Telah Selesai"
+            queuesRacik={queues.pickupRacik}
+            queuesNonRacik={queues.pickupNonRacik}
+            color="#52c41a" 
+          />
+        </Col>
+      </Row>
     </div>
   );
 };
