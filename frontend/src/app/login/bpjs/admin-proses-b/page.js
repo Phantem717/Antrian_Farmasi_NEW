@@ -11,11 +11,10 @@ import Sidebar from "@/app/component/Sidebar-b";
 import BarcodeScanner from "@/app/component/bpjs/admin-proses/BarcodeScanner-b";
 import PharmacyAPI from "@/app/utils/api/Pharmacy";
 import { useRouter, usePathname } from "next/navigation";
-
+import { getSocket } from "@/app/utils/api/socket";
 const { Content } = Layout;
 function useTokenCheck() {
   const [token, setToken] = useState("");
-
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setToken(localStorage.getItem('token'));
@@ -36,6 +35,8 @@ function useTokenCheck() {
   return { token, isExpired: checkTokenExpired() };
 }
 export default function Admin() {
+    const socket = getSocket();
+
   const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
   const siderWidth = collapsed ? 80 : 300;
@@ -46,24 +47,12 @@ export default function Admin() {
 
   // Fetch queue list
   useEffect(() => {
-    const fetchQueueList = async () => {
       if (!checkResponse) {
         router.push("/login");
         return;
       }
-
-      try {
-        const response = await PharmacyAPI.getAllPharmacyTasks();
-        console.log("?? Data antrian dari API:", response.data);
-        setDaftarAntrian(response.data);
-      } catch (error) {
-        console.error("? Error fetching queue list:", error);
-      }
-    };
-
-    fetchQueueList();
-    const interval = setInterval(fetchQueueList, 10000);
-    return () => clearInterval(interval);
+   
+    
   }, [useTokenCheck, router]); // Now stable dependencies
 
   const handleScanResult = (data) => {
@@ -90,7 +79,6 @@ export default function Admin() {
             <div style={{ flex: "1", display: "flex", flexDirection: "column", alignItems: "center", marginTop: "100px" }}>
               <BarcodeScanner 
                 onScanResult={handleScanResult} 
-                daftarAntrian={daftarAntrian}
               />
               <p style={{ fontWeight: "bold", marginTop: "10px", textAlign: "center" }}>
                 {scanResult && `?? Hasil Scan: ${scanResult}`}

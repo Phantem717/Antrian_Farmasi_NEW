@@ -18,8 +18,16 @@ const createPickupTask = async (req, res) => {
     });
     res.status(201).json({ message: 'Pickup Task created successfully', data: result });
   } catch (error) {
-    console.error('Error creating Pickup Task:', error.message);
+    console.log("ERRPR",error.message);
+    if(error.message.startsWith("Duplicate")){
+      console.log("HIT");
+          res.status(500).json({ message: 'Data Sudah Diproses', error: error.message });
+
+    }else{
+   console.error('Error creating Pickup Task:', error.message);
     res.status(500).json({ message: 'Failed to create Pickup Task', error: error.message });
+    }
+ 
   }
 };
 

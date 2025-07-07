@@ -81,6 +81,30 @@ class PharmacyTask {
     }
   }
 
+   static async getAllByStatus(status) {
+    try {
+      const connection = getDb();
+      const query = `
+      SELECT 
+        da.NOP,
+        da.sep_no,
+        da.patient_name,
+        da.medical_record_no,
+        da.queue_number,
+        da.status_medicine,
+        pt.status,
+        pt.medicine_type
+      FROM Pharmacy_Task pt
+      JOIN Doctor_Appointments da ON pt.NOP = da.NOP
+      WHERE pt.status = ?
+      ORDER BY da.NOP DESC;
+      `;
+      const [rows] = await connection.execute(query, [status]);
+      return rows;
+    } catch (error) {
+      throw error;
+    }
+  }
   /**
    * Memperbarui record task berdasarkan NOP.
    * @param {number|string} NOP - NOP task farmasi.

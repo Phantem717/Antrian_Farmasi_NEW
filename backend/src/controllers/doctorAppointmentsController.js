@@ -28,11 +28,14 @@ const createAppointment = async (req, res) => {
       data: result 
     });
   } catch (error) {
-    console.error('Error creating appointment:', error);
-    res.status(500).json({ 
-      message: 'Failed to create appointment', 
-      error: error.message 
-    });
+     if(error.message.startsWith("Duplicate")){
+      console.log("HIT");
+          res.status(500).json({ message: 'Data Sudah Diproses', error: error.message });
+
+    }else{
+   console.error('Error creating APPOINTMENT Task:', error.message);
+    res.status(500).json({ message: 'Failed to create APOINTMENT Task', error: error.message });
+    }
   }
 };
 

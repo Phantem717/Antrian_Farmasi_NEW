@@ -1,6 +1,6 @@
 //src\app\component\admin-obat\DaftarAntrian.js
 "use client";
-import { io } from 'socket.io-client';
+import { io, Socket } from 'socket.io-client';
 
 import React, { useState, useEffect,useRef } from "react";
 import {
@@ -31,7 +31,7 @@ import DataTable from "datatables.net-dt";
 import $ from 'jquery';
 import DatePicker from '@/app/component/datepicker';
 import "datatables.net-dt/css/dataTables.dataTables.css";
-
+import { getSocket } from '@/app/utils/api/socket';
 const DaftarAntrian = ({ selectedQueueIds, setSelectedQueueIds, setSelectedQueue, setSelectedLoket,setSelectedQueue2,selectedQueue2 }) => {
     const [searchText, setSearchText] = useState('');
 
@@ -41,6 +41,7 @@ const DaftarAntrian = ({ selectedQueueIds, setSelectedQueueIds, setSelectedQueue
   const [selectedLoketLocal, setSelectedLoketLocal] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
   const [date,setDate]= useState("");
+  const socket = getSocket();
   // Run this whenever queueList changes
   // ? Loket yang diizinkan untuk admin obat
   const allowedLokets = ["Loket 3", "Loket 4"];
@@ -134,17 +135,14 @@ const DaftarAntrian = ({ selectedQueueIds, setSelectedQueueIds, setSelectedQueue
 };
 
   
-  // ? Fetch Daftar Antrian setelah memilih Loket
-  
-// In your DaftarAntrian.js component
+async function getInitalData(){
+    const response = await PickupAPI.getAllPickupTasks();
+    processQueue(response);
+}
+  const processQueue = async (response) => {
+    if (!selectedLoketLocal && !selectedStatus) return;
 
-// Update your useEffect that fetches queue list
-useEffect(() => {
-  if (!selectedLoketLocal && !selectedStatus) return;
-
-  const fetchQueueList = async () => {
     try {
-      const response = await PickupAPI.getAllPickupTasks();
       
       let filteredQueues = response.data.filter((item) => {
         if (!item || !item.status || item.waiting_pickup_medicine_stamp === undefined) {
@@ -204,10 +202,13 @@ const getEarliestTimestamp = (item) => {
       console.error("Error fetching queue list:", error);
     }
   };
+useEffect(() => {
+  getInitalData();
+  socket.on('get_responses_pickup',(payload)=>{
+    processQueue(payload);
+  })
 
-  fetchQueueList();
-  const interval = setInterval(fetchQueueList, 10000);
-  return () => clearInterval(interval);
+  
 }, [selectedStatus, selectedLoketLocal, date]); // Add date to dependencies
 
 // Add a clear date function

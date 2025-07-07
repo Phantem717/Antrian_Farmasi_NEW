@@ -85,6 +85,21 @@ const getAllPharmacyTasks = async (req, res) => {
   }
 };
 
+const getAllPharmacyTasksByStatus = async (req, res) => {
+  try {
+    const status = req.params.status;
+    const tasks = await PharmacyTask.getAllByStatus(status);
+    res.status(200).json({ data: tasks });
+  } catch (error) {
+    console.error('Error retrieving all pharmacy tasks:', error);
+    res.status(500).json({
+      message: 'Failed to retrieve pharmacy tasks',
+      error: error.message,
+    });
+  }
+};
+
+
 /**
  * Controller untuk memperbarui Pharmacy Task berdasarkan Booking ID.
  */
@@ -165,4 +180,5 @@ module.exports = {
   getAllPharmacyTasks,
   updatePharmacyTask,
   deletePharmacyTask,
+  getAllPharmacyTasksByStatus
 };

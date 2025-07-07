@@ -79,7 +79,7 @@ let urlprinter = "";
       }
     );
 
-    console.log("ANRIAN RESPONSE:", response.data);
+    console.log("ANRIAN RESPONSE:", response.data, urlprinter, payload.medicine_type);
     return response.data;
 } catch (error) {
     console.error('Error Printing:', error.message);

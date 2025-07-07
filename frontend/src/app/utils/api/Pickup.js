@@ -17,7 +17,7 @@ const PickupAPI = {
     // 2. Get Pickup Task by Booking ID
     getPickupTaskByNOP: async (NOP) => {
         try {
-            const response = await axios.get(`${BASE_URL}/api/pickup-task/`,+ encodeURIComponent(NOP));
+            const response = await axios.get(`${BASE_URL}/api/pickup-task/${encodeURIComponent(NOP)}`);
             return response.data;
         } catch (error) {
             console.error(`Error fetching pickup task with Booking ID ${NOP}:`, error);

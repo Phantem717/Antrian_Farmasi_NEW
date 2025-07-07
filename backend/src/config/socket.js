@@ -1,5 +1,7 @@
 let io;
 const responseControl = require('../controllers/responsesController');
+const medControl = require('../models/medicineTask')
+const pickupControl = require('../models/pickupTask')
 module.exports = {
   init: (server) => {
     const { Server } = require('socket.io');
@@ -45,7 +47,7 @@ try {
         message: '? Initial data fetched',
         data: data
       });
-            console.log("GET RESPONSE");
+            // console.log("GET RESPONSE");
 
     } catch (err) {
       console.error('? Error fetching responses:', err.message);
@@ -53,7 +55,50 @@ try {
         message: '? Failed to fetch data',
         error: err.message
       });
-    }});      console.log('?? Client connected:', socket.id);
+    }});      
+    
+    socket.on('update_proses', async () => {
+      try {
+      const data = await medControl.getAll();
+      io.emit('get_responses_proses', {
+        message: '? Initial data fetched',
+        data: data
+      });
+
+      io.emit('update_daftar_proses');
+            console.log("GET RESPONSE");
+
+    } catch (err) {
+      console.error('? Error fetching responses:', err.message);
+      io.emit('get_responses_proses', {
+        message: '? Failed to fetch data',
+        error: err.message
+      });
+    }
+    });
+
+    
+    socket.on('update_pickup', async () => {
+      try {
+      const data = await pickupControl.getAll();
+      io.emit('get_responses_pickup', {
+        message: '? Initial data fetched',
+        data: data
+      });
+            console.log("GET RESPONSE");
+      
+            io.emit('update_daftar_pickup');
+
+
+    } catch (err) {
+      console.error('? Error fetching responses:', err.message);
+      io.emit('get_responses_pickup', {
+        message: '? Failed to fetch data',
+        error: err.message
+      });
+    }
+    });
+    console.log('?? Client connected:', socket.id);
 
       // Listener uji coba
         socket.emit("test_ping", { message: "? Server is alive!" });

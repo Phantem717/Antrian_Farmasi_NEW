@@ -93,19 +93,31 @@ useEffect(() => {
           ? new Date(task.waiting_pickup_medicine_stamp)
           : task.waiting_pickup_medicine_stamp;
 
-        return task.status.includes("pickup") &&
-          task.status !== "completed_pickup_medicine" &&
-          stamp.toISOString().split('T')[0] === dateString;
+    const stampDateString = stamp.toISOString().split('T')[0];
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayString = yesterday.toISOString().split('T')[0];
+    const todayString = today.toISOString().split('T')[0];
+    const isYesterday = stampDateString === yesterdayString
+
+        return ((task.status.includes("pickup") &&
+         task.status !== "completed_pickup_medicine" &&
+      stampDateString === todayString) || ( task.status.includes("pending_pickup_medicine") && 
+      (stampDateString === todayString || stampDateString === yesterdayString))) ;
       })
       .map(task => ({
         queueNumber: task.queue_number,
         type: task.status_medicine,
         patient_name: task.patient_name,
+isYesterday: new Date(new Date(task.waiting_pickup_medicine_stamp).setHours(0,0,0,0)) == 
+             new Date(new Date().setHours(0,0,0,0) - 86400000),
         status: task.status === "waiting_pickup_medicine" ? "Menunggu"
           : task.status === "called_pickup_medicine" ? "Dipanggil"
           : task.status === "pending_pickup_medicine" ? "Terlewat"
           : task.status === "recalled_pickup_medicine" ? "Dipanggil"
-          : "-"
+          : "-",
+
       }));
 
     console.log("DATA", pickupData, verificationData, medicineData);
@@ -187,30 +199,31 @@ useEffect(() => {
             width: '100%',
             marginTop: 20,
             marginBottom: 10,
-            '--duration': `${times.processTimeRacik}s`,     height: `${Math.min(queuesRacik.length, 5) * 200}px`
+            '--duration': `${times.processTimeRacik}s`,     height: `1030px`
           }}
           
         >
-          <div className="w-full flex flex-col items-start">
+          <div className="w-full flex flex-col items-center justify-center">
             {queuesRacik.length > 0 ? (
               queuesRacik.map((queue, index) => (
                 <div
                   key={index}
                   className="bg-white text-green-700 text-6xl font-extrabold p-4 shadow border-2 border-black  rounded w-full"
                   style={{ 
-                    height: '140px', 
-                    width: '305px', 
+                    height: '160px', 
+                    width: '355px', 
                     marginBottom: '8px', 
                     display: 'flex', 
                     flexDirection: 'column', 
-                    justifyContent: 'center' 
+                    justifyContent: 'center', 
+                    alignItems: 'center'
                   }}
 
                 >
                   <div className="text-center text-6xl w-full leading-none">
                     {queue.queueNumber}
                   </div>
-                  <div className="mt-2 w-full bg-green-400 px-4 py-2 text-black text-center text-xl truncate whitespace-nowrap overflow-hidden leading-tight">
+                  <div className="mt-2 w-full bg-green-400 px-4 py-2 text-black text-center text-3xl truncate whitespace-nowrap overflow-hidden leading-tight">
                     {queue.patient_name}
                   </div>
                 </div>
@@ -235,19 +248,19 @@ useEffect(() => {
             height: '50%',
             marginTop: 20,
             marginBottom: 10,
-            '--duration': `${times.processTimeNon}s`,     height: `${Math.min(queuesNonRacik.length, 5) * 200}px`
+            '--duration': `${times.processTimeNon}s`,     height: `1030px`
           }}
 
         >
-          <div className="w-full flex flex-col items-start">
+          <div className="w-full flex flex-col items-center justify-center">
             {queuesNonRacik.length > 0 ? (
               queuesNonRacik.map((queue, index) => (
                 <div
                   key={index}
                   className="bg-white text-green-700 text-6xl font-extrabold p-4 shadow border-2 border-black rounded w-full"
                   style={{ 
-                    height: '140px', 
-                    width: '305px', 
+                    height: '160px', 
+                    width: '355px', 
                     marginBottom: '8px', 
                     display: 'flex', 
                     flexDirection: 'column', 
@@ -258,7 +271,7 @@ useEffect(() => {
                   <div className="text-center text-6xl w-full leading-none">
                     {queue.queueNumber}
                   </div>
-                  <div className="mt-2 w-full bg-green-400 px-4 py-2 text-black text-center text-xl truncate whitespace-nowrap overflow-hidden leading-tight">
+                  <div className="mt-2 w-full bg-green-400 px-4 py-2 text-3xl text-black text-center  truncate whitespace-nowrap overflow-hidden leading-tight">
                     {queue.patient_name}
                   </div>
                 </div>
@@ -277,13 +290,13 @@ useEffect(() => {
 
   const QueueSectionVerification = ({ title, queues,bgColor }) => (
       
-    <div className={`p-4 flex-1 min-w-0 ${bgColor} rounded-lg shadow-md`} style={{ height: "1200px" }}>
+    <div className={`p-4 flex-1 min-w-0 ${bgColor} rounded-lg shadow-md`} style={{ height: "1180px" }}>
       <p className="text-2xl font-bold text-white text-center uppercase">{title}</p>
       <div className="flex gap- mt-2">
         <div className="bg-white p-2 rounded-md shadow-md w-full h-full">
         <Marquee fade={false} direction="up" 
 className="gap-[3rem] " innerClassName="gap-[3rem] [--gap:3rem]"
-              style={{ '--duration': `${times.verifTime}s`,     height: `${Math.min(queues.length, 5) * 200}px` }}
+              style={{ '--duration': `${times.verifTime}s`,     height: `1100px` }}
  >
 
     <div className="w-full ">
@@ -317,12 +330,12 @@ const QueueSectionPickup = ({ title, queuesRacik, queuesNonRacik, bgColor }) => 
     <p className="text-2xl font-bold text-white text-center uppercase">{title}</p>
     <div className="flex flex-wrap gap-2 mt-2 overflow-x-hidden">
       {/* Racikan */}
-      <div className="flex-1 min-w-[300px] bg-white p-2 rounded-md shadow-md" style={{height: `${Math.min(queuesRacik.length, 5) * 270}px`}}>
+      <div className="flex-1 min-w-[300px] bg-white p-2 rounded-md shadow-md" style={{height: `1120px`}}>
         <p className="text-2xl font-extrabold text-center text-green-700 uppercase">Racikan</p>
         <div className="bg-white rounded-md p-2">
           {queuesRacik.length > 0 ? (
               <Marquee fade={true} direction="up" className="gap-[3rem]" innerClassName="gap-[3rem] [--gap:3rem]"       
-              style={{ '--duration': `${times.pickupTimeRacik}s`,     height: `${Math.min(queuesRacik.length, 5) * 200}px` // Dynamic height
+              style={{ '--duration': `${times.pickupTimeRacik}s`,     height: `1060px` // Dynamic height
 }} 
 >
               <div className="flex flex-col gap-2">
@@ -333,6 +346,11 @@ const QueueSectionPickup = ({ title, queuesRacik, queuesNonRacik, bgColor }) => 
                     style={{ minHeight: "140px" }}
                   >
                     <div className="flex flex-col font-extrabold">
+                      {queue.isYesterday && 
+                      (
+                       <div className={`text-2xl ${getStatusColor(queue.status)}`}>KEMARIN</div>
+                      )
+                      }
                       <div className={`text-4xl ${getStatusColor(queue.status)}`}>{queue.queueNumber}</div>
                     <div className={`text-3xl ${getStatusColor(queue.status)}`}>{queue.status}</div>
                     </div>
@@ -352,14 +370,14 @@ const QueueSectionPickup = ({ title, queuesRacik, queuesNonRacik, bgColor }) => 
       </div>
 
       {/* Non-Racikan */}
-      <div className="flex-1 min-w-[300px] bg-white p-2 rounded-md shadow-md" style={{height: `${Math.min(queuesNonRacik.length, 5) * 220}px`}}>
+      <div className="flex-1 min-w-[300px] bg-white p-2 rounded-md shadow-md" style={{height: `1120px`}}>
         <p className="text-2xl font-extrabold text-center text-green-700 uppercase">Non-Racikan</p>
-        <div className="bg-white rounded-md p-2" style={{ height: "800px" }}>
+        <div className="bg-white rounded-md p-2" style={{ height: "1000px" }}>
           {queuesNonRacik.length > 0 ? (
             <Marquee
               direction="up"
              className="gap-[3rem]" innerClassName="gap-[3rem] [--gap:3rem]"              
-              style={{ '--duration': `${times.pickupTimeNon}s`, height: `${Math.min(queuesNonRacik.length, 5) * 200}px`}}
+              style={{ '--duration': `${times.pickupTimeNon}s`, height: `1060px`}}
 
             >
               <div className="flex flex-col gap-2">
@@ -370,6 +388,11 @@ const QueueSectionPickup = ({ title, queuesRacik, queuesNonRacik, bgColor }) => 
                     style={{ minHeight: "140px" }}
                   >
                    <div className="flex flex-col font-extrabold">
+                     {queue.isYesterday && 
+                      (
+                       <div className={`text-2xl ${getStatusColor(queue.status)}`}>KEMARIN</div>
+                      )
+                      }
                       <div className={`text-4xl ${getStatusColor(queue.status)}`}>{queue.queueNumber}</div>
                     <div className={`text-3xl ${getStatusColor(queue.status)}`}>{queue.status}</div>
                     </div>

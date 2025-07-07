@@ -1,176 +1,198 @@
 "use client";
-import { updateButtonStatus } from "@/app/utils/api/Button";
 
 import React, { useState, useEffect, useRef } from "react";
 import { TextField, Box, Typography } from "@mui/material";
 import Swal from "sweetalert2";
-import BPJSBarcodeAPI from "@/app/utils/api/BPJS_Barcode"; // ✅ Import API BPJS
-import PickupAPI from "@/app/utils/api/Pickup"; // ✅ Import API Pickup
-import PharmacyAPI from "@/app/utils/api/Pharmacy"; // ✅ Import API Pharmacy
-import MedicineAPI from "@/app/utils/api/Medicine"; // ✅ Gunakan API Medicine
+import BPJSBarcodeAPI from "@/app/utils/api/BPJS_Barcode";
+import PickupAPI from "@/app/utils/api/Pickup";
+import PharmacyAPI from "@/app/utils/api/Pharmacy";
+import MedicineAPI from "@/app/utils/api/Medicine";
 import DoctorAppointmentAPI from "@/app/utils/api/Doctor_Appoinment";
 import WA_API from "@/app/utils/api/WA";
-import {getSocket} from "@/app/utils/api/socket";
+import { getSocket } from "@/app/utils/api/socket";
+import { updateButtonStatus } from "@/app/utils/api/Button";
 
-export default function BarcodeScanner({ onScanResult , handleBulkPharmacyUpdate}) {
+export default function BarcodeScanner({ onScanResult, handleBulkPharmacyUpdate }) {
     const [inputValue, setInputValue] = useState("");
-   const socket = getSocket();
+    const [daftarAntrian, setDaftarAntrian] = useState([]);
     const inputRef = useRef(null);
-const [daftarAntrian,setDaftarAntrian] = useState([]);
-async function retryOperation(operation, maxRetries = 3, delayMs = 1000) {
-  let lastError;
-  
-  for (let attempt = 1; attempt <= maxRetries; attempt++) {
-    try {
-      const result = await operation();
-      return result;
-    } catch (error) {
-      lastError = error;
-      console.warn(`Attempt ${attempt} failed:`, error.message);
-      
-      if (attempt < maxRetries) {
-        await new Promise(resolve => setTimeout(resolve, delayMs * attempt));
-      }
-    }
-  }
-  
-  throw lastError;
-}
-    useEffect(() => {
-        const fetchQueueList = async () => {
-          try {
-            const response = await PharmacyAPI.getAllPharmacyTasks();
-            console.log("COCKET 📡 Data antrian dari API SOCKET:", response.data);
-            setDaftarAntrian(response.data);
-          } catch (error) {
-            console.error("❌ Error fetching queue list:", error);
-          }
-        };
-    
-        fetchQueueList();
-        const interval = setInterval(fetchQueueList, 10000); // Refresh tiap 10 detik
-        return () => clearInterval(interval);
-      }, []);
-    const handleKeyDown = async (event) => {
-        if (event.key === "Enter") {
-           
-            const NOP = event.target.value.trim();
-            if (!NOP) {
-                Swal.fire({
-                    icon: "warning",
-                    title: "Input Kosong!",
-                    text: "Silakan masukkan Booking ID.",
-                    timer: 2000,
-                    showConfirmButton: false,
-                });
-                return;
-            }
+    const socket = getSocket();
 
-            console.log("📡 Booking ID yang di-scan:", NOP);
-
+    // Retry mechanism with exponential backoff
+    const retryOperation = async (operation, maxRetries = 3, initialDelay = 1000) => {
+        let attempt = 0;
+        let delay = initialDelay;
+        
+        while (attempt < maxRetries) {
             try {
-                // 🔹 STEP 1: Switch Medicine to Pickup di BPJS
-                 
-                // 🔹 Ambil medicine_type dari daftar antrian berdasarkan NOP
-                const foundItem = daftarAntrian.find(item => item.NOP === NOP);
-                console.log("FOUND ITEM",foundItem);
-                    await updateButtonStatus(NOP, "completed_verification");
-
-                    await handleBulkPharmacyUpdate(foundItem.status_medicine);
-                    const pharResp= await PharmacyAPI.updatePharmacyTask(foundItem.NOP, {
-                      status: "waiting_medicine",
-                      medicine_type: foundItem.status_medicine,
-                    });
-
-                    console.log("PHARMACY RESP",pharResp);
-                    
-                    const medResp=  await MedicineAPI.createMedicineTask({
-                                NOP: foundItem.NOP,
-                                Executor: null,
-                                Executor_Names: null,
-                                status: "waiting_medicine",
-                                lokasi: "Lantai 1 BPJS"
-                              });
-                              console.log("MEDRESP",medResp);
-                  
-                 
-                  const doctorResponse = await DoctorAppointmentAPI.getAppointmentByNOP(NOP);
-                  console.log("DOCRESP",doctorResponse);
-                  const payload = {
-                    phone_number: doctorResponse.data.phone_number,
-                    patient_name: doctorResponse.data.patient_name,
-                    NOP: doctorResponse.data.NOP,
-                    queue_number: doctorResponse.data.queue_number,
-                    medicine_type : doctorResponse.data.status_medicine,
-                    sep: doctorResponse.data.sep_no,
-                    rm: doctorResponse.data.medical_record_no,
-                    docter: doctorResponse.data.doctor_name,
-                    nik: doctorResponse.data.nik,
-                    prev_queue_number: "-"
-                }
-                const sendResponse = await retryOperation(
-    () => WA_API.sendWAVerif(payload),
-    3, // max retries
-    1000 // initial delay (will increase exponentially)
-  );
-                // const print = await retryOperation(
-//     () => printAntrianFarmasi(printPayload),
-//     3, // max retries
-//     1000 // initial delay (will increase exponentially)
-//   );
-
-                socket.emit('update_display', console.log("EMIT UPDATE"));
-
-                console.log("WA SENT",sendResponse);
-
-                Swal.fire({
-                    icon: "success",
-                    title: "Proses Berhasil!",
-                    text: `Booking ID ${NOP} berhasil diproses.`,
-                    timer: 2000,
-                    showConfirmButton: false,
-                });
-            
-                onScanResult(NOP);
-                setInputValue("");
-                inputRef.current.focus();
+                return await operation();
             } catch (error) {
-                console.error("❌ Error saat memproses scan:", error);
-                console.error("🔍 Detail Error:", error.response?.data || error.message);
-            
-                Swal.fire({
-                    icon: "error",
-                    title: "Gagal Memproses!",
-                    text: `Terjadi kesalahan saat memproses Booking ID ${NOP}.`,
-                    timer: 2000,
-                    showConfirmButton: false,
-                }).then(()=>{
-    onScanResult(NOP);
-                setInputValue("");
-                });
+                attempt++;
+                if (attempt >= maxRetries) throw error;
+                
+                console.warn(`Attempt ${attempt} failed, retrying in ${delay}ms...`);
+                await new Promise(resolve => setTimeout(resolve, delay));
+                delay *= 2; // Exponential backoff
             }
-            
+        }
+    };
+
+    const fetchQueueList = async () => {
+        try {
+            const response = await PharmacyAPI.getAllPharmacyTasksByStatus("waiting_verification");
+            console.log("Data antrian dari API:", response.data);
+            setDaftarAntrian(response.data);
+        } catch (error) {
+            console.error("Error fetching queue list:", error);
         }
     };
 
     useEffect(() => {
         inputRef.current.focus();
+        fetchQueueList();
+
+        // Set up socket listeners
+        socket.on('update_daftar_proses', fetchQueueList);
+        socket.on('update_display', () => console.log("Display update received"));
+
+        // Clean up socket listeners on unmount
+        return () => {
+            socket.off('update_daftar_proses', fetchQueueList);
+            socket.off('update_display');
+        };
     }, []);
 
-    return (
-        <Box sx={{ textAlign: "center", padding: "20px", border: "1px solid #ddd", borderRadius: "8px" }}>
-            <Typography variant="h6">Masukkan Barcode / QR Code</Typography>
-            <TextField
-                    inputRef={inputRef}
-                    label="Tekan Enter untuk Scan"
-                    variant="outlined"
-                    fullWidth
-                    value={inputValue}  // <-- Pastikan nilai input dikontrol
-                    onChange={(e) => setInputValue(e.target.value)} // <-- Update state saat user mengetik
-                    onKeyDown={handleKeyDown}
-                    sx={{ marginTop: "10px" }}
-                />
+    const processScan = async (NOP) => {
+        const foundItem = daftarAntrian.find(item => item.NOP === NOP);
+        
+        if (!foundItem) {
+            throw new Error(`Booking ID ${NOP} tidak ditemukan dalam daftar antrian.`);
+        }
 
+        // Update button status
+        await updateButtonStatus(NOP, "completed_verification");
+
+        // Handle bulk pharmacy update
+        await handleBulkPharmacyUpdate(foundItem.status_medicine);
+
+        // Update pharmacy task
+        const pharResp = await PharmacyAPI.updatePharmacyTask(foundItem.NOP, {
+            status: "waiting_medicine",
+            medicine_type: foundItem.status_medicine,
+        });
+        console.log("Pharmacy response:", pharResp);
+
+        // Create medicine task
+        const medResp = await MedicineAPI.createMedicineTask({
+            NOP: foundItem.NOP,
+            Executor: null,
+            Executor_Names: null,
+            status: "waiting_medicine",
+            lokasi: "Lantai 1 BPJS"
+        });
+        console.log("Medicine response:", medResp);
+
+        // Get doctor appointment details
+        const doctorResponse = await DoctorAppointmentAPI.getAppointmentByNOP(NOP);
+        console.log("Doctor response:", doctorResponse);
+
+        // Prepare WA payload
+        const payload = {
+            phone_number: doctorResponse.data.phone_number,
+            patient_name: doctorResponse.data.patient_name,
+            NOP: doctorResponse.data.NOP,
+            queue_number: doctorResponse.data.queue_number,
+            medicine_type: doctorResponse.data.status_medicine,
+            sep: doctorResponse.data.sep_no,
+            rm: doctorResponse.data.medical_record_no,
+            docter: doctorResponse.data.doctor_name,
+            nik: doctorResponse.data.nik || "-",
+            prev_queue_number: "-"
+        };
+
+        // Send WA notification with retry
+        const sendResponse = await retryOperation(() => WA_API.sendWAVerif(payload));
+        console.log("WA response:", sendResponse);
+
+        // Emit socket events
+        socket.emit('update_display');
+        socket.emit('update_proses');
+        socket.emit('update_pickup');
+        // Update local state by removing processed item
+        setDaftarAntrian(prev => prev.filter(item => item.NOP !== NOP));
+
+        return { success: true };
+    };
+
+    const handleKeyDown = async (event) => {
+        if (event.key !== "Enter") return;
+
+        const NOP = event.target.value.trim();
+        if (!NOP) {
+            Swal.fire({
+                icon: "warning",
+                title: "Input Kosong!",
+                text: "Silakan masukkan Booking ID.",
+                timer: 2000,
+                showConfirmButton: false,
+            });
+            return;
+        }
+
+        console.log("Booking ID yang di-scan:", NOP);
+
+        try {
+            await processScan(NOP);
+
+            Swal.fire({
+                icon: "success",
+                title: "Proses Berhasil!",
+                text: `Booking ID ${NOP} berhasil diproses.`,
+                timer: 2000,
+                showConfirmButton: false,
+            });
+
+            onScanResult(NOP);
+            setInputValue("");
+            inputRef.current.focus();
+        } catch (error) {
+            console.error("Error saat memproses scan:", error);
+            
+            Swal.fire({
+                icon: "error",
+                title: "Gagal Memproses!",
+                text: error.response?.data?.message || error.message,
+                timer: 2000,
+                showConfirmButton: false,
+            }).then(() => {
+                onScanResult(NOP);
+                setInputValue("");
+            });
+        }
+    };
+
+    return (
+        <Box sx={{ 
+            textAlign: "center", 
+            padding: "20px", 
+            border: "1px solid #ddd", 
+            borderRadius: "8px",
+            backgroundColor: "background.paper"
+        }}>
+            <Typography variant="h6" gutterBottom>
+                Masukkan Barcode / QR Code
+            </Typography>
+            <TextField
+                inputRef={inputRef}
+                label="Tekan Enter untuk Scan"
+                variant="outlined"
+                fullWidth
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                onKeyDown={handleKeyDown}
+                sx={{ marginTop: "10px" }}
+                autoComplete="off"
+            />
         </Box>
     );
 }

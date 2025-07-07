@@ -23,6 +23,7 @@
     "datatables.net": "^2.3.1",
     "datatables.net-dt": "^2.3.1",
     "escpos": "^3.0.0-alpha.6",
+    "file-saver": "^2.0.5",
     "frontend": "file:",
     "jquery": "^3.7.1",
     "jsqr": "^1.4.0",
@@ -36,7 +37,8 @@
     "react-webcam": "^7.2.0",
     "socket.io-client": "^4.8.1",
     "sweetalert2": "^11.21.2",
-    "sweetalert2-react-content": "^5.1.0"
+    "sweetalert2-react-content": "^5.1.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

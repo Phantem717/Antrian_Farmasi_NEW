@@ -5,7 +5,7 @@ try {
     const data = req.body
     console.log("PRINT DATA",data);
 
-    if(!data.phone_number|| !data.barcode || !data.patient_name || !data.farmasi_queue_number || !data.medicine_type || !data.SEP || !data.tanggal_lahir || !data.queue_number){
+    if(!data.phone_number|| !data.barcode || !data.patient_name  || !data.medicine_type || !data.SEP || !data.tanggal_lahir || !data.queue_number){
         return res.status(400).json({ message: "Payload incomplete. Required: phone_number, booking_id, queue_number, patient_name." });
 
     }

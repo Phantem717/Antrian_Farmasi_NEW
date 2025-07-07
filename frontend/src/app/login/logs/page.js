@@ -50,7 +50,6 @@ export default function Logs() {
   }
   const fetchQueueList = async () => {
     try {
-      const response = await LogsAPI.getAllLogs();
       
       let [allLogs,medicineType,dataPerHour,avgTime] = await Promise.all([
         LogsAPI.getAllLogs(),

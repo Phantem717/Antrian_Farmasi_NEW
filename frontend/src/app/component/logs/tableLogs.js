@@ -1,6 +1,8 @@
 //src\components\admin\DisplayAntrian.js
 import React, { useState, useEffect } from "react";
 import DatePicker from "@/app/component/datepicker";
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 import {
   Box,
   Button,
@@ -15,6 +17,7 @@ import {
   Typography,
   Checkbox,
 } from "@mui/material";
+import { ConstructionOutlined } from "@mui/icons-material";
 const tableLogs = ({
     selectedQueueIds,// ?? Mengirim daftar nomor yang dipilih
     setSelectedQueueIds, // ?? Agar bisa diperbarui dari DaftarAntrian
@@ -25,7 +28,48 @@ const tableLogs = ({
       const [selectedStatus, setSelectedStatus] = useState("");
       const [filteredData,setFilteredData]= useState([]);
      const [type, setType] = useState("");
-const [date, setDate] = useState(null);
+const [date, setDate] = useState(new Date());
+console.log("TABLELOGS",selectedQueueIds);
+const ExportToExcel = ({ data, fileName }) => {
+   const exportData = filteredData.map(item => ({
+    NOP: item.NOP,
+    'Nomor Antrian': item.queue_number,
+    'Nama Pasien': item.patient_name,
+    'No. Rekam Medis': item.medical_record_no || "-",
+    'Status Medicine': item.status_medicine || "-",
+    'Waiting Verification': item.waiting_verification_stamp 
+      ? new Date(item.waiting_verification_stamp).toLocaleString("id-ID")
+      : "-",
+    'Completed Verification': item.completed_verification_stamp 
+      ? new Date(item.completed_verification_stamp).toLocaleString("id-ID")
+      : "-",
+    'Waiting Medicine': item.waiting_medicine_stamp 
+      ? new Date(item.waiting_medicine_stamp).toLocaleString("id-ID")
+      : "-",
+    'Completed Medicine': item.completed_medicine_stamp 
+      ? new Date(item.completed_medicine_stamp).toLocaleString("id-ID")
+      : "-",
+    'Waiting Pickup Medicine': item.waiting_pickup_medicine_stamp 
+      ? new Date(item.waiting_pickup_medicine_stamp).toLocaleString("id-ID")
+      : "-",
+    'Called Pickup Medicine': item.called_pickup_medicine_stamp 
+      ? new Date(item.called_pickup_medicine_stamp).toLocaleString("id-ID")
+      : "-",
+    'Completed Pickup Medicine': item.completed_pickup_medicine_stamp 
+      ? new Date(item.completed_pickup_medicine_stamp).toLocaleString("id-ID")
+      : "-",
+    'Duration (Menit)': item.verification_to_pickup_minutes || "-"
+  }));
+
+  // Create worksheet and workbook
+  const ws = XLSX.utils.json_to_sheet(exportData);
+  ws['!rows'] = [{ hpx: 500 }]; 
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Data Antrian");
+
+  // Generate Excel file
+  XLSX.writeFile(wb, `Data_Antrian_${new Date().toISOString().split('T')[0]}.xlsx`);
+}
 
      useEffect(() => {
   let filtered = [...selectedQueueIds];
@@ -70,8 +114,8 @@ const [date, setDate] = useState(null);
 
     if (startDate) {
       filtered = filtered.filter(item => {
-        if (!item.completed_pickup_medicine_stamp) return false;
-        const completedDate = new Date(item.completed_pickup_medicine_stamp);
+        // if (!item.completed_pickup_medicine_stamp) return false;
+        const completedDate = new Date(item.waiting_verification_stamp);
         return completedDate >= startDate;
       });
     }
@@ -83,14 +127,14 @@ const [date, setDate] = useState(null);
     selectedDay.setHours(0, 0, 0, 0);
 
     filtered = filtered.filter(item => {
-      if (!item.completed_pickup_medicine_stamp) return false;
-      const completedDate = new Date(item.completed_pickup_medicine_stamp);
+      const completedDate = new Date(item.waiting_verification_stamp);
       completedDate.setHours(0, 0, 0, 0);
       return completedDate.toDateString() === selectedDay.toDateString();
     });
   }
 
   setFilteredData(filtered);
+  console.log("FILTER",filteredData);
 }, [selectedQueueIds, type, selectedFilter, date]);
 
 
@@ -142,8 +186,8 @@ const handleFilterChange = (value) => {
 </Select>
 
 <Box sx={{ display: "flex", alignItems: "center", gap: "10px" }}>
-  <div className="w-[200px]">
-    <DatePicker date={date} setDate={setDate} />
+  <div className="w-[200px] z-10">
+    <DatePicker date={date} setDate={setDate} selectedStatus={"LOGS"} />
   </div>
   {date && (
     <Button
@@ -185,6 +229,20 @@ const handleFilterChange = (value) => {
   </div>
  
 </Box>
+  {/* Add Export Button Here */}
+  <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
+    <Button 
+      variant="contained" 
+      color="primary" 
+      onClick={ExportToExcel}
+      sx={{ 
+        backgroundColor: '#4CAF50',
+        '&:hover': { backgroundColor: '#388E3C' }
+      }}
+    >
+      Export to Excel
+    </Button>
+  </Box>
     </Box>
 
     <Paper elevation={3} sx={{ padding: "10px", maxHeight: "700px", overflow: "auto" }}>
@@ -192,9 +250,11 @@ const handleFilterChange = (value) => {
 
       <Table stickyHeader className="z-0" >
         <TableHead>
-          <TableRow>
+          <TableRow className="z-0">
     
-            <TableCell align="center"><strong>NOP</strong></TableCell>
+            <TableCell align="center"><strong>NOP</strong></TableCell>  
+                        <TableCell align="center"><strong>Nomor Antrian</strong></TableCell>  
+
             <TableCell align="center"><strong>Nama Pasien</strong></TableCell>
             <TableCell align="center"><strong>No. Rekam Medis</strong></TableCell>
             <TableCell align="center"><strong>Status Medicine</strong></TableCell> 
@@ -217,6 +277,8 @@ const handleFilterChange = (value) => {
             
              
               <TableCell align="center">{item.NOP}</TableCell>
+                            <TableCell align="center">{item.queue_number}</TableCell>
+
               <TableCell align="center">{item.patient_name}</TableCell>
               <TableCell align="center">{item.medical_record_no || "-"}</TableCell>
               <TableCell align="center">{item.status_medicine || "-"}</TableCell>

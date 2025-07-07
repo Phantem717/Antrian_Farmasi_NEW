@@ -11,9 +11,12 @@ const PrintAntrian = {
     
             return response.data;
         } catch (error) {
+
             console.error("? Error sending Printing:", error.response?.data || error.message);
             throw error;
+            
         }
+
     }
     
 };

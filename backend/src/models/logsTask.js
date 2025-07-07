@@ -9,39 +9,54 @@ class logsTask {
     try {
       const connection = getDb();
       const query = `
-        SELECT 
-        da.NOP,
-          da.patient_name,
-          da.sep_no,
-          da.medical_record_no,
-          da.status_medicine,
-          pa.waiting_pickup_medicine_stamp,
-          pa.called_pickup_medicine_stamp,
-          pa.recalled_pickup_medicine_stamp,
-          pa.pending_pickup_medicine_stamp,
-          pa.completed_pickup_medicine_stamp,
-          pt.status,
-          mt.waiting_medicine_stamp,
-          mt.completed_medicine_stamp,
-          vt.waiting_verification_stamp,
-          vt.called_verification_stamp,
-          vt.recalled_verification_stamp,
-          vt.pending_verification_stamp,
-          vt.processed_verification_stamp,
-          vt.completed_verification_stamp,
-            TIMESTAMPDIFF(
-    MINUTE, 
-    vt.completed_verification_stamp, 
-    pa.called_pickup_medicine_stamp
-  ) AS verification_to_pickup_minutes
+      SELECT 
+    da.NOP,
+    da.patient_name,
+    da.queue_number,
+    da.sep_no,
+    da.medical_record_no,
+    da.status_medicine,
+    
 
-        FROM Doctor_Appointments da
-        LEFT JOIN Verification_Task vt ON da.NOP = vt.NOP
-        LEFT JOIN Pharmacy_Task pt ON da.NOP = pt.NOP
-        LEFT JOIN Medicine_Task mt ON da.NOP = mt.NOP
-        LEFT JOIN Pickup_Task pa ON da.NOP = pa.NOP
-        WHERE pt.status = 'completed_pickup_medicine'
-      `;
+    pa.waiting_pickup_medicine_stamp,
+    pa.called_pickup_medicine_stamp,
+    pa.recalled_pickup_medicine_stamp,
+    pa.pending_pickup_medicine_stamp,
+    pa.completed_pickup_medicine_stamp,
+    
+
+    pt.status,
+    
+
+    mt.waiting_medicine_stamp,
+    mt.completed_medicine_stamp,
+    
+
+    vt.waiting_verification_stamp,
+    vt.called_verification_stamp,
+    vt.recalled_verification_stamp,
+    vt.pending_verification_stamp,
+    vt.processed_verification_stamp,
+    vt.completed_verification_stamp,
+    
+
+   TIMESTAMPDIFF(
+        MINUTE, 
+        vt.completed_verification_stamp, 
+        CASE 
+            WHEN pa.called_pickup_medicine_stamp IS NOT NULL 
+            THEN pa.called_pickup_medicine_stamp
+            
+            ELSE pa.completed_pickup_medicine_stamp
+        END
+    ) AS verification_to_pickup_minutes
+    
+FROM Doctor_Appointments da
+LEFT JOIN Verification_Task vt ON da.NOP = vt.NOP
+LEFT JOIN Pharmacy_Task pt ON da.NOP = pt.NOP
+LEFT JOIN Medicine_Task mt ON da.NOP = mt.NOP
+LEFT JOIN Pickup_Task pa ON da.NOP = pa.NOP
+ORDER BY vt.waiting_verification_stamp;  `;
 
       const [rows] = await connection.execute(query);
       return rows;

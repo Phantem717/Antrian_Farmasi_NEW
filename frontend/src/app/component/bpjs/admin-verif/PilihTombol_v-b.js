@@ -137,7 +137,6 @@ console.log("PILIH TOMBOL CONNECTED");
         selectedQueue2.map(async (queue) => {
           const NOP = queue.NOP;
       
-         
               console.log("STATUS TYPE",statusType);
               if(statusType == "recalled_verification"){
                 console.log("CHANGED STATUS");
@@ -230,8 +229,6 @@ console.log("PILIH TOMBOL CONNECTED");
                 medicine_type: medicineType,
               });
       
-             
-    
               await DoctorAppointmentAPI.updateStatusMedicine(queue.NOP, medicineType);
               const doctorResponse = await DoctorAppointmentAPI.getAppointmentByNOP(queue.NOP);
               // const checkMedicine = await MedicineAPI.getMedicineTaskByNOP(NOP);
@@ -245,7 +242,7 @@ console.log("PILIH TOMBOL CONNECTED");
                 });
             
               console.log("DOCRESP",doctorResponse);
-                console.log("PREV QUEUE",queue.queue_number);
+              console.log("PREV QUEUE",queue.queue_number);
                                 socket.emit('update_display', console.log("EMIT UPDATE"));
 
                    Swal.fire({
@@ -257,6 +254,9 @@ console.log("PILIH TOMBOL CONNECTED");
         timer: 2500,
         timerProgressBar: true,
       });
+
+      socket.emit('update_proses');
+
               const payload = {
                 phone_number: doctorResponse.data.phone_number,
                 patient_name: doctorResponse.data.patient_name,

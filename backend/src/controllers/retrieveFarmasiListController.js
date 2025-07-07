@@ -8,6 +8,7 @@ const { getCurrentTimestamp, convertToJakartaTime } = require('../handler/timeHa
 const { createAntrianFarmasi } = require('../services/createFarmasiQueueService');
 const { createVerificationTaskInternal } = require('./verificationTaskController');
 const { printAntrianFarmasi } = require('../services/printAntrianService');
+let io;
 async function retryOperation(operation, maxRetries = 3, delayMs = 1000) {
   let lastError;
   
@@ -159,6 +160,8 @@ const print = await retryOperation(
       verification_task: existingVerificationTask,
       result: payload
     });
+
+    
 
   } catch (error) {
     console.error("GET FARMASI LIST ERROR", error);

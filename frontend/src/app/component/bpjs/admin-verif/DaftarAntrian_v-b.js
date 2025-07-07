@@ -33,6 +33,8 @@ import {getSocket} from "@/app/utils/api/socket";
 import $ from 'jquery';
 import PhoneEditForm from "@/app/component/bpjs/admin-verif/phoneEditForm";
 import DatePicker from '@/app/component/datepicker';
+import PrintIcon from '@mui/icons-material/Print';
+import PrintAntrian from "@/app/utils/api/printAntrian";
 
 const DaftarAntrian = ({ selectedQueueIds, setSelectedQueueIds, onSelectQueue, setSelectedLoket,setSelectedQueue2,selectedQueue2 }) => {  
   const [queueList, setQueueList] = useState([]);
@@ -59,6 +61,11 @@ const DaftarAntrian = ({ selectedQueueIds, setSelectedQueueIds, onSelectQueue, s
           allowedLokets.includes(loket.loket_name)
         );
         setLokets(filteredLokets);
+
+           const activeLoket = filteredLokets.find(loket => loket.status === "active");
+        if (activeLoket) {
+          setSelectedLoketLocal(activeLoket.loket_name);
+          setSelectedLoket(activeLoket.loket_name);        }
       } catch (error) {
         console.error("? Error fetching lokets:", error);
       }
@@ -271,6 +278,68 @@ console.log("DATe",date);
 
     }
   }
+
+  async function handlePrintFunction(payload){
+    try {
+       if(!payload){
+   Swal.fire({
+          icon: "error",
+          title: "Print Gagal",
+          text: "Data Kurang atau tidak sesuai",
+          timer: 2000,
+          showConfirmButton: false,
+        });
+  }
+
+  const printPayload = {
+    phone_number: payload.phone_number || "-",
+    barcode: payload.NOP || "-",
+    medicine_type: payload.status_medicine || "-",
+    SEP: payload.sep_no || "-",
+    tanggal_lahir: payload.patient_date_of_birth || null,
+    queue_number : payload.queue_number || "-",
+    patient_name: payload.patient_name || "-"
+  }
+
+  console.log("PRINT PAYLOAD",payload);
+
+  const print = await PrintAntrian.printAntrian(printPayload);
+  const printResp = print.dataPrint;
+  if(printResp.success){
+Swal.fire({
+          icon: "success",
+          title: "Print Berhasil",
+          text: "Antrian Berhasil Di Print",
+          timer: 2000,
+          showConfirmButton: false,
+        });
+  }
+  else{
+Swal.fire({
+                    icon: "error",
+                    title: "Gagal Print!",
+                    text: `${printResp.message}`,
+                    timer: 2000,
+                    showConfirmButton: false,
+                })
+  }
+  console.log("PRINT",print);
+    
+
+
+    } catch (error) {
+            console.error("Error deleting tasks:", error);
+  Swal.fire({
+                    icon: "error",
+                    title: "Gagal Print!",
+                    text: `${error.response.data.message}`,
+                    timer: 2000,
+                    showConfirmButton: false,
+                })
+    }
+ 
+
+  }
   return (
     <Box sx={{ padding: "10px" }}>
       {visible &&
@@ -281,8 +350,8 @@ console.log("DATe",date);
 
       {phoneVisible &&
       <PhoneEditForm visible={phoneVisible} onClose={handleClosePhoneForm} selectedQueue={phoneQueue}/>
-
       }
+
       <Typography variant="h4" align="center" sx={{ marginBottom: "20px" }}>
         Daftar Antrian
       </Typography>
@@ -401,8 +470,10 @@ console.log("DATe",date);
 return (
               
   <TableRow key={item.NOP} hover>
-    <TableCell align="center">
+    <TableCell align="center" className="flex flex-row justify-center items-center">
       <Checkbox checked={selectedQueueIds.includes(item.NOP)} onChange={() => handleSelectQueue(item.NOP)} />
+        <Button onClick={()=>handlePrintFunction(item)}>      <PrintIcon className="flex items-middle" ></PrintIcon>
+</Button>
     </TableCell>
    
     <TableCell align="center">{item.queue_number}</TableCell>

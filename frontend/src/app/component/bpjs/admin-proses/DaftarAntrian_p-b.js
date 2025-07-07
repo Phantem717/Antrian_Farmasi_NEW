@@ -4,8 +4,9 @@ import React, { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import { Box, Typography, Table, TableBody, TableCell, TableHead, TableRow, Paper,TextField,Button } from "@mui/material";
 import MedicineAPI from "@/app/utils/api/Medicine";
-
+import { getSocket } from "@/app/utils/api/socket";
 export default function DaftarAntrian({ scanResult, setIsDeleted }) {
+    const socket = getSocket();
     const [queueList, setQueueList] = useState([]);
         const [rawQueueList, setRawQueueList] = useState([]);
 
@@ -20,10 +21,25 @@ const handleSearchClear = () => {
   setSearchText('');
   // The useEffect will automatically reset to rawQueueList
 };
-    const fetchQueue = async () => {
+async function fetchInitialQueue(){
+            setLoading(true);
+try {
+    const response = await MedicineAPI.getAllMedicineTasks();
+    processQueue(response);
+
+
+} catch (error) {
+ console.error("Gagal mengambil data antrian:", error);
+            setQueueList([]);
+            setRawQueueList([]);
+} finally{
+                setLoading(false);
+
+}
+}
+    const processQueue = async (response) => {
         setLoading(true);
         try {
-            const response = await MedicineAPI.getAllMedicineTasks();
             
             if (response && Array.isArray(response.data)) {
                 const formattedData = response.data
@@ -78,8 +94,13 @@ const handleSearchClear = () => {
     };
 
     useEffect(() => {
-        fetchQueue();
-    }, []);
+        fetchInitialQueue();
+        socket.on('get_responses_proses', (payload) => {
+            console.log("PAYLOAD",payload)
+            processQueue(payload);
+        })
+         
+    }, [socket]);
 
     useEffect(() => {
         if (!scanResult) return;
@@ -154,7 +175,7 @@ const handleSearchClear = () => {
                       Clear
                     </Button>
                   </form>
-                </div>s
+                </div>
                 <Box sx={{ maxHeight: "600px", overflowY: "auto" }}>
                     <Table stickyHeader>
                         <TableHead>

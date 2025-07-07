@@ -18,8 +18,14 @@ const createMedicineTask = async (req, res) => {
 
     res.status(201).json({ message: 'Medicine Task created successfully', data: result });
   } catch (error) {
-    console.error('Error creating Medicine Task:', error.message);
+    if(error.message.startsWith("Duplicate")){
+      console.log("HIT");
+          res.status(500).json({ message: 'Data Sudah Diproses', error: error.message });
+
+    }else{
+   console.error('Error creating Medicine Task:', error.message);
     res.status(500).json({ message: 'Failed to create Medicine Task', error: error.message });
+    }
   }
 };
 
