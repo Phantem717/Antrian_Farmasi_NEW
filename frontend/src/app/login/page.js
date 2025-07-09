@@ -51,7 +51,7 @@ const LoginPage = () => {
 
       });
       
-      router.push("/login/bpjs/admin-verif-b");
+      router.push("/login/location");
     }
     
   } catch (error) {

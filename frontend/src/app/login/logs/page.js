@@ -123,6 +123,7 @@ export default function Logs() {
             overflow: "hidden",
             display: "flex",
             flexDirection: "column",
+            marginBottom:"25px"
           }}
         >
       <MedicineTypeCard medicineType={medicineType} />
@@ -134,8 +135,9 @@ export default function Logs() {
         setSelectedQueueIds= {setSelectedQueueIds}  />
         </Content>
 
-        <Footer />
       </Layout>
+        <Footer />
+
     </Layout>
   );
 }

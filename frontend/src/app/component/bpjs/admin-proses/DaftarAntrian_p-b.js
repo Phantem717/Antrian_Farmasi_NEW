@@ -2,48 +2,54 @@
 
 import React, { useState, useEffect } from "react";
 import Swal from "sweetalert2";
-import { Box, Typography, Table, TableBody, TableCell, TableHead, TableRow, Paper,TextField,Button } from "@mui/material";
+import { Box, Typography, Table, TableBody, TableCell, TableHead, TableRow, Paper,TextField,Button,Input } from "@mui/material";
 import MedicineAPI from "@/app/utils/api/Medicine";
 import { getSocket } from "@/app/utils/api/socket";
 import { Form } from "antd";
 import { SearchOutlined, CloseOutlined } from '@ant-design/icons';
+import { DatePicker } from "antd";
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
 
 export default function DaftarAntrian({ scanResult, setIsDeleted }) {
+    dayjs.extend(customParseFormat);
+    const dateFormat = "YYYY-MM-DD";
     const socket = getSocket();
     const [queueList, setQueueList] = useState([]);
-        const [rawQueueList, setRawQueueList] = useState([]);
-
+    const [rawQueueList, setRawQueueList] = useState([]);
+    const [selectedDate, setSelectedDate] = useState(dayjs());
     const [loading, setLoading] = useState(true);
-      const [searchText, setSearchText] = useState('');
-const handleSearch = (searchText) => {
-  setSearchText(searchText);
-  // No need to manually filter here - the useEffect will handle it
-};
+    const [searchText, setSearchText] = useState('');
 
-const handleSearchClear = () => {
-  setSearchText('');
-  // The useEffect will automatically reset to rawQueueList
-};
-async function fetchInitialQueue(){
-            setLoading(true);
-try {
-    const response = await MedicineAPI.getAllMedicineTasks();
-    processQueue(response);
+    const handleSearch = (searchText) => {
+        setSearchText(searchText);
+    };
 
+    const changeDate = (date) => {
+        setSelectedDate(date || dayjs());
+    };
 
-} catch (error) {
- console.error("Gagal mengambil data antrian:", error);
+    const handleSearchClear = () => {
+        setSearchText('');
+    };
+
+    async function fetchInitialQueue() {
+        setLoading(true);
+        try {
+            const response = await MedicineAPI.getAllMedicineTasks();
+            processQueue(response);
+        } catch (error) {
+            console.error("Gagal mengambil data antrian:", error);
             setQueueList([]);
             setRawQueueList([]);
-} finally{
-                setLoading(false);
+        } finally {
+            setLoading(false);
+        }
+    }
 
-}
-}
     const processQueue = async (response) => {
         setLoading(true);
         try {
-            
             if (response && Array.isArray(response.data)) {
                 const formattedData = response.data
                     .filter(item => {
@@ -52,12 +58,13 @@ try {
                         const medicineStamp = typeof item.waiting_medicine_stamp === "string" 
                             ? new Date(item.waiting_medicine_stamp) 
                             : item.waiting_medicine_stamp;
+                            
                         const medicineDateString = medicineStamp.toISOString().split('T')[0];
-                        const dateString = new Date().toISOString().split('T')[0];
+                        const selectedDateString = selectedDate.format('YYYY-MM-DD');
 
                         return item.status === "waiting_medicine" && 
                                item.lokasi === "Lantai 1 BPJS" && 
-                               medicineDateString === dateString;
+                               medicineDateString === selectedDateString;
                     })
                     .map((item) => ({
                         NOP: item.NOP,
@@ -77,33 +84,42 @@ try {
                     });
 
                 setRawQueueList(formattedData);
-    if (!searchText) {
-        setQueueList(formattedData);
-      } else {
-        const filtered = formattedData.filter(item =>
-          item.patient_name?.toLowerCase().includes(searchText.toLowerCase())
-        );
-        setQueueList(filtered);
-      }
+                applyFilters(formattedData, searchText);
             } else {
                 setQueueList([]);
+                setRawQueueList([]);
             }
         } catch (error) {
             console.error("Gagal mengambil data antrian:", error);
             setQueueList([]);
+            setRawQueueList([]);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const applyFilters = (data, searchText) => {
+        if (!searchText) {
+            setQueueList(data);
+        } else {
+            const filtered = data.filter(item =>
+                item.patient_name?.toLowerCase().includes(searchText.toLowerCase())
+            );
+            setQueueList(filtered);
         }
     };
 
     useEffect(() => {
         fetchInitialQueue();
         socket.on('get_responses_proses', (payload) => {
-            console.log("PAYLOAD",payload)
+            console.log("PAYLOAD", payload);
             processQueue(payload);
-        })
-         
-    }, [socket]);
+        });
+        
+        return () => {
+            socket.off('get_responses_proses');
+        };
+    }, [socket, selectedDate]);
 
     useEffect(() => {
         if (!scanResult) return;
@@ -113,6 +129,7 @@ try {
 
             if (isExist) {
                 setQueueList(prevList => prevList.filter(item => item.NOP !== scanResult));
+                setRawQueueList(prevList => prevList.filter(item => item.NOP !== scanResult));
                 setIsDeleted(true);
                 await Swal.fire({
                     icon: "success",
@@ -135,16 +152,10 @@ try {
         showAlertAndUpdate();
     }, [scanResult]);
 
-  useEffect(() => {
-  if (!searchText) {
-    setQueueList(rawQueueList);
-  } else {
-    const filtered = rawQueueList.filter(item =>
-      item.patient_name?.toLowerCase().includes(searchText.toLowerCase())
-    );
-    setQueueList(filtered);
-  }
-}, [searchText, rawQueueList]);
+    useEffect(() => {
+        applyFilters(rawQueueList, searchText);
+    }, [searchText, rawQueueList]);
+
     return (
         <Box sx={{ padding: "10px", overflow: "auto" }}>
             <Typography variant="h4" align="center" sx={{ marginBottom: "20px" }}>
@@ -152,49 +163,59 @@ try {
             </Typography>
 
             <Paper elevation={3} sx={{ padding: "10px" }}>
+                <DatePicker 
+                    size="large"
+                    onChange={changeDate} 
+                    maxDate={dayjs()}
+                    defaultValue={dayjs()}
+                    value={selectedDate}
+                    format={dateFormat}
+                    style={{ marginBottom: '16px' }}
+                />
+                
                 <div style={{ width: '100%', display: 'flex' }}>
-  <Form
-    layout="inline"
-    onFinish={() => handleSearch(searchText)}
-    style={{
-      width: '100%',
-      display: 'flex',
-      alignItems: 'center',
-      gap: '8px',
-      flexWrap: 'nowrap'
-    }}
-  >
-    <Form.Item 
-      style={{ 
-        flex: '1',
-        margin: 0,
-        minWidth: 0, // Crucial for proper flex behavior
-      }}
-    >
-      <Input
-        placeholder="Search patients"
-        value={searchText}
-        onChange={(e) => setSearchText(e.target.value)}
-        suffix={<SearchOutlined />}
-        style={{ width: '100%' }}
-      />
-    </Form.Item>
+                    <Form
+                        layout="inline"
+                        onFinish={() => handleSearch(searchText)}
+                        style={{
+                            width: '100%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            flexWrap: 'nowrap'
+                        }}
+                    >
+                        <Form.Item 
+                            style={{ 
+                                flex: '1',
+                                margin: 0,
+                                minWidth: 0,
+                            }}
+                        >
+                            <Input
+                                placeholder="Search patients"
+                                value={searchText}
+                                onChange={(e) => setSearchText(e.target.value)}
+                                suffix={<SearchOutlined />}
+                                style={{ width: '100%' }}
+                            />
+                        </Form.Item>
 
-    <Form.Item style={{ 
-      margin: 0,
-      flex: '0 0 auto' // Prevents shrinking
-    }}>
-      <Button
-        type="default"
-        onClick={handleSearchClear}
-        icon={<CloseOutlined />}
-        style={{ whiteSpace: 'nowrap' }}
-      >
-        Clear
-      </Button>
-    </Form.Item>
-  </Form>
-</div>
+                        <Form.Item style={{ 
+                            margin: 0,
+                            flex: '0 0 auto'
+                        }}>
+                            <Button
+                                type="default"
+                                onClick={handleSearchClear}
+                                icon={<CloseOutlined />}
+                                style={{ whiteSpace: 'nowrap' }}
+                            >
+                                Clear
+                            </Button>
+                        </Form.Item>
+                    </Form>
+                </div>
 
                 <Box sx={{ maxHeight: "600px", overflowY: "auto" }}>
                     <Table stickyHeader>
@@ -233,7 +254,7 @@ try {
                                 ))
                             ) : (
                                 <TableRow>
-                                    <TableCell colSpan={7} align="center">Tidak ada antrean waiting_medicine.</TableCell>
+                                    <TableCell colSpan={7} align="center">Tidak ada antrean waiting_medicine untuk tanggal {selectedDate.format('DD/MM/YYYY')}.</TableCell>
                                 </TableRow>
                             )}
                         </TableBody>

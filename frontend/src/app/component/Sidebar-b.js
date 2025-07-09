@@ -10,10 +10,10 @@ import {
 } from "@ant-design/icons";
 import { useRouter, usePathname } from "next/navigation";
 import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
-
+import { LeftCircleOutlined } from "@ant-design/icons";
 const { Sider } = Layout;
 
-const Sidebar = ({ collapsed, setCollapsed }) => {
+const Sidebar = ({ collapsed, setCollapsed, isLocation }) => {
   const router = useRouter();
   const pathname = usePathname(); // Ambil path URL saat ini
 
@@ -49,6 +49,7 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
 
   // Definisikan items menu dalam array
   const menuItems = [
+   
     {
       key: "1",
       icon: <UserOutlined />,
@@ -67,18 +68,7 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
       label: "Admin Obat",
       onClick: () => router.push("/login/bpjs/admin-obat-b"),
     },
-    // {
-    //   key: "4",
-    //   icon: <SettingOutlined />,
-    //   label: "Manajemen Akun",
-    //   onClick: () => router.push("/login/manajemen-akun"),
-    // },
-    // {
-    //   key: "6",
-    //   icon: <EditOutlined />,
-    //   label: "Edit Marquee",
-    //   onClick: () => router.push("/login/bpjs/edit-marquee-b"),
-    // },
+  
     {
       key: "8",
       icon: <SettingOutlined />,
@@ -93,17 +83,7 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
       collapsed={collapsed}
       onCollapse={setCollapsed}
       collapsedWidth={80}
-      // trigger={
-      //   <div style={{ 
-      //     color: "white", 
-      //     padding: "10px", 
-      //     textAlign: "center" ,
-      //     zIndex: 100,
-      //     top: 0
-      //   }}>
-      //     {collapsed ? ">" : "<"}
-      //   </div>
-      // }
+    
       width={300}
       style={{
         background: "#001529",
@@ -115,43 +95,47 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
       }}
     >
       {/* Judul Sidebar */}
-      <div
-        className="logo"
+       <div
         style={{
-          color: "white",
-          textAlign: "center",
-          padding: collapsed ? "16px 0" : "20px 10px", // Less padding when collapsed
-          fontSize: collapsed ? "16px" : "22px",
-          fontWeight: "bold",
-          transition: "0.3s",
+          height: 64, // Standard Ant Design header height
           display: "flex",
-          margin: 5,
-          justifyContent: "center"
-
+          alignItems: "center",
+          justifyContent: collapsed ? "center" : "space-between",
+          padding: collapsed ? 0 : "0 16px",
+          borderBottom: "1px solid rgba(255, 255, 255, 0.1)"
         }}
       >
-        {collapsed ? "" : "Admin Panel"}
+        {!collapsed && !isLocation && (
+          <LeftCircleOutlined 
+            onClick={() => router.push('/login/location')}
+            style={{ color: "white", fontSize: 20 }}
+          />
+        )}
+        
+        {!collapsed && (
+          <span style={{ color: "white", fontWeight: "bold", fontSize:"20px"}}>Admin Panel</span>
+        )}
+
+     
 
         <Button
-        type="text"
-        icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-        onClick={() => setCollapsed(!collapsed)}
-        style={{
-          color: "white",
-          fontSize: "16px",
-          position: "absolute",
-       top: collapsed ? "16px" : "21px",
-        right: collapsed ? "21px" : "15px",
-          zIndex: 1,
-         
-        }}
-      />
+          type="text"
+          icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+          onClick={() => setCollapsed(!collapsed)}
+          style={{
+            color: "white",
+            fontSize: "16px",
+            width: collapsed ? "100%" : "auto",
+            height: "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center"
+          }}
+        />
       </div>
      
-     
-
-      {/* Menu Sidebar */}
-      <Menu
+   {!isLocation && (
+           <Menu
         theme="dark"
         selectedKeys={[currentSelectedKey]}
         mode="inline"
@@ -164,6 +148,9 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
         } : {}) }}
         items={menuItems} // Gunakan properti `items`
       />
+        )}
+      {/* Menu Sidebar */}
+     
 
       {/* Logout di Paling Bawah */}
       <Menu

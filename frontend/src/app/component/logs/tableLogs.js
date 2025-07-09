@@ -1,6 +1,7 @@
 //src\components\admin\DisplayAntrian.js
 import React, { useState, useEffect } from "react";
-import DatePicker from "@/app/component/datepicker";
+import { DatePicker } from "antd";
+
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import {
@@ -18,10 +19,14 @@ import {
   Checkbox,
 } from "@mui/material";
 import { ConstructionOutlined } from "@mui/icons-material";
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
 const tableLogs = ({
     selectedQueueIds,// ?? Mengirim daftar nomor yang dipilih
     setSelectedQueueIds, // ?? Agar bisa diperbarui dari DaftarAntrian
 }) => {
+   dayjs.extend(customParseFormat);
+    const dateFormat="YYYY-MM-DD"
    const [queueList, setQueueList] = useState([]);
       const [lokets, setLokets] = useState([]);
       const [selectedFilter, setSelectedFilter] = useState("");
@@ -138,6 +143,11 @@ const ExportToExcel = ({ data, fileName }) => {
 }, [selectedQueueIds, type, selectedFilter, date]);
 
 
+const changeDate = (date,dateString) => {
+  console.log("date",date,dateString);
+  setDate(dateString);
+}
+
 const handleFilterType = (value) => {
   setType(value); // No filtering logic here
 };
@@ -187,17 +197,15 @@ const handleFilterChange = (value) => {
 
 <Box sx={{ display: "flex", alignItems: "center", gap: "10px" }}>
   <div className="w-[200px] z-10">
-    <DatePicker date={date} setDate={setDate} selectedStatus={"LOGS"} />
-  </div>
-  {date && (
-    <Button
-      variant="outlined"
-      onClick={handleClearDate}
-      sx={{ height: '40px' }}
-    >
-      Clear
-    </Button>
-  )}
+ <DatePicker 
+            size="large"
+         
+            onChange={changeDate} 
+                maxDate={dayjs(new Date().toISOString(), dateFormat)}
+                defaultValue={dayjs(new Date().toISOString(), dateFormat)}
+
+            />  </div>
+ 
 </Box>
 
 <Box sx={{ display: "flex", alignItems: "center", gap: "10px" }}>

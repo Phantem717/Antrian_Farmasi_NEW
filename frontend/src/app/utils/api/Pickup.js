@@ -41,7 +41,7 @@ const PickupAPI = {
     // ✅ Update Pickup Task dengan format body yang benar
     updatePickupTask: async (NOP, updatedData) => {
         try {
-            const response = await axios.put(`${BASE_URL}/api/pickup-task//${encodeURIComponent(NOP)}`, updatedData, {
+            const response = await axios.put(`${BASE_URL}/api/pickup-task/${encodeURIComponent(NOP)}`, updatedData, {
                 headers: { 'Content-Type': 'application/json' }
             });
             return response.data;

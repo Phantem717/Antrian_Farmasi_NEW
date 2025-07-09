@@ -17,59 +17,6 @@ const NextQueue = ({ verificationData, medicineData, pickupData }) => {
   });
 
   const [isScrolling, setIsScrolling] = useState(false);
-//   const nextQueueRef = useRef(null);
-//   const medicineRef = useRef(null);
-//   const pickupRef = useRef(null);
-
-//   // Enhanced auto-scroll function
-//   const autoScroll = (ref, queueLength) => {
-//     if (!ref.current || queueLength === 0 || isScrolling) return;
-    
-//     setIsScrolling(true);
-// const scrollSpeed = Math.min(2, Math.max(1, Math.floor(queueLength / 10)));
-//     const itemHeight = 60; // Approximate height of each queue item
-//     const delayBeforeReset = Math.max(2000, queueLength * 500); // Dynamic delay based on queue length
-
-//     const scroll = () => {
-//       if (!ref.current) return;
-//       const maxScroll = ref.current.scrollHeight - ref.current.clientHeight;
-//       const currentScroll = ref.current.scrollTop;
-
-//       if (currentScroll < maxScroll - 5) { // 5px buffer
-//         ref.current.scrollBy({ top: scrollSpeed, behavior: "smooth" });
-//         requestAnimationFrame(scroll);
-//       } else {
-//         // Only reset if we've actually scrolled to the bottom
-//         setTimeout(() => {
-//           if (ref.current) {
-//             ref.current.scrollTo({ top: 0, behavior: "smooth" });
-//             setTimeout(() => {
-//               setIsScrolling(false);
-//               // Restart scroll only if data hasn't changed
-//               if (ref.current && ref.current.scrollHeight === maxScroll) {
-//                 autoScroll(ref, queueLength);
-//               }
-//             }, 1000);
-//           }
-//         }, delayBeforeReset);
-//       }
-//     };
-
-//     requestAnimationFrame(scroll);
-//   };
-
-//   // Update scroll effects to include queue length
-//   useEffect(() => {
-//     if (queues.verificationQueue.length > 0) {
-//       autoScroll(nextQueueRef, queues.verificationQueue.length);
-//     }
-//     if (queues.medicineRacik.length > 0 || queues.medicineNonRacik.length > 0) {
-//       autoScroll(medicineRef, Math.max(queues.medicineRacik.length, queues.medicineNonRacik.length));
-//     }
-//     if (queues.pickupRacik.length > 0 || queues.pickupNonRacik.length > 0) {
-//       autoScroll(pickupRef, Math.max(queues.pickupRacik.length, queues.pickupNonRacik.length));
-//     }
-//   }, [queues]);
 
   // 🔄 Ambil data antrian dari API saat komponen pertama kali di-load
   useEffect(() => {
