@@ -1,7 +1,6 @@
 // src/controllers/doctorAppointmentsController.js
 
 const DoctorAppointment = require('../models/doctorAppointments');
-// const io = req.app.get('socketio');
 
 /**
  * Controller untuk membuat appointment baru.
@@ -12,7 +11,7 @@ const createAppointment = async (req, res) => {
     const result = await DoctorAppointment.create(appointmentData);
     const io = req.app.get('socketio');
 
-    io.emit('new_doctor_appointment',{
+    io.emit('insert_appointment',{
       message: 'Doctor Created Succesfully',
       data: result
     });

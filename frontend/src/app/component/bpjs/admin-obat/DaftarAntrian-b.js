@@ -84,31 +84,44 @@ const DaftarAntrian = ({ selectedQueueIds, setSelectedQueueIds, setSelectedQueue
     }
   }
   // ? Fetch Loket dari API
-  useEffect(() => {
-    const fetchLokets = async () => {
-      try {
-        const loketData = await LoketAPI.getAllLokets();
-        const filteredLokets = loketData.data.filter((loket) => 
-          allowedLokets.includes(loket.loket_name)
-        );
-        setLokets(filteredLokets);
-  
-        // ? Cek apakah ada loket yang aktif, lalu set sebagai selectedLoket
-        const activeLoket = filteredLokets.find(loket => loket.status === "active");
-        if (activeLoket) {
-          setSelectedLoketLocal(activeLoket.loket_name);
-          setSelectedLoket(activeLoket.loket_name);        }
-  
-      } catch (error) {
-        console.error("? Error fetching lokets:", error);
+    let isMounted = true; // Track if component is mounted
+
+  const fetchLokets = async () => {
+    try {
+      const loketData = await LoketAPI.getAllLokets();
+      if (!isMounted) return; // Don't update if unmounted
+
+      const filteredLokets = loketData.data.filter((loket) => 
+        allowedLokets.includes(loket.loket_name)
+      );
+      
+      setLokets(filteredLokets);
+
+      // Only update selected loket if we don't already have one selected
+      // or if the current selection is no longer active
+      const activeLoket = filteredLokets.find(loket => loket.status === "active");
+      if (activeLoket) {
+        setSelectedLoketLocal(prev => prev || activeLoket.loket_name);
+        setSelectedLoket(prev => prev || activeLoket.loket_name);
       }
-    };
-  
-    fetchLokets();
-    const interval = setInterval(fetchLokets, 5000);
-    return () => clearInterval(interval);
-  }, []);
-  
+    } catch (error) {
+      console.error("Error fetching lokets:", error);
+    }
+  };
+
+  useEffect(() => {
+  fetchLokets();
+  return () => {
+    isMounted = false;
+    socket.off('update_loket', handleLoketUpdate);
+  };
+}, [allowedLokets]);
+
+const handleLoketUpdate = () => {
+    if (isMounted) fetchLokets();
+  };
+
+
 
   const handleLoketChange = async (loketName) => {
     setSelectedLoketLocal(loketName);
@@ -134,6 +147,7 @@ const DaftarAntrian = ({ selectedQueueIds, setSelectedQueueIds, setSelectedQueue
             await LoketAPI.updateLoket(loket.loket_id, loket.loket_name, loket.description, "close");
           }
         }
+  socket.on('update_loket', handleLoketUpdate);
 
     console.log(`? Loket ${loketName} diaktifkan.`);
   } catch (error) {

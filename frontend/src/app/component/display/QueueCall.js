@@ -44,6 +44,7 @@ const utteranceRef = useRef(null);
       }
   
       const queue = queueList[index];
+      console.log("QUEUE",queue);
       const { patient_name, queue_number, loket } = queue;
   
       if (!queue_number || !loket) {

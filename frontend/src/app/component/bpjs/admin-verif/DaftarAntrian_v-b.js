@@ -39,7 +39,6 @@ import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import PrintIcon from '@mui/icons-material/Print';
 import PrintAntrian from "@/app/utils/api/printAntrian";
-
 const DaftarAntrian = ({ selectedQueueIds, setSelectedQueueIds, onSelectQueue, setSelectedLoket,setSelectedQueue2,selectedQueue2 }) => {  
   dayjs.extend(customParseFormat);
   const dateFormat="YYYY-MM-DD"
@@ -59,31 +58,35 @@ const DaftarAntrian = ({ selectedQueueIds, setSelectedQueueIds, onSelectQueue, s
   // ? Loket yang diizinkan untuk admin verifikasi
   const allowedLokets = ["Loket 1", "Loket 2"];
   // ? Fetch Loket dari API
-  useEffect(() => {
-    const fetchLokets = async () => {
-      try {
-        const loketData = await LoketAPI.getAllLokets();
-        const filteredLokets = loketData.data.filter((loket) => 
-          allowedLokets.includes(loket.loket_name)
-        );
-        setLokets(filteredLokets);
+    let isMounted = true; // Track if component is mounted
 
-           const activeLoket = filteredLokets.find(loket => loket.status === "active");
-        if (activeLoket) {
-          setSelectedLoketLocal(activeLoket.loket_name);
-          setSelectedLoket(activeLoket.loket_name);        }
-      } catch (error) {
-        console.error("? Error fetching lokets:", error);
+  const fetchLokets = async () => {
+    try {
+      const loketData = await LoketAPI.getAllLokets();
+      if (!isMounted) return; // Don't update if unmounted
+
+      const filteredLokets = loketData.data.filter((loket) => 
+        allowedLokets.includes(loket.loket_name)
+      );
+      
+      setLokets(filteredLokets);
+
+      // Only update selected loket if we don't already have one selected
+      // or if the current selection is no longer active
+      const activeLoket = filteredLokets.find(loket => loket.status === "active");
+      if (activeLoket) {
+        setSelectedLoketLocal(prev => prev || activeLoket.loket_name);
+        setSelectedLoket(prev => prev || activeLoket.loket_name);
       }
-    };
+    } catch (error) {
+      console.error("Error fetching lokets:", error);
+    }
+  };
 
-    fetchLokets();
-    const interval = setInterval(fetchLokets, 5000);
-    return () => clearInterval(interval);
-  }, []);
-useEffect(() => {
-  if (!selectedLoketLocal && !selectedStatus) return;
-
+const handleLoketUpdate = () => {
+    if (isMounted) fetchLokets();
+  };
+  
   const fetchQueueList = async () => {
     try {
       const response = await VerificationAPI.getAllVerificationTasks();
@@ -147,11 +150,12 @@ useEffect(() => {
       console.error("Error fetching queue list:", error);
     }
   };
-
+useEffect(() => {
+  if (!selectedLoketLocal && !selectedStatus) return;
   fetchQueueList();
-  
-  const interval = setInterval(fetchQueueList, 10000);
-  return () => clearInterval(interval);
+
+
+ 
 }, [selectedStatus, selectedLoketLocal, date]);
 
 const handleLoketChange = async (loketName) => {
@@ -177,6 +181,7 @@ const handleLoketChange = async (loketName) => {
         await LoketAPI.updateLoket(loket.loket_id, loket.loket_name, loket.description, "close");
       }
     }
+  socket.on('update_loket', handleLoketUpdate);
 
     console.log(`? Loket ${loketName} diaktifkan, lainnya ditutup.`);
   } catch (error) {
@@ -209,6 +214,18 @@ const handleLoketChange = async (loketName) => {
     console.log("SQ2", selectedQueue2, selectedQueueIds);
   };
   
+  useEffect(() => {
+  fetchLokets();
+    socket.on('insert_appointment',fetchQueueList)
+
+  return () => {
+    isMounted = false;
+    socket.off('update_loket', handleLoketUpdate);
+        socket.off('insert_appointment',fetchQueueList)
+
+  };
+}, [allowedLokets]);
+
   async function deleteAction() {
     if (!selectedQueue2 || !selectedQueueIds || selectedQueueIds.length === 0) {
       console.log("Queues Needed");

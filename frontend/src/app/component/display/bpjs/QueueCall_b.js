@@ -22,6 +22,7 @@ const QueueCall = ({lokasi}) => {
 const socket = getSocket();
 const utteranceRef = useRef(null);
   let testArray = [];
+  
   const announceQueue = (queueList) => {
     console.log("LIST",queueList);
     if (!window.speechSynthesis) {
@@ -47,6 +48,8 @@ const utteranceRef = useRef(null);
       }
   
       const queue = queueList[index];
+            console.log("QUEUE",queue);
+
       const { patient_name, queue_number, loket } = queue;
   
       if (!queue_number || !loket) {
