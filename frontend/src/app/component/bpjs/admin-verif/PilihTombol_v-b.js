@@ -155,7 +155,8 @@ console.log("PILIH TOMBOL CONNECTED");
         })
       );
       
-  
+              socket.emit('update_verif');
+
       Swal.fire({
         icon: "success",
         title: `Berhasil memperbarui ${selectedQueueIds.length} antrian ke status ${statusType.replace("_", " ")}`,
@@ -256,6 +257,7 @@ console.log("PILIH TOMBOL CONNECTED");
       });
 
       socket.emit('update_proses');
+            socket.emit('update_verif');
 
               const payload = {
                 phone_number: doctorResponse.data.phone_number,
@@ -287,7 +289,6 @@ console.log("PILIH TOMBOL CONNECTED");
               queue_number: queue.queue_number,
               docter: queue.doctor_name
             }
-
             const printResp = await PrintAntrian.printAntrian(printPayload);
             console.log("PRINT AFTER CHANGE",printResp);
               console.log("WA SENT",sendResponse);    

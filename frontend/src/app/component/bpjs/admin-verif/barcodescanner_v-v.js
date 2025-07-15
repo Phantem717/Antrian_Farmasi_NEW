@@ -52,12 +52,12 @@ export default function BarcodeScanner({ onScanResult, handleBulkPharmacyUpdate 
         fetchQueueList();
 
         // Set up socket listeners
-        socket.on('update_daftar_proses', fetchQueueList);
+        socket.on('update_daftar_verif', fetchQueueList);
         socket.on('update_display', () => console.log("Display update received"));
 
         // Clean up socket listeners on unmount
         return () => {
-            socket.off('update_daftar_proses', fetchQueueList);
+            socket.off('update_daftar_verif', fetchQueueList);
             socket.off('update_display');
         };
     }, []);
@@ -110,16 +110,19 @@ export default function BarcodeScanner({ onScanResult, handleBulkPharmacyUpdate 
             prev_queue_number: "-"
         };
 
-        // Send WA notification with retry
-        const sendResponse = await retryOperation(() => WA_API.sendWAVerif(payload));
-        console.log("WA response:", sendResponse);
-
-        // Emit socket events
-        socket.emit('update_display');
+ socket.emit('update_display');
         socket.emit('update_proses');
         socket.emit('update_pickup');
+        socket.emit('update_verif');
+        // Send WA notification with retry
+                setDaftarAntrian(prev => prev.filter(item => item.NOP !== NOP));
+
+        // const sendResponse = await retryOperation(() => WA_API.sendWAVerif(payload));
+        // console.log("WA response:", sendResponse);
+
+        // Emit socket events
+       
         // Update local state by removing processed item
-        setDaftarAntrian(prev => prev.filter(item => item.NOP !== NOP));
 
         return { success: true };
     };
@@ -142,7 +145,7 @@ export default function BarcodeScanner({ onScanResult, handleBulkPharmacyUpdate 
         console.log("Booking ID yang di-scan:", NOP);
 
         try {
-            await processScan(NOP);
+            await processScan(NOP.replace(/\t/g, "").trim());
 
             Swal.fire({
                 icon: "success",

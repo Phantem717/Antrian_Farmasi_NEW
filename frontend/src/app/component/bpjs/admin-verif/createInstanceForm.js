@@ -17,6 +17,7 @@ import Swal from "sweetalert2";
 Swal.mixin({
   zIndex: 2000
 });
+import { getSocket } from "@/app/utils/api/socket";
 import CloseIcon from '@mui/icons-material/Close'; // Add this import
 import PrintAntrian from "@/app/utils/api/printAntrian";
 import { updateButtonStatus } from "@/app/utils/api/Button";
@@ -44,7 +45,7 @@ export default function BarcodeScanner({ visible, onClose }) {
   const isBarcoded = useRef(false);
   const inputRef = useRef(null);
   const isTyped = useRef(false);
-
+  const socket = getSocket();
   useEffect(() => {
     if (visible) {
       setTimeout(() => inputRef.current?.focus(), 100);
@@ -69,7 +70,9 @@ export default function BarcodeScanner({ visible, onClose }) {
 }
 
   async function validateBarcode(barcode) {
-    if (!barcode) {
+      const cleanedBarcode = barcode.replace(/\s+/g, "");
+
+    if (!cleanedBarcode) {
       Swal.fire({
         icon: "error",
         title: "Barcode kosong",
@@ -80,7 +83,7 @@ export default function BarcodeScanner({ visible, onClose }) {
       return false;
     }
 
-    if (!barcode.startsWith("NOP") && barcode.length !== 19) {
+    if (!cleanedBarcode.startsWith("NOP") && cleanedBarcode.length !== 19) {
       Swal.fire({
         icon: "error",
         title: "Data Bukan NOP/SEP",
@@ -101,7 +104,7 @@ export default function BarcodeScanner({ visible, onClose }) {
   async function handleBarcodeEnter(e) {
     if (e.key === "Enter") {
       e.preventDefault();
-      const barcode = inputValue.trim();
+const barcode = inputValue.replace(/\s+/g, ""); // Removes ALL whitespace
       
       // Validate before making API call
       if (!await validateBarcode(barcode)) {
@@ -197,7 +200,7 @@ export default function BarcodeScanner({ visible, onClose }) {
   async function handleSubmit(e) {
     e.preventDefault();
     try {
-        if (!inputValue || !type || !docter || !NIK  || !phoneNumber ||!name ||!medical_record_no ||!DOB ||!NOP ) {
+        if (!inputValue || !type || !docter  || !phoneNumber ||!name ||!medical_record_no ||!DOB ||!NOP ) {
               onClose?.();
           console.log(inputValue,type,docter,NIK,SEP,phoneNumber,name,medical_record_no,DOB,NOP,PRB);
         return Swal.fire({
@@ -284,8 +287,9 @@ if(!inputValue.startsWith("NOP") && inputValue.length != 19) {
             queue_number: queueNumberData.data.queue_number ?? null,
             PRB: PRB
         }
-
-      const WARESP =await WA_API.sendWAAntrian(WAPayload);
+      socket.emit('update_verif');
+      socket.emit('update_display');
+      // const WARESP =await WA_API.sendWAAntrian(WAPayload);
       const PRINTRESP= await PrintAntrian.printAntrian(printPayload);
                   await new Promise(resolve => setTimeout(resolve, 1000)); // 1-second delay
 
@@ -362,7 +366,7 @@ return (
             variant="outlined"
             fullWidth
             value={inputValue}
-           onChange={(e) => setInputValue(e.target.value)}
+           onChange={(e) => setInputValue(e.target.value.replace(/\s+/g, ""))}
     onKeyDown={handleBarcodeEnter} 
           />
           <TextField

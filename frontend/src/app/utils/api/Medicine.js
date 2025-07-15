@@ -1,8 +1,12 @@
 //src\app\utils\api\Medicine.js
 import axios from 'axios';
 
-const BASE_URL = 'http://172.16.21.214:5000'; // Base URL API
 
+
+const HOST = process.env.NEXT_PUBLIC_API_HOST; // 🔥 Pastikan server bisa diakses dari IP lain
+const PORT = process.env.NEXT_PUBLIC_API_PORT
+console.log(HOST,PORT)
+const BASE_URL = `http://${HOST}:${PORT}`; // Base URL API
 const MedicineAPI = {
     // 1. Get All Medicine Tasks
     getAllMedicineTasks: async () => {
@@ -12,6 +16,28 @@ const MedicineAPI = {
         } catch (error) {
             console.error('Error fetching all medicine tasks:', error);
             throw error;
+        }
+    },
+
+    getMedicineByDate: async(date)=>{
+        try {
+         
+            const response = await axios.get(`${BASE_URL}/api/medicine-task/by-date/${encodeURIComponent(date)}`);
+            return response.data;
+
+        } catch (error) {
+             console.error('Error fetching all medicine tasks:', error);
+            throw error;
+        }
+    },
+
+    getMedicineToday: async()=>{
+        try {
+             const response = await axios.get(`${BASE_URL}/api/medicine-task/today/now`);
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching all medicine tasks:', error);
+            throw error; 
         }
     },
 

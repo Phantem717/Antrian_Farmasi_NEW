@@ -1,7 +1,10 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://172.16.21.214:5000'; // Base URL API
 
+const HOST = process.env.NEXT_PUBLIC_API_HOST; // 🔥 Pastikan server bisa diakses dari IP lain
+const PORT = process.env.NEXT_PUBLIC_API_PORT
+console.log(HOST,PORT)
+const BASE_URL = `http://${HOST}:${PORT}`; // Base URL API
 const PickupAPI = {
     // 1. Get All Pickup Tasks
     getAllPickupTasks: async () => {
@@ -51,6 +54,25 @@ const PickupAPI = {
         }
     },
 
+    getPickupToday: async() => {
+        try {
+            const response = await axios.get(`${BASE_URL}/api/pickup-task/today/now`);
+            return response.data;        } catch (error) {
+            console.error(`Error fetching pickup task with Booking ID ${NOP}:`, error);
+            throw error;
+        }
+    }
+,
+ getPickupByDate: async(date) => {
+        try {
+            const response = await axios.get(`${BASE_URL}/api/pickup-task/by-date/${encodeURIComponent(date)}`);
+            return response.data;        
+        } catch (error) {
+            console.error(`Error fetching pickup task with Booking ID ${NOP}:`, error);
+            throw error;
+        }
+    }
+,
     // 5. Delete Pickup Task by Booking ID
     deletePickupTask: async (NOP) => {
         try {

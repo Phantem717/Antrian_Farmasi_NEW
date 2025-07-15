@@ -92,6 +92,43 @@ const getAllVerificationTasks = async (req, res) => {
   }
 };
 
+const getVerificationToday = async (req,res) => {
+   try {
+    const tasks = await VerificationTask.getToday();
+console.log("TASLS",tasks)
+    // 🔹 Filter hanya status dari "waiting_verification" sampai "completed_verification"
+    const validStatuses = [
+      "waiting_verification",
+      "called_verification",
+      "recalled_verification",
+      "pending_verification",
+      "processed_verification",
+      "completed_verification"
+    ];
+
+    const filteredTasks = tasks.filter(task => validStatuses.includes(task.status));
+    console.log("TASKS",filteredTasks);
+    res.status(200).json({ data: filteredTasks });
+  } catch (error) {
+    console.error('Error retrieving Verification Tasks:', error.message);
+    res.status(500).json({ message: 'Failed to retrieve Verification Tasks', error: error.message });
+  }
+}
+
+const getVerificationDate = async (req,res) => {
+ try {
+    const { date } = req.params;
+    const task = await VerificationTask.getByDate(date);
+    if (!task) {
+      return res.status(404).json({ message: 'Verification Task not found' });
+    }
+    res.status(200).json({ data: task });
+  } catch (error) {
+    console.error('Error retrieving Verification Task:', error.message);
+    res.status(500).json({ message: 'Failed to retrieve Verification Task', error: error.message });
+  }
+};
+
 /**
  * Controller untuk memperbarui Verification_Task berdasarkan NOP.
  * Hanya field target (berdasarkan status) yang akan di-update dengan timestamp baru
@@ -211,4 +248,6 @@ module.exports = {
   getAllVerificationTasks,
   updateVerificationTask,
   deleteVerificationTask,
+  getVerificationToday,
+  getVerificationDate
 };

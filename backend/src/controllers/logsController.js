@@ -1,6 +1,8 @@
 // src/controllers/doctorAppointmentsController.js
 
+const logsTask = require('../models/logsTask');
 const logs = require('../models/logsTask');
+const { all } = require('../routes/verificationTaskRoutes');
 
 /**
  * Controller untuk mengambil semua logs dari berbagai task.
@@ -22,6 +24,44 @@ const getAllLogs = async (req, res) => {
   }
 };
 
+const getLogsToday = async (req,res)=>{
+  try {
+        const allLogs = await logs.getToday();
+
+    res.status(200).json({ 
+      message: "List of all Logs",
+      data: allLogs
+    });
+  } catch (error) {
+     console.error("Error fetching logs:", error);
+    res.status(500).json({ 
+      message: "Failed to fetch logs", 
+      error: error.message 
+    });
+  }
+}
+
+
+const getLogsByDate = async (req,res)=>{
+  try {
+    const {date} = req.params
+        const allLogs = await logsTask.getByDate(date);
+        if(!allLogs){
+          return res.status(404).json({message: "Log Not Found"})
+        }
+
+    res.status(200).json({ 
+      message: "List of all Logs",
+      data: allLogs
+    });
+  } catch (error) {
+     console.error("Error fetching logs:", error);
+    res.status(500).json({ 
+      message: "Failed to fetch logs", 
+      error: error.message 
+    });
+  }
+}
 const getTotalMedicineType = async (req, res) => {
   try {
     const totalMed = await logs.getTotalMedicineType();
@@ -76,5 +116,7 @@ module.exports = {
   getAllLogs,
   getTotalMedicineType,
   getAvgServiceTime,
-  getDataPerHour
+  getDataPerHour,
+ getLogsToday,
+ getLogsByDate
 };

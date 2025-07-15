@@ -29,6 +29,15 @@ const createMedicineTask = async (req, res) => {
   }
 };
 
+const getMedicineToday = async (req,res) => {
+  try {
+     const tasks = await MedicineTask.getMedicineToday();
+    res.status(200).json({ data: tasks });
+  } catch (error) {
+     console.error('Error retrieving Medicine Tasks:', error.message);
+    res.status(500).json({ message: 'Failed to retrieve Medicine Tasks', error: error.message });
+  }
+}
 /**
  * Controller untuk mengambil Medicine Task berdasarkan NOP.
  */
@@ -52,6 +61,22 @@ const getMedicineTaskByNOP = async (req, res) => {
 const getAllMedicineTasks = async (req, res) => {
   try {
     const tasks = await MedicineTask.getAll();
+    res.status(200).json({ data: tasks });
+  } catch (error) {
+    console.error('Error retrieving Medicine Tasks:', error.message);
+    res.status(500).json({ message: 'Failed to retrieve Medicine Tasks', error: error.message });
+  }
+};
+
+const getAllMedicineByDate = async (req, res) => {
+  try {
+    const {date} = req.params;
+    const tasks = await MedicineTask.getMedicineByDate(date);
+    console.log("TASKS",tasks);
+    if(!tasks){
+            return res.status(404).json({ message: "Medicine Task not found" });
+
+    }
     res.status(200).json({ data: tasks });
   } catch (error) {
     console.error('Error retrieving Medicine Tasks:', error.message);
@@ -195,5 +220,7 @@ module.exports = {
   getAllMedicineTasks,
   updateMedicineTask,
   deleteMedicineTask,
-  updateMedicineTaskInternal
+  updateMedicineTaskInternal,
+  getMedicineToday,
+  getAllMedicineByDate
 };

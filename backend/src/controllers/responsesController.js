@@ -11,11 +11,10 @@ const getAllResponses = async (location) => {
     }
 
     const [verificationResp, medicineResp, pickupResp, loketResp, pharmacyResp] = await Promise.all([
-      VerificationTask.getAll(),
-      MedicineTask.getAll(),
-      PickupTask.getAll(),
+      VerificationTask.getToday(),
+      MedicineTask.getMedicineToday(),
+      PickupTask.getPickupDisplay(),
       loket.getAll(),
-      PharmacyTask.getAll()
     ]);
 
     return {
@@ -24,11 +23,10 @@ const getAllResponses = async (location) => {
       medicineData: medicineResp.filter(item => item.lokasi === location),
       pickupData: pickupResp.filter(item => item.lokasi === location),
       loketData: loketResp,
-      pharmacyData: pharmacyResp.filter(item => item.lokasi === location)
     };
   } catch (error) {
     console.error("? Error fetching all responses:", error);
-    throw error;
+    throw error; 
   }
 };
 

@@ -1,6 +1,7 @@
 //src\components\admin\DisplayAntrian.js
 import React, { useState, useEffect } from "react";
 import { DatePicker } from "antd";
+import LogsAPI from "@/app/utils/api/Logs";
 
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
@@ -32,8 +33,10 @@ const tableLogs = ({
       const [selectedFilter, setSelectedFilter] = useState("");
       const [selectedStatus, setSelectedStatus] = useState("");
       const [filteredData,setFilteredData]= useState([]);
+      const [isCalendarActive, setIsCalendarActive] = useState(false);
+const [isFilterActive, setIsFilterActive] = useState(false);
      const [type, setType] = useState("");
-const [date, setDate] = useState(new Date());
+const [date, setDate] = useState(null);
 console.log("TABLELOGS",selectedQueueIds);
 const ExportToExcel = ({ data, fileName }) => {
    const exportData = filteredData.map(item => ({
@@ -117,18 +120,15 @@ const ExportToExcel = ({ data, fileName }) => {
         break;
     }
 
-    if (startDate) {
-      filtered = filtered.filter(item => {
-        // if (!item.completed_pickup_medicine_stamp) return false;
-        const completedDate = new Date(item.waiting_verification_stamp);
-        return completedDate >= startDate;
-      });
-    }
+    
   }
-
-  // Filter by exact date picker
+let response;
+const getLogsByDate = async (date) => {
+    response = await LogsAPI.getLogsByDate(date);
+    console.log("RESPOSNE",response);
+} 
   if (date) {
-    const selectedDay = new Date(date);
+   const selectedDay = new Date(date);
     selectedDay.setHours(0, 0, 0, 0);
 
     filtered = filtered.filter(item => {
@@ -138,14 +138,16 @@ const ExportToExcel = ({ data, fileName }) => {
     });
   }
 
-  setFilteredData(filtered);
   console.log("FILTER",filteredData);
 }, [selectedQueueIds, type, selectedFilter, date]);
 
 
 const changeDate = (date,dateString) => {
-  console.log("date",date,dateString);
+  console.log("date", date, dateString);
   setDate(dateString);
+  setIsCalendarActive(true);
+  setIsFilterActive(false); // Disable filter dropdown when calendar is active
+  setSelectedFilter("");
 }
 
 const handleFilterType = (value) => {
@@ -153,8 +155,11 @@ const handleFilterType = (value) => {
 };
 
 const handleFilterChange = (value) => {
-  setSelectedFilter(value); // No filtering logic here
-};
+ setSelectedFilter(value);
+  setIsFilterActive(true);
+  setIsCalendarActive(false); // Disable calendar when filter is active
+  setDate(null); // Clear the date selection};
+}
       const handleClearDate = () => {
   setDate(null);
 };
@@ -165,27 +170,24 @@ const handleFilterChange = (value) => {
     </Typography>
 
     <Box sx={{ display: "flex", alignItems: "center", marginBottom: "20px" }}>
-    <Select
-  value={selectedFilter}
-  onChange={(e) => handleFilterChange(e.target.value)}
-  displayEmpty
-  renderValue={(selected) => {
-    if (!selected) {
-      return <em>Pilih Opsi</em>;
-    }
-    // Optionally make this prettier if needed
-    const labelMap = {
-      hari_ini: "Hari Ini",
-      minggu_ini: "Minggu Ini",
-      bulan_ini: "Bulan Ini",
-      "3_bulan": "3 Bulan Lalu",
-      "6_bulan": "6 Bulan Lalu",
-      tahun_ini: "Tahun Ini",
-    };
-    return labelMap[selected] || selected;
-  }}
-  sx={{ width: "200px", marginRight: "10px" }}
->
+   <Select
+    value={selectedFilter}
+    onChange={(e) => handleFilterChange(e.target.value)}
+    displayEmpty
+    renderValue={(selected) => {
+      if (!selected) return <em>Pilih Opsi</em>;
+      const labelMap = {
+        hari_ini: "Hari Ini",
+        minggu_ini: "Minggu Ini",
+        bulan_ini: "Bulan Ini",
+        "3_bulan": "3 Bulan Lalu",
+        "6_bulan": "6 Bulan Lalu",
+        tahun_ini: "Tahun Ini",
+      };
+      return labelMap[selected] || selected;
+    }}
+    sx={{ width: "200px", marginRight: "10px" }}
+  >
   <MenuItem value=""><em>Pilih Opsi</em></MenuItem>
   <MenuItem value="hari_ini">Hari Ini</MenuItem>
   <MenuItem value="minggu_ini">Minggu Ini</MenuItem>
@@ -199,7 +201,7 @@ const handleFilterChange = (value) => {
   <div className="w-[200px] z-10">
  <DatePicker 
             size="large"
-         
+
             onChange={changeDate} 
                 maxDate={dayjs(new Date().toISOString(), dateFormat)}
                 defaultValue={dayjs(new Date().toISOString(), dateFormat)}

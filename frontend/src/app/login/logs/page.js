@@ -52,7 +52,7 @@ export default function Logs() {
     try {
       
       let [allLogs,medicineType,dataPerHour,avgTime] = await Promise.all([
-        LogsAPI.getAllLogs(),
+        LogsAPI.getAllLogsToday(),
         LogsAPI.getMedicineType(),
       LogsAPI.getDataPerHour(),
     LogsAPI.getAvgServiceTime()]
@@ -129,7 +129,6 @@ export default function Logs() {
       <MedicineTypeCard medicineType={medicineType} />
       <BarChart dataPerHour={dataPerHour}/>
       <AvgServiceTime avgTime={avgTime}/>
-          
                   <TableLogs  
         selectedQueueIds = {selectedQueueIds}// ?? Mengirim daftar nomor yang dipilih
         setSelectedQueueIds= {setSelectedQueueIds}  />

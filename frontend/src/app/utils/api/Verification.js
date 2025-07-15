@@ -1,8 +1,12 @@
 //src\app\utils\api\Verification.js
 import axios from 'axios';
 
-const BASE_URL = 'http://172.16.21.214:5000'; // Base URL API
 
+
+const HOST = process.env.NEXT_PUBLIC_API_HOST; // 🔥 Pastikan server bisa diakses dari IP lain
+const PORT = process.env.NEXT_PUBLIC_API_PORT
+console.log("IP",HOST,PORT)
+const BASE_URL = `http://${HOST}:${PORT}`; // Base URL API
 const VerificationAPI = {
     // 1. Get All Verification Tasks
     getAllVerificationTasks: async () => {
@@ -16,6 +20,28 @@ const VerificationAPI = {
         }
     },
 
+    getVerificationTasksToday: async () => {
+  try {
+    console.log("VERIF");
+            const response = await axios.get(`${BASE_URL}/api/verification-task/now/today`);
+            console.log("VERIF",response.data);
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching today verification tasks:', error);
+            throw error;
+        }
+    },
+
+    getVerificationTasksByDate: async (date) => {
+        try {
+             const response = await axios.get(`${BASE_URL}/api/verification-task/by-date/${encodeURIComponent(date)}`);
+            console.log("VERIF",response.data);
+            return response.data;
+        } catch (error) {
+             console.error('Error fetching all verification tasks:', error);
+            throw error;
+        }
+    },
     // 2. Get Verification Task by Booking ID
     getVerificationTaskByNOP: async (NOP) => {
         try {

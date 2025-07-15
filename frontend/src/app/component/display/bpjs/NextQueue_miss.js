@@ -8,30 +8,32 @@ import "@devnomic/marquee/dist/index.css";
 import { queue } from "jquery";
 
 const NextQueue = ({ verificationData, medicineData, pickupData }) => {
+  const [lastCalled, setLastCalled] = useState({
+    racik: null,
+    nonRacik: null
+  });
   const [queues, setQueues] = useState({
-    nextQueueRacik: [],
-    nextQueueNonRacik: [],
-    medicineRacik: [],
-    medicineNonRacik: [],
     pickupRacik: [],
     pickupNonRacik: [],
-    verificationQueue: [],
+    pickupTerlewatNonRacik: [],
+    pickupTerlewatRacik: [],
     pickupQueue: []
   });
+
 const [times, setTimes] = useState({
-  verifTime: 10,
   processTimeNon: 10,
-   processTimeRacik: 10,
+processTimeRacik: 10,
   pickupTimeNon: 10,
   pickupTimeRacik: 10
-});    const socket = getSocket();
-  function calculateTime(verifLength,processLengthNon, processLengthRacik, pickupLengthNon, pickupLengthRacik) {
-  const verifTime = verifLength < 3 ? 10 : verifLength * 10;
+});    
+
+const socket = getSocket();
+  function calculateTime(processLengthNon, processLengthRacik, pickupLengthNon, pickupLengthRacik) {
   const processTimeNon = processLengthNon < 3 ? 10 : (processLengthNon * 10);
   const processTimeRacik =processLengthRacik< 3 ? 10 : (processLengthRacik * 10)
   const pickupTimeNon = pickupLengthNon < 3 ? 10 : (pickupLengthNon * 10);
   const pickupTimeRacik = pickupLengthRacik < 3 ? 10 : (pickupLengthRacik * 10);
-  return { verifTime, processTimeNon,processTimeRacik, pickupTimeNon,pickupTimeRacik };
+  return {  processTimeNon,processTimeRacik, pickupTimeNon,pickupTimeRacik };
 }
 
 
@@ -41,33 +43,7 @@ useEffect(() => {
   const handleGetResponses = (payload) => {
     console.log("? GOT RESP", payload);
 
-    const dateString = new Date().toISOString().split('T')[0];
-
     // Extract and filter verification data
-    const verificationData = payload.data.verificationData
-    .sort((a, b) => ( // Sort by timestamp (oldest first)
-    new Date(a.waiting_verification_stamp) - new Date(b.waiting_verification_stamp)
-  ))
-      .map(task => ({
-        queueNumber: task.queue_number,
-        type: task.status_medicine,
-        status: task.status === "waiting_verification" ? "Menunggu"
-          : task.status === "called_verification" ? "Dipanggil"
-          : task.status === "pending_verification" ? "Terlewat"
-          : task.status === "recalled_verification" ? "Dipanggil"
-          : task.status === "processed_verification" ? "Verifikasi"
-          : "-",
-        patient_name: task.patient_name
-      }));
-
-    const medicineData = payload.data.medicineData
-      .map(task => ({
-        queueNumber: task.queue_number,
-        type: task.status_medicine,
-        status: task.status,
-        patient_name: task.patient_name
-      }));
-
     const pickupData = payload.data.pickupData
       .map(task => ({
         queueNumber: task.queue_number,
@@ -83,34 +59,58 @@ isYesterday: new Date(new Date(task.waiting_pickup_medicine_stamp).setHours(0,0,
 
       }));
 
-    console.log("DATA", pickupData, verificationData, medicineData);
+    console.log("DATA", pickupData);
 
     setQueues({
-      verificationQueue: verificationData,
-      pickupQueue: pickupData,
-      nextQueueRacik: verificationData.filter(task => task.type === "Racikan"),
-      nextQueueNonRacik: verificationData.filter(task => task.type === "Non - Racikan"),
-      medicineRacik: medicineData.filter(task => task.type === "Racikan"),
-      medicineNonRacik: medicineData.filter(task => task.type === "Non - Racikan"),
-      pickupRacik: pickupData.filter(task => task.type === "Racikan"),
-      pickupNonRacik: pickupData.filter(task => task.type === "Non - Racikan"),
+    
+      pickupRacik: pickupData.filter(task => task.type == "Racikan" && task.status != "Terlewat"),
+      pickupNonRacik: pickupData.filter(task => task.type == "Non - Racikan" && task.status != "Terlewat"),
+        pickupTerlewatRacik: pickupData.filter(task => task.type == "Racikan" && task.status == "Terlewat"),
+      pickupTerlewatNonRacik: pickupData.filter(task => task.type == "Non - Racikan"  && task.status == "Terlewat"),
     });
 
    const newTimes = calculateTime(
-    verificationData.length,
-    medicineData.filter(task => task.type === "Non - Racikan").length,
-    medicineData.filter(task => task.type === "Racikan").length,
-    pickupData.filter(task => task.type === "Non - Racikan").length,
-    pickupData.filter(task => task.type === "Racikan").length
+  
+   
+    pickupData.filter(task => task.type == "Non - Racikan" != "Terlewat").length,
+    pickupData.filter(task => task.type == "Racikan" != "Terlewat").length,
+     pickupData.filter(task => task.type == "Racikan" && task.status == "Terlewat").length,
+    pickupData.filter(task => task.type == "Non - Racikan"  && task.status == "Terlewat").length,
   );
 
   setTimes(newTimes);
+
+    // const calledRacik = pickupData
+    //     .filter(task => task.type === "Racikan" && task.status === "Dipanggil")
+    //     .sort((a, b) => new Date(b.calledTime) - new Date(a.calledTime))[0];
+      
+    //   const calledNonRacik = pickupData
+    //     .filter(task => task.type === "Non - Racikan" && task.status === "Dipanggil")
+    //     .sort((a, b) => new Date(b.calledTime) - new Date(a.calledTime))[0];
+
+    //   setLastCalled({
+    //     racik: calledRacik,
+    //     nonRacik: calledNonRacik
+    //   });
+    //     console.log("last",lastCalled);
+
   console.log("Time Estimates:", newTimes);
   };
 
+     const handleLatestPickup = (payload) => {
+        const data = payload.data
+        console.log("PAYLOAD",data);
+  setLastCalled(prev => ({
+  ...prev,
+  racik: data.medicine_type === "Racikan" ? data : prev.racik,
+  nonRacik: data.medicine_type !== "Racikan" ? data : prev.nonRacik
+}));
+  console.log("last2",lastCalled);
+};
+
   if (socket) {
     socket.on('get_responses', handleGetResponses, console.log("GET RESPONSES FE"));
-
+    socket.on('send_latest_pickup',(payload)=> handleLatestPickup(payload));
     // Optional: trigger the data on mount
  
   }
@@ -119,6 +119,7 @@ isYesterday: new Date(new Date(task.waiting_pickup_medicine_stamp).setHours(0,0,
   return () => {
     if (socket) {
       socket.off('get_responses', handleGetResponses);
+      socket.off('send_latest_pickup',handleLatestPickup)
     }
   };
 }, []); // Run only once on mount
@@ -147,11 +148,38 @@ isYesterday: new Date(new Date(task.waiting_pickup_medicine_stamp).setHours(0,0,
   };
 
   // Queue section components
- const QueueSection = ({ title, queuesRacik, queuesNonRacik, bgColor }) => (
+ const QueuePickup = ({ title, queuesRacik, queuesNonRacik, bgColor }) => (
   <div className={`p-4 flex-1 min-w-0 ${bgColor} rounded-lg shadow-md overflow-hidden`} style={{ minHeight: "1200px" }}>
     <p className="text-2xl font-bold text-white text-center uppercase">{title}</p>
-    
+     <div className="flex gap-4 mb-4 mt-2">
+        {/* Last Called Racikan */}
+        <div className="flex-1 bg-blue-600 p-4 rounded-lg ">
+          <p className="text-2xl font-bold text-white text-center">Terakhir Dipanggil (Racikan)</p>
+          {lastCalled.racik ? (
+            <div className="text-white text-center mt-2">
+              <div className="text-6xl font-extrabold">{lastCalled.racik.queue_number}</div>
+              <div className="text-2xl font-extrabold truncate mt-2">{lastCalled.racik.patient_name}</div>
+            </div>
+          ) : (
+            <div className="text-white text-center mt-2">-</div>
+          )}
+        </div>
+        
+        {/* Last Called Non-Racikan */}
+        <div className="flex-1 bg-blue-600 p-4 rounded-lg">
+          <p className="text-2xl font-bold text-white text-center">Terakhir Dipanggil (Non-Racikan)</p>
+          {lastCalled.nonRacik ? (
+            <div className="text-white text-center mt-2">
+              <div className="text-6xl font-extrabold">{lastCalled.nonRacik.queue_number}</div>
+              <div className="text-2xl font-extrabold truncate mt-2">{lastCalled.nonRacik.patient_name}</div>
+            </div>
+          ) : (
+            <div className="text-white text-center mt-2">-</div>
+          )}
+        </div>
+      </div>
     <div className="flex gap-4 mt-4 flex-wrap">
+       
       {/* Racikan Section - Now matches Non-Racikan styling */}
       <div className="flex-1 min-w-[300px] bg-white p-2 rounded-md shadow-md overflow-hidden">
         <p className="text-2xl font-extrabold text-center text-green-700 uppercase">Racikan</p>
@@ -174,7 +202,6 @@ isYesterday: new Date(new Date(task.waiting_pickup_medicine_stamp).setHours(0,0,
                   className="bg-white text-green-700 text-6xl font-extrabold p-4 shadow border-2 border-black  rounded w-full"
                   style={{ 
                     height: '160px', 
-                    width: '355px', 
                     marginBottom: '8px', 
                     display: 'flex', 
                     flexDirection: 'column', 
@@ -223,7 +250,6 @@ isYesterday: new Date(new Date(task.waiting_pickup_medicine_stamp).setHours(0,0,
                   className="bg-white text-green-700 text-6xl font-extrabold p-4 shadow border-2 border-black rounded w-full"
                   style={{ 
                     height: '160px', 
-                    width: '355px', 
                     marginBottom: '8px', 
                     display: 'flex', 
                     flexDirection: 'column', 
@@ -251,43 +277,7 @@ isYesterday: new Date(new Date(task.waiting_pickup_medicine_stamp).setHours(0,0,
   </div>
 );
 
-  const QueueSectionVerification = ({ title, queues,bgColor }) => (
-      
-    <div className={`p-4 flex-1 min-w-0 ${bgColor} rounded-lg shadow-md`} style={{ height: "1180px" }}>
-      <p className="text-2xl font-bold text-white text-center uppercase">{title}</p>
-      <div className="flex gap- mt-2">
-        <div className="bg-white p-2 rounded-md shadow-md w-full h-full">
-        <Marquee fade={false} direction="up" 
-className="gap-[3rem] " innerClassName="gap-[3rem] [--gap:3rem]"
-              style={{ '--duration': `${times.verifTime}s`,     height: `1100px` }}
- >
-
-    <div className="w-full ">
-            {queues.length > 0 ? (
-              queues.map((queue, index) => (
-                <div key={index}            
-                 className="flex items-center flex-col justify-between   bg-white text-green-700 text-6xl font-extrabold p-4 shadow text-center border-2 border-black  rounded w-full"
->
-                <div className="flex flex-row gap-5 justify-around w-full h-1/6">
-                   <div className={`flex-1 text-4xl text-left items-middle ${getStatusColor(queue.status)}`}>{queue.queueNumber}</div>
-                  <div className={`flex-1 text-3xl text-center ${getStatusColor(queue.status)}`}>{queue.type}</div>
-                  <div className={`flex-1 text-3xl text-right ${getStatusColor(queue.status)}`}>{queue.status}</div>
-                </div>
-                  <div className={`flex-1 text-4xl text-center bg-green-400 mt-2 w-full p-1  text-black`}>{queue.patient_name}</div>
-                </div>
-              ))
-              
-            ) : (
-              <div className="bg-white text-black p-2 shadow text-center font-bold text-2xl">Belum Ada Antrian</div>
-            )}
-            
-          </div>
-          </Marquee>
-        </div>
-      </div>
-    </div>
-  );
-const QueueSectionPickup = ({ title, queuesRacik, queuesNonRacik, bgColor }) => (
+const QueuePickupTerlewat = ({ title, queuesRacik, queuesNonRacik, bgColor }) => (
   <div className={`p-4 flex-1 min-w-0 ${bgColor} rounded-lg shadow-md`} style={{ minHeight: "1200px" }}>
     <p className="text-2xl font-bold text-white text-center uppercase">{title}</p>
     <div className="flex flex-wrap gap-2 mt-2 overflow-x-hidden">
@@ -313,8 +303,7 @@ const QueueSectionPickup = ({ title, queuesRacik, queuesNonRacik, bgColor }) => 
                        <div className={`text-2xl ${getStatusColor(queue.status)}`}>KEMARIN</div>
                       )
                       }
-                      <div className={`text-4xl ${getStatusColor(queue.status)}`}>{queue.queueNumber}</div>
-                    <div className={`text-3xl ${getStatusColor(queue.status)}`}>{queue.status}</div>
+                      <div className={`text-6xl ${getStatusColor(queue.status)}`}>{queue.queueNumber}</div>
                     </div>
                       <div className="text-center mt-2 w-full bg-green-400 px-4 py-2 text-black text-3xl truncate whitespace-nowrap overflow-hidden leading-tight">
 {queue.patient_name}</div>
@@ -355,8 +344,7 @@ const QueueSectionPickup = ({ title, queuesRacik, queuesNonRacik, bgColor }) => 
                        <div className={`text-2xl ${getStatusColor(queue.status)}`}>KEMARIN</div>
                       )
                       }
-                      <div className={`text-4xl ${getStatusColor(queue.status)}`}>{queue.queueNumber}</div>
-                    <div className={`text-3xl ${getStatusColor(queue.status)}`}>{queue.status}</div>
+                      <div className={`text-6xl ${getStatusColor(queue.status)}`}>{queue.queueNumber}</div>
                     </div>
                       <div className="text-center text-bold mt-2 w-full bg-green-400 px-4 py-2 text-black text-3xl truncate whitespace-nowrap overflow-hidden leading-tight">
 {queue.patient_name}</div>
@@ -375,24 +363,31 @@ const QueueSectionPickup = ({ title, queuesRacik, queuesNonRacik, bgColor }) => 
     </div>
   </div>
 );
+
   return (
    <div className="bg-white p-4 shadow-lg border border-green-700 w-full "  style={{ minHeight: "300px" }}>
-      <div className="flex w-full gap-4 flex-wrap justify-center">
-        <QueueSectionVerification 
-          title="Proses Pengecekan Ketersediaan Obat" 
-          queues={queues.verificationQueue} 
-          bgColor="bg-green-700"
+      
+        <div className="flex flex-wrap flex-row gap-2">
+  <QueuePickup
+          title="Obat Telah Selesai" 
+          queuesNonRacik={queues.pickupNonRacik} 
+          queuesRacik={queues.pickupRacik}        
+                    bgColor="bg-green-700" 
+
         />
 
-        <QueueSection 
-          title="Proses Penyiapan Obat" 
-          queuesRacik={queues.medicineRacik} 
-          queuesNonRacik={queues.medicineNonRacik}        
-          bgColor="bg-yellow-600" 
+        <QueuePickupTerlewat
+          title="Panggilan Obat Terlewat" 
+          queuesRacik={queues.pickupTerlewatRacik} 
+          queuesNonRacik={queues.pickupTerlewatNonRacik} 
+          bgColor="bg-red-700" 
         />
 
+        </div>
+      
+
+      
       </div>
-    </div>
   );
 };
 

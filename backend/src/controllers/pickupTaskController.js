@@ -61,6 +61,40 @@ const getAllPickupTasks = async (req, res) => {
   }
 };
 
+const getAllPickupToday= async (req, res) => {
+  try {
+    const tasks = await PickupTask.getPickupToday();
+    res.status(200).json({ data: tasks });
+  } catch (error) {
+    console.error('Error retrieving Pickup Tasks:', error.message);
+    res.status(500).json({ message: 'Failed to retrieve Pickup Tasks', error: error.message });
+  }
+};
+
+
+const getAllPickupDisplay= async (req, res) => {
+  try {
+    const tasks = await PickupTask.getPickupDisplay();
+    res.status(200).json({ data: tasks });
+  } catch (error) {
+    console.error('Error retrieving Pickup Tasks:', error.message);
+    res.status(500).json({ message: 'Failed to retrieve Pickup Tasks', error: error.message });
+  }
+};
+
+const getAllPickupByDate = async (req, res) => {
+  try {
+    const {date} = req.params;
+    const tasks = await PickupTask.getPickupByDate(date);
+    if(!tasks){
+    res.status(404).json({message: 'PickupNotFOund'});
+    }
+    res.status(200).json({ data: tasks });
+  } catch (error) {
+    console.error('Error retrieving Pickup Tasks:', error.message);
+    res.status(500).json({ message: 'Failed to retrieve Pickup Tasks', error: error.message });
+  }
+};
 /**
  * Controller untuk memperbarui Pickup Task berdasarkan NOP.
  * Hanya field target (berdasarkan status) yang akan di-update dengan timestamp baru
@@ -185,4 +219,7 @@ module.exports = {
   getAllPickupTasks,
   updatePickupTask,
   deletePickupTask,
+  getAllPickupByDate,
+  getAllPickupToday,
+  getAllPickupDisplay
 };

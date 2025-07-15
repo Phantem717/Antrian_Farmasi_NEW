@@ -1,13 +1,19 @@
 let io;
+require('dotenv').config({ path: './.env' }); // Or just require('dotenv').config();
+
 const responseControl = require('../controllers/responsesController');
 const medControl = require('../models/medicineTask')
-const pickupControl = require('../models/pickupTask')
+const pickupControl = require('../models/pickupTask');
+const VerificationTask = require('../models/verificationTask');
+const verifControl = require('../models/verificationTask')
 module.exports = {
   init: (server) => {
     const { Server } = require('socket.io');
+    const HOST = process.env.FE_HOST;
+    const PORT = process.env.FE_PORT
     io = new Server(server, {
       cors: {
-        origin: "http://172.16.21.214:3009", // Change to frontend IP in production
+        origin: `http://${HOST}:${PORT}`, // Change to frontend IP in production
         methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE'],
         credentials: true,
       },
@@ -59,7 +65,7 @@ try {
     
     socket.on('update_proses', async () => {
       try {
-      const data = await medControl.getAll();
+      const data = await medControl.getMedicineToday();
       io.emit('get_responses_proses', {
         message: '? Initial data fetched',
         data: data
@@ -77,10 +83,30 @@ try {
     }
     });
 
+    socket.on('update_verif', async ()=>{
+      try {
+      const data = await VerificationTask.getAll();
+      io.emit('get_responses_verif', {
+        message: '? Initial data fetched',
+        data: data
+      });
+
+      io.emit('update_daftar_verif');
+            console.log("GET RESPONSE");
+
+    } catch (err) {
+      console.error('? Error fetching responses:', err.message);
+      io.emit('get_responses_verif', {
+        message: '? Failed to fetch data',
+        error: err.message
+      });
+    }
+    });
+
     
     socket.on('update_pickup', async () => {
       try {
-      const data = await pickupControl.getAll();
+      const data = await pickupControl.getPickupToday();
       io.emit('get_responses_pickup', {
         message: '? Initial data fetched',
         data: data
@@ -98,6 +124,14 @@ try {
       });
     }
     });
+
+    socket.on('update_latest_pickup', (payload) => {
+      console.log("PAYLOAD",payload.message,payload.data);
+      io.emit('send_latest_pickup', {
+        message: payload.message,
+        data: payload.data
+      });
+    })
     console.log('?? Client connected:', socket.id);
 
       // Listener uji coba

@@ -39,6 +39,7 @@ import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import PrintIcon from '@mui/icons-material/Print';
 import PrintAntrian from "@/app/utils/api/printAntrian";
+
 const DaftarAntrian = ({ selectedQueueIds, setSelectedQueueIds, onSelectQueue, setSelectedLoket,setSelectedQueue2,selectedQueue2 }) => {  
   dayjs.extend(customParseFormat);
   const dateFormat="YYYY-MM-DD"
@@ -88,74 +89,78 @@ const handleLoketUpdate = () => {
   };
   
   const fetchQueueList = async () => {
-    try {
-      const response = await VerificationAPI.getAllVerificationTasks();
-      
-      let filteredQueues = response.data.filter((item) => {
-        if (!item || !item.status || item.waiting_verification_stamp === undefined) {
-          return false;
-        }
-        
-        const verificationStamp = typeof item.waiting_verification_stamp === 'string' 
-          ? new Date(item.waiting_verification_stamp) 
-          : item.waiting_verification_stamp;
+  try {
+    let response;
+    if (date) {
+      response = await VerificationAPI.getVerificationTasksByDate(new Date(date).toISOString().split('T')[0]);
+    } else {
+      response = await VerificationAPI.getVerificationTasksToday();
 
-        const verifDateString = verificationStamp.toISOString().split('T')[0];
-        
-        // If date filter is applied, check against it
-        if (date) {
-          const filterDateString = new Date(date).toISOString().split('T')[0];
-          return item.status.toLowerCase() === selectedStatus.toLowerCase() && 
-                 verifDateString === filterDateString;
-        }
-        
-        // If no date filter, use today's date
-        const todayString = new Date().toISOString().split('T')[0];
-        return item.status.toLowerCase() === selectedStatus.toLowerCase() && 
-               verifDateString === todayString;
-      });
 
-      // Use EARLIEST timestamp like the pickup version
-      const getEarliestTimestamp = (item) => {
-        const timestamps = [
-          item.waiting_verification_stamp,
-          item.called_verification_stamp,
-          item.recalled_verification_stamp,
-          item.pending_verification_stamp,
-          item.processed_verification_stamp,
-        ]
-          .filter(Boolean)
-          .map((ts) => new Date(ts).getTime());
+    }
 
-        return timestamps.length > 0 ? Math.min(...timestamps) : Infinity;
-      };
+    console.log("RESPONSE", response);
+    let filteredQueues = response.data;
 
-      // Sort by earliest timestamp (ascending) like pickup version
-      filteredQueues = filteredQueues.sort(
-        (a, b) => getEarliestTimestamp(a) - getEarliestTimestamp(b)
+    // Add status filtering here
+    if (selectedStatus) {
+      filteredQueues = filteredQueues.filter(item => item.status === selectedStatus);
+    }
+
+    // Rest of your sorting logic remains the same
+    const getEarliestTimestamp = (item) => {
+      const timestamps = [
+        item.waiting_verification_stamp,
+        item.called_verification_stamp,
+        item.recalled_verification_stamp,
+        item.pending_verification_stamp,
+        item.processed_verification_stamp,
+      ]
+        .filter(Boolean)
+        .map((ts) => new Date(ts).getTime());
+
+      return timestamps.length > 0 ? Math.min(...timestamps) : Infinity;
+    };
+
+    filteredQueues = filteredQueues.sort(
+      (a, b) => getEarliestTimestamp(a) - getEarliestTimestamp(b)
+    );
+
+    setRawQueueList(filteredQueues);
+    
+    if (!searchText) {
+      setQueueList(filteredQueues);
+    } else {
+      const filtered = filteredQueues.filter(item =>
+        item.patient_name?.toLowerCase().includes(searchText.toLowerCase())
       );
+      setQueueList(filtered);
+    }
 
-      setRawQueueList(filteredQueues);
-      
-      if (!searchText) {
-        setQueueList(filteredQueues);
-      } else {
-        const filtered = filteredQueues.filter(item =>
-          item.patient_name?.toLowerCase().includes(searchText.toLowerCase())
-        );
-        setQueueList(filtered);
-      }
+  } catch (error) {
+    console.error("Error fetching queue list:", error);
+  }
+};
 
+useEffect(() => {
+  if ( !selectedStatus) return;
+  
+  const fetchData = async () => {
+    try {
+      await fetchQueueList();
     } catch (error) {
-      console.error("Error fetching queue list:", error);
+      console.error('Error in fetchQueueList:', error);
     }
   };
-useEffect(() => {
-  if (!selectedLoketLocal && !selectedStatus) return;
-  fetchQueueList();
+
+  fetchData();
+  socket.on('update_daftar_verif',fetchData);
+
+    return () => {
+            socket.off('update_daftar_verif', fetchData);
+        };
 
 
- 
 }, [selectedStatus, selectedLoketLocal, date]);
 
 const handleLoketChange = async (loketName) => {
@@ -294,7 +299,6 @@ const changeDate = (date,dateString) => {
   setDate(dateString);
 }
 
-// console.log("DATe",date);
   async function handleUpdatePhone(selectedQueue){
     try {
       console.log(selectedQueue);
@@ -334,7 +338,7 @@ const changeDate = (date,dateString) => {
   const print = await PrintAntrian.printAntrian(printPayload);
   const printResp = print.dataPrint;
   if(printResp.success){
-Swal.fire({
+        Swal.fire({
           icon: "success",
           title: "Print Berhasil",
           text: "Antrian Berhasil Di Print",
@@ -426,15 +430,7 @@ Swal.fire({
 
             />
             {/* <DatePicker2 date={date} setDate={setDate} selectedStatus={selectedStatus}/> */}
-          {date && (
-            <Button
-              variant="outlined"
-              onClick={handleClearDate}
-              sx={{ height: '40px' }}
-            >
-              Clear
-            </Button>
-          )}
+          
         </Box>
 
         <Box sx={{ display: "flex", gap: "10px" }}>
@@ -538,12 +534,19 @@ return (
     <TableCell align="center">
     {item.status_medicine === "Tidak ada Resep" ? "Tidak ada Resep" : item.status_medicine === "Racikan" ? "Racikan" : item.status_medicine}
     </TableCell>
-     <TableCell align="center" className="flex flex-row items-center " style={{gap:"1px"}}>
-     <Button onClick={(e)=>handleUpdatePhone(item)} className="p-0 m-0">
+     <TableCell align="center" >
+      <div className="flex flex-row items-center h-full " style={{gap:"1px", minWidth:"120px"}}>
+ <Button onClick={(e)=>handleUpdatePhone(item)} className="p-0 m-0">
             <EditIcon className="p-0 m-0"></EditIcon>
 
      </Button>
+
+      <div>
     {item.phone_number}
+
+    </div>
+      </div>
+   
     </TableCell>
      <TableCell align="center">
      {item.waiting_verification_stamp 

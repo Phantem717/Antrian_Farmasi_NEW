@@ -29,7 +29,7 @@ let urlprinter = "";
 
  }
  let PRB= "";
- if(payload.PRB != null){
+ if(payload.PRB != null && !payload.PRB.includes("Potensi")){
   PRB = "PRB";
  }
  

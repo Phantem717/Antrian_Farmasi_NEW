@@ -8,6 +8,8 @@ const {
   getAllPickupTasks,
   updatePickupTask,
   deletePickupTask,
+  getAllPickupByDate,
+  getAllPickupToday
 } = require('../controllers/pickupTaskController');
 
 router.post('/', createPickupTask);
@@ -15,5 +17,6 @@ router.get('/:NOP', getPickupTaskByNOP);
 router.get('/', getAllPickupTasks);
 router.put('/:NOP', updatePickupTask);
 router.delete('/:NOP', deletePickupTask);
-
+router.get('/today/now',getAllPickupToday);
+router.get('/by-date/:date',getAllPickupByDate);
 module.exports = router;

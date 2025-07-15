@@ -17,7 +17,7 @@ export default function DaftarAntrian({ scanResult, setIsDeleted }) {
     const socket = getSocket();
     const [queueList, setQueueList] = useState([]);
     const [rawQueueList, setRawQueueList] = useState([]);
-    const [selectedDate, setSelectedDate] = useState(dayjs());
+    const [selectedDate, setSelectedDate] = useState(null);
     const [loading, setLoading] = useState(true);
     const [searchText, setSearchText] = useState('');
 
@@ -25,8 +25,9 @@ export default function DaftarAntrian({ scanResult, setIsDeleted }) {
         setSearchText(searchText);
     };
 
-    const changeDate = (date) => {
-        setSelectedDate(date || dayjs());
+    const changeDate = (date,datestring) => {
+        console.log("DATE",date);
+        setSelectedDate(datestring || dayjs());
     };
 
     const handleSearchClear = () => {
@@ -34,9 +35,17 @@ export default function DaftarAntrian({ scanResult, setIsDeleted }) {
     };
 
     async function fetchInitialQueue() {
+        let response;
+
         setLoading(true);
         try {
-            const response = await MedicineAPI.getAllMedicineTasks();
+            if(selectedDate){
+                response = await MedicineAPI.getMedicineByDate(selectedDate);
+            }
+            else{
+                response = await MedicineAPI.getMedicineToday();
+
+            }
             processQueue(response);
         } catch (error) {
             console.error("Gagal mengambil data antrian:", error);
@@ -51,22 +60,7 @@ export default function DaftarAntrian({ scanResult, setIsDeleted }) {
         setLoading(true);
         try {
             if (response && Array.isArray(response.data)) {
-                const formattedData = response.data
-                    .filter(item => {
-                        if (!item) return false;
-                        
-                        const medicineStamp = typeof item.waiting_medicine_stamp === "string" 
-                            ? new Date(item.waiting_medicine_stamp) 
-                            : item.waiting_medicine_stamp;
-                            
-                        const medicineDateString = medicineStamp.toISOString().split('T')[0];
-                        const selectedDateString = selectedDate.format('YYYY-MM-DD');
-
-                        return item.status === "waiting_medicine" && 
-                               item.lokasi === "Lantai 1 BPJS" && 
-                               medicineDateString === selectedDateString;
-                    })
-                    .map((item) => ({
+                const formattedData = response.data.map((item) => ({
                         NOP: item.NOP,
                         patient_name: item.patient_name || "Tidak Diketahui",
                         queue_number: item.queue_number || '-',
@@ -163,15 +157,14 @@ export default function DaftarAntrian({ scanResult, setIsDeleted }) {
             </Typography>
 
             <Paper elevation={3} sx={{ padding: "10px" }}>
-                <DatePicker 
-                    size="large"
-                    onChange={changeDate} 
-                    maxDate={dayjs()}
-                    defaultValue={dayjs()}
-                    value={selectedDate}
-                    format={dateFormat}
-                    style={{ marginBottom: '16px' }}
-                />
+               <DatePicker 
+                             size="large"
+               
+                           onChange={changeDate} 
+                               maxDate={dayjs(new Date().toISOString(), dateFormat)}
+                               defaultValue={dayjs(new Date().toISOString(), dateFormat)}
+               
+                           /> 
                 
                 <div style={{ width: '100%', display: 'flex' }}>
                     <Form
@@ -254,7 +247,7 @@ export default function DaftarAntrian({ scanResult, setIsDeleted }) {
                                 ))
                             ) : (
                                 <TableRow>
-                                    <TableCell colSpan={7} align="center">Tidak ada antrean waiting_medicine untuk tanggal {selectedDate.format('DD/MM/YYYY')}.</TableCell>
+                                    <TableCell colSpan={7} align="center">Tidak ada antrean waiting_medicine untuk tanggal {selectedDate}.</TableCell>
                                 </TableRow>
                             )}
                         </TableBody>

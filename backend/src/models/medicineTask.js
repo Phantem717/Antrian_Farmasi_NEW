@@ -106,6 +106,65 @@ class MedicineTask {
     }
   }
 
+  static async getMedicineToday(){
+     try {
+      const connection = getDb();
+      const query = `
+        SELECT
+          mt.*, 
+          da.patient_name,
+          da.sep_no,
+          da.medical_record_no,
+          da.queue_number,
+          da.status_medicine,
+          pt.status,
+          pt.medicine_type
+        FROM Medicine_Task mt
+        LEFT JOIN Doctor_Appointments da ON mt.NOP = da.NOP
+        LEFT JOIN Pharmacy_Task pt ON mt.NOP = pt.NOP
+        WHERE date(mt.waiting_medicine_stamp) = CURRENT_DATE
+AND (pt.status IS NULL OR 
+       (pt.status != 'completed_medicine' AND pt.status LIKE 'waiting_medicine'))
+         ORDER BY 
+    da.queue_number;
+      `;
+      const [rows] = await connection.execute(query);
+      return rows;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  
+  static async getMedicineByDate(date){
+     try {
+      const connection = getDb();
+      const query = `
+        SELECT
+          mt.*, 
+          da.patient_name,
+          da.sep_no,
+          da.medical_record_no,
+          da.queue_number,
+          da.status_medicine,
+          pt.status,
+          pt.medicine_type
+        FROM Medicine_Task mt
+        LEFT JOIN Doctor_Appointments da ON mt.NOP = da.NOP
+         LEFT JOIN Pharmacy_Task pt ON mt.NOP = pt.NOP
+
+        WHERE date(mt.waiting_medicine_stamp) = ?
+AND (pt.status IS NULL OR 
+       (pt.status != 'completed_medicine' AND pt.status LIKE 'waiting_medicine'))
+         ORDER BY 
+    da.queue_number;
+      `;
+      const [rows] = await connection.execute(query, [date]);
+      return rows;
+    } catch (error) {
+      throw error;
+    }
+  }
   /**
    * Memperbarui record Medicine_Task berdasarkan NOP.
    * @param {number} NOP - ID task.

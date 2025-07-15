@@ -101,27 +101,56 @@ class VerificationTask {
     try {
       const connection = getDb();
       const query = `
-        SELECT 
-          vt.*, 
-          da.patient_name,
-          da.sep_no,
-          da.medical_record_no,
-          da.queue_number,
-          da.farmasi_queue_number,
-          da.patient_date_of_birth,
-          da.status_medicine,
-          da.phone_number,
-          pt.status,
-          pt.medicine_type
-        FROM Verification_Task vt
+       SELECT 
+  vt.*, 
+  da.patient_name,
+  da.sep_no,
+  da.medical_record_no,
+  da.queue_number,
+  da.farmasi_queue_number,
+  da.patient_date_of_birth,
+  da.status_medicine,
+  da.phone_number,
+  pt.status,
+  pt.medicine_type
+FROM Verification_Task vt
+LEFT JOIN Doctor_Appointments da ON vt.NOP = da.NOP
+LEFT JOIN Pharmacy_Task pt ON vt.NOP = pt.NOP
+WHERE (da.queue_number LIKE 'RC%' OR da.queue_number LIKE 'NR%') AND DATE(vt.waiting_verification_stamp) = CURRENT_DATE
+ORDER BY vt.waiting_verification_stamp ASC;
+      `;
 
-        LEFT JOIN Doctor_Appointments da ON vt.NOP = da.NOP
-        LEFT JOIN Pharmacy_Task pt ON vt.NOP = pt.NOP
-        WHERE da.queue_number LIKE 'RC%' OR da.queue_number LIKE 'NR%'
+      const [rows] = await connection.execute(query);
+      return rows;
+    } catch (error) {
+      throw error;
+    }
+  }
 
-        ORDER BY 
-        vt.waiting_verification_stamp
-        ASC;
+  static async getToday(){
+     try {
+      const connection = getDb();
+      const query = `
+     SELECT 
+  vt.*, 
+  da.patient_name,
+  da.sep_no,
+  da.medical_record_no,
+  da.queue_number,
+  da.farmasi_queue_number,
+  da.patient_date_of_birth,
+  da.status_medicine,
+  da.phone_number,
+  pt.status,
+  pt.medicine_type
+FROM Verification_Task vt
+LEFT JOIN Doctor_Appointments da ON vt.NOP = da.NOP
+LEFT JOIN Pharmacy_Task pt ON vt.NOP = pt.NOP
+WHERE (da.queue_number LIKE 'RC%' OR da.queue_number LIKE 'NR%') 
+  AND DATE(vt.waiting_verification_stamp) = CURRENT_DATE
+  AND (pt.status IS NULL OR 
+       (pt.status != 'completed_verification' AND pt.status LIKE '%verification%'))
+ORDER BY vt.waiting_verification_stamp ASC;
       `;
 
       const [rows] = await connection.execute(query);
@@ -131,6 +160,40 @@ class VerificationTask {
     }
   }
   
+  
+  static async getByDate(date){
+     try {
+      const connection = getDb();
+      const query = `
+       SELECT 
+  vt.*, 
+  da.patient_name,
+  da.sep_no,
+  da.medical_record_no,
+  da.queue_number,
+  da.farmasi_queue_number,
+  da.patient_date_of_birth,
+  da.status_medicine,
+  da.phone_number,
+  pt.status,
+  pt.medicine_type
+FROM Verification_Task vt
+LEFT JOIN Doctor_Appointments da ON vt.NOP = da.NOP
+LEFT JOIN Pharmacy_Task pt ON vt.NOP = pt.NOP
+WHERE (da.queue_number LIKE 'RC%' OR da.queue_number LIKE 'NR%')
+  AND DATE(vt.waiting_verification_stamp) = ?
+  AND vt.waiting_verification_stamp IS NOT NULL
+  AND (pt.status IS NULL OR 
+       (pt.status != 'completed_verification' AND pt.status LIKE '%verification%'))
+ORDER BY vt.waiting_verification_stamp ASC;
+      `;
+
+      const [rows] = await connection.execute(query, [date]);
+      return rows;
+    } catch (error) {
+      throw error;
+    }
+  }
   /**
    * Memperbarui record Verification_Task berdasarkan NOP.
    * @param {number} NOP - ID task.

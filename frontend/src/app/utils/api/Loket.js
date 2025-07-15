@@ -1,7 +1,9 @@
 import axios from "axios";
 
-const BASE_URL = 'http://172.16.21.214:5000'; // Base URL API
-
+const HOST = process.env.NEXT_PUBLIC_API_HOST; // 🔥 Pastikan server bisa diakses dari IP lain
+const PORT = process.env.NEXT_PUBLIC_API_PORT
+console.log(HOST,PORT)
+const BASE_URL = `http://${HOST}:${PORT}`; // Base URL API
 const LoketAPI = {
   // ✅ Ambil Semua Loket
   getAllLokets: async () => {

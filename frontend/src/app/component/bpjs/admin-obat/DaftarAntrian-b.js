@@ -28,12 +28,12 @@ import PharmacyAPI from '@/app/utils/api/Pharmacy';
 import VerificationAPI from '@/app/utils/api/Verification';
 import MedicineAPI from '@/app/utils/api/Medicine';
 import Swal from 'sweetalert2';
-import DataTable from "datatables.net-dt";
+// import DataTable from "datatables.net-dt";
 import $ from 'jquery';
 import { DatePicker } from "antd";
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
-import "datatables.net-dt/css/dataTables.dataTables.css";
+// import "datatables.net-dt/css/dataTables.dataTables.css";
 import { Form } from "antd";
 import { SearchOutlined, CloseOutlined } from '@ant-design/icons';
 
@@ -157,37 +157,24 @@ const handleLoketUpdate = () => {
 
   
 async function getInitalData(){
-    const response = await PickupAPI.getAllPickupTasks();
+  let response;
+  if(date){
+    response = await PickupAPI.getPickupByDate(date);
+  }
+  else{
+    response = await PickupAPI.getPickupToday();
+  }
     processQueue(response);
 }
   const processQueue = async (response) => {
-    if (!selectedLoketLocal && !selectedStatus) return;
+    if ( !selectedStatus) return;
 
     try {
       
-      let filteredQueues = response.data.filter((item) => {
-        if (!item || !item.status || item.waiting_pickup_medicine_stamp === undefined) {
-          return false;
-        }
-        
-        const verificationStamp = typeof item.waiting_pickup_medicine_stamp === 'string' 
-          ? new Date(item.waiting_pickup_medicine_stamp) 
-          : item.waiting_pickup_medicine_stamp;
-
-        const verifDateString = verificationStamp.toISOString().split('T')[0];
-        
-        // If date filter is applied, check against it
-        if (date) {
-          const filterDateString = new Date(date).toISOString().split('T')[0];
-          return item.status.toLowerCase() === selectedStatus.toLowerCase() && 
-                 verifDateString === filterDateString;
-        }
-        
-        // If no date filter, use today's date
-        const todayString = new Date().toISOString().split('T')[0];
-        return item.status.toLowerCase() === selectedStatus.toLowerCase() && 
-               verifDateString === todayString;
-      });
+      let filteredQueues = response.data
+       if (selectedStatus) {
+      filteredQueues = filteredQueues.filter(item => item.status === selectedStatus);
+    }
 const getEarliestTimestamp = (item) => {
         const timestamps = [
           item.waiting_pickup_medicine_stamp,
@@ -353,15 +340,7 @@ const handleSearchClear = () => {
                 defaultValue={dayjs(new Date().toISOString(), dateFormat)}
 
             />  </div>
-  {date && (
-    <Button
-      variant="outlined"
-      onClick={handleClearDate}
-      sx={{ height: '40px' }}
-    >
-      Clear
-    </Button>
-  )}
+  
 </Box>
 
         <Box sx={{ display: "flex", gap: "10px", zIndex:"0"}}>

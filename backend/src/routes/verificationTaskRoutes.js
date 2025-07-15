@@ -8,6 +8,8 @@ const {
   getAllVerificationTasks,
   updateVerificationTask,
   deleteVerificationTask,
+  getVerificationToday,
+  getVerificationDate
 } = require('../controllers/verificationTaskController');
 
 router.post('/', createVerificationTask);
@@ -15,5 +17,7 @@ router.get('/:NOP', getVerificationTaskByNOP);
 router.get('/', getAllVerificationTasks);
 router.put('/:NOP', updateVerificationTask);
 router.delete('/:NOP', deleteVerificationTask);
+router.get('/now/today',getVerificationToday);
+router.get('/by-date/:date',getVerificationDate);
 
 module.exports = router;

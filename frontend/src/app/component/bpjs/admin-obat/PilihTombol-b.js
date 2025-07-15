@@ -47,6 +47,8 @@ const socket = getSocket();
         socket.emit('call_queues_pickup', {
           data:selectedQueue2, lokasi: "Lantai 1 BPJS"
         });
+
+        
       }
       await Promise.all(
         selectedQueue2.map(async (queue) => {
@@ -82,16 +84,29 @@ const socket = getSocket();
 
           }
           console.log("PAYLOAD PICKUP",payload)
-            const sendResponse = await WA_API.sendWAPickup(payload);
+        if (queue === selectedQueue2[0]) { // Only for first item
+          console.log("CALLED");
+            socket.emit('update_latest_pickup',
+
+ {
+              message: "Update Pickup",
+              data: payload
+            });
+          }
+
+          socket.emit('update_pickup');
+        socket.emit('update_display');
+            // const sendResponse = await WA_API.sendWAPickup(payload);
                               await new Promise(resolve => setTimeout(resolve, 1000)); // 1-second delay
 
-            console.log("WA SENT",sendResponse);   
+            // console.log("WA SENT",sendResponse);   
           }
         })
 
        
       );
-                                      socket.emit('update_display', console.log("EMIT UPDATE"));
+        socket.emit('update_pickup');
+        socket.emit('update_display', console.log("EMIT UPDATE"));
 
       Swal.fire({
         icon: "success",
@@ -108,7 +123,7 @@ const socket = getSocket();
         setIsCompleteServiceEnabled(true);
       }
       setSelectedQueue2([]); // ✅ Reset pilihan setelah pemanggilan
-
+      
       setSelectedQueueIds([]);
       onStatusUpdate();
       

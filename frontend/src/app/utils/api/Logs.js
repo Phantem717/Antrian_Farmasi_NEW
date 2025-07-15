@@ -1,7 +1,9 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://172.16.21.214:5000'; // Base URL API
-
+const HOST = process.env.NEXT_PUBLIC_API_HOST; // 🔥 Pastikan server bisa diakses dari IP lain
+const PORT = process.env.NEXT_PUBLIC_API_PORT
+console.log(HOST,PORT)
+const BASE_URL = `http://${HOST}:${PORT}`; // Base URL API
 const LogsAPI = {
     // 1. Get All Appointments
     getAllLogs: async () => {
@@ -10,6 +12,26 @@ const LogsAPI = {
             return response.data;
         } catch (error) {
             console.error('Error fetching all appointments:', error);
+            throw error;
+        }
+    },
+     getAllLogsToday: async () => {
+        try {
+            const response = await axios.get(`${BASE_URL}/api/logs/today/now`);
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching all appointments:', error);
+            throw error;
+        }
+    },
+
+    getLogsByDate: async (date) => {
+        try {
+             const response = await axios.get(`${BASE_URL}/api/logs/by-date/${encodeURIComponent(date)}`);
+            console.log("VERIF",response.data);
+            return response.data;
+        } catch (error) {
+             console.error('Error fetching all verification tasks:', error);
             throw error;
         }
     },

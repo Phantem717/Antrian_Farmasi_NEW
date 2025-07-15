@@ -107,6 +107,93 @@ class PickupTask {
     }
   }
 
+  static async getPickupToday(){
+     try {
+      const connection = getDb();
+      const query = `
+        SELECT
+          pt.*, 
+          da.patient_name,
+          da.sep_no,
+          da.medical_record_no,
+          da.queue_number,
+          da.status_medicine,
+          ph.status,
+          ph.medicine_type
+        FROM Pickup_Task pt
+          LEFT JOIN Doctor_Appointments da ON pt.NOP = da.NOP
+          LEFT JOIN Pharmacy_Task ph ON pt.NOP = ph.NOP
+          WHERE date(pt.waiting_pickup_medicine_stamp) = CURRENT_DATE
+ AND (ph.status IS NULL OR 
+       (ph.status != 'completed_pickup_medicine' AND ph.status LIKE '%pickup%'))
+          ORDER BY 
+    da.queue_number;
+      `;
+      const [rows] = await connection.execute(query);
+      return rows;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+   static async getPickupDisplay(){
+     try {
+      const connection = getDb();
+      const query = `
+       SELECT
+  pt.*, 
+  da.patient_name,
+  da.sep_no,
+  da.medical_record_no,
+  da.queue_number,
+  da.status_medicine,
+  ph.status,
+  ph.medicine_type
+FROM Pickup_Task pt
+  LEFT JOIN Doctor_Appointments da ON pt.NOP = da.NOP
+  LEFT JOIN Pharmacy_Task ph ON pt.NOP = ph.NOP
+WHERE (date(pt.waiting_pickup_medicine_stamp) = CURRENT_DATE 
+   OR date(pt.waiting_pickup_medicine_stamp) = CURRENT_DATE - INTERVAL 1 DAY)
+  AND (ph.status IS NULL OR 
+       (ph.status != 'completed_pickup_medicine' AND ph.status LIKE '%pickup%'))
+ORDER BY 
+  da.queue_number;
+      `;
+      const [rows] = await connection.execute(query);
+      return rows;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+   static async getPickupByDate(date){
+     try {
+      const connection = getDb();
+      const query = `
+        SELECT
+          pt.*, 
+          da.patient_name,
+          da.sep_no,
+          da.medical_record_no,
+          da.queue_number,
+          da.status_medicine,
+          ph.status,
+          ph.medicine_type
+        FROM Pickup_Task pt
+          LEFT JOIN Doctor_Appointments da ON pt.NOP = da.NOP
+          LEFT JOIN Pharmacy_Task ph ON pt.NOP = ph.NOP
+          WHERE date(pt.waiting_pickup_medicine_stamp) = ?
+           AND (ph.status IS NULL OR 
+       (ph.status != 'completed_pickup_medicine' AND ph.status LIKE '%pickup%'))
+          ORDER BY 
+    da.queue_number;
+      `;
+      const [rows] = await connection.execute(query,[date]);
+      return rows;
+    } catch (error) {
+      throw error;
+    }
+  }
   /**
    * Memperbarui record Pickup_Task berdasarkan NOP.
    * @param {number} NOP - ID task.

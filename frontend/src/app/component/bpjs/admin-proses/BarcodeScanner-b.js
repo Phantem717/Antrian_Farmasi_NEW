@@ -99,19 +99,7 @@ export default function BarcodeScanner({ onScanResult }) {
                 
                 const doctorResponse = await DoctorAppointmentAPI.getAppointmentByNOP(NOP);
                 console.log("DOCRESP", doctorResponse);
-                
-                const payload = {
-                    phone_number: doctorResponse.data.phone_number,
-                    patient_name: doctorResponse.data.patient_name,
-                    NOP: doctorResponse.data.NOP,
-                    queue_number: doctorResponse.data.queue_number,
-                    medicine_type: doctorResponse.data.status_medicine,
-                    sep: doctorResponse.data.sep_no,
-                    rm: doctorResponse.data.medical_record_no,
-                    docter: doctorResponse.data.doctor_name,
-                    nik: doctorResponse.data.nik ?? "-"
-                };
-                
+               
                 socket.emit('update_display');
                 socket.emit('update_pickup');
 
