@@ -23,6 +23,10 @@ services:
       - CONS_ID_FARMASI=39205596
       - SECRETKEY=BeatoCarloAcutis
       - API_URL=https://rscarolus.com/api
+      - DB_HOST=db
+      - DB_USER=root
+      - DB_PASSWORD=secret
+      - DB_NAME=farmasi_queue_db
     depends_on:
       - db
     networks:
