@@ -1,7 +1,6 @@
 //src\components\admin\DisplayAntrian.js
 import React, { useState, useEffect } from "react";
 import { DatePicker } from "antd";
-import LogsAPI from "@/app/utils/api/Logs";
 
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
@@ -22,6 +21,7 @@ import {
 import { ConstructionOutlined } from "@mui/icons-material";
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
+import LogsAPI from "@/app/utils/api/Logs";
 const tableLogs = ({
     selectedQueueIds,// ?? Mengirim daftar nomor yang dipilih
     setSelectedQueueIds, // ?? Agar bisa diperbarui dari DaftarAntrian
@@ -33,8 +33,6 @@ const tableLogs = ({
       const [selectedFilter, setSelectedFilter] = useState("");
       const [selectedStatus, setSelectedStatus] = useState("");
       const [filteredData,setFilteredData]= useState([]);
-      const [isCalendarActive, setIsCalendarActive] = useState(false);
-const [isFilterActive, setIsFilterActive] = useState(false);
      const [type, setType] = useState("");
 const [date, setDate] = useState(null);
 console.log("TABLELOGS",selectedQueueIds);
@@ -78,76 +76,66 @@ const ExportToExcel = ({ data, fileName }) => {
   // Generate Excel file
   XLSX.writeFile(wb, `Data_Antrian_${new Date().toISOString().split('T')[0]}.xlsx`);
 }
+ useEffect(() => {
+    const fetchInitialData = async () => {
+      try {
+        const response = await LogsAPI.getAllLogsToday();
+        setQueueList(response.data);
+        setFilteredData(response.data);
+      } catch (err) {
+        setError(err.message || "Failed to load data");
+        message.error("Failed to load logs data");
+      } finally {
+      }
+    };
 
-     useEffect(() => {
-  let filtered = [...selectedQueueIds];
+    fetchInitialData();
+  }, []);
 
-  // Filter by type
-  if (type === 'racikan') {
-    filtered = filtered.filter(item => item.status_medicine === 'Racikan');
-  } else if (type === 'nonracikan') {
-    filtered = filtered.filter(item => item.status_medicine === 'Non - Racikan');
-  }
+  // Apply filters whenever filter criteria change
+  useEffect(() => {
+    const applyFilters = async () => {
+      try {
+        let data = [...queueList];
 
-  // Filter by fixed range (hari_ini, minggu_ini, etc.)
-  if (selectedFilter) {
-    const today = new Date();
-    let startDate;
+        // Apply period filter if selected
+        if (selectedFilter) {
+          const response = await LogsAPI.getByPeriod(selectedFilter);
+                    console.log("SELECTED",selectedFilter,response);
 
-    switch (selectedFilter) {
-      case "hari_ini":
-        startDate = new Date(today);
-        startDate.setHours(0, 0, 0, 0);
-        break;
-      case "minggu_ini":
-        startDate = new Date(today);
-        startDate.setDate(today.getDate() - today.getDay());
-        startDate.setHours(0, 0, 0, 0);
-        break;
-      case "bulan_ini":
-        startDate = new Date(today.getFullYear(), today.getMonth(), 1);
-        break;
-      case "3_bulan":
-        startDate = new Date(today);
-        startDate.setMonth(today.getMonth() - 3);
-        break;
-      case "6_bulan":
-        startDate = new Date(today);
-        startDate.setMonth(today.getMonth() - 6);
-        break;
-      case "tahun_ini":
-        startDate = new Date(today.getFullYear(), 0, 1);
-        break;
-    }
+          data = response.data;
+        }
 
-    
-  }
-let response;
-const getLogsByDate = async (date) => {
-    response = await LogsAPI.getLogsByDate(date);
-    console.log("RESPOSNE",response);
-} 
-  if (date) {
-   const selectedDay = new Date(date);
-    selectedDay.setHours(0, 0, 0, 0);
+        // Apply date filter if selected
+        if (date) {
+          const response = await LogsAPI.getLogsByDate(date);
+                              console.log("SELECTED DATE",date,response);
 
-    filtered = filtered.filter(item => {
-      const completedDate = new Date(item.waiting_verification_stamp);
-      completedDate.setHours(0, 0, 0, 0);
-      return completedDate.toDateString() === selectedDay.toDateString();
-    });
-  }
+          data = response.data;
+        }
 
-  console.log("FILTER",filteredData);
-}, [selectedQueueIds, type, selectedFilter, date]);
+        // Apply type filter
+        if (type === 'racikan') {
+          data = data.filter(item => item.status_medicine === 'Racikan');
+        } else if (type === 'nonracikan') {
+          data = data.filter(item => item.status_medicine === 'Non - Racikan');
+        }
+
+        setFilteredData(data);
+      } catch (err) {
+        setError(err.message || "Failed to apply filters");
+        message.error("Failed to apply filters");
+      } finally {
+      }
+    };
+
+    applyFilters();
+  }, [type, selectedFilter, date, queueList]);
 
 
 const changeDate = (date,dateString) => {
-  console.log("date", date, dateString);
+  console.log("date",date,dateString);
   setDate(dateString);
-  setIsCalendarActive(true);
-  setIsFilterActive(false); // Disable filter dropdown when calendar is active
-  setSelectedFilter("");
 }
 
 const handleFilterType = (value) => {
@@ -155,11 +143,8 @@ const handleFilterType = (value) => {
 };
 
 const handleFilterChange = (value) => {
- setSelectedFilter(value);
-  setIsFilterActive(true);
-  setIsCalendarActive(false); // Disable calendar when filter is active
-  setDate(null); // Clear the date selection};
-}
+  setSelectedFilter(value); // No filtering logic here
+};
       const handleClearDate = () => {
   setDate(null);
 };
@@ -170,24 +155,27 @@ const handleFilterChange = (value) => {
     </Typography>
 
     <Box sx={{ display: "flex", alignItems: "center", marginBottom: "20px" }}>
-   <Select
-    value={selectedFilter}
-    onChange={(e) => handleFilterChange(e.target.value)}
-    displayEmpty
-    renderValue={(selected) => {
-      if (!selected) return <em>Pilih Opsi</em>;
-      const labelMap = {
-        hari_ini: "Hari Ini",
-        minggu_ini: "Minggu Ini",
-        bulan_ini: "Bulan Ini",
-        "3_bulan": "3 Bulan Lalu",
-        "6_bulan": "6 Bulan Lalu",
-        tahun_ini: "Tahun Ini",
-      };
-      return labelMap[selected] || selected;
-    }}
-    sx={{ width: "200px", marginRight: "10px" }}
-  >
+    <Select
+  value={selectedFilter}
+  onChange={(e) => handleFilterChange(e.target.value)}
+  displayEmpty
+  renderValue={(selected) => {
+    if (!selected) {
+      return <em>Pilih Opsi</em>;
+    }
+    // Optionally make this prettier if needed
+    const labelMap = {
+      hari_ini: "Hari Ini",
+      minggu_ini: "Minggu Ini",
+      bulan_ini: "Bulan Ini",
+      "3_bulan": "3 Bulan Lalu",
+      "6_bulan": "6 Bulan Lalu",
+      tahun_ini: "Tahun Ini",
+    };
+    return labelMap[selected] || selected;
+  }}
+  sx={{ width: "200px", marginRight: "10px" }}
+>
   <MenuItem value=""><em>Pilih Opsi</em></MenuItem>
   <MenuItem value="hari_ini">Hari Ini</MenuItem>
   <MenuItem value="minggu_ini">Minggu Ini</MenuItem>
@@ -201,10 +189,9 @@ const handleFilterChange = (value) => {
   <div className="w-[200px] z-10">
  <DatePicker 
             size="large"
-
+         
             onChange={changeDate} 
                 maxDate={dayjs(new Date().toISOString(), dateFormat)}
-                defaultValue={dayjs(new Date().toISOString(), dateFormat)}
 
             />  </div>
  
@@ -282,7 +269,8 @@ const handleFilterChange = (value) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {filteredData.map((item, index) => (
+          {filteredData &&
+          filteredData.map((item, index) => (
             <TableRow key={item.NOP} hover>
             
              
@@ -366,6 +354,8 @@ const handleFilterChange = (value) => {
             </TableCell>
             </TableRow>
           ))}
+          
+          
         </TableBody>
       </Table>
       </Box>

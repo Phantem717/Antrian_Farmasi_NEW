@@ -1,46 +1,109 @@
-import React from "react";
+import React, { useEffect,useState } from "react";
 import { Box, Paper } from "@mui/material";
 import { Progress } from 'antd';
-
-const MedicineTypeCard = ({ medicineType }) => {
+import { Pie } from '@ant-design/plots';
+import LogsAPI from "@/app/utils/api/Logs";
+const MedicineTypeCard = () => {
     // console.log("COUNT",medicineType);
     // Safely handle medicineType data
-    const racikanCount = medicineType?.[0]?.booking_count || 0;
-    const nonRacikanCount = medicineType?.[1]?.booking_count || 0;
-    const total = racikanCount + nonRacikanCount;
-    const racikanPercent = total > 0 ? Math.round((racikanCount / total) * 100) : 0;
+    const [medicineType,setMedicineType] = useState([]);
+    
+    useEffect(() => {
+    const fetchList = async() => {
 
+        try {
+    const response = await LogsAPI.getMedicineType();
+    setMedicineType(response.data);
+
+
+    }
+    catch (err) {
+        setError(err.message || "Failed to load data");
+        message.error("Failed to load logs data");
+      } finally {
+      }
+    }
+    fetchList();
+    },[])
+    
+    const racikanCount = medicineType?.[1]?.booking_count || 0;
+    const nonRacikanCount = medicineType?.[0]?.booking_count || 0;
+    const total = racikanCount + nonRacikanCount;
+    const config = {
+        data: [
+        {type: 'Racikan', value: racikanCount},
+        {type: 'Non - Racikan', value: nonRacikanCount}
+        ],
+        angleField: 'value',
+    colorField: 'type',
+    innerRadius: 0.6,
+    label: {
+      text: 'value',
+      style: {
+        fontWeight: 'bold',
+        fontSize:40,
+        color: 'black'
+      },
+    },
+    legend: {
+      color: {
+        title: false,
+        position: 'right',
+        layout: 'vertical',
+        rowPadding: 5,
+      },
+    },
+    annotations: [
+      {
+        type: 'text',
+        style: {
+          text: 'Total Medications',
+          x: '50%',
+          y: '55%',
+          textAlign: 'center',
+          fontSize: 20,
+          fontStyle: 'bold',
+          
+        },
+        
+      },
+      {
+        type: 'text',
+        style: {
+             text: `${total}`,
+          x: '50%',
+          y: '45%',
+          textAlign: 'center',
+          fontSize: 70,
+          fontStyle: 'bold',
+        }
+      }
+      
+    ],
+       
+    }
     return (
-        <Box sx={{ padding: "10px", width:"300px" }}>
-            <Paper elevation={3} sx={{ padding: "10px", maxHeight: "700px", overflow: "auto" }}>
+        <Box sx={{ padding: "10px", width:"1000px" }}>
+            <Paper elevation={3} sx={{ padding: "10px", maxHeight: "1000px", overflow: "auto" }}>
                 <Box >
                     <div className="text-center">
-                        <Progress
-                            type="dashboard"
-                            percent={100}
-                            strokeColor="#8884d8" // Racikan color
-                            success={{
-                                percent: racikanPercent,
-                                strokeColor: "#82ca9d" // Non-racikan color
-                            }}
-                            size={150}
-                            format={() => (
-                                <div className="flex flex-col">
-                                    <span className="font-bold">{total}</span>
-                                    <span className="text-xs">Total Medications</span>
-                                </div>
-                            )}
-                        />
-                        <div className="flex justify-center gap-4 mt-4">
+                        <div className="text-4xl font-bold mb-2 uppercase">
+                            Total Medications
+                        </div>
+                        <div className="flex justify-center w-full">
+                        <Pie {...config}/>
+
+                        </div>
+                        {/* <div className="flex justify-center gap-4 ">
                             <div className="flex items-center">
-                                <div className="w-3 h-3 bg-[#8884d8] mr-2 rounded-full"></div>
-                                <span>Racikan: {racikanCount}</span>
+                                <div className="w-3 h-3 bg-[#8884d8] mr-2 rounded-full "></div>
+                                <span className="text-2xl font-bold uppercase">Racikan: {racikanCount}</span>
                             </div>
                             <div className="flex items-center">
                                 <div className="w-3 h-3 bg-[#82ca9d] mr-2 rounded-full"></div>
-                                <span>Non-Racikan: {nonRacikanCount}</span>
+                                <span className="text-2xl font-bold uppercase">Non-Racikan: {nonRacikanCount}</span>
                             </div>
-                        </div>
+                        </div> */}
                     </div>
                 </Box>
             </Paper>

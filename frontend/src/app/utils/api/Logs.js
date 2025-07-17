@@ -24,6 +24,17 @@ const LogsAPI = {
             throw error;
         }
     },
+    getByPeriod: async (period) => {
+try {
+  
+     const response = await axios.get(`${BASE_URL}/api/logs/period/${encodeURIComponent(period)}`);
+     console.log("RESP PERIOD",response);
+            return response.data;
+} catch (error) {
+     console.error('Error fetching all appointments:', error);
+    throw error;
+}
+    },
 
     getLogsByDate: async (date) => {
         try {

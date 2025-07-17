@@ -62,6 +62,30 @@ const getLogsByDate = async (req,res)=>{
     });
   }
 }
+const getByPeriod = async (req,res) => {
+  try {
+    const {period} = req.params
+    const response = await logsTask.getByTimePeriod(period);
+    console.log("FILTER",response);
+    if(!response){
+       return res.status(404).json({ 
+      message: "Logs Not Found", 
+      error: error.message 
+    });
+  }
+
+     res.status(200).json({
+      data: response
+    });
+    
+  } catch (error) {
+      console.error("Error fetching logs:", error);
+    res.status(500).json({ 
+      message: "Failed to fetch logs", 
+      error: error.message 
+    });
+  }
+}
 const getTotalMedicineType = async (req, res) => {
   try {
     const totalMed = await logs.getTotalMedicineType();
@@ -118,5 +142,6 @@ module.exports = {
   getAvgServiceTime,
   getDataPerHour,
  getLogsToday,
- getLogsByDate
+ getLogsByDate,
+ getByPeriod
 };

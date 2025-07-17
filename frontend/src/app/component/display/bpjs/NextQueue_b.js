@@ -147,146 +147,151 @@ isYesterday: new Date(new Date(task.waiting_pickup_medicine_stamp).setHours(0,0,
   };
 
   // Queue section components
- const QueueSection = ({ title, queuesRacik, queuesNonRacik, bgColor }) => (
-  <div className={`p-4 flex-1 min-w-0 ${bgColor} rounded-lg shadow-md overflow-hidden`} style={{ minHeight: "1200px" }}>
-    <p className="text-2xl font-bold text-white text-center uppercase">{title}</p>
-    
-    <div className="flex gap-4 mt-4 flex-wrap">
-      {/* Racikan Section - Now matches Non-Racikan styling */}
-      <div className="flex-1 min-w-[300px] bg-white p-2 rounded-md shadow-md overflow-hidden">
-        <p className="text-2xl font-extrabold text-center text-green-700 uppercase">Racikan</p>
-        <Marquee
-          direction="up"
-          pauseOnHover
-          style={{
-            width: '100%',
-            marginTop: 20,
-            marginBottom: 10,
-            '--duration': `${times.processTimeRacik}s`,     height: `1030px`
-          }}
-          
-        >
-          <div className="w-full flex flex-col items-center justify-center">
-            {queuesRacik.length > 0 ? (
-              queuesRacik.map((queue, index) => (
-                <div
-                  key={index}
-                  className="bg-white text-green-700 text-6xl font-extrabold p-4 shadow border-2 border-black  rounded w-full"
-                  style={{ 
-                    height: '160px', 
-                    width: '355px', 
-                    marginBottom: '8px', 
-                    display: 'flex', 
-                    flexDirection: 'column', 
-                    justifyContent: 'center', 
-                    alignItems: 'center'
-                  }}
+ const QueueSection = ({ title, queuesRacik, queuesNonRacik, bgColor }) => {
+  const renderQueueItems = (queues, isRacikan = true) => {
+    if (queues.length === 0) {
+      return (
+        <div className="bg-white text-black p-4 shadow text-center font-bold text-2xl w-full">
+          Belum Ada Antrian
+        </div>
+      );
+    }
 
-                >
-                  <div className="text-center text-6xl w-full leading-none">
-                    {queue.queueNumber}
-                  </div>
-                  <div className="mt-2 w-full bg-green-400 px-4 py-2 text-black text-center text-3xl truncate whitespace-nowrap overflow-hidden leading-tight">
-                    {queue.patient_name}
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="bg-white text-black p-4 shadow text-center font-bold text-2xl w-full">
-                Belum Ada Antrian
-              </div>
-            )}
-          </div>
-        </Marquee>
+    return queues.map((queue, index) => (
+      <div
+        key={`${queue.queueNumber}-${index}-${isRacikan ? 'racik' : 'nonracik'}`}
+        className="bg-white text-green-700 text-6xl font-extrabold p-4 shadow border-2 border-black rounded w-full"
+        style={{ 
+          height: '160px',
+          marginBottom: '8px',
+          display: 'flex',
+          width: '100%',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center'
+        }}
+      >
+        <div className="text-center text-6xl w-full leading-none">
+          {queue.queueNumber}
+        </div>
+        <div className="mt-2 w-full bg-green-400 px-4 py-2 text-black text-center text-3xl truncate whitespace-nowrap overflow-hidden leading-tight">
+          {queue.patient_name}
+        </div>
       </div>
+    ));
+  };
 
-      {/* Non-Racikan Section */}
-      <div className="flex-1 min-w-[300px] bg-white p-2 rounded-md shadow-md overflow-hidden">
-        <p className="text-2xl font-extrabold text-center text-green-700 uppercase">Non-Racikan</p>
-        <Marquee
-          direction="up"
-          pauseOnHover
-          style={{
-            width: '100%',
-            height: '50%',
-            marginTop: 20,
-            marginBottom: 10,
-            '--duration': `${times.processTimeNon}s`,     height: `1030px`
-          }}
+  const renderMarqueeSection = (queues, duration, isRacikan) => {
+    return (
+      <Marquee
+        direction="up"
+        pauseOnHover
+        style={{
+          width: '100%',
+          marginTop: 20,
+          marginBottom: 10,
+          '--duration': `${duration}s`,
+          height: '1030px'
+        }}
+      >
+        <div className="w-full flex flex-col items-center justify-center">
+          {renderQueueItems(queues, isRacikan)}
+        </div>
+      </Marquee>
+    );
+  };
 
-        >
-          <div className="w-full flex flex-col items-center justify-center">
-            {queuesNonRacik.length > 0 ? (
-              queuesNonRacik.map((queue, index) => (
-                <div
-                  key={index}
-                  className="bg-white text-green-700 text-6xl font-extrabold p-4 shadow border-2 border-black rounded w-full"
-                  style={{ 
-                    height: '160px', 
-                    width: '355px', 
-                    marginBottom: '8px', 
-                    display: 'flex', 
-                    flexDirection: 'column', 
-                    justifyContent: 'center' 
-                  }}
-                  
-                >
-                  <div className="text-center text-6xl w-full leading-none">
-                    {queue.queueNumber}
-                  </div>
-                  <div className="mt-2 w-full bg-green-400 px-4 py-2 text-3xl text-black text-center  truncate whitespace-nowrap overflow-hidden leading-tight">
-                    {queue.patient_name}
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="bg-white text-black p-4 shadow text-center font-bold text-2xl w-full">
-                Belum Ada Antrian
-              </div>
-            )}
-          </div>
-        </Marquee>
-      </div>
-    </div>
-  </div>
-);
-
-  const QueueSectionVerification = ({ title, queues,bgColor }) => (
-      
-    <div className={`p-4 flex-1 min-w-0 ${bgColor} rounded-lg shadow-md`} style={{ height: "1180px" }}>
+  return (
+    <div className={`p-4 flex-1 min-w-0 ${bgColor} rounded-lg shadow-md overflow-hidden`} style={{ minHeight: "1200px" }}>
       <p className="text-2xl font-bold text-white text-center uppercase">{title}</p>
-      <div className="flex gap- mt-2">
-        <div className="bg-white p-2 rounded-md shadow-md w-full h-full">
-        <Marquee fade={false} direction="up" 
-className="gap-[3rem] " innerClassName="gap-[3rem] [--gap:3rem]"
-              style={{ '--duration': `${times.verifTime}s`,     height: `1100px` }}
- >
+      
+      <div className="flex gap-4 mt-4 flex-wrap">
+        {/* Racikan Section */}
+        <div className="flex-1 min-w-[300px] bg-white p-2 rounded-md shadow-md overflow-hidden">
+          <p className="text-2xl font-extrabold text-center text-green-700 uppercase">Racikan</p>
+          {queuesRacik.length > 4 ? 
+            renderMarqueeSection(queuesRacik, times.processTimeRacik, true) :
+            <div className="w-full flex flex-col items-center " style={{ height: '1030px', overflowY: 'auto' }}>
+              {renderQueueItems(queuesRacik, true)}
+            </div>
+          }
+        </div>
 
-    <div className="w-full ">
-            {queues.length > 0 ? (
-              queues.map((queue, index) => (
-                <div key={index}            
-                 className="flex items-center flex-col justify-between   bg-white text-green-700 text-6xl font-extrabold p-4 shadow text-center border-2 border-black  rounded w-full"
->
-                <div className="flex flex-row gap-5 justify-around w-full h-1/6">
-                   <div className={`flex-1 text-4xl text-left items-middle ${getStatusColor(queue.status)}`}>{queue.queueNumber}</div>
-                  <div className={`flex-1 text-3xl text-center ${getStatusColor(queue.status)}`}>{queue.type}</div>
-                  <div className={`flex-1 text-3xl text-right ${getStatusColor(queue.status)}`}>{queue.status}</div>
-                </div>
-                  <div className={`flex-1 text-4xl text-center bg-green-400 mt-2 w-full p-1  text-black`}>{queue.patient_name}</div>
-                </div>
-              ))
-              
-            ) : (
-              <div className="bg-white text-black p-2 shadow text-center font-bold text-2xl">Belum Ada Antrian</div>
-            )}
-            
-          </div>
-          </Marquee>
+        {/* Non-Racikan Section */}
+        <div className="flex-1 min-w-[300px] bg-white p-2 rounded-md shadow-md overflow-hidden">
+          <p className="text-2xl font-extrabold text-center text-green-700 uppercase">Non-Racikan</p>
+          {queuesNonRacik.length > 4 ? 
+            renderMarqueeSection(queuesNonRacik, times.processTimeNon, false) :
+            <div className="w-full flex flex-col items-center " style={{ height: '1030px', overflowY: 'auto' }}>
+              {renderQueueItems(queuesNonRacik, false)}
+            </div>
+          }
         </div>
       </div>
     </div>
   );
+};
+
+ const QueueSectionVerification = ({ title, queues, bgColor }) => {
+  const renderQueueItems = () => {
+    if (queues.length === 0) {
+      return (
+        <div className="bg-white text-black p-2 shadow text-center font-bold text-2xl">
+          Belum Ada Antrian
+        </div>
+      );
+    }
+
+    return queues.map((queue, index) => (
+      <div 
+        key={`${queue.queueNumber}-${index}`}
+        className="flex items-center flex-col justify-between bg-white text-green-700 text-6xl font-extrabold p-4 shadow text-center border-2 border-black rounded w-full"
+      >
+        <div className="flex flex-row gap-5 justify-around w-full h-1/6">
+          <div className={`flex-1 text-4xl text-left items-middle ${getStatusColor(queue.status)}`}>
+            {queue.queueNumber}
+          </div>
+          <div className={`flex-1 text-3xl text-center ${getStatusColor(queue.status)}`}>
+            {queue.type}
+          </div>
+          <div className={`flex-1 text-3xl text-right ${getStatusColor(queue.status)}`}>
+            {queue.status}
+          </div>
+        </div>
+        <div className={`flex-1 text-4xl text-center bg-green-400 mt-2 w-full p-1 text-black`}>
+          {queue.patient_name}
+        </div>
+      </div>
+    ));
+  };
+
+  return (
+    <div className={`p-4 flex-1 min-w-0 ${bgColor} rounded-lg shadow-md`} style={{ height: "1180px" }}>
+      <p className="text-2xl font-bold text-white text-center uppercase">{title}</p>
+      <div className="flex gap- mt-2">
+        <div className="bg-white p-2 rounded-md shadow-md w-full h-full">
+          {queues.length > 5 ? (
+            <Marquee 
+              fade={false} 
+              direction="up"
+              className="gap-[3rem]" 
+              innerClassName="gap-[3rem] [--gap:3rem]"
+              style={{ '--duration': `${times.verifTime}s`, height: `1100px` }}
+            >
+              <div className="w-full">
+                {renderQueueItems()}
+              </div>
+            </Marquee>
+          ) : (
+            <div className="w-full" style={{ height: '1100px', overflowY: 'auto' }}>
+              {renderQueueItems()}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
 const QueueSectionPickup = ({ title, queuesRacik, queuesNonRacik, bgColor }) => (
   <div className={`p-4 flex-1 min-w-0 ${bgColor} rounded-lg shadow-md`} style={{ minHeight: "1200px" }}>
     <p className="text-2xl font-bold text-white text-center uppercase">{title}</p>

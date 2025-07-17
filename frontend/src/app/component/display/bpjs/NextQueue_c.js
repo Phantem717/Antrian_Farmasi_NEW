@@ -114,6 +114,31 @@ const NextQueue = () => {
     }
   };
 
+  const renderQueueItems = () => {
+  if (queuesRacik.length === 0) {
+    return <Text>Belum Ada Antrian</Text>;
+  }
+
+  const items = queuesRacik.map((queue, index) => (
+    <Card key={`${queue.queueNumber}-${index}`} style={{ marginBottom: 16 }}>
+      <Title level={3}>{queue.queueNumber}</Title>
+      <Text type="secondary">{queue.patient_name}</Text>
+    </Card>
+  ));
+
+  return queuesRacik.length > 5 ? (
+    <Marquee direction="up" speed={50}>
+      {items}
+    </Marquee>
+  ) : (
+    <div>{items}</div>
+  );
+};
+
+const renderQueueItemsProses = () => {
+  
+}
+
   const QueueCard = ({ title, queuesRacik, queuesNonRacik, color }) => (
     <Card 
       title={<Title level={4} className="text-center">{title}</Title>}
@@ -124,18 +149,11 @@ const NextQueue = () => {
         <Col span={12}>
           <Divider orientation="left" style={{ color: 'green' }}>Racikan</Divider>
           <div style={{ height: 500, overflow: 'hidden' }}>
-            <Marquee direction="up" speed={50}>
-              {queuesRacik.length > 0 ? (
-                queuesRacik.map((queue, index) => (
-                  <Card key={index} style={{ marginBottom: 16 }}>
-                    <Title level={3}>{queue.queueNumber}</Title>
-                    <Text type="secondary">{queue.patient_name}</Text>
-                  </Card>
-                ))
-              ) : (
-                <Text>Belum Ada Antrian</Text>
-              )}
-            </Marquee>
+          
+            
+           {renderQueueItems()}
+
+           
           </div>
         </Col>
         <Col span={12}>

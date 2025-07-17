@@ -289,7 +289,7 @@ if(!inputValue.startsWith("NOP") && inputValue.length != 19) {
         }
       socket.emit('update_verif');
       socket.emit('update_display');
-      // const WARESP =await WA_API.sendWAAntrian(WAPayload);
+      const WARESP =await WA_API.sendWAAntrian(WAPayload);
       const PRINTRESP= await PrintAntrian.printAntrian(printPayload);
                   await new Promise(resolve => setTimeout(resolve, 1000)); // 1-second delay
 

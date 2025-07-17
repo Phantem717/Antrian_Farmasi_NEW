@@ -1,8 +1,27 @@
-import React from "react";
+import React, {useState, useEffect} from "react";
 import { Column } from '@ant-design/plots';
 import { Box, Paper, Typography } from "@mui/material";
-
-const BardataPerHour = ({ dataPerHour = [] }) => {
+import LogsAPI from "@/app/utils/api/Logs";
+const BardataPerHour = () => {
+  const [dataPerHour,setdataPerHour] = useState([]);
+      
+      useEffect(() => {
+      const fetchList = async() => {
+  
+          try {
+      const response = await LogsAPI.getDataPerHour();
+      setdataPerHour(response.data);
+  
+  
+      }
+      catch (err) {
+          setError(err.message || "Failed to load data");
+          message.error("Failed to load logs data");
+        } finally {
+        }
+      }
+      fetchList();
+      },[])
   const fullHourData = Array.from({ length: 24 }, (_, hour) => {
     const found = dataPerHour.find(item => Number(item.hour_of_day) === hour);
     return {

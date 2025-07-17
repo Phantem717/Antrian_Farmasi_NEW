@@ -8,7 +8,8 @@ const {
     getAvgServiceTime,
     getDataPerHour,
     getLogsToday,
-    getLogsByDate
+    getLogsByDate,
+    getByPeriod
 } = require('../controllers/logsController');
     
 router.get('/', getAllLogs);
@@ -17,4 +18,5 @@ router.get('/total-medicine',getTotalMedicineType);
 router.get('/service-time',getAvgServiceTime);
 router.get('/data-per-hour',getDataPerHour);
 router.get('/today/now',getLogsToday);
+router.get('/period/:period',getByPeriod);
 module.exports = router;

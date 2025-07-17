@@ -48,58 +48,7 @@ export default function Logs() {
   
     return { token, isExpired: checkTokenExpired() };
   }
-  const fetchQueueList = async () => {
-    try {
-      
-      let [allLogs,medicineType,dataPerHour,avgTime] = await Promise.all([
-        LogsAPI.getAllLogsToday(),
-        LogsAPI.getMedicineType(),
-      LogsAPI.getDataPerHour(),
-    LogsAPI.getAvgServiceTime()]
-      );
-      const payload ={
-       racikan : {
-        time: avgTime.data[0]['AVG PROCESSING TIME - RACIKAN (MINUTES)'],
-        type: 'Racikan'
-       },
-       nonracikan : {
- time: avgTime.data[0]['AVG PROCESSING TIME - NON-RACIKAN (MINUTES)'],
-        type: 'Non - Racikan'
-       }
-      }
-      // ? Filter berdasarkan status
-      console.log("?? Data antrian dari API:", allLogs,"DATA MEDIDICNE:",medicineType, "DATA PER HOUR",dataPerHour, "SERVICE TIME",payload);
-
-      // console.log("?? Data antrian setelah diurutkan:", response.data);
-      setSelectedQueueIds(allLogs.data);
-      setMedicineType(medicineType.data);
-      setDataPerHour(
-        dataPerHour.data.map(item => ({
-          ...item,
-          hour_of_day: item.hour_of_day.toString(), // convert to string
-        }))
-      );   
-      setAvgTime(payload); 
-        // setQueueList(filteredQueues);
-    } catch (error) {
-      console.error("? Error fetching queue list:", error);
-    }
-  };
-
-
-  const checkResponse = useTokenCheck();
-  const router = useRouter();
-
-  useEffect(() => {
-    if(!checkResponse){
-      router.push("/login"); // Arahkan ke halaman login
-    }
-    else{
-      fetchQueueList();
-
-    }
-  },[useTokenCheck,router])
-
+  
   return (
     <Layout style={{ minheight: "100vh", overflow: "hidden" }}>
       <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
@@ -126,12 +75,11 @@ export default function Logs() {
             marginBottom:"25px"
           }}
         >
-      <MedicineTypeCard medicineType={medicineType} />
-      <BarChart dataPerHour={dataPerHour}/>
-      <AvgServiceTime avgTime={avgTime}/>
+      <MedicineTypeCard />
+      <BarChart />
+      <AvgServiceTime />
                   <TableLogs  
-        selectedQueueIds = {selectedQueueIds}// ?? Mengirim daftar nomor yang dipilih
-        setSelectedQueueIds= {setSelectedQueueIds}  />
+         />
         </Content>
 
       </Layout>

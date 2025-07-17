@@ -2,9 +2,11 @@ const axios = require('axios');
 require('dotenv').config({ path: './.env' }); // Or just require('dotenv').config();
 
 const generateSignature = require('../utils/signature');
-const password = process.env.PASSWORD ;
-const consID2 = process.env.CONS_ID_FARMASI;
-
+const password = process.env.PASSWORD_WA ;
+const consID2 = process.env.CONS_ID_WA;
+const HOST = process.env.API_WA
+const path = `http://${HOST}/api/v1/integration/whatsappweb/hello/send-text`
+console.log("ENV",password,consID2,HOST,path);
 async function sendWAVerif(payload){
     try {
       const { timestamp, signature } = generateSignature(consID2, password);
@@ -18,10 +20,10 @@ async function sendWAVerif(payload){
 
       }
       let change_queue_message;
-      if(payload?.prev_queue_number?.trim() != "-" || payload?.prev_queue_number?.trim() != null){
+      if(payload?.prev_queue_number?.trim() != "-" ){
         change_queue_message= `_Nomor Antrian anda telah berubah/diganti dari *${payload.prev_queue_number}* menjadi *${payload.queue_number}*_`
       }
-  const url = `https://rscarolus.com/api/v1/integration/whatsappweb/hello/send-text`;
+  const url = path;
 console.log("PHONE_NUMBER",payload.phone_number);
   const response = await axios.post(
     url,
@@ -69,7 +71,7 @@ async function sendWAProses(payload){
     try {
         const { timestamp, signature } = generateSignature(consID2, password);
 
-    const url = `https://rscarolus.com/api/v1/integration/whatsappweb/hello/send-text`;
+    const url = path;
     const url_local = `http:/192.168.6.85/api/v1/integration/whatsappweb/hello/send-text`;
 console.log("PHONE_NUMBER",payload.phone_number);
     const response = await axios.post(
@@ -131,7 +133,7 @@ async function sendWAAntrian(payload){
           duration = "Obat anda akan siap dalam 30 menit"
 
         }
-    const url = `https://rscarolus.com/api/v1/integration/whatsappweb/hello/send-text`;
+    const url = path;
 console.log("PHONE_NUMBER",payload.phone_number);
     const response = await axios.post(
       url,
@@ -180,7 +182,7 @@ async function sendWAPickup(payload){
     try {
         const { timestamp, signature } = generateSignature(consID2, password);
 
-    const url = `https://rscarolus.com/api/v1/integration/whatsappweb/hello/send-text`;
+    const url = path;
 console.log("PHONE_NUMBER_PICKUP",payload.phone_number);
     const response = await axios.post(
       url,

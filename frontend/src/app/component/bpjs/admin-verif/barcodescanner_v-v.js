@@ -110,20 +110,21 @@ export default function BarcodeScanner({ onScanResult, handleBulkPharmacyUpdate 
             prev_queue_number: "-"
         };
 
- socket.emit('update_display');
-        socket.emit('update_proses');
-        socket.emit('update_pickup');
-        socket.emit('update_verif');
         // Send WA notification with retry
                 setDaftarAntrian(prev => prev.filter(item => item.NOP !== NOP));
+            console.log("WA_PAYLOAD1",payload)
 
-        // const sendResponse = await retryOperation(() => WA_API.sendWAVerif(payload));
-        // console.log("WA response:", sendResponse);
+        const sendResponse = await retryOperation(() => WA_API.sendWAVerif(payload));
+        console.log("WA response:", sendResponse);
 
         // Emit socket events
        
         // Update local state by removing processed item
 
+ socket.emit('update_display');
+        socket.emit('update_proses');
+        socket.emit('update_pickup');
+        socket.emit('update_verif');
         return { success: true };
     };
 

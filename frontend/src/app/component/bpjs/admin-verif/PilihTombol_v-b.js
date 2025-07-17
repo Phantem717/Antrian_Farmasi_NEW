@@ -155,7 +155,6 @@ console.log("PILIH TOMBOL CONNECTED");
         })
       );
       
-              socket.emit('update_verif');
 
       Swal.fire({
         icon: "success",
@@ -169,7 +168,8 @@ console.log("PILIH TOMBOL CONNECTED");
       setSelectedQueue2([]); // ✅ Reset pilihan setelah pemanggilan
 
       setSelectedQueueIds([]); // ✅ Reset setelah update
-  
+                socket.emit('update_verif');
+
     } catch (error) {
       console.error("❌ Error saat memperbarui status:", error);
       Swal.fire({
@@ -244,7 +244,6 @@ console.log("PILIH TOMBOL CONNECTED");
             
               console.log("DOCRESP",doctorResponse);
               console.log("PREV QUEUE",queue.queue_number);
-                                socket.emit('update_display', console.log("EMIT UPDATE"));
 
                    Swal.fire({
         icon: "success",
@@ -256,9 +255,7 @@ console.log("PILIH TOMBOL CONNECTED");
         timerProgressBar: true,
       });
 
-      socket.emit('update_proses');
-            socket.emit('update_verif');
-
+     
               const payload = {
                 phone_number: doctorResponse.data.phone_number,
                 patient_name: doctorResponse.data.patient_name,
@@ -274,6 +271,7 @@ console.log("PILIH TOMBOL CONNECTED");
     
     
             }
+            console.log("WA_PAYLOAD2",payload)
               const sendResponse = await WA_API.sendWAVerif(payload);
                                 await new Promise(resolve => setTimeout(resolve, 1000)); // 1-second delay
 
@@ -300,7 +298,11 @@ console.log("PILIH TOMBOL CONNECTED");
       setSelectedQueue2([]); // ✅ Reset pilihan setelah pemanggilan
 
       setSelectedQueueIds([]); // ✅ Reset setelah update
-  
+   socket.emit('update_proses');
+            socket.emit('update_verif');
+                                            socket.emit('update_display', console.log("EMIT UPDATE"));
+
+
     } catch (error) {
       console.error("❌ Error saat memperbarui status RACIKAN/NON-RACIKAN:", error);
       Swal.fire({

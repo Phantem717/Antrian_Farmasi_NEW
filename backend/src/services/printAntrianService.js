@@ -12,20 +12,20 @@ try {
  const url = `https://rscarolus.com/api/v1/visit/queue/pharmacy/cetak`;
 let message = "";
 let urlprinter = "";
- if(payload.medicine_type == "Racikan" || payload.medicine_type == "racikan" || payload.queue_number.startsWith("RC")){
+ if(payload.medicine_type == "Racikan" || payload.queue_number.startsWith("RC")){
  message = "Mohon Menunggu 30 menit sampai 1 jam Karena Obat Anda Adalah Racikan";
  urlprinter="172.16.31.4";
  }
 
- else if(payload.medicine_type == "Non - Racikan" || payload.medicine_type == "nonracikan"  || payload.queue_number.startsWith("NR")){
+ else if(payload.medicine_type.startsWith("Non")  || payload.queue_number.startsWith("NR")){
     message = "Mohon Menunggu Bentar Obat anda adalah Non - Racikan"
-    urlprinter="172.16.26.78";
+    urlprinter="172.16.26.203";
 
  }
  
  else{
     message = "Obat Anda Tidak Ada Resepnya"
-        urlprinter="172.16.26.78";
+        urlprinter="172.16.26.203";
 
  }
  let PRB= "";
@@ -79,7 +79,7 @@ let urlprinter = "";
       }
     );
 
-    console.log("ANRIAN RESPONSE:", response.data, urlprinter, payload.medicine_type);
+    console.log("ANRIAN RESPONSE:", response.data, urlprinter, payload.medicine_type, payload.NOP, payload.patient_name);
     return response.data;
 } catch (error) {
     console.error('Error Printing:', error.message);

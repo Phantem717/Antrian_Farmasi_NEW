@@ -80,23 +80,22 @@ const socket = getSocket();
               docter: doctorResponse.data.doctor_name,
               nik: doctorResponse.data.nik,
               queue_number: doctorResponse.data.queue_number,
-              NOP : doctorResponse.data.NOP
+              NOP : doctorResponse.data.NOP,
+              waiting_pickup_medicine_stamp: queue.waiting_pickup_medicine_stamp
 
           }
           console.log("PAYLOAD PICKUP",payload)
         if (queue === selectedQueue2[0]) { // Only for first item
           console.log("CALLED");
             socket.emit('update_latest_pickup',
-
  {
               message: "Update Pickup",
               data: payload
             });
           }
 
-          socket.emit('update_pickup');
-        socket.emit('update_display');
-            // const sendResponse = await WA_API.sendWAPickup(payload);
+      
+            const sendResponse = await WA_API.sendWAPickup(payload);
                               await new Promise(resolve => setTimeout(resolve, 1000)); // 1-second delay
 
             // console.log("WA SENT",sendResponse);   
@@ -105,9 +104,7 @@ const socket = getSocket();
 
        
       );
-        socket.emit('update_pickup');
-        socket.emit('update_display', console.log("EMIT UPDATE"));
-
+        
       Swal.fire({
         icon: "success",
         title: `Status berhasil diperbarui menjadi ${status.replace("_", " ")}`,
@@ -125,6 +122,9 @@ const socket = getSocket();
       setSelectedQueue2([]); // ✅ Reset pilihan setelah pemanggilan
       
       setSelectedQueueIds([]);
+      socket.emit('update_pickup');
+        socket.emit('update_display', console.log("EMIT UPDATE"));
+
       onStatusUpdate();
       
 
