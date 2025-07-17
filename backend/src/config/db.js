@@ -2,7 +2,7 @@
 const mysql = require('mysql2/promise');
 
 const dbConfig = {
-  host: 'localhost',
+  host: 'db',
   user: 'root',      // ganti dengan username MySQL kamu
   password: '',      // ganti dengan password MySQL kamu
   database: 'farmasi_queue_db'   // nama database yang ingin digunakan
