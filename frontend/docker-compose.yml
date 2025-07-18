@@ -21,7 +21,6 @@ services:
     tty: true
     restart: always
     command: ["npx", "next", "start", "-p", "3000", "-H", "0.0.0.0"]
-    restart: unless-stopped
 
 networks:
   app_network:
