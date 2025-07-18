@@ -7,9 +7,7 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
-    volumes:
-      - ./src/app:/app/src/app  # For development (hot reload)
-      - /app/node_modules
+      
     environment:
       - HOST=0.0.0.0 # Pastikan container mendengarkan di semua alamat
       - NODE_ENV=production
