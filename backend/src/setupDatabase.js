@@ -81,7 +81,7 @@ const queries = [
   );`,
 
   // Tabel Loket
-  `CREATE TABLE IF NOT EXISTS loket (
+  `CREATE TABLE IF NOT EXISTS Loket (
     loket_id INT AUTO_INCREMENT PRIMARY KEY,
     loket_name VARCHAR(100),
     Executor VARCHAR(50),

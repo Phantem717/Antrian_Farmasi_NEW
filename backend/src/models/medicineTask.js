@@ -21,7 +21,7 @@ class MedicineTask {
       `;
       const [loket] = await connection.execute(`
         SELECT loket_name 
-        FROM loket 
+        FROM Loket 
         WHERE status = "active" 
         AND (loket_name = "Loket 3" OR loket_name = "Loket 4") 
         LIMIT 1;
@@ -189,7 +189,7 @@ AND (pt.status IS NULL OR
       `;
     //   const [loket] = await connection.execute(`
     //     SELECT loket_name 
-    //     FROM loket 
+    //     FROM Loket 
     //     WHERE status = "active" 
     //     AND (loket_name = "Loket 3" OR loket_name = "Loket 4") 
     //     LIMIT 1;
