@@ -4,7 +4,7 @@ const { getDb } = require('./config/db');
 
 const queries = [
   // Tabel Doctor_Appointments
-  `CREATE TABLE IF NOT EXISTS Doctor_Appointments (
+  `CREATE TABLE IF NOT EXISTS doctor_appointments (
     NOP VARCHAR(255) NOT NULL PRIMARY KEY,
     sep_no VARCHAR(50),
     queue_number VARCHAR(20),
@@ -22,8 +22,8 @@ const queries = [
     PRB VARCHAR(255)
 );`,
 
-  // Tabel Pharmacy_Task
-  `CREATE TABLE IF NOT EXISTS Pharmacy_Task (
+  // Tabel pharmacy_task
+  `CREATE TABLE IF NOT EXISTS pharmacy_task (
     NOP VARCHAR(255) NOT NULL PRIMARY KEY,
     lokasi VARCHAR(50),
     status VARCHAR(50),
@@ -31,7 +31,7 @@ const queries = [
   );`,
 
   // Tabel Verification_Task (menggunakan booking_id sebagai PK & FK)
-  `CREATE TABLE IF NOT EXISTS Verification_Task (
+  `CREATE TABLE IF NOT EXISTS verification_task (
     NOP VARCHAR(255) PRIMARY KEY NOT NULL,
   Executor VARCHAR(50),
     Executor_Names VARCHAR(150),
@@ -43,12 +43,12 @@ const queries = [
     completed_verification_stamp TIMESTAMP,
     loket VARCHAR(50),
     lokasi VARCHAR(50),
-    FOREIGN KEY (NOP) REFERENCES Pharmacy_Task(NOP)
+    FOREIGN KEY (NOP) REFERENCES pharmacy_task(NOP)
     ON DELETE CASCADE ON UPDATE CASCADE
   );`,
   
   // Tabel Medicine_Task (menggunakan booking_id sebagai PK & FK)
-  `CREATE TABLE IF NOT EXISTS Medicine_Task (
+  `CREATE TABLE IF NOT EXISTS medicine_task (
     NOP VARCHAR(255) NOT NULL PRIMARY KEY,
     Executor VARCHAR(50),
     Executor_Names VARCHAR(150),
@@ -60,12 +60,12 @@ const queries = [
     completed_medicine_stamp TIMESTAMP,
     loket VARCHAR(50),
     lokasi VARCHAR(50),
-    FOREIGN KEY (NOP) REFERENCES Pharmacy_Task(NOP)
+    FOREIGN KEY (NOP) REFERENCES pharmacy_task(NOP)
     ON DELETE CASCADE ON UPDATE CASCADE
   );`,
 
   // Tabel Pickup_Task (menggunakan booking_id sebagai PK & FK)
-  `CREATE TABLE IF NOT EXISTS Pickup_Task (
+  `CREATE TABLE IF NOT EXISTS pickup_task (
     NOP VARCHAR(255) NOT NULL PRIMARY KEY,
     Executor VARCHAR(50),
     Executor_Names VARCHAR(150),
@@ -77,11 +77,11 @@ const queries = [
     completed_pickup_medicine_stamp TIMESTAMP,
   loket VARCHAR(50),
     lokasi VARCHAR(50),
-    FOREIGN KEY (NOP) REFERENCES Pharmacy_Task(NOP)    ON DELETE CASCADE ON UPDATE CASCADE
+    FOREIGN KEY (NOP) REFERENCES pharmacy_task(NOP)    ON DELETE CASCADE ON UPDATE CASCADE
   );`,
 
   // Tabel Loket
-  `CREATE TABLE IF NOT EXISTS Loket (
+  `CREATE TABLE IF NOT EXISTS loket (
     loket_id INT AUTO_INCREMENT PRIMARY KEY,
     loket_name VARCHAR(100),
     Executor VARCHAR(50),
