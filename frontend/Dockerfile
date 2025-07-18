@@ -10,7 +10,7 @@ RUN npm install
 COPY . .
 
 # Build aplikasi
-RUN npm run build
+RUN npm run build --prefix src/app
 
 # Jalankan aplikasi dengan opsi IP fleksibel
 CMD ["npx", "next", "start", "-p", "3000", "-H", "0.0.0.0"]
