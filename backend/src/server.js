@@ -72,7 +72,7 @@ app.use('/api/check',checkRegistrationRoute);
   // Menjalankan server pada semua network interfaces
   const PORT = process.env.PORT || 5000;
 
-  server.listen(PORT, () => {
+  server.listen(PORT, '0.0.0.0', () => {
     console.log(`✅ Server berjalan pada ${PORT}`,loginRoutes);
   });
 })();
