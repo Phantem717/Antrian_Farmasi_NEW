@@ -17,10 +17,18 @@ import { Switch } from 'antd';
 const Sidebar = ({ collapsed, setCollapsed, isLocation }) => {
   const router = useRouter();
   const pathname = usePathname(); // Ambil path URL saat ini
-
- const onChange = checked => {
-  console.log(`switch to ${checked}`);
-};
+  const [isWhatsAppEnabled, setIsWhatsAppEnabled] = React.useState(() => {
+    if (typeof window !== 'undefined') { // Check for SSR
+      const savedState = localStorage.getItem('waToggleState');
+      return savedState ? savedState === 'true' : false; // Default true if no saved state
+    }
+    return true; // Fallback for SSR
+  });
+ const onChange = (checked) => {
+    setIsWhatsAppEnabled(checked);
+    localStorage.setItem('waToggleState', checked.toString());
+    // Add your WhatsApp API call here if needed
+  };
 
   // Mapping URL ke key Menu
   const menuKeyMapping = {
@@ -176,6 +184,35 @@ const Sidebar = ({ collapsed, setCollapsed, isLocation }) => {
             onClick: handleLogout,
             style: { fontSize: "18px", fontWeight: "bold", color: "#ff4d4f", height: "60px", lineHeight: "60px" },
           },
+         {
+  key: "9",
+  label: (
+    <div style={{ 
+      display: 'flex', 
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      padding: '0 16px',
+      height: '100%'
+    }}>
+      <span style={{ 
+        fontSize: '18px',
+        color: 'rgba(255, 255, 255, 0.65)'
+      }}>
+        WA Ke Pasien
+      </span>
+      <Switch 
+        checked={isWhatsAppEnabled}
+        onChange={onChange}
+      />
+    </div>
+  ),
+  style: { 
+    height: '60px', 
+    lineHeight: '60px',
+    margin: 0,
+    padding: 0
+  }
+}
           
         ]}
 
@@ -183,7 +220,6 @@ const Sidebar = ({ collapsed, setCollapsed, isLocation }) => {
       />
 
       <div>
-        <Switch defaultChecked onChange={onChange} />;
         </div>
     </Sider>
   );
