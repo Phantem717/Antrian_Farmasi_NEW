@@ -67,6 +67,8 @@ async function insertAll(payload) {
 }
 
 const getFarmasiList = async (req, res) => {
+        const io = req.app.get('socketio');
+
   console.log("GETLIST");
   try {
     if (!req.body || typeof req.body !== 'object' || Object.keys(req.body).length === 0) {
@@ -144,7 +146,6 @@ const print = await retryOperation(
       // const print = await printAntrianFarmasi(printPayload);
       await new Promise(resolve => setTimeout(resolve, 2000)); // 1-second delay
 
-      const io = req.app.get('socketio');
       
       if (print.success == false) {
         io.emit('print_error', {
@@ -152,7 +153,7 @@ const print = await retryOperation(
         });
       }
     }
-         io.emit('insert_appointment',{
+     io.emit('insert_appointment',{
       message: 'Doctor Created Succesfully',
       data: existingDoctorAppointment
     });
