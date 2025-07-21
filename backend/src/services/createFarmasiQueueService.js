@@ -20,7 +20,6 @@ try {
             sub_facility: medicine_type, 
             location_id: "farmasi-bpjs"
         }
-        
       },
       {
         headers: {
