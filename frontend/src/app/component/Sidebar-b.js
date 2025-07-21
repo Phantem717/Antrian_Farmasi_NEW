@@ -40,10 +40,8 @@ const Sidebar = ({ collapsed, setCollapsed, isLocation }) => {
     "/login/bpjs/edit-marquee-b": "6",
     "/login/logs": "8"
   };
-
   // Tentukan menu yang aktif berdasarkan pathname
   const currentSelectedKey = menuKeyMapping[pathname] || "1"; // Default ke Admin Verifikasi jika tidak cocok
-
   const handleLogout = () => {
  Swal.fire({
           icon: "success",
@@ -192,7 +190,8 @@ const Sidebar = ({ collapsed, setCollapsed, isLocation }) => {
       alignItems: 'center',
       justifyContent: 'space-between',
       padding: '0 16px',
-      height: '100%'
+      height: '100%',
+      pointerEvents: 'none'
     }}>
       <span style={{ 
         fontSize: '18px',
