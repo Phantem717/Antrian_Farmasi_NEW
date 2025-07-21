@@ -2,7 +2,7 @@ const axios = require('axios');
 require('dotenv').config({ path: './.env' }); // Or just require('dotenv').config();
 
 const generateSignature = require('../utils/signature');
-const password = process.env.PASSWORD_WA ;
+const password = process.env.PASSWORD ;
 const consID2 = process.env.CONS_ID_WA;
 const HOST = process.env.API_WA
 const path = `http://${HOST}/api/v1/integration/whatsappweb/hello/send-text`
