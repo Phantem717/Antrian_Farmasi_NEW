@@ -191,7 +191,7 @@ const Sidebar = ({ collapsed, setCollapsed, isLocation }) => {
       justifyContent: 'space-between',
       padding: '0 16px',
       height: '100%',
-      pointerEvents: 'none'
+      
     }}>
       <span style={{ 
         fontSize: '18px',
@@ -202,6 +202,9 @@ const Sidebar = ({ collapsed, setCollapsed, isLocation }) => {
       <Switch 
         checked={isWhatsAppEnabled}
         onChange={onChange}
+         style={{
+    backgroundColor: isWhatsAppEnabled ? "#0033ff" : "#ccc"  // Customize "on" and "off" colors
+  }}
       />
     </div>
   ),
