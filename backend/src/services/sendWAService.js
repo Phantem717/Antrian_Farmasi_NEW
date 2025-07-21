@@ -28,7 +28,7 @@ console.log("PHONE_NUMBER",payload.phone_number);
   const response = await axios.post(
     url,
     {
-      phone: payload.switch_WA ? payload.phone_number : "081286968913",
+      phone: payload.switch_WA == 'true' ? payload.phone_number : "081286968913",
       // phone: payload.phone_number,
 
       message : `*Notifikasi Sistem Otomatis*
@@ -77,7 +77,7 @@ console.log("PHONE_NUMBER",payload.phone_number);
     const response = await axios.post(
       url,
       {
-      phone: payload.switch_WA ? payload.phone_number : "081286968913",
+      phone: payload.switch_WA == 'true' ? payload.phone_number : "081286968913",
         // phone: payload.phone_number,
 
       message: `Notifikasi Sistem Otomatis
@@ -138,7 +138,7 @@ console.log("PHONE_NUMBER",payload.phone_number);
     const response = await axios.post(
       url,
       {
-      phone: payload.switch_WA ? payload.phone_number : "081286968913",
+      phone: payload.switch_WA == 'true' ? payload.phone_number : "081286968913",
         // phone: payload.phone_number,
 
         message : `
@@ -187,7 +187,7 @@ console.log("PHONE_NUMBER_PICKUP",payload.phone_number);
     const response = await axios.post(
       url,
       {
-      phone: payload.switch_WA ? payload.phone_number : "081286968913",
+      phone: payload.switch_WA == 'true' ? payload.phone_number : "081286968913",
         // phone: payload.phone_number,
         message : `*Notifikasi Sistem Otomatis*
 
