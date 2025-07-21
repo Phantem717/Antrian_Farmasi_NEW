@@ -12,10 +12,15 @@ import { useRouter, usePathname } from "next/navigation";
 import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
 import { LeftCircleOutlined } from "@ant-design/icons";
 const { Sider } = Layout;
+import { Switch } from 'antd';
 
 const Sidebar = ({ collapsed, setCollapsed, isLocation }) => {
   const router = useRouter();
   const pathname = usePathname(); // Ambil path URL saat ini
+
+ const onChange = checked => {
+  console.log(`switch to ${checked}`);
+};
 
   // Mapping URL ke key Menu
   const menuKeyMapping = {
@@ -171,8 +176,15 @@ const Sidebar = ({ collapsed, setCollapsed, isLocation }) => {
             onClick: handleLogout,
             style: { fontSize: "18px", fontWeight: "bold", color: "#ff4d4f", height: "60px", lineHeight: "60px" },
           },
+          
         ]}
+
+        
       />
+
+      <div>
+        <Switch defaultChecked onChange={onChange} />;
+        </div>
     </Sider>
   );
 };
