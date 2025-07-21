@@ -107,10 +107,11 @@ export default function BarcodeScanner({ visible, onClose,selectedQueue }) {
             rm: selectedQueue.medical_record_no??"-",
             tanggal_lahir:  selectedQueue.patient_date_of_birth??"-",
             queue_number: selectedQueue.queue_number ?? null,
+            switch_WA: localStorage.getItem('waToggleState')
         };
 
               socket.emit('update_verif');
-        
+
       const WARESP =await WA_API.sendWAAntrian(WAPayload);
                   await new Promise(resolve => setTimeout(resolve, 1000)); // 1-second delay
 

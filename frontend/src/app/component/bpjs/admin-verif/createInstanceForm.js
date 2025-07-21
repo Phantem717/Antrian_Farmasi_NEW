@@ -285,7 +285,8 @@ if(!inputValue.startsWith("NOP") && inputValue.length != 19) {
             SEP:  SEP ?? "-",
             tanggal_lahir: DOB ?? "-",
             queue_number: queueNumberData.data.queue_number ?? null,
-            PRB: PRB
+            PRB: PRB,
+            switch_WA: localStorage.getItem('waToggleState')
         }
       socket.emit('update_verif');
       socket.emit('update_display');

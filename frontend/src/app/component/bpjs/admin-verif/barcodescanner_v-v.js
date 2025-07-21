@@ -107,7 +107,9 @@ export default function BarcodeScanner({ onScanResult, handleBulkPharmacyUpdate 
             rm: doctorResponse.data.medical_record_no,
             docter: doctorResponse.data.doctor_name,
             nik: doctorResponse.data.nik || "-",
-            prev_queue_number: "-"
+            prev_queue_number: "-",
+            switch_WA: localStorage.getItem('waToggleState')
+
         };
 
         // Send WA notification with retry
