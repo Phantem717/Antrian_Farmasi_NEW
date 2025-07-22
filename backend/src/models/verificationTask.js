@@ -17,10 +17,9 @@ class VerificationTask {
    * @returns {Promise<Object>} - Hasil query.
    */
   static async create(data) {
-      let connection;
 
     try {
-      const pool = await getDb();      connection = await pool.getConnection();
+      const pool = await getDb();    
       const query = `
         INSERT INTO Verification_Task (
           NOP, Executor, Executor_Names,
@@ -65,10 +64,9 @@ class VerificationTask {
    * @returns {Promise<Object>} - Record Verification_Task.
    */
   static async findByNOP(NOP) {
-      let connection;
 
     try {
-      const pool = await getDb();      connection = await pool.getConnection();
+      const pool = await getDb();      
       const query = `
         SELECT 
           vt.*, 
@@ -102,10 +100,9 @@ class VerificationTask {
    * @returns {Promise<Array>} - Array dari semua record Verification_Task.
    */
   static async getAll() {
-      let connection;
 
     try {
-      const pool = await getDb();      connection = await pool.getConnection();
+      const pool = await getDb();    
       const query = `
        SELECT 
   vt.*, 
@@ -134,10 +131,9 @@ ORDER BY vt.waiting_verification_stamp ASC;
   }
 
   static async getToday(){
-      let connection;
 
     try {
-      const pool = await getDb();      connection = await pool.getConnection();
+      const pool = await getDb();     
       const query = `
      SELECT 
   vt.*, 
@@ -170,10 +166,9 @@ ORDER BY vt.waiting_verification_stamp ASC;
   
   
   static async getByDate(date){
-       let connection;
 
     try {
-      const pool = await getDb();      connection = await pool.getConnection();
+      const pool = await getDb();    
       const query = `
        SELECT 
   vt.*, 
@@ -219,10 +214,9 @@ ORDER BY vt.waiting_verification_stamp ASC;
    * @returns {Promise<Object>} - Hasil query update.
    */
   static async update(NOP, data) {
-      let connection;
 
     try {
-      const pool = await getDb();      connection = await pool.getConnection();
+      const pool = await getDb();     
       const query = `
         UPDATE Verification_Task
         SET Executor = ?,
@@ -269,10 +263,9 @@ ORDER BY vt.waiting_verification_stamp ASC;
    * @returns {Promise<Object>} - Hasil query delete.
    */
   static async delete(NOP) {
-     let connection;
 
     try {
-      const pool = await getDb();      connection = await pool.getConnection();
+      const pool = await getDb();    
       const query = `DELETE FROM Verification_Task WHERE NOP = ?`;
       const [result] = await pool.execute(query, [NOP]);
       return result;

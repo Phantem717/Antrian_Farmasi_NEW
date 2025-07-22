@@ -8,10 +8,8 @@ class ApiResponses {
    * @returns {Promise<Object>} - Database operation result
    */
   static async create(responseData) {
-    let connection;
     try {
       const pool = await getDb();
-      connection = await pool.getConnection();
       
       const query = `
         INSERT INTO api_responses (
@@ -35,9 +33,7 @@ class ApiResponses {
         responseData: JSON.stringify(responseData)
       });
       throw new Error(`Database operation failed: ${error.message}`);
-    } finally {
-      if (connection) pool.release();
-    }
+    } 
   }
 }
 
