@@ -1,54 +1,50 @@
 // src/config/db.js
 const mysql = require('mysql2/promise');
-    require('dotenv').config();
+require('dotenv').config();
 
 const dbConfig = {
-         host: process.env.DB_HOST,
-        user: process.env.DB_USER,
-        password: process.env.DB_PASSWORD,
-        database: process.env.DB_NAME, // nama database yang ingin digunakan
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
 };
 
 let pool;
 
-/**
- * Inisialisasi koneksi ke database.
- * Jika database belum ada, akan dibuat terlebih dahulu.
- */
 async function initDb() {
   try {
-    // Pertama, koneksikan ke server MySQL tanpa database tertentu
+    // Step 1: Connect without DB
     const tempConnection = await mysql.createConnection({
       host: dbConfig.host,
       user: dbConfig.user,
       password: dbConfig.password,
-      
     });
-    // Buat database jika belum ada
+
     await tempConnection.query(`CREATE DATABASE IF NOT EXISTS \`${dbConfig.database}\``);
-    console.log(`Database '${dbConfig.database}' sudah dibuat atau sudah ada.`);
+    console.log(`Database '${dbConfig.database}' dibuat atau sudah ada.`);
     await tempConnection.end();
 
-    // Sekarang, koneksikan ke database yang sudah ada
- pool = await mysql.createPool({
+    // Step 2: Create pool with DB
+    pool = mysql.createPool({
       ...dbConfig,
       waitForConnections: true,
       connectionLimit: 10,
       enableKeepAlive: true,
-    });    console.log('Koneksi ke MySQL berhasil');
+    });
+
+    // Test connection from pool
+    const conn = await pool.getConnection();
+    console.log("? Koneksi ke MySQL pool berhasil.");
+    conn.release();
+
   } catch (error) {
-    console.error('Error menghubungkan ke MySQL:', error);
+    console.error("? Error menghubungkan ke MySQL:", error);
     process.exit(1);
   }
 }
 
-/**
- * Mendapatkan instance koneksi yang sudah diinisialisasi.
- */
 function getDb() {
-  if (!pool) {
-    throw new Error("Database belum diinisialisasi!");
-  }
+  if (!pool) throw new Error("Database belum diinisialisasi!");
   return pool;
 }
 
