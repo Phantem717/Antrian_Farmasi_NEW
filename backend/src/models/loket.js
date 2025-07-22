@@ -83,6 +83,8 @@ class Loket {
       const [result] = await pool.execute(query, values);
       return result;
     } catch (error) {
+        console.error("Model error in getAll:", error);
+
       throw error;
     }
   }
