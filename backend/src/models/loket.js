@@ -50,7 +50,10 @@ class Loket {
   let conn;
   try {
     conn = await pool.getConnection();
-    const [rows] = await conn.query('SELECT * FROM Loket');
+    const [rows] = await conn.query({
+  sql: 'SELECT * FROM Loket',
+  timeout: 5000, // 5-second timeout
+});
     console.log("Query results:", rows);
     return rows; // Explicit return
   } catch (error) {
@@ -58,7 +61,6 @@ class Loket {
     throw error; // Propagate error to controller
   } finally {
     if (conn) conn.release(); // Critical: Release connection
-    pool.end();
   }
 }
   /**
