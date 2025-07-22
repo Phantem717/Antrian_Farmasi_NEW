@@ -44,6 +44,7 @@ const getAllLokets = async (req, res) => {
   try {
     console.log("GET ALL LOKGET");
     const lokets = await Loket.getAll();
+    console.log("TESTLOKET");
     console.log("LOKETS",lokets);
     res.status(200).json({ data: lokets });
   } catch (error) {
