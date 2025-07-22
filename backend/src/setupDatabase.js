@@ -108,6 +108,8 @@ async function setupDatabase() {
       console.log(`Query ${i + 1} berhasil dieksekusi.`);
     }
     console.log('Setup database selesai.');
+    await connection.end();
+
   } catch (error) {
     console.error('Error saat setup database:', error);
     throw error;

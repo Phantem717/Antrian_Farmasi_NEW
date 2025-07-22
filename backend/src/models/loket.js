@@ -58,6 +58,7 @@ class Loket {
     throw error; // Propagate error to controller
   } finally {
     if (conn) conn.release(); // Critical: Release connection
+    pool.end();
   }
 }
   /**
