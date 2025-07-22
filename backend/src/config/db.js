@@ -36,10 +36,6 @@ async function initDb() {
     });
 
     // Test connection from pool
-    const conn = await pool.getConnection();
-    console.log("? Koneksi ke MySQL pool berhasil.");
-    conn.release();
-
   } catch (error) {
     console.error("? Error menghubungkan ke MySQL:", error);
     process.exit(1);

@@ -7,10 +7,9 @@ class Loket {
    * @param {Object} loketData - Data loket yang akan disimpan.
    */
   static async create(loketData) {
-     let connection;
 
     try {
-      const pool = await getDb();      connection = await pool.getConnection();
+      const pool = await getDb();    
       const query = `
         INSERT INTO Loket (loket_name, description, status)
         VALUES (?, ?, ?)
@@ -32,10 +31,9 @@ class Loket {
    * @param {number} loket_id - ID loket.
    */
   static async findById(loket_id) {
-   let connection;
 
     try {
-      const pool = await getDb();      connection = await pool.getConnection();
+      const pool = await getDb();      
       const query = `SELECT * FROM Loket WHERE loket_id = ?`;
       const [rows] = await pool.execute(query, [loket_id]);
       return rows[0];
@@ -48,10 +46,9 @@ class Loket {
    * Mengambil semua record loket.
    */
   static async getAll() {
-      let connection;
 
     try {
-      const pool = await getDb();      connection = await pool.getConnection();
+      const pool = await getDb();      
 
       const query = `SELECT * FROM Loket`;
       const [rows] = await pool.execute(query);
@@ -69,10 +66,9 @@ class Loket {
    * @param {Object} loketData - Data yang akan diupdate.
    */
   static async update(loket_id, loketData) {
-     let connection;
 
     try {
-      const pool = await getDb();      connection = await pool.getConnection();
+      const pool = await getDb();      
       const query = `
         UPDATE Loket
         SET loket_name = ?, description = ?, status = ?
@@ -96,10 +92,9 @@ class Loket {
    * @param {number} loket_id - ID loket.
    */
   static async delete(loket_id) {
-    let connection;
 
     try {
-      const pool = await getDb();      connection = await pool.getConnection();
+      const pool = await getDb();      
       const query = `DELETE FROM Loket WHERE loket_id = ?`;
       const [result] = await pool.execute(query, [loket_id]);
       return result;
