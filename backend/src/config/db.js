@@ -33,6 +33,7 @@ async function initDb() {
       connectionLimit: 10,
       enableKeepAlive: true,
     });
+console.log("? Pool created successfully");
 
     // Test connection from pool
   } catch (error) {
@@ -40,9 +41,12 @@ async function initDb() {
     process.exit(1);
   }
 }
-
-async function  getDb() {
-  if (!pool) throw new Error("Database belum diinisialisasi!");
+async function getDb() {
+  if (!pool) {
+    console.error("? Pool not initialized");
+    throw new Error("Database belum diinisialisasi!");
+  }
+  console.log("? getDb() called");
   return pool;
 }
 
