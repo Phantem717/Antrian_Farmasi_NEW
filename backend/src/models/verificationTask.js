@@ -31,7 +31,7 @@ class VerificationTask {
       `;
       const [loket] = await connection.execute(`
         SELECT loket_name 
-        FROM loket 
+        FROM Loket 
         WHERE status = "active" 
         AND (loket_name = "Loket 1" OR loket_name = "Loket 2") 
         LIMIT 1;
@@ -226,7 +226,7 @@ ORDER BY vt.waiting_verification_stamp ASC;
       `;
       const [loket] = await connection.execute(`
         SELECT loket_name 
-        FROM loket 
+        FROM Loket 
         WHERE status = "active" 
         AND (loket_name = "Loket 1" OR loket_name = "Loket 2") 
         LIMIT 1;

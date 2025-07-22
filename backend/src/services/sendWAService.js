@@ -2,7 +2,7 @@ const axios = require('axios');
 require('dotenv').config({ path: './.env' }); // Or just require('dotenv').config();
 
 const generateSignature = require('../utils/signature');
-const password = process.env.PASSWORD_WA ;
+const password = process.env.PASSWORD ;
 const consID2 = process.env.CONS_ID_WA;
 const HOST = process.env.API_WA
 const path = `http://${HOST}/api/v1/integration/whatsappweb/hello/send-text`
@@ -28,7 +28,7 @@ console.log("PHONE_NUMBER",payload.phone_number);
   const response = await axios.post(
     url,
     {
-      phone: "081286968913",
+      phone: payload.switch_WA == 'true' ? payload.phone_number : "081286968913",
       // phone: payload.phone_number,
 
       message : `*Notifikasi Sistem Otomatis*
@@ -77,7 +77,7 @@ console.log("PHONE_NUMBER",payload.phone_number);
     const response = await axios.post(
       url,
       {
-        phone: "081286968913",
+      phone: payload.switch_WA == 'true' ? payload.phone_number : "081286968913",
         // phone: payload.phone_number,
 
       message: `Notifikasi Sistem Otomatis
@@ -138,7 +138,7 @@ console.log("PHONE_NUMBER",payload.phone_number);
     const response = await axios.post(
       url,
       {
-        phone: "081286968913",
+      phone: payload.switch_WA == 'true' ? payload.phone_number : "081286968913",
         // phone: payload.phone_number,
 
         message : `
@@ -187,7 +187,7 @@ console.log("PHONE_NUMBER_PICKUP",payload.phone_number);
     const response = await axios.post(
       url,
       {
-        phone: "081286968913",
+      phone: payload.switch_WA == 'true' ? payload.phone_number : "081286968913",
         // phone: payload.phone_number,
         message : `*Notifikasi Sistem Otomatis*
 

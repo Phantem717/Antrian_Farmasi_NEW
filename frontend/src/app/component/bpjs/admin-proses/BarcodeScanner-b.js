@@ -101,6 +101,8 @@ export default function BarcodeScanner({ onScanResult }) {
                 console.log("DOCRESP", doctorResponse);
                
                 socket.emit('update_display');
+                socket.emit('update_proses');
+
                 socket.emit('update_pickup');
 
                 Swal.fire({

@@ -70,10 +70,9 @@ app.use('/api/create-farmasi',createFarmasiRoute);
 app.use('/api/pharmacy-status',pharmacyStatusRoutes);
 app.use('/api/check',checkRegistrationRoute);
   // Menjalankan server pada semua network interfaces
-  const HOST = process.env.HOST || '172.16.21.214'; // 🔥 Pastikan server bisa diakses dari IP lain
   const PORT = process.env.PORT || 5000;
 
-  server.listen(PORT, HOST, () => {
-    console.log(`✅ Server berjalan pada ${HOST}:${PORT}`,loginRoutes);
+  server.listen(PORT, '0.0.0.0', () => {
+    console.log(`✅ Server berjalan pada ${PORT}`,loginRoutes);
   });
 })();

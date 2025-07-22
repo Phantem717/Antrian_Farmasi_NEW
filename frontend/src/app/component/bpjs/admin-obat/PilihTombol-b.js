@@ -81,7 +81,8 @@ const socket = getSocket();
               nik: doctorResponse.data.nik,
               queue_number: doctorResponse.data.queue_number,
               NOP : doctorResponse.data.NOP,
-              waiting_pickup_medicine_stamp: queue.waiting_pickup_medicine_stamp
+              waiting_pickup_medicine_stamp: queue.waiting_pickup_medicine_stamp,
+              switch_WA: localStorage.getItem('waToggleState')
 
           }
           console.log("PAYLOAD PICKUP",payload)

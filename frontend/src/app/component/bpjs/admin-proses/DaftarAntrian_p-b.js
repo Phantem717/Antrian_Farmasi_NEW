@@ -125,6 +125,7 @@ export default function DaftarAntrian({ scanResult, setIsDeleted }) {
                 setQueueList(prevList => prevList.filter(item => item.NOP !== scanResult));
                 setRawQueueList(prevList => prevList.filter(item => item.NOP !== scanResult));
                 setIsDeleted(true);
+                
                 await Swal.fire({
                     icon: "success",
                     title: "Antrian Dihapus",
