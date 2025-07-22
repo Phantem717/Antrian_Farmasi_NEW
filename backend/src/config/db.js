@@ -9,6 +9,7 @@ const dbConfig = {
   database: process.env.DB_NAME,
 };
 
+let pool;
 
 async function initDb() {
   try {
@@ -24,12 +25,9 @@ async function initDb() {
     await tempConnection.end();
 
     // Step 2: Create pool with DB
-    const pool = mysql.createPool({
- host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-        waitForConnections: true,
+    pool = mysql.createPool({
+      ...dbConfig,
+      waitForConnections: true,
       connectionLimit: 10,
       enableKeepAlive: true,
     });
