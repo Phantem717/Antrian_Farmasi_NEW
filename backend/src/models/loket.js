@@ -46,22 +46,20 @@ class Loket {
    * Mengambil semua record loket.
    */
   static async getAll() {
-
-    try {
-      const pool = await getDb();      
-
-      const query = `SELECT * FROM Loket`;
-      const [rows] = await pool.execute(query);
-            console.log("LOKET", "HASIL: ",pool,rows);
-
-      return rows;
-    } catch (error) {
-              console.error("Model error in getAll:", error);
-
-      throw error;
-    }
+  const pool = await getDb();
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    const [rows] = await conn.query('SELECT * FROM Loket');
+    console.log("Query results:", rows);
+    return rows; // Explicit return
+  } catch (error) {
+    console.error("Model error:", error);
+    throw error; // Propagate error to controller
+  } finally {
+    if (conn) conn.release(); // Critical: Release connection
   }
-
+}
   /**
    * Memperbarui record loket berdasarkan loket_id.
    * @param {number} loket_id - ID loket.
