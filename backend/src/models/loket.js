@@ -55,8 +55,11 @@ class Loket {
     try {
       const pool = getDb();
       connection = await pool.getConnection();
+
       const query = `SELECT * FROM Loket`;
       const [rows] = await connection.execute(query);
+            console.log("LOKET", pool,connection,query,rows);
+
       return rows;
     } catch (error) {
       throw error;

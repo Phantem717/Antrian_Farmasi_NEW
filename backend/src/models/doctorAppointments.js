@@ -64,6 +64,7 @@ class DoctorAppointment {
 
     try {
       const pool = getDb();
+      
       connection = await pool.getConnection();
       const query = `SELECT * 
 FROM Doctor_Appointments da
