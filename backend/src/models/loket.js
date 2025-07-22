@@ -60,7 +60,7 @@ class Loket {
     console.error("Model error:", error);
     throw error; // Propagate error to controller
   } finally {
-    if (conn) conn.release(); // Critical: Release connection
+  conn.release(); // Critical: Release connection
   }
 }
   /**
