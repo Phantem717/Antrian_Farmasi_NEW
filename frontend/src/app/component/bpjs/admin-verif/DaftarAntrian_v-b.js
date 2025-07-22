@@ -62,6 +62,7 @@ const DaftarAntrian = ({ selectedQueueIds, setSelectedQueueIds, onSelectQueue, s
     let isMounted = true; // Track if component is mounted
 
   const fetchLokets = async () => {
+    console.log("TEST FETCH");
     try {
       const loketData = await LoketAPI.getAllLokets();
           console.log("Raw loket data:", loketData); // Add this line
@@ -222,6 +223,7 @@ const handleLoketChange = async (loketName) => {
   };
   
   useEffect(() => {
+    console.log("FETCH LOKET");
   fetchLokets();
     socket.on('insert_appointment',fetchQueueList)
 
