@@ -58,7 +58,7 @@ class Loket {
 
       const query = `SELECT * FROM Loket`;
       const [rows] = await pool.execute(query);
-            console.log("LOKET", "HASIL: ",rows);
+            console.log("LOKET", "HASIL: ",pool,rows);
 
       return rows;
     } catch (error) {
