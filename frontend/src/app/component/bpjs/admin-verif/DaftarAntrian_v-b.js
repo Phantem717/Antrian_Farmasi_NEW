@@ -62,10 +62,8 @@ const DaftarAntrian = ({ selectedQueueIds, setSelectedQueueIds, onSelectQueue, s
     let isMounted = true; // Track if component is mounted
 
   const fetchLokets = async () => {
-    console.log("TEST FETCH");
     try {
       const loketData = await LoketAPI.getAllLokets();
-          console.log("Raw loket data:", loketData); // Add this line
 
       if (!isMounted) return; // Don't update if unmounted
 
