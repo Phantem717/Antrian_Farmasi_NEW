@@ -64,6 +64,8 @@ const DaftarAntrian = ({ selectedQueueIds, setSelectedQueueIds, onSelectQueue, s
   const fetchLokets = async () => {
     try {
       const loketData = await LoketAPI.getAllLokets();
+          console.log("Raw loket data:", loketData); // Add this line
+
       if (!isMounted) return; // Don't update if unmounted
 
       const filteredLokets = loketData.data.filter((loket) => 
