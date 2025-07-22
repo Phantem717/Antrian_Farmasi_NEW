@@ -57,7 +57,7 @@ class Loket {
       connection = await pool.getConnection();
 
       const query = `SELECT * FROM Loket`;
-      const [rows] = await connection.execute(query);
+      const [rows] = await pool.execute(query);
             console.log("LOKET", "HASIL: ",rows);
 
       return rows;
