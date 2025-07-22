@@ -7,8 +7,11 @@ class getPharmacyTasks {
    * @param {Object} NOP - Data appointment yang akan disimpan.
    */
   static async getByNOP(NOP) {
+     let connection;
+
     try {
-      const connection = getDb();
+      const pool = getDb();
+      connection = await pool.getConnection();
       const query = `
      SELECT 
   da.patient_name,
@@ -46,8 +49,11 @@ WHERE da.NOP =?
    * @param {Object} SEP - Data appointment yang akan disimpan.
    */
   static async getBySEP(SEP) {
-      try {
-      const connection = getDb();
+       let connection;
+
+    try {
+      const pool = getDb();
+      connection = await pool.getConnection();
       const query = `
      SELECT 
   da.patient_name,

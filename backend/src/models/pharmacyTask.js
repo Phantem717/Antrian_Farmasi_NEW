@@ -7,8 +7,11 @@ class PharmacyTask {
    * @param {Object} taskData - Data task yang akan disimpan.
    */
   static async create(taskData) {
+      let connection;
+
     try {
-      const connection = getDb();
+      const pool = getDb();
+      connection = await pool.getConnection();
       const query = `
         INSERT INTO Pharmacy_Task (NOP, status, medicine_type,lokasi)
         VALUES ( ?, ?, ?,?)
@@ -31,8 +34,11 @@ class PharmacyTask {
    * @param {number|string} NOP - NOP task farmasi.
    */
   static async findByNOP(NOP) {
+      let connection;
+
     try {
-      const connection = getDb();
+      const pool = getDb();
+      connection = await pool.getConnection();
       const query = `
       SELECT 
         da.NOP,
@@ -58,8 +64,11 @@ class PharmacyTask {
    * Mengambil semua record task farmasi.
    */
   static async getAll() {
+      let connection;
+
     try {
-      const connection = getDb();
+      const pool = getDb();
+      connection = await pool.getConnection();
       const query = `
       SELECT 
         da.NOP,
@@ -82,8 +91,11 @@ class PharmacyTask {
   }
 
    static async getAllByStatus(status) {
+      let connection;
+
     try {
-      const connection = getDb();
+      const pool = getDb();
+      connection = await pool.getConnection();
       const query = `
       SELECT 
         da.NOP,
@@ -111,8 +123,11 @@ class PharmacyTask {
    * @param {Object} taskData - Data task yang akan diupdate.
    */
   static async update(NOP, taskData) {
+      let connection;
+
     try {
-      const connection = getDb();
+      const pool = getDb();
+      connection = await pool.getConnection();
       const query = `
         UPDATE Pharmacy_Task
         SET status = ?, medicine_type = ?
@@ -135,8 +150,11 @@ class PharmacyTask {
    * @param {number|string} NOP - NOP task farmasi.
    */
   static async delete(NOP) {
+      let connection;
+
     try {
-      const connection = getDb();
+      const pool = getDb();
+      connection = await pool.getConnection();
       const query = `DELETE FROM Pharmacy_Task WHERE NOP = ?`;
       const [result] = await connection.execute(query, [NOP]);
       return result;

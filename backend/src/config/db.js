@@ -3,13 +3,13 @@ const mysql = require('mysql2/promise');
     require('dotenv').config();
 
 const dbConfig = {
-host: process.env.DB_HOST,
+         host: process.env.DB_HOST,
         user: process.env.DB_USER,
         password: process.env.DB_PASSWORD,
         database: process.env.DB_NAME, // nama database yang ingin digunakan
 };
 
-let connection;
+let pool;
 
 /**
  * Inisialisasi koneksi ke database.
@@ -21,7 +21,8 @@ async function initDb() {
     const tempConnection = await mysql.createConnection({
       host: dbConfig.host,
       user: dbConfig.user,
-      password: dbConfig.password
+      password: dbConfig.password,
+      
     });
     // Buat database jika belum ada
     await tempConnection.query(`CREATE DATABASE IF NOT EXISTS \`${dbConfig.database}\``);
@@ -29,8 +30,12 @@ async function initDb() {
     await tempConnection.end();
 
     // Sekarang, koneksikan ke database yang sudah ada
-    connection = await mysql.createConnection(dbConfig);
-    console.log('Koneksi ke MySQL berhasil');
+ pool = await mysql.createPool({
+      ...dbConfig,
+      waitForConnections: true,
+      connectionLimit: 10,
+      enableKeepAlive: true,
+    });    console.log('Koneksi ke MySQL berhasil');
   } catch (error) {
     console.error('Error menghubungkan ke MySQL:', error);
     process.exit(1);
@@ -41,10 +46,10 @@ async function initDb() {
  * Mendapatkan instance koneksi yang sudah diinisialisasi.
  */
 function getDb() {
-  if (!connection) {
+  if (!pool) {
     throw new Error("Database belum diinisialisasi!");
   }
-  return connection;
+  return pool;
 }
 
 module.exports = {

@@ -7,8 +7,11 @@ class PickupTask {
    * @param {Object} data - Data Pickup_Task yang akan disimpan.
    */
   static async create(data) {
+      let connection;
+
     try {
-      const connection = getDb();
+      const pool = getDb();
+      connection = await pool.getConnection();
       const query = `
         INSERT INTO Pickup_Task (
           NOP, Executor, Executor_Names,
@@ -54,8 +57,11 @@ class PickupTask {
    * @param {number} NOP - ID task.
    */
   static async findByNOP(NOP) {
+      let connection;
+
     try {
-      const connection = getDb();
+      const pool = getDb();
+      connection = await pool.getConnection();
       const query = `
         SELECT
           pt.*, 
@@ -82,8 +88,11 @@ class PickupTask {
    * Mengambil semua record Pickup_Task.
    */
   static async getAll() {
+      let connection;
+
     try {
-      const connection = getDb();
+      const pool = getDb();
+      connection = await pool.getConnection();
       const query = `
         SELECT
           pt.*, 
@@ -108,8 +117,11 @@ class PickupTask {
   }
 
   static async getPickupToday(){
-     try {
-      const connection = getDb();
+       let connection;
+
+    try {
+      const pool = getDb();
+      connection = await pool.getConnection();
       const query = `
         SELECT
           pt.*, 
@@ -137,8 +149,11 @@ class PickupTask {
   }
 
    static async getPickupDisplay(){
-     try {
-      const connection = getDb();
+      let connection;
+
+    try {
+      const pool = getDb();
+      connection = await pool.getConnection();
       const query = `
        SELECT
   pt.*, 
@@ -167,8 +182,11 @@ ORDER BY
   }
 
    static async getPickupByDate(date){
-     try {
-      const connection = getDb();
+       let connection;
+
+    try {
+      const pool = getDb();
+      connection = await pool.getConnection();
       const query = `
         SELECT
           pt.*, 
@@ -200,8 +218,11 @@ ORDER BY
    * @param {Object} data - Data baru untuk update.
    */
   static async update(NOP, data) {
+      let connection;
+
     try {
-      const connection = getDb();
+      const pool = getDb();
+      connection = await pool.getConnection();
       const query = `
         UPDATE Pickup_Task
         SET Executor = ?,
@@ -248,8 +269,11 @@ ORDER BY
    * @param {number} NOP - ID task.
    */
   static async delete(NOP) {
+     let connection;
+
     try {
-      const connection = getDb();
+      const pool = getDb();
+      connection = await pool.getConnection();
       const query = `DELETE FROM Pickup_Task WHERE NOP = ?`;
       const [result] = await connection.execute(query, [NOP]);
       return result;

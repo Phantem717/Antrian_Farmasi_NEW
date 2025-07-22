@@ -7,8 +7,11 @@ class MedicineTask {
    * @param {Object} data - Data Medicine_Task yang akan disimpan.
    */
   static async create(data) {
+      let connection;
+
     try {
-      const connection = getDb();
+      const pool = getDb();
+      connection = await pool.getConnection();
       const query = `
         INSERT INTO Medicine_Task (
           NOP, Executor, Executor_Names,
@@ -53,8 +56,11 @@ class MedicineTask {
    * @param {number} NOP - ID task.
    */
   static async findByNOP(NOP) {
+     let connection;
+
     try {
-      const connection = getDb();
+      const pool = getDb();
+      connection = await pool.getConnection();
       const query = `
         SELECT
           mt.*, 
@@ -81,8 +87,11 @@ class MedicineTask {
    * Mengambil semua record Medicine_Task.
    */
   static async getAll() {
+      let connection;
+
     try {
-      const connection = getDb();
+      const pool = getDb();
+      connection = await pool.getConnection();
       const query = `
         SELECT
           mt.*, 
@@ -107,8 +116,11 @@ class MedicineTask {
   }
 
   static async getMedicineToday(){
-     try {
-      const connection = getDb();
+       let connection;
+
+    try {
+      const pool = getDb();
+      connection = await pool.getConnection();
       const query = `
         SELECT
           mt.*, 
@@ -137,8 +149,11 @@ AND (pt.status IS NULL OR
 
   
   static async getMedicineByDate(date){
-     try {
-      const connection = getDb();
+       let connection;
+
+    try {
+      const pool = getDb();
+      connection = await pool.getConnection();
       const query = `
         SELECT
           mt.*, 
@@ -171,8 +186,11 @@ AND (pt.status IS NULL OR
    * @param {Object} data - Data baru untuk update.
    */
   static async update(NOP, data) {
+      let connection;
+
     try {
-      const connection = getDb();
+      const pool = getDb();
+      connection = await pool.getConnection();
       const query = `
         UPDATE Medicine_Task
         SET Executor = ?,
@@ -222,8 +240,11 @@ AND (pt.status IS NULL OR
    * @param {number} NOP - ID task.
    */
   static async delete(NOP) {
+      let connection;
+
     try {
-      const connection = getDb();
+      const pool = getDb();
+      connection = await pool.getConnection();
       const query = `DELETE FROM Medicine_Task WHERE NOP = ?`;
       const [result] = await connection.execute(query, [NOP]);
       return result;

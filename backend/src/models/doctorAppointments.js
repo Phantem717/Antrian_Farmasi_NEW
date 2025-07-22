@@ -7,8 +7,11 @@ class DoctorAppointment {
    * @param {Object} appointmentData - Data appointment yang akan disimpan.
    */
   static async create(appointmentData) {
+          let connection;
+
     try {
-      const connection = getDb();
+      const pool = getDb();
+      connection = await pool.getConnection();
       const query = `
         INSERT INTO Doctor_Appointments (
           sep_no,
@@ -57,8 +60,11 @@ class DoctorAppointment {
    * Mengambil semua record appointment tanpa limit.
    */
   static async findAll() {
+    let connection;
+
     try {
-      const connection = getDb();
+      const pool = getDb();
+      connection = await pool.getConnection();
       const query = `SELECT * 
 FROM Doctor_Appointments da
 WHERE da.queue_number LIKE 'RC%' OR da.queue_number LIKE 'NR%'
@@ -75,8 +81,11 @@ ORDER BY da.queue_number`;
    * @param {string} NOP - ID booking appointment.
    */
   static async findByNOP(NOP) {
+    let connection;
+
     try {
-      const connection = getDb();
+      const pool = getDb();
+      connection = await pool.getConnection();
       const query = `SELECT * FROM Doctor_Appointments WHERE NOP = ?`;
       const [rows] = await connection.execute(query, [NOP]);
       return rows[0];
@@ -92,8 +101,11 @@ ORDER BY da.queue_number`;
    */
 
   static async updateStatusMedicine(NOP, status_medicine) {
+     let connection;
+
     try {
-      const connection = getDb();
+      const pool = getDb();
+      connection = await pool.getConnection();
       const query = `
         UPDATE Doctor_Appointments 
         SET status_medicine = ?
@@ -109,8 +121,11 @@ ORDER BY da.queue_number`;
 }
 
  static async updatePhoneNumber(NOP,phone_number) {
+     let connection;
+
     try {
-      const connection = getDb();
+      const pool = getDb();
+      connection = await pool.getConnection();
       const query = `
         UPDATE Doctor_Appointments 
         SET phone_number = ?
@@ -126,8 +141,11 @@ ORDER BY da.queue_number`;
 }
 
 static async updateMedicineType(NOP,status_medicine,farmasi_queue_number){
-  try {
-    const connection = getDb();
+   let connection;
+
+    try {
+      const pool = getDb();
+      connection = await pool.getConnection();
     const query = `
       UPDATE Doctor_Appointments 
       SET status_medicine = ?,
@@ -146,8 +164,11 @@ static async updateMedicineType(NOP,status_medicine,farmasi_queue_number){
 }
 
   static async getLatestAntrian() {
+     let connection;
+
     try {
-      const connection = getDb();
+      const pool = getDb();
+      connection = await pool.getConnection();
       const query = `SELECT queue_number 
 FROM Doctor_Appointments
 WHERE queue_number LIKE 'FA%' 
@@ -167,8 +188,11 @@ ORDER BY queue_number DESC LIMIT 1
    * @param {string} NOP - ID booking appointment.
    */
   static async delete(NOP) {
+     let connection;
+
     try {
-      const connection = getDb();
+      const pool = getDb();
+      connection = await pool.getConnection();
       const query = `DELETE FROM Doctor_Appointments WHERE NOP = ?`;
       const [result] = await connection.execute(query, [NOP]);
       return result;
