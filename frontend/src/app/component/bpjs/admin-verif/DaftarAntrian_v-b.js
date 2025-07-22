@@ -39,6 +39,7 @@ import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import PrintIcon from '@mui/icons-material/Print';
 import PrintAntrian from "@/app/utils/api/printAntrian";
+  const allowedLokets = ["Loket 1", "Loket 2"];
 
 const DaftarAntrian = ({ selectedQueueIds, setSelectedQueueIds, onSelectQueue, setSelectedLoket,setSelectedQueue2,selectedQueue2 }) => {  
   dayjs.extend(customParseFormat);
@@ -57,7 +58,6 @@ const DaftarAntrian = ({ selectedQueueIds, setSelectedQueueIds, onSelectQueue, s
     const [date,setDate]= useState("");
   
   // ? Loket yang diizinkan untuk admin verifikasi
-  const allowedLokets = ["Loket 1", "Loket 2"];
   // ? Fetch Loket dari API
     let isMounted = true; // Track if component is mounted
 
@@ -221,7 +221,6 @@ const handleLoketChange = async (loketName) => {
   };
   
   useEffect(() => {
-    console.log("FETCH LOKET");
   fetchLokets();
     socket.on('insert_appointment',fetchQueueList)
 
