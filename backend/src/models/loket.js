@@ -47,13 +47,13 @@ class Loket {
    */
  static async getAll() {
   const pool = await getDb();
+  const conn = await pool.getConnection(); // ? Explicit connection
+
   try {
-    const [rows] = await pool.query('SELECT * FROM Loket');
-    console.log("? Retrieved loket rows:", rows);
+    const [rows] = await conn.query('SELECT * FROM Loket');
     return rows;
-  } catch (err) {
-    console.error("? Failed to get lokets:", err);
-    throw err;
+  } finally {
+    conn.release(); // ?? Critical cleanup
   }
 }
 

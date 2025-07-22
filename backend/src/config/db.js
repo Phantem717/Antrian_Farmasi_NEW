@@ -8,12 +8,14 @@ const dbConfig = {
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
 };
-
 let pool;
+let initializing = false;
 
 async function initDb() {
+  if (pool || initializing) return; // avoid duplicate init
+
   try {
-    // Step 1: Connect without DB
+    initializing = true;
     const tempConnection = await mysql.createConnection({
       host: dbConfig.host,
       user: dbConfig.user,
@@ -21,36 +23,32 @@ async function initDb() {
     });
 
     await tempConnection.query(`CREATE DATABASE IF NOT EXISTS \`${dbConfig.database}\``);
-    console.log(`Database '${dbConfig.database}' dibuat atau sudah ada.`);
     await tempConnection.end();
 
-    // Step 2: Create pool with DB
     pool = mysql.createPool({
- host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
+      ...dbConfig,
+      waitForConnections: true,
       connectionLimit: 10,
       enableKeepAlive: true,
+  idleTimeout: 30000,            // 30 seconds idle
+  queueLimit: 0,               // Prevent infinite queues
+  keepAliveInitialDelay: 10000  
     });
-console.log("? Pool created successfully");
 
-    // Test connection from pool
+    console.log("? MySQL pool initialized");
   } catch (error) {
-    console.error("? Error menghubungkan ke MySQL:", error);
-    process.exit(1);
+    console.error("? MySQL init failed:", error);
+    throw error;
+  } finally {
+    initializing = false;
   }
 }
+
 async function getDb() {
   if (!pool) {
-    console.error("? Pool not initialized");
-    throw new Error("Database belum diinisialisasi!");
+    await initDb(); // ensure pool is ready before using
   }
-  console.log("? getDb() called");
   return pool;
 }
 
-module.exports = {
-  initDb,
-  getDb,
-};
+module.exports = { initDb, getDb };
