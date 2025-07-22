@@ -102,7 +102,7 @@ const queries = [
 
 async function setupDatabase() {
   try {
-    const connection = getDb();
+    const connection = await getDb();
     for (const [i, query] of queries.entries()) {
       await connection.execute(query);
       console.log(`Query ${i + 1} berhasil dieksekusi.`);
