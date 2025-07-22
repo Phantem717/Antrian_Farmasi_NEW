@@ -9,8 +9,7 @@ class logsTask {
      let connection;
 
     try {
-      const pool = getDb();
-      connection = await pool.getConnection();
+      const pool = await getDb();      connection = await pool.getConnection();
       const query = `
       SELECT 
     da.NOP,
@@ -72,8 +71,7 @@ ORDER BY vt.waiting_verification_stamp;  `;
      let connection;
 
     try {
-      const pool = getDb();
-      connection = await pool.getConnection();
+      const pool = await getDb();      connection = await pool.getConnection();
       const query = `
       SELECT 
     da.NOP,
@@ -125,8 +123,7 @@ static async getByTimePeriod(period) {
    let connection;
 
     try {
-      const pool = getDb();
-      connection = await pool.getConnection();
+      const pool = await getDb();      connection = await pool.getConnection();
         
         // Define date conditions based on period
         let dateCondition;
@@ -207,8 +204,7 @@ static async getByDate(date) {
    let connection;
 
     try {
-      const pool = getDb();
-      connection = await pool.getConnection();
+      const pool = await getDb();      connection = await pool.getConnection();
       const query = `
       SELECT 
     da.NOP,
@@ -261,8 +257,7 @@ ORDER BY vt.waiting_verification_stamp;  `;
    let connection;
 
     try {
-      const pool = getDb();
-      connection = await pool.getConnection();
+      const pool = await getDb();      connection = await pool.getConnection();
       const query = `  
       SELECT 
     da.status_medicine,
@@ -288,8 +283,7 @@ GROUP BY da.status_medicine`;
      let connection;
 
     try {
-      const pool = getDb();
-      connection = await pool.getConnection();
+      const pool = await getDb();      connection = await pool.getConnection();
       const query = `  
       SELECT 
     AVG(CASE WHEN da.status_medicine = 'Racikan' 
@@ -318,8 +312,7 @@ WHERE pt.medicine_type LIKE 'Non - Racikan' OR pt.medicine_type LIKE 'Racikan'
      let connection;
 
     try {
-      const pool = getDb();
-      connection = await pool.getConnection();
+      const pool = await getDb();      connection = await pool.getConnection();
       const query = `SELECT 
     AVG(CASE WHEN da.status_medicine = 'Racikan' 
              THEN TIMESTAMPDIFF(MINUTE, vt.waiting_verification_stamp, pa.completed_pickup_medicine_stamp) 
@@ -349,8 +342,7 @@ WHERE pt.status = 'completed_pickup_medicine'
       let connection;
 
     try {
-      const pool = getDb();
-      connection = await pool.getConnection();
+      const pool = await getDb();      connection = await pool.getConnection();
 
 
       const query = `SELECT 

@@ -10,8 +10,7 @@ class Loket {
      let connection;
 
     try {
-      const pool = getDb();
-      connection = await pool.getConnection();
+      const pool = await getDb();      connection = await pool.getConnection();
       const query = `
         INSERT INTO Loket (loket_name, description, status)
         VALUES (?, ?, ?)
@@ -36,8 +35,7 @@ class Loket {
    let connection;
 
     try {
-      const pool = getDb();
-      connection = await pool.getConnection();
+      const pool = await getDb();      connection = await pool.getConnection();
       const query = `SELECT * FROM Loket WHERE loket_id = ?`;
       const [rows] = await pool.execute(query, [loket_id]);
       return rows[0];
@@ -53,8 +51,7 @@ class Loket {
       let connection;
 
     try {
-      const pool = getDb();
-      connection = await pool.getConnection();
+      const pool = await getDb();      connection = await pool.getConnection();
 
       const query = `SELECT * FROM Loket`;
       const [rows] = await pool.execute(query);
@@ -75,8 +72,7 @@ class Loket {
      let connection;
 
     try {
-      const pool = getDb();
-      connection = await pool.getConnection();
+      const pool = await getDb();      connection = await pool.getConnection();
       const query = `
         UPDATE Loket
         SET loket_name = ?, description = ?, status = ?
@@ -103,8 +99,7 @@ class Loket {
     let connection;
 
     try {
-      const pool = getDb();
-      connection = await pool.getConnection();
+      const pool = await getDb();      connection = await pool.getConnection();
       const query = `DELETE FROM Loket WHERE loket_id = ?`;
       const [result] = await pool.execute(query, [loket_id]);
       return result;

@@ -10,8 +10,7 @@ class PickupTask {
       let connection;
 
     try {
-      const pool = getDb();
-      connection = await pool.getConnection();
+      const pool = await getDb();      connection = await pool.getConnection();
       const query = `
         INSERT INTO Pickup_Task (
           NOP, Executor, Executor_Names,
@@ -60,8 +59,7 @@ class PickupTask {
       let connection;
 
     try {
-      const pool = getDb();
-      connection = await pool.getConnection();
+      const pool = await getDb();      connection = await pool.getConnection();
       const query = `
         SELECT
           pt.*, 
@@ -91,8 +89,7 @@ class PickupTask {
       let connection;
 
     try {
-      const pool = getDb();
-      connection = await pool.getConnection();
+      const pool = await getDb();      connection = await pool.getConnection();
       const query = `
         SELECT
           pt.*, 
@@ -120,8 +117,7 @@ class PickupTask {
        let connection;
 
     try {
-      const pool = getDb();
-      connection = await pool.getConnection();
+      const pool = await getDb();      connection = await pool.getConnection();
       const query = `
         SELECT
           pt.*, 
@@ -152,8 +148,7 @@ class PickupTask {
       let connection;
 
     try {
-      const pool = getDb();
-      connection = await pool.getConnection();
+      const pool = await getDb();      connection = await pool.getConnection();
       const query = `
        SELECT
   pt.*, 
@@ -185,8 +180,7 @@ ORDER BY
        let connection;
 
     try {
-      const pool = getDb();
-      connection = await pool.getConnection();
+      const pool = await getDb();      connection = await pool.getConnection();
       const query = `
         SELECT
           pt.*, 
@@ -221,8 +215,7 @@ ORDER BY
       let connection;
 
     try {
-      const pool = getDb();
-      connection = await pool.getConnection();
+      const pool = await getDb();      connection = await pool.getConnection();
       const query = `
         UPDATE Pickup_Task
         SET Executor = ?,
@@ -272,8 +265,7 @@ ORDER BY
      let connection;
 
     try {
-      const pool = getDb();
-      connection = await pool.getConnection();
+      const pool = await getDb();      connection = await pool.getConnection();
       const query = `DELETE FROM Pickup_Task WHERE NOP = ?`;
       const [result] = await pool.execute(query, [NOP]);
       return result;

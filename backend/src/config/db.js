@@ -46,7 +46,7 @@ async function initDb() {
   }
 }
 
-function getDb() {
+async function  getDb() {
   if (!pool) throw new Error("Database belum diinisialisasi!");
   return pool;
 }

@@ -10,8 +10,7 @@ class PharmacyTask {
       let connection;
 
     try {
-      const pool = getDb();
-      connection = await pool.getConnection();
+      const pool = await getDb();      connection = await pool.getConnection();
       const query = `
         INSERT INTO Pharmacy_Task (NOP, status, medicine_type,lokasi)
         VALUES ( ?, ?, ?,?)
@@ -37,8 +36,7 @@ class PharmacyTask {
       let connection;
 
     try {
-      const pool = getDb();
-      connection = await pool.getConnection();
+      const pool = await getDb();      connection = await pool.getConnection();
       const query = `
       SELECT 
         da.NOP,
@@ -67,8 +65,7 @@ class PharmacyTask {
       let connection;
 
     try {
-      const pool = getDb();
-      connection = await pool.getConnection();
+      const pool = await getDb();      connection = await pool.getConnection();
       const query = `
       SELECT 
         da.NOP,
@@ -94,8 +91,7 @@ class PharmacyTask {
       let connection;
 
     try {
-      const pool = getDb();
-      connection = await pool.getConnection();
+      const pool = await getDb();      connection = await pool.getConnection();
       const query = `
       SELECT 
         da.NOP,
@@ -126,8 +122,7 @@ class PharmacyTask {
       let connection;
 
     try {
-      const pool = getDb();
-      connection = await pool.getConnection();
+      const pool = await getDb();      connection = await pool.getConnection();
       const query = `
         UPDATE Pharmacy_Task
         SET status = ?, medicine_type = ?
@@ -153,8 +148,7 @@ class PharmacyTask {
       let connection;
 
     try {
-      const pool = getDb();
-      connection = await pool.getConnection();
+      const pool = await getDb();      connection = await pool.getConnection();
       const query = `DELETE FROM Pharmacy_Task WHERE NOP = ?`;
       const [result] = await pool.execute(query, [NOP]);
       return result;

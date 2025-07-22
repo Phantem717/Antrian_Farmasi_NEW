@@ -10,8 +10,7 @@ class DoctorAppointment {
           let connection;
 
     try {
-      const pool = getDb();
-      connection = await pool.getConnection();
+      const pool = await getDb();      connection = await pool.getConnection();
       const query = `
         INSERT INTO Doctor_Appointments (
           sep_no,
@@ -63,8 +62,7 @@ class DoctorAppointment {
     let connection;
 
     try {
-      const pool = getDb();
-      
+      const pool = await getDb();      
       connection = await pool.getConnection();
       const query = `SELECT * 
 FROM Doctor_Appointments da
@@ -85,8 +83,7 @@ ORDER BY da.queue_number`;
     let connection;
 
     try {
-      const pool = getDb();
-      connection = await pool.getConnection();
+      const pool = await getDb();      connection = await pool.getConnection();
       const query = `SELECT * FROM Doctor_Appointments WHERE NOP = ?`;
       const [rows] = await pool.execute(query, [NOP]);
       return rows[0];
@@ -105,8 +102,7 @@ ORDER BY da.queue_number`;
      let connection;
 
     try {
-      const pool = getDb();
-      connection = await pool.getConnection();
+      const pool = await getDb();      connection = await pool.getConnection();
       const query = `
         UPDATE Doctor_Appointments 
         SET status_medicine = ?
@@ -125,8 +121,7 @@ ORDER BY da.queue_number`;
      let connection;
 
     try {
-      const pool = getDb();
-      connection = await pool.getConnection();
+      const pool = await getDb();      connection = await pool.getConnection();
       const query = `
         UPDATE Doctor_Appointments 
         SET phone_number = ?
@@ -145,8 +140,7 @@ static async updateMedicineType(NOP,status_medicine,farmasi_queue_number){
    let connection;
 
     try {
-      const pool = getDb();
-      connection = await pool.getConnection();
+      const pool = await getDb();      connection = await pool.getConnection();
     const query = `
       UPDATE Doctor_Appointments 
       SET status_medicine = ?,
@@ -168,8 +162,7 @@ static async updateMedicineType(NOP,status_medicine,farmasi_queue_number){
      let connection;
 
     try {
-      const pool = getDb();
-      connection = await pool.getConnection();
+      const pool = await getDb();      connection = await pool.getConnection();
       const query = `SELECT queue_number 
 FROM Doctor_Appointments
 WHERE queue_number LIKE 'FA%' 
@@ -192,8 +185,7 @@ ORDER BY queue_number DESC LIMIT 1
      let connection;
 
     try {
-      const pool = getDb();
-      connection = await pool.getConnection();
+      const pool = await getDb();      connection = await pool.getConnection();
       const query = `DELETE FROM Doctor_Appointments WHERE NOP = ?`;
       const [result] = await pool.execute(query, [NOP]);
       return result;

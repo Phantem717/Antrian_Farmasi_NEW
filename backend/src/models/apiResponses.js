@@ -10,7 +10,7 @@ class ApiResponses {
   static async create(responseData) {
     let connection;
     try {
-      const pool = getDb();
+      const pool = await getDb();
       connection = await pool.getConnection();
       
       const query = `

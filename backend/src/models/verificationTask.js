@@ -20,8 +20,7 @@ class VerificationTask {
       let connection;
 
     try {
-      const pool = getDb();
-      connection = await pool.getConnection();
+      const pool = await getDb();      connection = await pool.getConnection();
       const query = `
         INSERT INTO Verification_Task (
           NOP, Executor, Executor_Names,
@@ -69,8 +68,7 @@ class VerificationTask {
       let connection;
 
     try {
-      const pool = getDb();
-      connection = await pool.getConnection();
+      const pool = await getDb();      connection = await pool.getConnection();
       const query = `
         SELECT 
           vt.*, 
@@ -107,8 +105,7 @@ class VerificationTask {
       let connection;
 
     try {
-      const pool = getDb();
-      connection = await pool.getConnection();
+      const pool = await getDb();      connection = await pool.getConnection();
       const query = `
        SELECT 
   vt.*, 
@@ -140,8 +137,7 @@ ORDER BY vt.waiting_verification_stamp ASC;
       let connection;
 
     try {
-      const pool = getDb();
-      connection = await pool.getConnection();
+      const pool = await getDb();      connection = await pool.getConnection();
       const query = `
      SELECT 
   vt.*, 
@@ -177,8 +173,7 @@ ORDER BY vt.waiting_verification_stamp ASC;
        let connection;
 
     try {
-      const pool = getDb();
-      connection = await pool.getConnection();
+      const pool = await getDb();      connection = await pool.getConnection();
       const query = `
        SELECT 
   vt.*, 
@@ -227,8 +222,7 @@ ORDER BY vt.waiting_verification_stamp ASC;
       let connection;
 
     try {
-      const pool = getDb();
-      connection = await pool.getConnection();
+      const pool = await getDb();      connection = await pool.getConnection();
       const query = `
         UPDATE Verification_Task
         SET Executor = ?,
@@ -278,8 +272,7 @@ ORDER BY vt.waiting_verification_stamp ASC;
      let connection;
 
     try {
-      const pool = getDb();
-      connection = await pool.getConnection();
+      const pool = await getDb();      connection = await pool.getConnection();
       const query = `DELETE FROM Verification_Task WHERE NOP = ?`;
       const [result] = await pool.execute(query, [NOP]);
       return result;

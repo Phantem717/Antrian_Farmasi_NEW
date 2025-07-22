@@ -10,8 +10,7 @@ class getPharmacyTasks {
      let connection;
 
     try {
-      const pool = getDb();
-      connection = await pool.getConnection();
+      const pool = await getDb();      connection = await pool.getConnection();
       const query = `
      SELECT 
   da.patient_name,
@@ -52,8 +51,7 @@ WHERE da.NOP =?
        let connection;
 
     try {
-      const pool = getDb();
-      connection = await pool.getConnection();
+      const pool = await getDb();      connection = await pool.getConnection();
       const query = `
      SELECT 
   da.patient_name,

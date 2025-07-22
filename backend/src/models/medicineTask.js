@@ -10,8 +10,7 @@ class MedicineTask {
       let connection;
 
     try {
-      const pool = getDb();
-      connection = await pool.getConnection();
+      const pool = await getDb();      connection = await pool.getConnection();
       const query = `
         INSERT INTO Medicine_Task (
           NOP, Executor, Executor_Names,
@@ -59,8 +58,7 @@ class MedicineTask {
      let connection;
 
     try {
-      const pool = getDb();
-      connection = await pool.getConnection();
+      const pool = await getDb();      connection = await pool.getConnection();
       const query = `
         SELECT
           mt.*, 
@@ -90,8 +88,7 @@ class MedicineTask {
       let connection;
 
     try {
-      const pool = getDb();
-      connection = await pool.getConnection();
+      const pool = await getDb();      connection = await pool.getConnection();
       const query = `
         SELECT
           mt.*, 
@@ -119,8 +116,7 @@ class MedicineTask {
        let connection;
 
     try {
-      const pool = getDb();
-      connection = await pool.getConnection();
+      const pool = await getDb();      connection = await pool.getConnection();
       const query = `
         SELECT
           mt.*, 
@@ -152,8 +148,7 @@ AND (pt.status IS NULL OR
        let connection;
 
     try {
-      const pool = getDb();
-      connection = await pool.getConnection();
+      const pool = await getDb();      connection = await pool.getConnection();
       const query = `
         SELECT
           mt.*, 
@@ -189,8 +184,7 @@ AND (pt.status IS NULL OR
       let connection;
 
     try {
-      const pool = getDb();
-      connection = await pool.getConnection();
+      const pool = await getDb();      connection = await pool.getConnection();
       const query = `
         UPDATE Medicine_Task
         SET Executor = ?,
@@ -243,8 +237,7 @@ AND (pt.status IS NULL OR
       let connection;
 
     try {
-      const pool = getDb();
-      connection = await pool.getConnection();
+      const pool = await getDb();      connection = await pool.getConnection();
       const query = `DELETE FROM Medicine_Task WHERE NOP = ?`;
       const [result] = await pool.execute(query, [NOP]);
       return result;
