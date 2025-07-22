@@ -9,7 +9,6 @@ const LoketAPI = {
   getAllLokets: async () => {
     try {
       const response = await axios.get(`${BASE_URL}/api/loket/`);
-      console.log("RESPONSE LOKET",response);
       return response.data;
     } catch (error) {
       console.error("❌ Error fetching all lokets:", error);
@@ -17,7 +16,7 @@ const LoketAPI = {
     }
   },
 
-  // ✅ Ambil Detail Loket Berdasarkan ID
+  // ✅ Ambil Detail Loket Berdasarkan IDS
   getLoketById: async (loketId) => {
     try {
       const response = await axios.get(`${BASE_URL}/api/loket/${loketId}`);
