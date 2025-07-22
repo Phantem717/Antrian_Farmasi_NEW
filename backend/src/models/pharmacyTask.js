@@ -7,9 +7,10 @@ class PharmacyTask {
    * @param {Object} taskData - Data task yang akan disimpan.
    */
   static async create(taskData) {
+  const pool = await getDb();
+  const conn = await pool.getConnection(); // ? Explicit connection
 
     try {
-      const pool = await getDb();    
       const query = `
         INSERT INTO Pharmacy_Task (NOP, status, medicine_type,lokasi)
         VALUES ( ?, ?, ?,?)
@@ -20,11 +21,13 @@ class PharmacyTask {
         taskData.medicine_type,
         taskData.lokasi
       ];
-      const [result] = await pool.execute(query, values);
+      const [result] = await conn.execute(query, values);
       return result;
     } catch (error) {
       throw error;
-    }
+    }finally {
+    conn.release(); // ?? Critical cleanup
+  }
   }
 
   /**
@@ -32,9 +35,10 @@ class PharmacyTask {
    * @param {number|string} NOP - NOP task farmasi.
    */
   static async findByNOP(NOP) {
+  const pool = await getDb();
+  const conn = await pool.getConnection(); // ? Explicit connection
 
     try {
-      const pool = await getDb();   
       const query = `
       SELECT 
         da.NOP,
@@ -49,20 +53,23 @@ class PharmacyTask {
       JOIN Doctor_Appointments da ON pt.NOP = da.NOP
       WHERE da.NOP = ?
       `;
-      const [rows] = await pool.execute(query, [NOP]);
+      const [rows] = await conn.execute(query, [NOP]);
       return rows[0];
     } catch (error) {
       throw error;
-    }
+    }finally {
+    conn.release(); // ?? Critical cleanup
+  }
   }
 
   /**
    * Mengambil semua record task farmasi.
    */
   static async getAll() {
+  const pool = await getDb();
+  const conn = await pool.getConnection(); // ? Explicit connection
 
     try {
-      const pool = await getDb();    
       const query = `
       SELECT 
         da.NOP,
@@ -77,17 +84,20 @@ class PharmacyTask {
       JOIN Doctor_Appointments da ON pt.NOP = da.NOP
       ORDER BY da.NOP DESC;
       `;
-      const [rows] = await pool.execute(query);
+      const [rows] = await conn.execute(query);
       return rows;
     } catch (error) {
       throw error;
-    }
+    }finally {
+    conn.release(); // ?? Critical cleanup
+  }
   }
 
    static async getAllByStatus(status) {
+  const pool = await getDb();
+  const conn = await pool.getConnection(); // ? Explicit connection
 
     try {
-      const pool = await getDb();    
       const query = `
       SELECT 
         da.NOP,
@@ -103,11 +113,13 @@ class PharmacyTask {
       WHERE pt.status = ?
       ORDER BY da.NOP DESC;
       `;
-      const [rows] = await pool.execute(query, [status]);
+      const [rows] = await conn.execute(query, [status]);
       return rows;
     } catch (error) {
       throw error;
-    }
+    }finally {
+    conn.release(); // ?? Critical cleanup
+  }
   }
   /**
    * Memperbarui record task berdasarkan NOP.
@@ -115,9 +127,10 @@ class PharmacyTask {
    * @param {Object} taskData - Data task yang akan diupdate.
    */
   static async update(NOP, taskData) {
+  const pool = await getDb();
+  const conn = await pool.getConnection(); // ? Explicit connection
 
     try {
-      const pool = await getDb();     
       const query = `
         UPDATE Pharmacy_Task
         SET status = ?, medicine_type = ?
@@ -128,11 +141,13 @@ class PharmacyTask {
         taskData.medicine_type,
         NOP
       ];
-      const [result] = await pool.execute(query, values);
+      const [result] = await conn.execute(query, values);
       return result;
     } catch (error) {
       throw error;
-    }
+    }finally {
+    conn.release(); // ?? Critical cleanup
+  }
   }
 
   /**
@@ -140,15 +155,18 @@ class PharmacyTask {
    * @param {number|string} NOP - NOP task farmasi.
    */
   static async delete(NOP) {
+  const pool = await getDb();
+  const conn = await pool.getConnection(); // ? Explicit connection
 
     try {
-      const pool = await getDb();   
       const query = `DELETE FROM Pharmacy_Task WHERE NOP = ?`;
-      const [result] = await pool.execute(query, [NOP]);
+      const [result] = await conn.execute(query, [NOP]);
       return result;
     } catch (error) {
       throw error;
-    }
+    }finally {
+    conn.release(); // ?? Critical cleanup
+  }
   }
 }
 

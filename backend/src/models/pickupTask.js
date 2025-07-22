@@ -7,9 +7,10 @@ class PickupTask {
    * @param {Object} data - Data Pickup_Task yang akan disimpan.
    */
   static async create(data) {
+  const pool = await getDb();
+  const conn = await pool.getConnection(); // ? Explicit connection
 
     try {
-      const pool = await getDb();     
       const query = `
         INSERT INTO Pickup_Task (
           NOP, Executor, Executor_Names,
@@ -21,7 +22,7 @@ class PickupTask {
         )
         VALUES (?, ?, ?, NOW(), ?, ?, ?, ?, ?, ?,?)
       `;
-      const [loket] = await pool.execute(`
+      const [loket] = await conn.execute(`
         SELECT loket_name 
         FROM Loket 
         WHERE status = "active" 
@@ -43,11 +44,13 @@ class PickupTask {
         activeLoket || null,
         data.lokasi
       ];
-      const [result] = await pool.execute(query, values);
+      const [result] = await conn.execute(query, values);
       return result;
     } catch (error) {
       throw error;
-    }
+    }finally {
+    conn.release(); // ?? Critical cleanup
+  }
   }
 
   /**
@@ -55,9 +58,10 @@ class PickupTask {
    * @param {number} NOP - ID task.
    */
   static async findByNOP(NOP) {
+  const pool = await getDb();
+  const conn = await pool.getConnection(); // ? Explicit connection
 
     try {
-      const pool = await getDb();     
       const query = `
         SELECT
           pt.*, 
@@ -73,20 +77,23 @@ class PickupTask {
           LEFT JOIN Pharmacy_Task ph ON pt.NOP = ph.NOP
         WHERE pt.NOP = ?
       `;
-      const [rows] = await pool.execute(query, [NOP]);
+      const [rows] = await conn.execute(query, [NOP]);
       return rows[0];
     } catch (error) {
       throw error;
-    }
+    }finally {
+    conn.release(); // ?? Critical cleanup
+  }
   }
 
   /**
    * Mengambil semua record Pickup_Task.
    */
   static async getAll() {
+  const pool = await getDb();
+  const conn = await pool.getConnection(); // ? Explicit connection
 
     try {
-      const pool = await getDb();    
       const query = `
         SELECT
           pt.*, 
@@ -103,17 +110,20 @@ class PickupTask {
           ORDER BY 
     da.queue_number;
       `;
-      const [rows] = await pool.execute(query);
+      const [rows] = await conn.execute(query);
       return rows;
     } catch (error) {
       throw error;
-    }
+    }finally {
+    conn.release(); // ?? Critical cleanup
+  }
   }
 
   static async getPickupToday(){
+  const pool = await getDb();
+  const conn = await pool.getConnection(); // ? Explicit connection
 
     try {
-      const pool = await getDb();    
       const query = `
         SELECT
           pt.*, 
@@ -133,17 +143,20 @@ class PickupTask {
           ORDER BY 
     da.queue_number;
       `;
-      const [rows] = await pool.execute(query);
+      const [rows] = await conn.execute(query);
       return rows;
     } catch (error) {
       throw error;
-    }
+    }finally {
+    conn.release(); // ?? Critical cleanup
+  }
   }
 
    static async getPickupDisplay(){
+  const pool = await getDb();
+  const conn = await pool.getConnection(); // ? Explicit connection
 
     try {
-      const pool = await getDb();    
       const query = `
        SELECT
   pt.*, 
@@ -164,17 +177,20 @@ WHERE (date(pt.waiting_pickup_medicine_stamp) = CURRENT_DATE
 ORDER BY 
   da.queue_number;
       `;
-      const [rows] = await pool.execute(query);
+      const [rows] = await conn.execute(query);
       return rows;
     } catch (error) {
       throw error;
-    }
+    }finally {
+    conn.release(); // ?? Critical cleanup
+  }
   }
 
    static async getPickupByDate(date){
+  const pool = await getDb();
+  const conn = await pool.getConnection(); // ? Explicit connection
 
     try {
-      const pool = await getDb();    
       const query = `
         SELECT
           pt.*, 
@@ -194,11 +210,13 @@ ORDER BY
           ORDER BY 
     da.queue_number;
       `;
-      const [rows] = await pool.execute(query,[date]);
+      const [rows] = await conn.execute(query,[date]);
       return rows;
     } catch (error) {
       throw error;
-    }
+    }finally {
+    conn.release(); // ?? Critical cleanup
+  }
   }
   /**
    * Memperbarui record Pickup_Task berdasarkan NOP.
@@ -206,9 +224,10 @@ ORDER BY
    * @param {Object} data - Data baru untuk update.
    */
   static async update(NOP, data) {
+  const pool = await getDb();
+  const conn = await pool.getConnection(); // ? Explicit connection
 
     try {
-      const pool = await getDb();      
       const query = `
         UPDATE Pickup_Task
         SET Executor = ?,
@@ -222,7 +241,7 @@ ORDER BY
             loket = ?
         WHERE NOP = ?
       `;
-      const [loket] = await pool.execute(`
+      const [loket] = await conn.execute(`
         SELECT loket_name 
         FROM Loket 
         WHERE status = "active" 
@@ -243,11 +262,13 @@ ORDER BY
         activeLoket || null,
         NOP,
       ];
-      const [result] = await pool.execute(query, values);
+      const [result] = await conn.execute(query, values);
       return result;
     } catch (error) {
       throw error;
-    }
+    }finally {
+    conn.release(); // ?? Critical cleanup
+  }
   }
 
   /**
@@ -255,11 +276,12 @@ ORDER BY
    * @param {number} NOP - ID task.
    */
   static async delete(NOP) {
+  const pool = await getDb();
+  const conn = await pool.getConnection(); // ? Explicit connection
 
     try {
-      const pool = await getDb();    
       const query = `DELETE FROM Pickup_Task WHERE NOP = ?`;
-      const [result] = await pool.execute(query, [NOP]);
+      const [result] = await conn.execute(query, [NOP]);
       return result;
     } catch (error) {
       throw error;

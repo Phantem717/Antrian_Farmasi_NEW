@@ -8,8 +8,10 @@ class ApiResponses {
    * @returns {Promise<Object>} - Database operation result
    */
   static async create(responseData) {
-    try {
       const pool = await getDb();
+  const conn = await pool.getConnection(); // ? Explicit connection
+
+    try {
       
       const query = `
         INSERT INTO api_responses (
@@ -24,7 +26,7 @@ class ApiResponses {
         responseData.response_type
       ];
       
-      const [result] = await pool.execute(query, values);
+      const [result] = await conn.execute(query, values);
       return result;
       
     } catch (error) {
@@ -33,7 +35,9 @@ class ApiResponses {
         responseData: JSON.stringify(responseData)
       });
       throw new Error(`Database operation failed: ${error.message}`);
-    } 
+    } finally {
+    conn.release(); // ?? Critical cleanup
+  }
   }
 }
 

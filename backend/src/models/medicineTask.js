@@ -7,9 +7,10 @@ class MedicineTask {
    * @param {Object} data - Data Medicine_Task yang akan disimpan.
    */
   static async create(data) {
+  const pool = await getDb();
+  const conn = await pool.getConnection(); // ? Explicit connection
 
     try {
-      const pool = await getDb();    
       const query = `
         INSERT INTO Medicine_Task (
           NOP, Executor, Executor_Names,
@@ -20,7 +21,7 @@ class MedicineTask {
         )
         VALUES (?, ?, ?, NOW(), ?, ?, ?, ?, ?, ?,?)
       `;
-      const [loket] = await pool.execute(`
+      const [loket] = await conn.execute(`
         SELECT loket_name 
         FROM Loket 
         WHERE status = "active" 
@@ -42,11 +43,13 @@ class MedicineTask {
         activeLoket || null,
         data.lokasi
       ];
-      const [result] = await pool.execute(query, values);
+      const [result] = await conn.execute(query, values);
       return result;
     } catch (error) {
       throw error;
-    }
+    }finally {
+    conn.release(); // ?? Critical cleanup
+  }
   }
 
   /**
@@ -54,9 +57,10 @@ class MedicineTask {
    * @param {number} NOP - ID task.
    */
   static async findByNOP(NOP) {
+  const pool = await getDb();
+  const conn = await pool.getConnection(); // ? Explicit connection
 
     try {
-      const pool = await getDb();     
       const query = `
         SELECT
           mt.*, 
@@ -72,20 +76,23 @@ class MedicineTask {
         LEFT JOIN Pharmacy_Task pt ON mt.NOP = pt.NOP
         WHERE mt.NOP = ?
       `;
-      const [rows] = await pool.execute(query, [NOP]);
+      const [rows] = await conn.execute(query, [NOP]);
       return rows[0];
     } catch (error) {
       throw error;
-    }
+    }finally {
+    conn.release(); // ?? Critical cleanup
+  }
   }
 
   /**
    * Mengambil semua record Medicine_Task.
    */
   static async getAll() {
+  const pool = await getDb();
+  const conn = await pool.getConnection(); // ? Explicit connection
 
     try {
-      const pool = await getDb();     
       const query = `
         SELECT
           mt.*, 
@@ -102,17 +109,20 @@ class MedicineTask {
          ORDER BY 
     da.queue_number;
       `;
-      const [rows] = await pool.execute(query);
+      const [rows] = await conn.execute(query);
       return rows;
     } catch (error) {
       throw error;
-    }
+    }finally {
+    conn.release(); // ?? Critical cleanup
+  }
   }
 
   static async getMedicineToday(){
+  const pool = await getDb();
+  const conn = await pool.getConnection(); // ? Explicit connection
 
     try {
-      const pool = await getDb();     
       const query = `
         SELECT
           mt.*, 
@@ -132,18 +142,21 @@ AND (pt.status IS NULL OR
          ORDER BY 
     da.queue_number;
       `;
-      const [rows] = await pool.execute(query);
+      const [rows] = await conn.execute(query);
       return rows;
     } catch (error) {
       throw error;
-    }
+    }finally {
+    conn.release(); // ?? Critical cleanup
+  }
   }
 
   
   static async getMedicineByDate(date){
+  const pool = await getDb();
+  const conn = await pool.getConnection(); // ? Explicit connection
 
     try {
-      const pool = await getDb();     
       const query = `
         SELECT
           mt.*, 
@@ -164,11 +177,13 @@ AND (pt.status IS NULL OR
          ORDER BY 
     da.queue_number;
       `;
-      const [rows] = await pool.execute(query, [date]);
+      const [rows] = await conn.execute(query, [date]);
       return rows;
     } catch (error) {
       throw error;
-    }
+    }finally {
+    conn.release(); // ?? Critical cleanup
+  }
   }
   /**
    * Memperbarui record Medicine_Task berdasarkan NOP.
@@ -176,9 +191,10 @@ AND (pt.status IS NULL OR
    * @param {Object} data - Data baru untuk update.
    */
   static async update(NOP, data) {
+  const pool = await getDb();
+  const conn = await pool.getConnection(); // ? Explicit connection
 
     try {
-      const pool = await getDb();     
       const query = `
         UPDATE Medicine_Task
         SET Executor = ?,
@@ -193,7 +209,7 @@ AND (pt.status IS NULL OR
 
         WHERE NOP = ?
       `;
-    //   const [loket] = await pool.execute(`
+    //   const [loket] = await conn.execute(`
     //     SELECT loket_name 
     //     FROM Loket 
     //     WHERE status = "active" 
@@ -216,11 +232,13 @@ AND (pt.status IS NULL OR
 
         NOP,
       ];
-      const [result] = await pool.execute(query, values);
+      const [result] = await conn.execute(query, values);
       return result;
     } catch (error) {
       throw error;
-    }
+    }finally {
+    conn.release(); // ?? Critical cleanup
+  }
   }
 
   /**
@@ -228,16 +246,18 @@ AND (pt.status IS NULL OR
    * @param {number} NOP - ID task.
    */
   static async delete(NOP) {
-      let connection;
+  const pool = await getDb();
+  const conn = await pool.getConnection(); // ? Explicit connection
 
     try {
-      const pool = await getDb();      connection = await pool.getConnection();
       const query = `DELETE FROM Medicine_Task WHERE NOP = ?`;
-      const [result] = await pool.execute(query, [NOP]);
+      const [result] = await conn.execute(query, [NOP]);
       return result;
     } catch (error) {
       throw error;
-    }
+    }finally {
+    conn.release(); // ?? Critical cleanup
+  }
   }
 }
 

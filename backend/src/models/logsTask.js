@@ -6,9 +6,10 @@ class logsTask {
    * Mengambil semua data log lengkap dari berbagai task berdasarkan NOP.
    */
   static async getAll() {
+  const pool = await getDb();
+  const conn = await pool.getConnection(); // ? Explicit connection
 
     try {
-      const pool = await getDb();   
       const query = `
       SELECT 
     da.NOP,
@@ -59,18 +60,20 @@ LEFT JOIN Medicine_Task mt ON da.NOP = mt.NOP
 LEFT JOIN Pickup_Task pa ON da.NOP = pa.NOP
 ORDER BY vt.waiting_verification_stamp;  `;
 
-      const [rows] = await pool.execute(query);
+      const [rows] = await conn.execute(query);
       return rows;
     } catch (error) {
       throw error;
-    }
+    }finally {
+    conn.release(); // ?? Critical cleanup
+  }
   }
 
   static async getToday() {
- 
+   const pool = await getDb();
+  const conn = await pool.getConnection(); // ? Explicit connection
 
     try {
-      const pool = await getDb();     
       const query = `
       SELECT 
     da.NOP,
@@ -112,16 +115,19 @@ LEFT JOIN Pickup_Task pa ON da.NOP = pa.NOP
 WHERE Date(vt.waiting_verification_stamp) = CURRENT_DATE
 ORDER BY vt.waiting_verification_stamp;  `;
 
-      const [rows] = await pool.execute(query);
+      const [rows] = await conn.execute(query);
       return rows;
     } catch (error) {
       throw error;
-    }
+    }finally {
+    conn.release(); // ?? Critical cleanup
+  }
   }
 static async getByTimePeriod(period) {
+  const pool = await getDb();
+  const conn = await pool.getConnection(); // ? Explicit connection
 
     try {
-      const pool = await getDb();     
         
         // Define date conditions based on period
         let dateCondition;
@@ -184,11 +190,13 @@ static async getByTimePeriod(period) {
         WHERE ${dateCondition}
         ORDER BY vt.waiting_verification_stamp;`;
 
-        const [rows] = await pool.execute(query);
+        const [rows] = await conn.execute(query);
         return rows;
     } catch (error) {
         throw error;
-    }
+    }finally {
+    conn.release(); // ?? Critical cleanup
+  }
 }
 
 // Usage examples:
@@ -199,9 +207,10 @@ static async getByTimePeriod(period) {
 // await getByTimePeriod('6months');
 // await getByTimePeriod('thisyear');
 static async getByDate(date) {
+  const pool = await getDb();
+  const conn = await pool.getConnection(); // ? Explicit connection
 
     try {
-      const pool = await getDb();     
       const query = `
       SELECT 
     da.NOP,
@@ -243,17 +252,20 @@ LEFT JOIN Pickup_Task pa ON da.NOP = pa.NOP
 WHERE Date(vt.waiting_verification_stamp) = ?
 ORDER BY vt.waiting_verification_stamp;  `;
 
-      const [rows] = await pool.execute(query, [date]);
+      const [rows] = await conn.execute(query, [date]);
       return rows;
     } catch (error) {
       throw error;
-    }
+    }finally {
+    conn.release(); // ?? Critical cleanup
+  }
   }
 
   static async getTotalMedicineType(){
+  const pool = await getDb();
+  const conn = await pool.getConnection(); // ? Explicit connection
 
     try {
-      const pool = await getDb();     
       const query = `  
       SELECT 
     da.status_medicine,
@@ -267,18 +279,21 @@ LEFT JOIN Pickup_Task pa ON da.NOP = pa.NOP
 
 WHERE pt.medicine_type LIKE 'Non - Racikan' OR pt.medicine_type LIKE 'Racikan'
 GROUP BY da.status_medicine`;
-          const [rows] = await pool.execute(query);
+          const [rows] = await conn.execute(query);
           return rows;
     } catch (error) {
       return error;
-    }
+    }finally {
+    conn.release(); // ?? Critical cleanup
+  }
    
   }
 
    static async getTodayMedicineType(){
+  const pool = await getDb();
+  const conn = await pool.getConnection(); // ? Explicit connection
 
     try {
-      const pool = await getDb();      
       const query = `  
       SELECT 
     AVG(CASE WHEN da.status_medicine = 'Racikan' 
@@ -295,18 +310,21 @@ LEFT JOIN Medicine_Task mt ON da.NOP = mt.NOP
 LEFT JOIN Pickup_Task pa ON da.NOP = pa.NOP
 WHERE pt.medicine_type LIKE 'Non - Racikan' OR pt.medicine_type LIKE 'Racikan'
 `;
-          const [rows] = await pool.execute(query);
+          const [rows] = await conn.execute(query);
           return rows;
     } catch (error) {
       return error;
-    }
+    }finally {
+    conn.release(); // ?? Critical cleanup
+  }
    
   }
 
   static async getAvgServiceTime(){
+  const pool = await getDb();
+  const conn = await pool.getConnection(); // ? Explicit connection
 
     try {
-      const pool = await getDb();     
       const query = `SELECT 
     AVG(CASE WHEN da.status_medicine = 'Racikan' 
              THEN TIMESTAMPDIFF(MINUTE, vt.waiting_verification_stamp, pa.completed_pickup_medicine_stamp) 
@@ -323,19 +341,22 @@ LEFT JOIN Pickup_Task pa ON da.NOP = pa.NOP
 WHERE pt.status = 'completed_pickup_medicine'
   `;
   
-  const [rows] = await pool.execute(query);
+  const [rows] = await conn.execute(query);
   return rows;
     } catch (error) {
       return error;
-    }
+    }finally {
+    conn.release(); // ?? Critical cleanup
+  }
    
 
   }
 
   static async getDataPerHour() {
+  const pool = await getDb();
+  const conn = await pool.getConnection(); // ? Explicit connection
 
     try {
-      const pool = await getDb();     
 
 
       const query = `SELECT 
@@ -346,12 +367,14 @@ WHERE pt.status = 'completed_pickup_medicine'
    
   GROUP BY HOUR(completed_pickup_medicine_stamp)
   ORDER BY hour_of_day`;
-  const [rows] = await pool.execute(query);
+  const [rows] = await conn.execute(query);
   return rows;
     } catch (error) {
       return error;
 
-    }
+    }finally {
+    conn.release(); // ?? Critical cleanup
+  }
    
   }
 }

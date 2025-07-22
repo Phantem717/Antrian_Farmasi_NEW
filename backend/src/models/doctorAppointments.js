@@ -7,9 +7,10 @@ class DoctorAppointment {
    * @param {Object} appointmentData - Data appointment yang akan disimpan.
    */
   static async create(appointmentData) {
+  const pool = await getDb();
+  const conn = await pool.getConnection(); // ? Explicit connection
 
     try {
-      const pool = await getDb();     
       const query = `
         INSERT INTO Doctor_Appointments (
           sep_no,
@@ -47,29 +48,34 @@ class DoctorAppointment {
         appointmentData.PRB
 
       ];
-      const [result] = await pool.execute(query, values);
+      const [result] = await conn.execute(query, values);
       return result;
     } catch (error) {
       throw error;
-    }
+    }finally {
+    conn.release(); // ?? Critical cleanup
+  }
   }
 
   /**
    * Mengambil semua record appointment tanpa limit.
    */
   static async findAll() {
+  const pool = await getDb();
+  const conn = await pool.getConnection(); // ? Explicit connection
 
     try {
-      const pool = await getDb();      
       const query = `SELECT * 
 FROM Doctor_Appointments da
 WHERE da.queue_number LIKE 'RC%' OR da.queue_number LIKE 'NR%'
 ORDER BY da.queue_number`;
-      const [rows] = await pool.execute(query);
+      const [rows] = await conn.execute(query);
       return rows;
     } catch (error) {
       throw error;
-    }
+    }finally {
+    conn.release(); // ?? Critical cleanup
+  }
   }
 
   /**
@@ -77,15 +83,18 @@ ORDER BY da.queue_number`;
    * @param {string} NOP - ID booking appointment.
    */
   static async findByNOP(NOP) {
+  const pool = await getDb();
+  const conn = await pool.getConnection(); // ? Explicit connection
 
     try {
-      const pool = await getDb();     
       const query = `SELECT * FROM Doctor_Appointments WHERE NOP = ?`;
-      const [rows] = await pool.execute(query, [NOP]);
+      const [rows] = await conn.execute(query, [NOP]);
       return rows[0];
     } catch (error) {
       throw error;
-    }
+    }finally {
+    conn.release(); // ?? Critical cleanup
+  }
   }
 
   /**
@@ -95,9 +104,10 @@ ORDER BY da.queue_number`;
    */
 
   static async updateStatusMedicine(NOP, status_medicine) {
+  const pool = await getDb();
+  const conn = await pool.getConnection(); // ? Explicit connection
 
     try {
-      const pool = await getDb();      
       const query = `
         UPDATE Doctor_Appointments 
         SET status_medicine = ?
@@ -105,18 +115,21 @@ ORDER BY da.queue_number`;
       `;
       const values = [status_medicine, NOP];
 
-      const [result] = await pool.execute(query, values);
+      const [result] = await conn.execute(query, values);
       return result;
     } catch (error) {
       throw error;
-    }
+    }finally {
+    conn.release(); // ?? Critical cleanup
+  }
 }
 
  static async updatePhoneNumber(NOP,phone_number) {
-    
+      const pool = await getDb();
+  const conn = await pool.getConnection(); // ? Explicit connection
+
 
     try {
-      const pool = await getDb();    
       const query = `
         UPDATE Doctor_Appointments 
         SET phone_number = ?
@@ -124,18 +137,21 @@ ORDER BY da.queue_number`;
       `;
       const values = [phone_number, NOP];
 
-      const [result] = await pool.execute(query, values);
+      const [result] = await conn.execute(query, values);
       return result;
     } catch (error) {
       throw error;
-    }
+    }finally {
+    conn.release(); // ?? Critical cleanup
+  }
 }
 
 static async updateMedicineType(NOP,status_medicine,farmasi_queue_number){
 
+  const pool = await getDb();
+  const conn = await pool.getConnection(); // ? Explicit connection
 
     try {
-      const pool = await getDb();    
     const query = `
       UPDATE Doctor_Appointments 
       SET status_medicine = ?,
@@ -145,18 +161,21 @@ static async updateMedicineType(NOP,status_medicine,farmasi_queue_number){
     `;
     const values = [status_medicine,farmasi_queue_number,farmasi_queue_number, NOP];
 
-    const [result] = await pool.execute(query, values);
+    const [result] = await conn.execute(query, values);
     return result;
   } catch (error) {
     throw error;
 
+  }finally {
+    conn.release(); // ?? Critical cleanup
   }
 }
 
   static async getLatestAntrian() {
+  const pool = await getDb();
+  const conn = await pool.getConnection(); // ? Explicit connection
 
     try {
-      const pool = await getDb();     
       const query = `SELECT queue_number 
 FROM Doctor_Appointments
 WHERE queue_number LIKE 'FA%' 
@@ -164,11 +183,13 @@ ORDER BY queue_number DESC LIMIT 1
 `;
 
       
-      const [rows] = await pool.execute(query);
+      const [rows] = await conn.execute(query);
       return rows[0]; // Instead of returning the whole array
     } catch (error) {
       throw error;
-    }
+    } finally {
+    conn.release(); // ?? Critical cleanup
+  }
   }
 
   /**
@@ -176,15 +197,18 @@ ORDER BY queue_number DESC LIMIT 1
    * @param {string} NOP - ID booking appointment.
    */
   static async delete(NOP) {
+  const pool = await getDb();
+  const conn = await pool.getConnection(); // ? Explicit connection
 
     try {
-      const pool = await getDb();     
       const query = `DELETE FROM Doctor_Appointments WHERE NOP = ?`;
-      const [result] = await pool.execute(query, [NOP]);
+      const [result] = await conn.execute(query, [NOP]);
       return result;
     } catch (error) {
       throw error;
-    }
+    }finally {
+    conn.release(); // ?? Critical cleanup
+  }
   }
 
   

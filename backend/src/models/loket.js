@@ -7,9 +7,10 @@ class Loket {
    * @param {Object} loketData - Data loket yang akan disimpan.
    */
   static async create(loketData) {
+  const pool = await getDb();
+  const conn = await pool.getConnection(); // ? Explicit connection
 
     try {
-      const pool = await getDb();    
       const query = `
         INSERT INTO Loket (loket_name, description, status)
         VALUES (?, ?, ?)
@@ -19,11 +20,13 @@ class Loket {
         loketData.description,
         loketData.status
       ];
-      const [result] = await pool.execute(query, values);
+      const [result] = await conn.execute(query, values);
       return result;
     } catch (error) {
       throw error;
-    }
+    }finally {
+    conn.release(); // ?? Critical cleanup
+  }
   }
 
   /**
@@ -31,15 +34,17 @@ class Loket {
    * @param {number} loket_id - ID loket.
    */
   static async findById(loket_id) {
-
+  const pool = await getDb();
+  const conn = await pool.getConnection(); 
     try {
-      const pool = await getDb();      
       const query = `SELECT * FROM Loket WHERE loket_id = ?`;
-      const [rows] = await pool.execute(query, [loket_id]);
+      const [rows] = await conn.execute(query, [loket_id]);
       return rows[0];
     } catch (error) {
       throw error;
-    }
+    }finally {
+    conn.release(); // ?? Critical cleanup
+  }
   }
 
   /**
@@ -51,6 +56,7 @@ class Loket {
 
   try {
     const [rows] = await conn.query('SELECT * FROM Loket');
+    console.log("LOKET",rows);
     return rows;
   } finally {
     conn.release(); // ?? Critical cleanup
@@ -63,9 +69,10 @@ class Loket {
    * @param {Object} loketData - Data yang akan diupdate.
    */
   static async update(loket_id, loketData) {
+  const pool = await getDb();
+  const conn = await pool.getConnection(); // ? Explicit connection
 
     try {
-      const pool = await getDb();      
       const query = `
         UPDATE Loket
         SET loket_name = ?, description = ?, status = ?
@@ -77,12 +84,14 @@ class Loket {
         loketData.status,
         loket_id
       ];
-      const [result] = await pool.execute(query, values);
+      const [result] = await conn.execute(query, values);
       return result;
     } catch (error) {
 
       throw error;
-    }
+    }finally {
+    conn.release(); // ?? Critical cleanup
+  }
   }
 
   /**
@@ -90,15 +99,18 @@ class Loket {
    * @param {number} loket_id - ID loket.
    */
   static async delete(loket_id) {
+  const pool = await getDb();
+  const conn = await pool.getConnection(); // ? Explicit connection
 
     try {
-      const pool = await getDb();      
       const query = `DELETE FROM Loket WHERE loket_id = ?`;
-      const [result] = await pool.execute(query, [loket_id]);
+      const [result] = await conn.execute(query, [loket_id]);
       return result;
     } catch (error) {
       throw error;
-    }
+    }finally {
+    conn.release(); // ?? Critical cleanup
+  }
   }
 }
 
