@@ -26,7 +26,7 @@ class ApiResponses {
         responseData.response_type
       ];
       
-      const [result] = await connection.execute(query, values);
+      const [result] = await pool.execute(query, values);
       return result;
       
     } catch (error) {
@@ -36,7 +36,7 @@ class ApiResponses {
       });
       throw new Error(`Database operation failed: ${error.message}`);
     } finally {
-      if (connection) connection.release();
+      if (connection) pool.release();
     }
   }
 }

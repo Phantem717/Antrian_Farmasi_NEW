@@ -22,7 +22,7 @@ class MedicineTask {
         )
         VALUES (?, ?, ?, NOW(), ?, ?, ?, ?, ?, ?,?)
       `;
-      const [loket] = await connection.execute(`
+      const [loket] = await pool.execute(`
         SELECT loket_name 
         FROM Loket 
         WHERE status = "active" 
@@ -44,7 +44,7 @@ class MedicineTask {
         activeLoket || null,
         data.lokasi
       ];
-      const [result] = await connection.execute(query, values);
+      const [result] = await pool.execute(query, values);
       return result;
     } catch (error) {
       throw error;
@@ -76,7 +76,7 @@ class MedicineTask {
         LEFT JOIN Pharmacy_Task pt ON mt.NOP = pt.NOP
         WHERE mt.NOP = ?
       `;
-      const [rows] = await connection.execute(query, [NOP]);
+      const [rows] = await pool.execute(query, [NOP]);
       return rows[0];
     } catch (error) {
       throw error;
@@ -108,7 +108,7 @@ class MedicineTask {
          ORDER BY 
     da.queue_number;
       `;
-      const [rows] = await connection.execute(query);
+      const [rows] = await pool.execute(query);
       return rows;
     } catch (error) {
       throw error;
@@ -140,7 +140,7 @@ AND (pt.status IS NULL OR
          ORDER BY 
     da.queue_number;
       `;
-      const [rows] = await connection.execute(query);
+      const [rows] = await pool.execute(query);
       return rows;
     } catch (error) {
       throw error;
@@ -174,7 +174,7 @@ AND (pt.status IS NULL OR
          ORDER BY 
     da.queue_number;
       `;
-      const [rows] = await connection.execute(query, [date]);
+      const [rows] = await pool.execute(query, [date]);
       return rows;
     } catch (error) {
       throw error;
@@ -205,7 +205,7 @@ AND (pt.status IS NULL OR
 
         WHERE NOP = ?
       `;
-    //   const [loket] = await connection.execute(`
+    //   const [loket] = await pool.execute(`
     //     SELECT loket_name 
     //     FROM Loket 
     //     WHERE status = "active" 
@@ -228,7 +228,7 @@ AND (pt.status IS NULL OR
 
         NOP,
       ];
-      const [result] = await connection.execute(query, values);
+      const [result] = await pool.execute(query, values);
       return result;
     } catch (error) {
       throw error;
@@ -246,7 +246,7 @@ AND (pt.status IS NULL OR
       const pool = getDb();
       connection = await pool.getConnection();
       const query = `DELETE FROM Medicine_Task WHERE NOP = ?`;
-      const [result] = await connection.execute(query, [NOP]);
+      const [result] = await pool.execute(query, [NOP]);
       return result;
     } catch (error) {
       throw error;

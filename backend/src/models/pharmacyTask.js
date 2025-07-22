@@ -22,7 +22,7 @@ class PharmacyTask {
         taskData.medicine_type,
         taskData.lokasi
       ];
-      const [result] = await connection.execute(query, values);
+      const [result] = await pool.execute(query, values);
       return result;
     } catch (error) {
       throw error;
@@ -53,7 +53,7 @@ class PharmacyTask {
       JOIN Doctor_Appointments da ON pt.NOP = da.NOP
       WHERE da.NOP = ?
       `;
-      const [rows] = await connection.execute(query, [NOP]);
+      const [rows] = await pool.execute(query, [NOP]);
       return rows[0];
     } catch (error) {
       throw error;
@@ -83,7 +83,7 @@ class PharmacyTask {
       JOIN Doctor_Appointments da ON pt.NOP = da.NOP
       ORDER BY da.NOP DESC;
       `;
-      const [rows] = await connection.execute(query);
+      const [rows] = await pool.execute(query);
       return rows;
     } catch (error) {
       throw error;
@@ -111,7 +111,7 @@ class PharmacyTask {
       WHERE pt.status = ?
       ORDER BY da.NOP DESC;
       `;
-      const [rows] = await connection.execute(query, [status]);
+      const [rows] = await pool.execute(query, [status]);
       return rows;
     } catch (error) {
       throw error;
@@ -138,7 +138,7 @@ class PharmacyTask {
         taskData.medicine_type,
         NOP
       ];
-      const [result] = await connection.execute(query, values);
+      const [result] = await pool.execute(query, values);
       return result;
     } catch (error) {
       throw error;
@@ -156,7 +156,7 @@ class PharmacyTask {
       const pool = getDb();
       connection = await pool.getConnection();
       const query = `DELETE FROM Pharmacy_Task WHERE NOP = ?`;
-      const [result] = await connection.execute(query, [NOP]);
+      const [result] = await pool.execute(query, [NOP]);
       return result;
     } catch (error) {
       throw error;

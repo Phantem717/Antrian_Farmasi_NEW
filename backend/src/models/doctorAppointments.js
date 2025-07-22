@@ -49,7 +49,7 @@ class DoctorAppointment {
         appointmentData.PRB
 
       ];
-      const [result] = await connection.execute(query, values);
+      const [result] = await pool.execute(query, values);
       return result;
     } catch (error) {
       throw error;
@@ -70,7 +70,7 @@ class DoctorAppointment {
 FROM Doctor_Appointments da
 WHERE da.queue_number LIKE 'RC%' OR da.queue_number LIKE 'NR%'
 ORDER BY da.queue_number`;
-      const [rows] = await connection.execute(query);
+      const [rows] = await pool.execute(query);
       return rows;
     } catch (error) {
       throw error;
@@ -88,7 +88,7 @@ ORDER BY da.queue_number`;
       const pool = getDb();
       connection = await pool.getConnection();
       const query = `SELECT * FROM Doctor_Appointments WHERE NOP = ?`;
-      const [rows] = await connection.execute(query, [NOP]);
+      const [rows] = await pool.execute(query, [NOP]);
       return rows[0];
     } catch (error) {
       throw error;
@@ -114,7 +114,7 @@ ORDER BY da.queue_number`;
       `;
       const values = [status_medicine, NOP];
 
-      const [result] = await connection.execute(query, values);
+      const [result] = await pool.execute(query, values);
       return result;
     } catch (error) {
       throw error;
@@ -134,7 +134,7 @@ ORDER BY da.queue_number`;
       `;
       const values = [phone_number, NOP];
 
-      const [result] = await connection.execute(query, values);
+      const [result] = await pool.execute(query, values);
       return result;
     } catch (error) {
       throw error;
@@ -156,7 +156,7 @@ static async updateMedicineType(NOP,status_medicine,farmasi_queue_number){
     `;
     const values = [status_medicine,farmasi_queue_number,farmasi_queue_number, NOP];
 
-    const [result] = await connection.execute(query, values);
+    const [result] = await pool.execute(query, values);
     return result;
   } catch (error) {
     throw error;
@@ -177,7 +177,7 @@ ORDER BY queue_number DESC LIMIT 1
 `;
 
       
-      const [rows] = await connection.execute(query);
+      const [rows] = await pool.execute(query);
       return rows[0]; // Instead of returning the whole array
     } catch (error) {
       throw error;
@@ -195,7 +195,7 @@ ORDER BY queue_number DESC LIMIT 1
       const pool = getDb();
       connection = await pool.getConnection();
       const query = `DELETE FROM Doctor_Appointments WHERE NOP = ?`;
-      const [result] = await connection.execute(query, [NOP]);
+      const [result] = await pool.execute(query, [NOP]);
       return result;
     } catch (error) {
       throw error;

@@ -61,7 +61,7 @@ LEFT JOIN Medicine_Task mt ON da.NOP = mt.NOP
 LEFT JOIN Pickup_Task pa ON da.NOP = pa.NOP
 ORDER BY vt.waiting_verification_stamp;  `;
 
-      const [rows] = await connection.execute(query);
+      const [rows] = await pool.execute(query);
       return rows;
     } catch (error) {
       throw error;
@@ -115,7 +115,7 @@ LEFT JOIN Pickup_Task pa ON da.NOP = pa.NOP
 WHERE Date(vt.waiting_verification_stamp) = CURRENT_DATE
 ORDER BY vt.waiting_verification_stamp;  `;
 
-      const [rows] = await connection.execute(query);
+      const [rows] = await pool.execute(query);
       return rows;
     } catch (error) {
       throw error;
@@ -189,7 +189,7 @@ static async getByTimePeriod(period) {
         WHERE ${dateCondition}
         ORDER BY vt.waiting_verification_stamp;`;
 
-        const [rows] = await connection.execute(query);
+        const [rows] = await pool.execute(query);
         return rows;
     } catch (error) {
         throw error;
@@ -250,7 +250,7 @@ LEFT JOIN Pickup_Task pa ON da.NOP = pa.NOP
 WHERE Date(vt.waiting_verification_stamp) = ?
 ORDER BY vt.waiting_verification_stamp;  `;
 
-      const [rows] = await connection.execute(query, [date]);
+      const [rows] = await pool.execute(query, [date]);
       return rows;
     } catch (error) {
       throw error;
@@ -276,7 +276,7 @@ LEFT JOIN Pickup_Task pa ON da.NOP = pa.NOP
 
 WHERE pt.medicine_type LIKE 'Non - Racikan' OR pt.medicine_type LIKE 'Racikan'
 GROUP BY da.status_medicine`;
-          const [rows] = await connection.execute(query);
+          const [rows] = await pool.execute(query);
           return rows;
     } catch (error) {
       return error;
@@ -306,7 +306,7 @@ LEFT JOIN Medicine_Task mt ON da.NOP = mt.NOP
 LEFT JOIN Pickup_Task pa ON da.NOP = pa.NOP
 WHERE pt.medicine_type LIKE 'Non - Racikan' OR pt.medicine_type LIKE 'Racikan'
 `;
-          const [rows] = await connection.execute(query);
+          const [rows] = await pool.execute(query);
           return rows;
     } catch (error) {
       return error;
@@ -336,7 +336,7 @@ LEFT JOIN Pickup_Task pa ON da.NOP = pa.NOP
 WHERE pt.status = 'completed_pickup_medicine'
   `;
   
-  const [rows] = await connection.execute(query);
+  const [rows] = await pool.execute(query);
   return rows;
     } catch (error) {
       return error;
@@ -361,7 +361,7 @@ WHERE pt.status = 'completed_pickup_medicine'
    
   GROUP BY HOUR(completed_pickup_medicine_stamp)
   ORDER BY hour_of_day`;
-  const [rows] = await connection.execute(query);
+  const [rows] = await pool.execute(query);
   return rows;
     } catch (error) {
       return error;

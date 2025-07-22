@@ -23,7 +23,7 @@ class PickupTask {
         )
         VALUES (?, ?, ?, NOW(), ?, ?, ?, ?, ?, ?,?)
       `;
-      const [loket] = await connection.execute(`
+      const [loket] = await pool.execute(`
         SELECT loket_name 
         FROM Loket 
         WHERE status = "active" 
@@ -45,7 +45,7 @@ class PickupTask {
         activeLoket || null,
         data.lokasi
       ];
-      const [result] = await connection.execute(query, values);
+      const [result] = await pool.execute(query, values);
       return result;
     } catch (error) {
       throw error;
@@ -77,7 +77,7 @@ class PickupTask {
           LEFT JOIN Pharmacy_Task ph ON pt.NOP = ph.NOP
         WHERE pt.NOP = ?
       `;
-      const [rows] = await connection.execute(query, [NOP]);
+      const [rows] = await pool.execute(query, [NOP]);
       return rows[0];
     } catch (error) {
       throw error;
@@ -109,7 +109,7 @@ class PickupTask {
           ORDER BY 
     da.queue_number;
       `;
-      const [rows] = await connection.execute(query);
+      const [rows] = await pool.execute(query);
       return rows;
     } catch (error) {
       throw error;
@@ -141,7 +141,7 @@ class PickupTask {
           ORDER BY 
     da.queue_number;
       `;
-      const [rows] = await connection.execute(query);
+      const [rows] = await pool.execute(query);
       return rows;
     } catch (error) {
       throw error;
@@ -174,7 +174,7 @@ WHERE (date(pt.waiting_pickup_medicine_stamp) = CURRENT_DATE
 ORDER BY 
   da.queue_number;
       `;
-      const [rows] = await connection.execute(query);
+      const [rows] = await pool.execute(query);
       return rows;
     } catch (error) {
       throw error;
@@ -206,7 +206,7 @@ ORDER BY
           ORDER BY 
     da.queue_number;
       `;
-      const [rows] = await connection.execute(query,[date]);
+      const [rows] = await pool.execute(query,[date]);
       return rows;
     } catch (error) {
       throw error;
@@ -236,7 +236,7 @@ ORDER BY
             loket = ?
         WHERE NOP = ?
       `;
-      const [loket] = await connection.execute(`
+      const [loket] = await pool.execute(`
         SELECT loket_name 
         FROM Loket 
         WHERE status = "active" 
@@ -257,7 +257,7 @@ ORDER BY
         activeLoket || null,
         NOP,
       ];
-      const [result] = await connection.execute(query, values);
+      const [result] = await pool.execute(query, values);
       return result;
     } catch (error) {
       throw error;
@@ -275,7 +275,7 @@ ORDER BY
       const pool = getDb();
       connection = await pool.getConnection();
       const query = `DELETE FROM Pickup_Task WHERE NOP = ?`;
-      const [result] = await connection.execute(query, [NOP]);
+      const [result] = await pool.execute(query, [NOP]);
       return result;
     } catch (error) {
       throw error;

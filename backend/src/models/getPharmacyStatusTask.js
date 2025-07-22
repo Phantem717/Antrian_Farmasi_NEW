@@ -37,7 +37,7 @@ LEFT JOIN Pickup_Task pt ON da.NOP = pt.NOP
 
 WHERE da.NOP =?
 `;
-      const [rows] = await connection.execute(query, [NOP]);
+      const [rows] = await pool.execute(query, [NOP]);
       return rows[0];
     } catch (error) {
       throw error;
@@ -79,7 +79,7 @@ LEFT JOIN Pickup_Task pt ON da.NOP = pt.NOP
 
 WHERE da.sep_no =?
 `;
-      const [rows] = await connection.execute(query, [SEP]);
+      const [rows] = await pool.execute(query, [SEP]);
       return rows[0];
     } catch (error) {
       throw error;

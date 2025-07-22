@@ -21,7 +21,7 @@ class Loket {
         loketData.description,
         loketData.status
       ];
-      const [result] = await connection.execute(query, values);
+      const [result] = await pool.execute(query, values);
       return result;
     } catch (error) {
       throw error;
@@ -39,7 +39,7 @@ class Loket {
       const pool = getDb();
       connection = await pool.getConnection();
       const query = `SELECT * FROM Loket WHERE loket_id = ?`;
-      const [rows] = await connection.execute(query, [loket_id]);
+      const [rows] = await pool.execute(query, [loket_id]);
       return rows[0];
     } catch (error) {
       throw error;
@@ -88,7 +88,7 @@ class Loket {
         loketData.status,
         loket_id
       ];
-      const [result] = await connection.execute(query, values);
+      const [result] = await pool.execute(query, values);
       return result;
     } catch (error) {
       throw error;
@@ -106,7 +106,7 @@ class Loket {
       const pool = getDb();
       connection = await pool.getConnection();
       const query = `DELETE FROM Loket WHERE loket_id = ?`;
-      const [result] = await connection.execute(query, [loket_id]);
+      const [result] = await pool.execute(query, [loket_id]);
       return result;
     } catch (error) {
       throw error;
