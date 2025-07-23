@@ -5,24 +5,22 @@ import LogsAPI from "@/app/utils/api/Logs";
 
 const AvgServiceTime = () => {
   const [avgTime, setAvgTime] = useState([]);
-  
   useEffect(() => {
-    const fetchList = async () => {
-      try {
-        // Make sure to call the function with parentheses
-        const response = await LogsAPI.getAvgServiceTime(); 
-        console.log("SERVICE TIME",response);
-         setAvgTime({
+  const fetchList = async () => {
+    try {
+      const response = await LogsAPI.getAvgServiceTime();
+      console.log("API Response:", response.data[0]);
+      
+      setAvgTime({
         racikan: response.data[0]['AVG PROCESSING TIME - RACIKAN (MINUTES)'],
         nonracikan: response.data[0]['AVG PROCESSING TIME - NON-RACIKAN (MINUTES)']
       });
-      } catch (err) {
-        console.error("Error fetching average service time:", err);
-      }
-    };
-    
-    fetchList();
-  }, []);
+    } catch (err) {
+      console.error("Fetch error:", err);
+    }
+  };
+  fetchList();
+}, []);
 
   // Improved data conversion and fallback
 const convertToNumber = (value) => {
@@ -39,11 +37,11 @@ const convertToNumber = (value) => {
 const chartData = [
   {
     type: 'Racikan',
-    time: convertToNumber(avgTime?.racikan.time)
+    time: parseFloat(avgTime?.racikan) || 0
   },
   {
     type: 'Non-Racikan',
-    time: convertToNumber(avgTime?.nonracikan.time)
+    time: parseFloat(avgTime?.nonracikan) || 0 
   }
 ];
 
@@ -56,15 +54,14 @@ const chartData = [
     barStyle: {
       radius: [4, 4, 0, 0],
     },
-    label: {
-      position: 'top',
-      formatter: (datum) => `${Math.round(datum.time)} mins`,
-      style: {
-        fontSize: 12,
-        fill: '#000',
-        fontWeight: 'bold',
-      },
-    },
+       label: {
+    position: 'top',
+    formatter: (datum) => {
+      const time = Number(datum.time);
+      return isNaN(time) ? 'N/A' : `${Math.round(time)} mins`;
+    }
+  },
+   
     yAxis: {
       min: 0, // Ensure chart starts at 0
       title: {
