@@ -96,17 +96,15 @@ ORDER BY vt.waiting_verification_stamp;  `;
     vt.pending_verification_stamp,
     vt.processed_verification_stamp,
     vt.completed_verification_stamp,
-   TIMESTAMPDIFF(
-        MINUTE, 
-        vt.completed_verification_stamp, 
-        CASE 
-            WHEN pa.called_pickup_medicine_stamp IS NOT NULL 
-            THEN pa.called_pickup_medicine_stamp
-            
-            ELSE pa.completed_pickup_medicine_stamp
-        END
-    ) AS verification_to_pickup_minutes
-    
+   ROUND(
+  TIMESTAMPDIFF(SECOND, vt.completed_verification_stamp,
+    CASE
+      WHEN pa.called_pickup_medicine_stamp IS NOT NULL
+      THEN pa.called_pickup_medicine_stamp
+      ELSE pa.completed_pickup_medicine_stamp
+    END
+  ) / 60.0, 1
+) AS verification_to_pickup_minutes
 FROM Doctor_Appointments da
 LEFT JOIN Verification_Task vt ON da.NOP = vt.NOP
 LEFT JOIN Pharmacy_Task pt ON da.NOP = pt.NOP
