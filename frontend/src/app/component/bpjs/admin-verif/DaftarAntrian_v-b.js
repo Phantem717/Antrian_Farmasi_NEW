@@ -255,7 +255,11 @@ const handleLoketChange = async (loketName) => {
                    timer: 2000,
                    timerProgressBar: true,
                  });
+
+      
       setSelectedQueueIds([]);
+      socket.emit('update_verif');
+      socket.emit('update_display');
     } catch (error) {
       console.error("Error deleting tasks:", error);
     }
