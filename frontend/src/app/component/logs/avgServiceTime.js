@@ -57,9 +57,8 @@ console.log("CHARt",chartData);
        label: {
     position: 'top',
     formatter: (datum) => {
-      const time = Number(datum.time);
-      console.log("TIME",time);
-      return isNaN(time) ? 'N/A' : `${Math.round(time)} mins`;
+      console.log("TIME",datum.time);
+      return datum.time ? `${Math.round(datum.time)} mins` : 'N/A' ;
     }
   },
    
@@ -77,7 +76,7 @@ console.log("CHARt",chartData);
       formatter: (datum) => {
         return {
           name: datum.type,
-          value: `${datum.time.toFixed(1)} minutes`,
+          value: `${datum.time} minutes`,
         };
       },
     },
