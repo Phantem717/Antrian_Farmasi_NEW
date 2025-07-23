@@ -57,7 +57,7 @@ console.log("CHARt",chartData);
        label: {
     position: 'top',
     formatter: (datum) => {
-      console.log("TIME",datum.time);
+      console.log("TIME",datum);
       return datum.time ? `${Math.round(datum.time)} mins` : 'N/A' ;
     }
   },
