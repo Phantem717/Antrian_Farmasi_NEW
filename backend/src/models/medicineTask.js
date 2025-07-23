@@ -21,7 +21,7 @@ class MedicineTask {
           processed_medicine_stamp, completed_medicine_stamp,
           loket,lokasi
         )
-        VALUES (?, ?, ?, NOW(), ?, ?, ?, ?, ?, ?,?)
+        VALUES (?, ?, ?,?, ?, ?, ?, ?, ?, ?,?)
       `;
       const [loket] = await conn.execute(`
         SELECT loket_name 

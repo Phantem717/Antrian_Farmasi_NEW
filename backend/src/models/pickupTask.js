@@ -21,7 +21,7 @@ class PickupTask {
           loket,
           lokasi
         )
-        VALUES (?, ?, ?, NOW(), ?, ?, ?, ?, ?, ?,?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)
       `;
       const [loket] = await conn.execute(`
         SELECT loket_name 

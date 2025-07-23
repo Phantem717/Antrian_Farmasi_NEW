@@ -29,7 +29,7 @@ class VerificationTask {
           processed_verification_stamp, completed_verification_stamp,
           loket,lokasi
         )
-        VALUES (?, ?, ?, NOW(),? , ?, ?, ?, ?, ?,?)
+        VALUES (?, ?, ?, ?,? , ?, ?, ?, ?, ?,?)
       `;
       const [loket] = await conn.execute(`
         SELECT loket_name 
