@@ -58,6 +58,7 @@ const chartData = [
     position: 'top',
     formatter: (datum) => {
       const time = Number(datum.time);
+      console.log("TIME",time);
       return isNaN(time) ? 'N/A' : `${Math.round(time)} mins`;
     }
   },
