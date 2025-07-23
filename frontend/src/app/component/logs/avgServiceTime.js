@@ -92,7 +92,7 @@ const AvgServiceTime = () => {
       },
     },
   };
-  console.log("AVG TIME",avgTime, "PAYLOAD",payload)
+  console.log("AVG TIME",avgTime)
 
   return (
     <Box sx={{ p: 2, width: "600px" }}>
