@@ -291,7 +291,7 @@ const handleFilterChange = (value) => {
        
             <TableCell align="center">
                 {item.completed_verification_stamp 
-                    ? new Date(item.completed_verification_stamp).toLocaleString("id-ID", {
+                    ? new Date(item.completed_verification_stamp).toLocaleString( {
                         dateStyle: "medium",
                         timeStyle: "short",
                     })
