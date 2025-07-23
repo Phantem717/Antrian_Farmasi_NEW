@@ -12,17 +12,10 @@ const AvgServiceTime = () => {
         // Make sure to call the function with parentheses
         const response = await LogsAPI.getAvgServiceTime(); 
         console.log("SERVICE TIME",response);
-         const payload ={
-       racikan : {
-        time: response.data[0]['AVG PROCESSING TIME - RACIKAN (MINUTES)'],
-        type: 'Racikan'
-       },
-       nonracikan : {
- time: response.data[0]['AVG PROCESSING TIME - NON-RACIKAN (MINUTES)'],
-        type: 'Non - Racikan'
-       }
-      }
-        setAvgTime(payload);
+         setAvgTime({
+        racikan: response.data[0]['AVG PROCESSING TIME - RACIKAN (MINUTES)'],
+        nonracikan: response.data[0]['AVG PROCESSING TIME - NON-RACIKAN (MINUTES)']
+      });
       } catch (err) {
         console.error("Error fetching average service time:", err);
       }
@@ -32,28 +25,27 @@ const AvgServiceTime = () => {
   }, []);
 
   // Improved data conversion and fallback
-  const convertToNumber = (value) => {
-    if (value === null || value === undefined) return 0;
-    if (typeof value === 'number') return value;
-    if (typeof value === 'string') {
-      // Handle different number formats
-      const num = parseFloat(value.replace(',', '.').replace(/[^0-9.-]/g, ''));
-      return isNaN(num) ? 0 : num;
-    }
-    return 0;
-  };
-
+const convertToNumber = (value) => {
+  if (value === null || value === undefined) return 0;
+  if (typeof value === 'number') return value;
+  if (typeof value === 'string') {
+    // Handle MySQL decimal format (e.g., "522.0000")
+    const num = parseFloat(value);
+    return isNaN(num) ? 0 : num;
+  }
+  return 0;
+};
   // Safely prepare chart data
-  const chartData = [
-    {
-      type: 'Racikan',
-      time: convertToNumber(avgTime?.racik?.time ?? avgTime?.racikan?.time ?? avgTime?.racikan ?? 0),
-    },
-    {
-      type: 'Non-Racikan',
-      time: convertToNumber(avgTime?.nonracik?.time ?? avgTime?.nonracikan?.time ?? avgTime?.nonracikan ?? 0),
-    }
-  ];
+const chartData = [
+  {
+    type: 'Racikan',
+    time: convertToNumber(avgTime?.racikan)
+  },
+  {
+    type: 'Non-Racikan',
+    time: convertToNumber(avgTime?.nonracikan)
+  }
+];
 
   const config = {
     data: chartData,
