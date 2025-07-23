@@ -1,5 +1,7 @@
 // src/models/medicineTask.js
 const { getDb } = require('../config/db');
+const { getCurrentTimestamp } = require('../handler/timeHandler');
+const { get } = require('../routes/doctorAppointments');
 
 class MedicineTask {
   /**
@@ -29,11 +31,12 @@ class MedicineTask {
         LIMIT 1;
     `);
     const activeLoket = loket[0].loket_name;
-
+        const timestamp = getCurrentTimestamp();
       const values = [
         data.NOP,
         data.Executor || null,
         data.Executor_Names || null,
+        timestamp,
         // waiting_medicine_stamp diisi oleh SQL menggunakan NOW()
         data.called_medicine_stamp || null,
         data.recalled_medicine_stamp || null,

@@ -1,6 +1,6 @@
 // src/models/verificationTask.js
 const { getDb } = require('../config/db');
-
+const { getCurrentTimestamp } = require('../handler/timeHandler')
 class VerificationTask {
   /**
    * Membuat record Verification_Task baru.
@@ -39,10 +39,12 @@ class VerificationTask {
         LIMIT 1;
     `);
     const activeLoket = loket[0].loket_name;
+    const timestamp = getCurrentTimestamp();
       const values = [
         data.NOP,
         data.Executor || null,
         data.Executor_Names || null,
+        timestamp,
         // waiting_verification_stamp di-set otomatis menggunakan NOW()
         data.called_verification_stamp || null,
         data.recalled_verification_stamp || null,

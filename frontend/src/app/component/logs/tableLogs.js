@@ -35,7 +35,6 @@ const tableLogs = ({
       const [filteredData,setFilteredData]= useState([]);
      const [type, setType] = useState("");
 const [date, setDate] = useState(null);
-console.log("TABLELOGS",selectedQueueIds);
 const ExportToExcel = ({ data, fileName }) => {
    const exportData = filteredData.map(item => ({
     NOP: item.NOP,
@@ -80,6 +79,8 @@ const ExportToExcel = ({ data, fileName }) => {
     const fetchInitialData = async () => {
       try {
         const response = await LogsAPI.getAllLogsToday();
+        console.log("TABLELOGS",response.data);
+
         setQueueList(response.data);
         setFilteredData(response.data);
       } catch (err) {
@@ -109,7 +110,7 @@ const ExportToExcel = ({ data, fileName }) => {
         // Apply date filter if selected
         if (date) {
           const response = await LogsAPI.getLogsByDate(date);
-                              console.log("SELECTED DATE",date,response);
+          console.log("SELECTED DATE",date,response);
 
           data = response.data;
         }
@@ -291,7 +292,7 @@ const handleFilterChange = (value) => {
        
             <TableCell align="center">
                 {item.completed_verification_stamp 
-                    ? new Date(item.completed_verification_stamp).toLocaleString( {
+                    ? new Date(item.completed_verification_stamp).toLocaleString("id-ID", {
                         dateStyle: "medium",
                         timeStyle: "short",
                     })
