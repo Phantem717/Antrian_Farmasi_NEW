@@ -105,7 +105,7 @@ const getTotalMedicineType = async (req, res) => {
 const getAvgServiceTime = async (req, res) => {
   try {
     const serviceTime = await logs.getAvgServiceTime();
-
+    console.log("CONTEOLLER DATA",serviceTime);
     res.status(200).json({ 
       message: "Total Service Time",
       data: serviceTime

@@ -56,7 +56,7 @@ class Loket {
 
   try {
     const [rows] = await conn.query('SELECT * FROM Loket');
-    console.log("LOKET",rows);
+    // console.log("LOKET",rows);
     return rows;
   } finally {
     conn.release(); // ?? Critical cleanup

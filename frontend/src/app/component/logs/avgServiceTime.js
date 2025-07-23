@@ -59,7 +59,12 @@ console.log("CHARt",chartData);
     formatter: (datum) => {
       console.log("TIME",datum);
       return datum? `${Math.round(datum)} mins` : 'N/A' ;
-    }
+    },
+       style: {
+        fontSize: 12,
+        fill: '#000',
+        fontWeight: 'bold',
+      },
   },
    
     yAxis: {
