@@ -39,11 +39,11 @@ const convertToNumber = (value) => {
 const chartData = [
   {
     type: 'Racikan',
-    time: convertToNumber(avgTime?.racikan)
+    time: convertToNumber(avgTime?.racikan.time)
   },
   {
     type: 'Non-Racikan',
-    time: convertToNumber(avgTime?.nonracikan)
+    time: convertToNumber(avgTime?.nonracikan.time)
   }
 ];
 
