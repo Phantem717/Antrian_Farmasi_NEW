@@ -44,6 +44,7 @@ const AvgServiceTime = () => {
   };
 
   // Safely prepare chart data
+  console.log("AVG TIME",avgTime, "PAYLOAD",payload)
   const chartData = [
     {
       type: 'Racikan',
