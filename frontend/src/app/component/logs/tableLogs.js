@@ -283,61 +283,47 @@ const handleFilterChange = (value) => {
               <TableCell align="center">{item.status_medicine || "-"}</TableCell>
               <TableCell align="center">
                 {item.waiting_verification_stamp 
-                    ? new Date(item.waiting_verification_stamp).toLocaleString("id-ID", {
-                        dateStyle: "medium",
-                        timeStyle: "short",
-                    })
+                    ? dayjs(item.waiting_verification_stamp, "YYYY-MM-DD HH:mm:ss").format("DD MMM YYYY HH:mm")
+
                 : "-"}
             </TableCell>
        
             <TableCell align="center">
                 {item.completed_verification_stamp 
-                    ? new Date(item.completed_verification_stamp).toLocaleString("id-ID", {
-                        dateStyle: "medium",
-                        timeStyle: "short",
-                    })
+                    ? dayjs(item.completed_verification_stamp, "YYYY-MM-DD HH:mm:ss").format("DD MMM YYYY HH:mm")
+
                 : "-"}
             </TableCell>
             <TableCell align="center">
                 {item.waiting_medicine_stamp 
-                    ? new Date(item.waiting_medicine_stamp).toLocaleString("id-ID", {
-                        dateStyle: "medium",
-                        timeStyle: "short",
-                    })
+                  ? dayjs(item.waiting_medicine_stamp, "YYYY-MM-DD HH:mm:ss").format("DD MMM YYYY HH:mm")
+
                 : "-"}
             </TableCell>
             <TableCell align="center">
                 {item.completed_medicine_stamp 
-                    ? new Date(item.completed_medicine_stamp).toLocaleString("id-ID", {
-                        dateStyle: "medium",
-                        timeStyle: "short",
-                    })
+                  ? dayjs(item.completed_medicine_stamp, "YYYY-MM-DD HH:mm:ss").format("DD MMM YYYY HH:mm")
+
                 : "-"}
             </TableCell>
             <TableCell align="center">
                 {item.waiting_pickup_medicine_stamp 
-                    ? new Date(item.waiting_pickup_medicine_stamp).toLocaleString("id-ID", {
-                        dateStyle: "medium",
-                        timeStyle: "short",
-                    })
+                  ? dayjs(item.waiting_pickup_medicine_stamp , "YYYY-MM-DD HH:mm:ss").format("DD MMM YYYY HH:mm")
+
                 : "-"}
             </TableCell>
             <TableCell align="center">
                 {item.called_pickup_medicine_stamp 
-                    ? new Date(item.called_pickup_medicine_stamp).toLocaleString("id-ID", {
-                        dateStyle: "medium",
-                        timeStyle: "short",
-                    })
+                  ? dayjs(item.called_pickup_medicine_stamp , "YYYY-MM-DD HH:mm:ss").format("DD MMM YYYY HH:mm")
+
                 : "-"}
             </TableCell>
       
         
             <TableCell align="center">
                 {item.completed_pickup_medicine_stamp 
-                    ? new Date(item.completed_pickup_medicine_stamp).toLocaleString("id-ID", {
-                        dateStyle: "medium",
-                        timeStyle: "short",
-                    })
+                  ? dayjs(item.completed_pickup_medicine_stamp , "YYYY-MM-DD HH:mm:ss").format("DD MMM YYYY HH:mm")
+
                 : "-"}
             </TableCell>
              <TableCell align="center">
