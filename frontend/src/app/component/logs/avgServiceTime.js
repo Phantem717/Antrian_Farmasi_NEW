@@ -58,7 +58,7 @@ console.log("CHARt",chartData);
     position: 'top',
     formatter: (datum) => {
       console.log("TIME",datum);
-      return datum.time ? `${Math.round(datum.time)} mins` : 'N/A' ;
+      return datum? `${Math.round(datum)} mins` : 'N/A' ;
     }
   },
    
@@ -76,7 +76,7 @@ console.log("CHARt",chartData);
       formatter: (datum) => {
         return {
           name: datum.type,
-          value: `${datum.time} minutes`,
+          value: `${datum} minutes`,
         };
       },
     },
