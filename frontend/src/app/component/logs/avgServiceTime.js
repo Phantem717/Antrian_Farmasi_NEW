@@ -44,7 +44,7 @@ const chartData = [
     time: parseFloat(avgTime?.nonracikan) || 0 
   }
 ];
-
+console.log("CHARt",chartData);
   const config = {
     data: chartData,
     xField: 'type',
