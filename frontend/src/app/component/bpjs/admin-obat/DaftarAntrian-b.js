@@ -51,7 +51,7 @@ const DaftarAntrian = ({ selectedQueueIds, setSelectedQueueIds, setSelectedQueue
   const socket = getSocket();
   // Run this whenever queueList changes
   // ? Loket yang diizinkan untuk admin obat
-  const allowedLokets = ["Loket 3", "Loket 4"];
+  const allowedLokets = ["Loket 1", "Loket 4"];
   async function deleteAction() {
     if (!selectedQueue2 || !selectedQueueIds || selectedQueueIds.length === 0) {
       console.log("Queues Needed");

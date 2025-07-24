@@ -77,7 +77,7 @@ export default function BarcodeScanner({ onScanResult }) {
                     Executor: null,
                     Executor_Names: null,
                     status: "completed_medicine", 
-                    loket: "Loket 3"
+                    loket: "Loket 1"
                 });
                 
                 console.log("MEDRESP", medResp);

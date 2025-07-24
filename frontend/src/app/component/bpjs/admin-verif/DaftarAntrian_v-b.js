@@ -39,7 +39,7 @@ import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import PrintIcon from '@mui/icons-material/Print';
 import PrintAntrian from "@/app/utils/api/printAntrian";
-  const allowedLokets = ["Loket 1", "Loket 2"];
+  const allowedLokets = ["Loket 2", "Loket 3"];
 
 const DaftarAntrian = ({ selectedQueueIds, setSelectedQueueIds, onSelectQueue, setSelectedLoket,setSelectedQueue2,selectedQueue2 }) => {  
   dayjs.extend(customParseFormat);
