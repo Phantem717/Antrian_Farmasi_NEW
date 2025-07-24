@@ -17,6 +17,6 @@ router.get('/:NOP', getPickupTaskByNOP);
 router.get('/', getAllPickupTasks);
 router.put('/:NOP', updatePickupTask);
 router.delete('/:NOP', deletePickupTask);
-router.get('/today/now',getAllPickupToday);
-router.get('/by-date/:date',getAllPickupByDate);
+router.get('/today/now/:category',getAllPickupToday);
+router.get('/by-date/:date/:category',getAllPickupByDate);
 module.exports = router;

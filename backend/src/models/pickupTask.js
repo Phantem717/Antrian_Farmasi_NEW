@@ -107,7 +107,7 @@ class PickupTask {
     }
   }
 
-  static async getPickupToday(){
+  static async getPickupToday(location){
      try {
       const connection = getDb();
       const query = `
@@ -126,10 +126,11 @@ class PickupTask {
           WHERE date(pt.waiting_pickup_medicine_stamp) = CURRENT_DATE
  AND (ph.status IS NULL OR 
        (ph.status != 'completed_pickup_medicine' AND ph.status LIKE '%pickup%'))
+       AND pt.lokasi = ?
           ORDER BY 
     da.queue_number;
       `;
-      const [rows] = await connection.execute(query);
+      const [rows] = await connection.execute(query,[location]);
       return rows;
     } catch (error) {
       throw error;
@@ -166,7 +167,7 @@ ORDER BY
     }
   }
 
-   static async getPickupByDate(date){
+   static async getPickupByDate(location,date){
      try {
       const connection = getDb();
       const query = `
@@ -185,10 +186,16 @@ ORDER BY
           WHERE date(pt.waiting_pickup_medicine_stamp) = ?
            AND (ph.status IS NULL OR 
        (ph.status != 'completed_pickup_medicine' AND ph.status LIKE '%pickup%'))
+              AND pt.lokasi = ?
+
           ORDER BY 
     da.queue_number;
       `;
-      const [rows] = await connection.execute(query,[date]);
+      const values = [
+        date,
+        location
+      ]
+      const [rows] = await connection.execute(query,values);
       return rows;
     } catch (error) {
       throw error;

@@ -20,10 +20,10 @@ const VerificationAPI = {
         }
     },
 
-    getVerificationTasksToday: async () => {
+    getVerificationTasksToday: async (category) => {
   try {
     console.log("VERIF");
-            const response = await axios.get(`${BASE_URL}/api/verification-task/now/today`);
+            const response = await axios.get(`${BASE_URL}/api/verification-task/now/today/${category}`);
             console.log("VERIF",response.data);
             return response.data;
         } catch (error) {
@@ -32,9 +32,9 @@ const VerificationAPI = {
         }
     },
 
-    getVerificationTasksByDate: async (date) => {
+    getVerificationTasksByDate: async (category,date) => {
         try {
-             const response = await axios.get(`${BASE_URL}/api/verification-task/by-date/${encodeURIComponent(date)}`);
+             const response = await axios.get(`${BASE_URL}/api/verification-task/by-date/${encodeURIComponent(date)}/${category}`);
             console.log("VERIF",response.data);
             return response.data;
         } catch (error) {

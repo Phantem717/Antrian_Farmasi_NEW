@@ -7,7 +7,21 @@ const DoctorAppointment = require('../models/doctorAppointments');
  */
 const createAppointment = async (req, res) => {
   try {
-    const appointmentData = req.body;
+    let appointmentData = req.body;
+    let location = appointmentData.lokasi;
+
+if(location.toLowerCase() == "bpjs"){
+      location = "Lantai 1 BPJS" 
+    }
+    if(location.toLowerCase() == "gmcb"){
+      location = "Lantai 1 GMCB" 
+
+    }
+     if(location.toLowerCase() == "lt3"){
+      location = "Lantai 3 GMCB" 
+
+    }     
+    appointmentData.lokasi = location;
     const result = await DoctorAppointment.create(appointmentData);
     const io = req.app.get('socketio');
 
@@ -58,6 +72,35 @@ const getAllAppointments = async (req, res) => {
   }
 };
 
+const getAllAppointmentsByLocation = async (req, res) => {
+  try {
+    let location = req.params.category;
+    if(location.toLowerCase() == "bpjs"){
+      location = "Lantai 1 BPJS" 
+    }
+    if(location.toLowerCase() == "gmcb"){
+      location = "Lantai 1 GMCB" 
+
+    }
+     if(location.toLowerCase() == "lt3"){
+      location = "Lantai 3 GMCB" 
+
+    }    const appointments = await DoctorAppointment.findAllByLocation(location);
+    
+    res.status(200).json({ 
+      message: "List of all appointments",
+      data: appointments
+    });
+  }catch (error) {
+    console.error("Error fetching appointments:", error);
+    res.status(500).json({ 
+      message: "Failed to fetch appointments", 
+      error: error.message 
+    });
+   
+  } 
+  }
+;
 
 /**
  * Controller untuk mendapatkan appointment berdasarkan NOP.
@@ -254,5 +297,6 @@ module.exports = {
   deleteAppointment,
   getLatestAntrian,
   updateMedicineType,
-  updatePhoneNumber
+  updatePhoneNumber,
+  getAllAppointmentsByLocation
 };

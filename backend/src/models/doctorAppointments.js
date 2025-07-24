@@ -70,6 +70,21 @@ ORDER BY da.queue_number`;
     }
   }
 
+  static async findAllByLocation(location) {
+    try {
+      const connection = getDb();
+      const query = `SELECT * 
+FROM Doctor_Appointments da
+WHERE da.queue_number LIKE 'RC%' OR da.queue_number LIKE 'NR%'
+AND da.lokasi = ?
+ORDER BY da.queue_number`;
+      const [rows] = await connection.execute(query, [location]);
+      return rows;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   /**
    * Mengambil record appointment berdasarkan booking_id.
    * @param {string} NOP - ID booking appointment.

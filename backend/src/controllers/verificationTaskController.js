@@ -33,8 +33,18 @@ const createVerificationTaskInternal = async (NOP, Executor = null, Executor_Nam
 // ✅ Fungsi yang tetap menangani request API secara langsung
 const createVerificationTask = async (req, res) => {
   try {
-    const { NOP, Executor, Executor_Names, status,location  } = req.body;
+    let { NOP, Executor, Executor_Names, status,location  } = req.body;
+ if(location.toLowerCase() == "bpjs"){
+      location = "Lantai 1 BPJS" 
+    }
+    if(location.toLowerCase() == "gmcb"){
+      location = "Lantai 1 GMCB" 
 
+    }
+     if(location.toLowerCase() == "lt3"){
+      location = "Lantai 3 GMCB" 
+
+    } 
     const result = await createVerificationTaskInternal(NOP, Executor, Executor_Names, status, location);
     const io = req.app.get('socketio');
 
@@ -94,7 +104,19 @@ const getAllVerificationTasks = async (req, res) => {
 
 const getVerificationToday = async (req,res) => {
    try {
-    const tasks = await VerificationTask.getToday();
+    let location = req.params.category;
+     if(location.toLowerCase() == "bpjs"){
+      location = "Lantai 1 BPJS" 
+    }
+    if(location.toLowerCase() == "gmcb"){
+      location = "Lantai 1 GMCB" 
+
+    }
+     if(location.toLowerCase() == "lt3"){
+      location = "Lantai 3 GMCB" 
+
+    } 
+    const tasks = await VerificationTask.getToday(location);
 console.log("TASLS",tasks)
     // 🔹 Filter hanya status dari "waiting_verification" sampai "completed_verification"
     const validStatuses = [
@@ -117,8 +139,20 @@ console.log("TASLS",tasks)
 
 const getVerificationDate = async (req,res) => {
  try {
-    const { date } = req.params;
-    const task = await VerificationTask.getByDate(date);
+    const { date,category } = req.params;
+    let location = category;
+    if(location.toLowerCase() == "bpjs"){
+      location = "Lantai 1 BPJS" 
+    }
+    if(location.toLowerCase() == "gmcb"){
+      location = "Lantai 1 GMCB" 
+
+    }
+     if(location.toLowerCase() == "lt3"){
+      location = "Lantai 3 GMCB" 
+
+    } 
+    const task = await VerificationTask.getByDate(location,date);
     if (!task) {
       return res.status(404).json({ message: 'Verification Task not found' });
     }

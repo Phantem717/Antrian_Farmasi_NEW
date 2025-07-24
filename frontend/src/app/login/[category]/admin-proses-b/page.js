@@ -80,6 +80,7 @@ export default function Admin({params}) {
           <div style={{ display: "flex", gap: "24px", flex: 1 }}>
             <div style={{ flex: "1", display: "flex", flexDirection: "column", alignItems: "center", marginTop: "100px" }}>
               <BarcodeScanner 
+              location={category}
                 onScanResult={handleScanResult} 
               />
               <p style={{ fontWeight: "bold", marginTop: "10px", textAlign: "center" }}>
@@ -88,6 +89,8 @@ export default function Admin({params}) {
             </div>
             <div style={{ flex: "2", overflowY: "auto", maxHeight: "100%" }}>
               <DaftarAntrian
+              location={category}
+
                 scanResult={scanResult}
                 setIsDeleted={setIsDeleted}
               />

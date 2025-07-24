@@ -127,7 +127,7 @@ ORDER BY vt.waiting_verification_stamp ASC;
     }
   }
 
-  static async getToday(){
+  static async getToday(location){
      try {
       const connection = getDb();
       const query = `
@@ -150,10 +150,11 @@ WHERE (da.queue_number LIKE 'RC%' OR da.queue_number LIKE 'NR%')
   AND DATE(vt.waiting_verification_stamp) = CURRENT_DATE
   AND (pt.status IS NULL OR 
        (pt.status != 'completed_verification' AND pt.status LIKE '%verification%'))
+  AND vt.lokasi = ?
 ORDER BY vt.waiting_verification_stamp ASC;
       `;
 
-      const [rows] = await connection.execute(query);
+      const [rows] = await connection.execute(query,[location]);
       return rows;
     } catch (error) {
       throw error;
@@ -161,7 +162,7 @@ ORDER BY vt.waiting_verification_stamp ASC;
   }
   
   
-  static async getByDate(date){
+  static async getByDate(location,date){
      try {
       const connection = getDb();
       const query = `
@@ -185,10 +186,14 @@ WHERE (da.queue_number LIKE 'RC%' OR da.queue_number LIKE 'NR%')
   AND vt.waiting_verification_stamp IS NOT NULL
   AND (pt.status IS NULL OR 
        (pt.status != 'completed_verification' AND pt.status LIKE '%verification%'))
+       AND vt.lokasi = ?
 ORDER BY vt.waiting_verification_stamp ASC;
       `;
-
-      const [rows] = await connection.execute(query, [date]);
+      const values = [
+        date,
+        location
+      ]
+      const [rows] = await connection.execute(query, values);
       return rows;
     } catch (error) {
       throw error;

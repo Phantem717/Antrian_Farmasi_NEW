@@ -81,7 +81,7 @@ class PharmacyTask {
     }
   }
 
-   static async getAllByStatus(status) {
+   static async getAllByStatus(location,status) {
     try {
       const connection = getDb();
       const query = `
@@ -97,9 +97,13 @@ class PharmacyTask {
       FROM Pharmacy_Task pt
       JOIN Doctor_Appointments da ON pt.NOP = da.NOP
       WHERE pt.status = ?
+      AND pt.lokasi = ?
       ORDER BY da.NOP DESC;
       `;
-      const [rows] = await connection.execute(query, [status]);
+      const values = [
+        status,location
+      ]
+      const [rows] = await connection.execute(query, values);
       return rows;
     } catch (error) {
       throw error;

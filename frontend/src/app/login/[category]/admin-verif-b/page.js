@@ -114,6 +114,7 @@ export default function Admin({params}) {
               <DisplayAntrian
                 queueNumber={selectedQueue ? `${selectedQueue.queue_number}` : "___"}
                 loketNumber={selectedLoket || "Pilih Loket"} // ? Gunakan loket yang dipilih
+                location={category}
               />
               <PilihAksi
                 selectedQueue2={selectedQueue2} // ?? Tetap mengirim antrian terakhir yang dipilih
@@ -121,6 +122,8 @@ export default function Admin({params}) {
                 setSelectedQueueIds={setSelectedQueueIds} // ?? Memungkinkan perubahan dari PilihAksi
                 setSelectedQueue2={setSelectedQueue2}
                 onStatusUpdate={() => {}}
+                location={category}
+
               />
             </div>
 
@@ -133,6 +136,8 @@ export default function Admin({params}) {
                 setSelectedLoket={setSelectedLoket} // ? FIXED: Prop Name Corrected
                 setSelectedQueue2={setSelectedQueue2}
                 selectedQueue2={selectedQueue2}
+                location={category}
+
               />
             </div>
           </div>

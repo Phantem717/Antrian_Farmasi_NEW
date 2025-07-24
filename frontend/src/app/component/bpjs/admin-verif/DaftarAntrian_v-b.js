@@ -40,7 +40,7 @@ import customParseFormat from 'dayjs/plugin/customParseFormat';
 import PrintIcon from '@mui/icons-material/Print';
 import PrintAntrian from "@/app/utils/api/printAntrian";
 
-const DaftarAntrian = ({ selectedQueueIds, setSelectedQueueIds, onSelectQueue, setSelectedLoket,setSelectedQueue2,selectedQueue2 }) => {  
+const DaftarAntrian = ({location, selectedQueueIds, setSelectedQueueIds, onSelectQueue, setSelectedLoket,setSelectedQueue2,selectedQueue2 }) => {  
   dayjs.extend(customParseFormat);
   const dateFormat="YYYY-MM-DD"
   const [queueList, setQueueList] = useState([]);
@@ -92,10 +92,11 @@ const handleLoketUpdate = () => {
   try {
     let response;
     if (date) {
-      response = await VerificationAPI.getVerificationTasksByDate(new Date(date).toISOString().split('T')[0]);
+      response = await VerificationAPI.getVerificationTasksByDate(location,new Date(date).toISOString().split('T')[0]);
+      console.log("DATE")
     } else {
-      response = await VerificationAPI.getVerificationTasksToday();
-
+      response = await VerificationAPI.getVerificationTasksToday(location);
+      console.log("TODAY");
 
     }
 
@@ -375,7 +376,7 @@ Swal.fire({
   return (
     <Box sx={{ padding: "10px" }}>
       {visible &&
-                    <CreateInstanceForm  visible={visible} 
+                    <CreateInstanceForm location={location}  visible={visible} 
         onClose={handleCloseBarcodeScanner} />
       
       }

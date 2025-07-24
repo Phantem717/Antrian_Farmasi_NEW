@@ -14,7 +14,7 @@ import CreateAntrianAPI from "@/app/utils/api/createAntrian";
 import PrintAntrian from "@/app/utils/api/printAntrian";
 // import VerificationAPI from "../../../utils/api/Verification";
 
-const PilihAksi = ({ selectedQueueIds = [], setSelectedQueueIds, selectedQueue2 = [] , setSelectedQueue2}) => {  
+const PilihAksi = ({location, selectedQueueIds = [], setSelectedQueueIds, selectedQueue2 = [] , setSelectedQueue2}) => {  
   const [isDeleted, setIsDeleted] = useState(false); // ✅ Untuk menghapus input scanner
    const [scanResult, setScanResult] = useState(""); // ✅ Simpan hasil scan
  
@@ -331,7 +331,7 @@ console.log("PILIH TOMBOL CONNECTED");
   }, [isDeleted]);
   return (
     <div>
-     <BarcodeScanner onScanResult={handleScanResult} handleBulkPharmacyUpdate = {handleBulkPharmacyUpdate} />
+     <BarcodeScanner location={location}onScanResult={handleScanResult} handleBulkPharmacyUpdate = {handleBulkPharmacyUpdate} />
 
         <Box
       sx={{

@@ -12,7 +12,7 @@ import WA_API from "@/app/utils/api/WA";
 import { getSocket } from "@/app/utils/api/socket";
 import { updateButtonStatus } from "@/app/utils/api/Button";
 
-export default function BarcodeScanner({ onScanResult, handleBulkPharmacyUpdate }) {
+export default function BarcodeScanner({location, onScanResult, handleBulkPharmacyUpdate }) {
     const [inputValue, setInputValue] = useState("");
     const [daftarAntrian, setDaftarAntrian] = useState([]);
     const inputRef = useRef(null);
@@ -39,7 +39,7 @@ export default function BarcodeScanner({ onScanResult, handleBulkPharmacyUpdate 
 
     const fetchQueueList = async () => {
         try {
-            const response = await PharmacyAPI.getAllPharmacyTasksByStatus("waiting_verification");
+            const response = await PharmacyAPI.getAllPharmacyTasksByStatus(location,"waiting_verification");
             console.log("Data antrian dari API:", response.data);
             setDaftarAntrian(response.data);
         } catch (error) {
@@ -88,7 +88,7 @@ export default function BarcodeScanner({ onScanResult, handleBulkPharmacyUpdate 
             Executor: null,
             Executor_Names: null,
             status: "waiting_medicine",
-            lokasi: "Lantai 1 BPJS"
+            lokasi: location
         });
         console.log("Medicine response:", medResp);
 
