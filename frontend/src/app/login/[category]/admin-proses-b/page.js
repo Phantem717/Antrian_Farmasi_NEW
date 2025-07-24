@@ -13,6 +13,7 @@ import PharmacyAPI from "@/app/utils/api/Pharmacy";
 import { useRouter, usePathname } from "next/navigation";
 import { getSocket } from "@/app/utils/api/socket";
 const { Content } = Layout;
+import { use } from "react";
 function useTokenCheck() {
   const [token, setToken] = useState("");
   useEffect(() => {
@@ -34,8 +35,9 @@ function useTokenCheck() {
 
   return { token, isExpired: checkTokenExpired() };
 }
-export default function Admin() {
-    const socket = getSocket();
+export default function Admin({params}) {
+  const {category} =use(params);
+      const socket = getSocket();
 
   const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);

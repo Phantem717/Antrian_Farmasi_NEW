@@ -10,6 +10,7 @@ import DaftarAntrian from "@/app/component/bpjs/admin-obat/DaftarAntrian-b";
 import MovingText from "@/app/component/bpjs/admin-obat/Movingtext";
 import Sidebar from "@/app/component/Sidebar-b";
 import { useRouter, usePathname } from "next/navigation";
+import { use } from 'react'; // Next.js 14+
 
 const { Content } = Layout;
 function useTokenCheck() {
@@ -34,7 +35,8 @@ function useTokenCheck() {
 
   return { token, isExpired: checkTokenExpired() };
 }
-export default function Admin() {
+export default function Admin({params}) {
+  const {category} = use(params);
   const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
   const siderWidth = collapsed ? 80 : 300;

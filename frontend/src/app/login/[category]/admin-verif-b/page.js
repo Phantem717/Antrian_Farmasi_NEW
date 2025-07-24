@@ -16,7 +16,7 @@ import {getSocket} from "@/app/utils/api/socket";
 import { useRouter, usePathname } from "next/navigation";
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
-
+import { use } from "react";
 function useTokenCheck() {
   const [token, setToken] = useState(null);
   const [isExpired, setIsExpired] = useState(true);
@@ -40,8 +40,9 @@ function useTokenCheck() {
 
   return { token, isExpired };
 }
-export default function Admin() {
-    const [isLoading, setIsLoading] = useState(false);
+export default function Admin({params}) {
+  const {category} = use(params);
+      const [isLoading, setIsLoading] = useState(false);
   const checkResponse = useTokenCheck();
   const router = useRouter();
 

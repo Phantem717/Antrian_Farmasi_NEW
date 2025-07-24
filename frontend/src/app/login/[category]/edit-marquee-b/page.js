@@ -4,10 +4,11 @@
 import React, { useState, useEffect } from "react";
 import { Layout, Input, Button, Form, notification } from "antd";
 import Sidebar from "@/app/component/Sidebar-b";
-
+import { use } from "react";
 const { Content } = Layout;
 
-const EditMarquee = () => {
+const EditMarquee = ({params}) => {
+  const {category} = use(params);
   const [messages, setMessages] = useState(["", ""]);
 
   useEffect(() => {
