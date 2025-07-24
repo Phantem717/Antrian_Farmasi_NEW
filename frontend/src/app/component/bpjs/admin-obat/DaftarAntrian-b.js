@@ -78,6 +78,9 @@ const DaftarAntrian = ({ selectedQueueIds, setSelectedQueueIds, setSelectedQueue
              timer: 2000,
              timerProgressBar: true,
            });
+                 socket.emit('update_display');
+      socket.emit('update_pickup');
+
      
     } catch (error) {
       console.error("Error deleting tasks:", error);
