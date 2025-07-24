@@ -277,7 +277,6 @@ if(!inputValue.startsWith("NOP") && inputValue.length != 19) {
             NOP: inputValue ?? "-",
             docter: docter??"-",
             nik: NIK??"-",
-            sep: SEP??"-",
             barcode: inputValue ?? "-",
             patient_name:  name ?? "-",
             farmasi_queue_number: queueNumberData.data.queue_number ?? "-",

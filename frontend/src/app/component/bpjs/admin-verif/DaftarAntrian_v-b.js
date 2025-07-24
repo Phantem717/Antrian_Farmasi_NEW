@@ -39,6 +39,7 @@ import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import PrintIcon from '@mui/icons-material/Print';
 import PrintAntrian from "@/app/utils/api/printAntrian";
+  const allowedLokets = ["Loket 1", "Loket 2"];
 
 const DaftarAntrian = ({ selectedQueueIds, setSelectedQueueIds, onSelectQueue, setSelectedLoket,setSelectedQueue2,selectedQueue2 }) => {  
   dayjs.extend(customParseFormat);
@@ -57,13 +58,13 @@ const DaftarAntrian = ({ selectedQueueIds, setSelectedQueueIds, onSelectQueue, s
     const [date,setDate]= useState("");
   
   // ? Loket yang diizinkan untuk admin verifikasi
-  const allowedLokets = ["Loket 1", "Loket 2"];
   // ? Fetch Loket dari API
     let isMounted = true; // Track if component is mounted
 
   const fetchLokets = async () => {
     try {
       const loketData = await LoketAPI.getAllLokets();
+
       if (!isMounted) return; // Don't update if unmounted
 
       const filteredLokets = loketData.data.filter((loket) => 
@@ -254,7 +255,11 @@ const handleLoketChange = async (loketName) => {
                    timer: 2000,
                    timerProgressBar: true,
                  });
+
+      
       setSelectedQueueIds([]);
+      socket.emit('update_verif');
+      socket.emit('update_display');
     } catch (error) {
       console.error("Error deleting tasks:", error);
     }

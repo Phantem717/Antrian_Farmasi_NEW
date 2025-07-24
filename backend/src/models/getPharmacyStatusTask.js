@@ -7,8 +7,10 @@ class getPharmacyTasks {
    * @param {Object} NOP - Data appointment yang akan disimpan.
    */
   static async getByNOP(NOP) {
+  const pool = await getDb();
+  const conn = await pool.getConnection(); // ? Explicit connection
+
     try {
-      const connection = getDb();
       const query = `
      SELECT 
   da.patient_name,
@@ -34,11 +36,13 @@ LEFT JOIN Pickup_Task pt ON da.NOP = pt.NOP
 
 WHERE da.NOP =?
 `;
-      const [rows] = await connection.execute(query, [NOP]);
+      const [rows] = await conn.execute(query, [NOP]);
       return rows[0];
     } catch (error) {
       throw error;
-    }
+    }finally {
+    conn.release(); // ?? Critical cleanup
+  }
   }
 
 /**
@@ -46,8 +50,10 @@ WHERE da.NOP =?
    * @param {Object} SEP - Data appointment yang akan disimpan.
    */
   static async getBySEP(SEP) {
-      try {
-      const connection = getDb();
+  const pool = await getDb();
+  const conn = await pool.getConnection(); // ? Explicit connection
+
+    try {
       const query = `
      SELECT 
   da.patient_name,
@@ -73,11 +79,13 @@ LEFT JOIN Pickup_Task pt ON da.NOP = pt.NOP
 
 WHERE da.sep_no =?
 `;
-      const [rows] = await connection.execute(query, [SEP]);
+      const [rows] = await conn.execute(query, [SEP]);
       return rows[0];
     } catch (error) {
       throw error;
-    }
+    }finally {
+    conn.release(); // ?? Critical cleanup
+  }
   }
   
 

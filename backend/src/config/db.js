@@ -1,53 +1,54 @@
 // src/config/db.js
 const mysql = require('mysql2/promise');
-    require('dotenv').config();
+require('dotenv').config();
 
 const dbConfig = {
-host: process.env.DB_HOST,
-        user: process.env.DB_USER,
-        password: process.env.DB_PASSWORD,
-        database: process.env.DB_NAME, // nama database yang ingin digunakan
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
 };
+let pool;
+let initializing = false;
 
-let connection;
-
-/**
- * Inisialisasi koneksi ke database.
- * Jika database belum ada, akan dibuat terlebih dahulu.
- */
 async function initDb() {
+  if (pool || initializing) return; // avoid duplicate init
+
   try {
-    // Pertama, koneksikan ke server MySQL tanpa database tertentu
+    initializing = true;
     const tempConnection = await mysql.createConnection({
       host: dbConfig.host,
       user: dbConfig.user,
-      password: dbConfig.password
+      password: dbConfig.password,
     });
-    // Buat database jika belum ada
+
     await tempConnection.query(`CREATE DATABASE IF NOT EXISTS \`${dbConfig.database}\``);
-    console.log(`Database '${dbConfig.database}' sudah dibuat atau sudah ada.`);
     await tempConnection.end();
 
-    // Sekarang, koneksikan ke database yang sudah ada
-    connection = await mysql.createConnection(dbConfig);
-    console.log('Koneksi ke MySQL berhasil');
+    pool = mysql.createPool({
+      ...dbConfig,
+      waitForConnections: true,
+      connectionLimit: 10,
+      enableKeepAlive: true,
+  idleTimeout: 30000,            // 30 seconds idle
+  queueLimit: 0,               // Prevent infinite queues
+  keepAliveInitialDelay: 10000  
+    });
+
+    console.log("? MySQL pool initialized");
   } catch (error) {
-    console.error('Error menghubungkan ke MySQL:', error);
-    process.exit(1);
+    console.error("? MySQL init failed:", error);
+    throw error;
+  } finally {
+    initializing = false;
   }
 }
 
-/**
- * Mendapatkan instance koneksi yang sudah diinisialisasi.
- */
-function getDb() {
-  if (!connection) {
-    throw new Error("Database belum diinisialisasi!");
+async function getDb() {
+  if (!pool) {
+    await initDb(); // ensure pool is ready before using
   }
-  return connection;
+  return pool;
 }
 
-module.exports = {
-  initDb,
-  getDb,
-};
+module.exports = { initDb, getDb };

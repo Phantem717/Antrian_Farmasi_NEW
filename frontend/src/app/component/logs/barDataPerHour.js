@@ -106,6 +106,8 @@ x:{
   return (
     <Box sx={{ p: 2 }}>
       <Paper elevation={3} sx={{ p: 2, minHeight: '400px' }}>
+         <Typography variant="h6" gutterBottom>
+Medicine Data Per Hour                </Typography>
         {dataPerHour.length > 0 ? (
           <Column {...config} />
         ) : (

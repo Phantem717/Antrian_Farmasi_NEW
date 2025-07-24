@@ -1,6 +1,6 @@
 // src/models/verificationTask.js
 const { getDb } = require('../config/db');
-
+const { getCurrentTimestamp } = require('../handler/timeHandler')
 class VerificationTask {
   /**
    * Membuat record Verification_Task baru.
@@ -17,8 +17,10 @@ class VerificationTask {
    * @returns {Promise<Object>} - Hasil query.
    */
   static async create(data) {
+  const pool = await getDb();
+  const conn = await pool.getConnection(); // ? Explicit connection
+
     try {
-      const connection = getDb();
       const query = `
         INSERT INTO Verification_Task (
           NOP, Executor, Executor_Names,
@@ -27,9 +29,9 @@ class VerificationTask {
           processed_verification_stamp, completed_verification_stamp,
           loket,lokasi
         )
-        VALUES (?, ?, ?, NOW(),? , ?, ?, ?, ?, ?,?)
+        VALUES (?, ?, ?, ?,? , ?, ?, ?, ?, ?,?)
       `;
-      const [loket] = await connection.execute(`
+      const [loket] = await conn.execute(`
         SELECT loket_name 
         FROM Loket 
         WHERE status = "active" 
@@ -37,10 +39,12 @@ class VerificationTask {
         LIMIT 1;
     `);
     const activeLoket = loket[0].loket_name;
+    const timestamp = getCurrentTimestamp();
       const values = [
         data.NOP,
         data.Executor || null,
         data.Executor_Names || null,
+        timestamp,
         // waiting_verification_stamp di-set otomatis menggunakan NOW()
         data.called_verification_stamp || null,
         data.recalled_verification_stamp || null,
@@ -50,11 +54,13 @@ class VerificationTask {
         activeLoket || null,
         data.lokasi || null
       ];
-      const [result] = await connection.execute(query, values);
+      const [result] = await conn.execute(query, values);
       return result;
     } catch (error) {
       throw error;
-    }
+    }finally {
+    conn.release(); // ?? Critical cleanup
+  }
   }
 
   /**
@@ -63,8 +69,10 @@ class VerificationTask {
    * @returns {Promise<Object>} - Record Verification_Task.
    */
   static async findByNOP(NOP) {
+  const pool = await getDb();
+  const conn = await pool.getConnection(); // ? Explicit connection
+
     try {
-      const connection = getDb();
       const query = `
         SELECT 
           vt.*, 
@@ -86,11 +94,13 @@ class VerificationTask {
         LEFT JOIN Medicine_Task mt ON vt.NOP = mt.NOP
         WHERE vt.NOP = ?
       `;
-      const [rows] = await connection.execute(query, [NOP]);
+      const [rows] = await conn.execute(query, [NOP]);
       return rows[0];
     } catch (error) {
       throw error;
-    }
+    }finally {
+    conn.release(); // ?? Critical cleanup
+  }
   }
 
   /**
@@ -98,8 +108,10 @@ class VerificationTask {
    * @returns {Promise<Array>} - Array dari semua record Verification_Task.
    */
   static async getAll() {
+  const pool = await getDb();
+  const conn = await pool.getConnection(); // ? Explicit connection
+
     try {
-      const connection = getDb();
       const query = `
        SELECT 
   vt.*, 
@@ -120,16 +132,21 @@ WHERE (da.queue_number LIKE 'RC%' OR da.queue_number LIKE 'NR%') AND DATE(vt.wai
 ORDER BY vt.waiting_verification_stamp ASC;
       `;
 
-      const [rows] = await connection.execute(query);
+      const [rows] = await conn.execute(query);
       return rows;
     } catch (error) {
       throw error;
-    }
+    }finally {
+    conn.release(); // ?? Critical cleanup
+  }
   }
 
   static async getToday(){
-     try {
-      const connection = getDb();
+  const pool = await getDb();
+  const conn = await pool.getConnection(); // ? Explicit connection
+
+    try {
+
       const query = `
      SELECT 
   vt.*, 
@@ -153,17 +170,21 @@ WHERE (da.queue_number LIKE 'RC%' OR da.queue_number LIKE 'NR%')
 ORDER BY vt.waiting_verification_stamp ASC;
       `;
 
-      const [rows] = await connection.execute(query);
+      const [rows] = await conn.execute(query);
       return rows;
     } catch (error) {
       throw error;
-    }
+    }finally {
+    conn.release(); // ?? Critical cleanup
+  }
   }
   
   
   static async getByDate(date){
-     try {
-      const connection = getDb();
+  const pool = await getDb();
+  const conn = await pool.getConnection(); // ? Explicit connection
+
+    try {
       const query = `
        SELECT 
   vt.*, 
@@ -188,11 +209,13 @@ WHERE (da.queue_number LIKE 'RC%' OR da.queue_number LIKE 'NR%')
 ORDER BY vt.waiting_verification_stamp ASC;
       `;
 
-      const [rows] = await connection.execute(query, [date]);
+      const [rows] = await conn.execute(query, [date]);
       return rows;
     } catch (error) {
       throw error;
-    }
+    }finally {
+    conn.release(); // ?? Critical cleanup
+  }
   }
   /**
    * Memperbarui record Verification_Task berdasarkan NOP.
@@ -209,8 +232,10 @@ ORDER BY vt.waiting_verification_stamp ASC;
    * @returns {Promise<Object>} - Hasil query update.
    */
   static async update(NOP, data) {
+  const pool = await getDb();
+  const conn = await pool.getConnection(); // ? Explicit connection
+
     try {
-      const connection = getDb();
       const query = `
         UPDATE Verification_Task
         SET Executor = ?,
@@ -224,7 +249,7 @@ ORDER BY vt.waiting_verification_stamp ASC;
             loket = ?
         WHERE NOP = ?
       `;
-      const [loket] = await connection.execute(`
+      const [loket] = await conn.execute(`
         SELECT loket_name 
         FROM Loket 
         WHERE status = "active" 
@@ -244,11 +269,13 @@ ORDER BY vt.waiting_verification_stamp ASC;
         activeLoket || null,
         NOP,
       ];
-      const [result] = await connection.execute(query, values);
+      const [result] = await conn.execute(query, values);
       return result;
     } catch (error) {
       throw error;
-    }
+    }finally {
+    conn.release(); // ?? Critical cleanup
+  }
   }
 
   /**
@@ -257,14 +284,18 @@ ORDER BY vt.waiting_verification_stamp ASC;
    * @returns {Promise<Object>} - Hasil query delete.
    */
   static async delete(NOP) {
+  const pool = await getDb();
+  const conn = await pool.getConnection(); // ? Explicit connection
+
     try {
-      const connection = getDb();
       const query = `DELETE FROM Verification_Task WHERE NOP = ?`;
-      const [result] = await connection.execute(query, [NOP]);
+      const [result] = await conn.execute(query, [NOP]);
       return result;
     } catch (error) {
       throw error;
-    }
+    }finally {
+    conn.release(); // ?? Critical cleanup
+  }
   }
 }
 

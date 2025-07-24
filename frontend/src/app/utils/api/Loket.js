@@ -16,7 +16,7 @@ const LoketAPI = {
     }
   },
 
-  // ✅ Ambil Detail Loket Berdasarkan ID
+  // ✅ Ambil Detail Loket Berdasarkan IDS
   getLoketById: async (loketId) => {
     try {
       const response = await axios.get(`${BASE_URL}/api/loket/${loketId}`);

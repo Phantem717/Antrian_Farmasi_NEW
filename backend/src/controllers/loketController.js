@@ -43,6 +43,7 @@ const getLoketById = async (req, res) => {
 const getAllLokets = async (req, res) => {
   try {
     const lokets = await Loket.getAll();
+   
     res.status(200).json({ data: lokets });
   } catch (error) {
     console.error('Error retrieving all lokets:', error);
