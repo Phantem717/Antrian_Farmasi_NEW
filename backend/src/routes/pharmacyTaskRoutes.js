@@ -24,6 +24,6 @@ router.put("/:NOP", updatePharmacyTask);
 // 🔹 Endpoint untuk menghapus Pharmacy Task berdasarkan ID
 router.delete("/:NOP", deletePharmacyTask);
 
-router.get("/status/:status",getAllPharmacyTasksByStatus)
+router.get("/status/:status/:category",getAllPharmacyTasksByStatus)
 
 module.exports = router;

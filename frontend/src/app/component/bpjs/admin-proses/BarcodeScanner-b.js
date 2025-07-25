@@ -11,7 +11,7 @@ import DoctorAppointmentAPI from "@/app/utils/api/Doctor_Appoinment";
 import WA_API from "@/app/utils/api/WA";
 import {getSocket} from "@/app/utils/api/socket";
 
-export default function BarcodeScanner({ onScanResult }) {
+export default function BarcodeScanner({location, onScanResult }) {
     const [inputValue, setInputValue] = useState("");
     const [daftarAntrian, setDaftarAntrian] = useState([]);
      
@@ -20,7 +20,7 @@ export default function BarcodeScanner({ onScanResult }) {
 
     const fetchDaftarAntrianList = async () => {
         try {
-            const response = await PharmacyAPI.getAllPharmacyTasksByStatus("waiting_medicine");
+            const response = await PharmacyAPI.getAllPharmacyTasksByStatus(location,"waiting_medicine");
             console.log("?? Data antrian dari API:", response.data);
             setDaftarAntrian(response.data);
         } catch (error) {
@@ -88,7 +88,7 @@ export default function BarcodeScanner({ onScanResult }) {
                     Executor: null,
                     Executor_Names: null,
                     status: "waiting_pickup_medicine",
-                    lokasi: "Lantai 1 BPJS"
+                    lokasi: location
                 });
                 console.log("? Pickup Task berhasil dibuat:", pickupResponse);
             
@@ -101,10 +101,10 @@ export default function BarcodeScanner({ onScanResult }) {
                 const doctorResponse = await DoctorAppointmentAPI.getAppointmentByNOP(NOP);
                 console.log("DOCRESP", doctorResponse);
                
-                socket.emit('update_display');
-                socket.emit('update_proses');
+                socket.emit('update_display',{location});
+                socket.emit('update_proses',{location});
 
-                socket.emit('update_pickup');
+                socket.emit('update_pickup',{location});
 
                 Swal.fire({
                     icon: "success",

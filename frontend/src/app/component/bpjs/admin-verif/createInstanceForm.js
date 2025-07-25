@@ -30,7 +30,7 @@ import WA_API from "@/app/utils/api/WA";
 import CreateAntrianAPI from "@/app/utils/api/createAntrian";
 import VerificationAPI from "@/app/utils/api/Verification";
 import CheckRegistrationInfo from "@/app/utils/api/checkRegistrationInfo";
-export default function BarcodeScanner({ visible, onClose }) {
+export default function BarcodeScanner({location, visible, onClose }) {
   const [inputValue, setInputValue] = useState("");
   const [name, setName] = useState("");
   const [type, setType] = useState("");
@@ -165,7 +165,7 @@ const barcode = inputValue.replace(/\s+/g, ""); // Removes ALL whitespace
       Executor: "-",
       Executor_Names: "-",
       status: null,
-      location: "Lantai 1 BPJS",
+      location: location,
     };
 
     const [doctorAppointment,  pharmacyData, verificationData] = await Promise.all([
@@ -236,7 +236,7 @@ if(!inputValue.startsWith("NOP") && inputValue.length != 19) {
         medical_record_no: medical_record_no|| "-",
         patient_date_of_birth: DOB || null,
         statusMedicine: medType,
-        location: "Lantai 1 BPJS",
+        location: location,
         phone_number: phoneNumber,
         doctor_name: docter||"-",
         nik: NIK||"-",
@@ -287,8 +287,8 @@ if(!inputValue.startsWith("NOP") && inputValue.length != 19) {
             PRB: PRB,
             switch_WA: localStorage.getItem('waToggleState')
         }
-      socket.emit('update_verif');
-      socket.emit('update_display');
+      socket.emit('update_verif',{location});
+      socket.emit('update_display',{location});
       const WARESP =await WA_API.sendWAAntrian(WAPayload);
       const PRINTRESP= await PrintAntrian.printAntrian(printPayload);
                   await new Promise(resolve => setTimeout(resolve, 1000)); // 1-second delay

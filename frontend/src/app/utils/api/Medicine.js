@@ -19,10 +19,10 @@ const MedicineAPI = {
         }
     },
 
-    getMedicineByDate: async(date)=>{
+    getMedicineByDate: async(category,date)=>{
         try {
          
-            const response = await axios.get(`${BASE_URL}/api/medicine-task/by-date/${encodeURIComponent(date)}`);
+            const response = await axios.get(`${BASE_URL}/api/medicine-task/by-date/${encodeURIComponent(date)}/${category}`);
             return response.data;
 
         } catch (error) {
@@ -31,9 +31,9 @@ const MedicineAPI = {
         }
     },
 
-    getMedicineToday: async()=>{
+    getMedicineToday: async(category)=>{
         try {
-             const response = await axios.get(`${BASE_URL}/api/medicine-task/today/now`);
+             const response = await axios.get(`${BASE_URL}/api/medicine-task/today/now/${category}`);
             return response.data;
         } catch (error) {
             console.error('Error fetching all medicine tasks:', error);

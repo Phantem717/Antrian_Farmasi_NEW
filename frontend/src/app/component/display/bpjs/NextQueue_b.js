@@ -7,11 +7,10 @@ import { Marquee } from "@devnomic/marquee";
 import "@devnomic/marquee/dist/index.css";
 import { queue } from "jquery";
 
-const NextQueue = ({ verificationData, medicineData, pickupData }) => {
-  const [currentDate, setCurrentDate] = useState(new Date().getDate()); // [currentDate,setCurrentDate]
+const NextQueue = ({location, verificationData, medicineData, pickupData }) => {
     const socket = getSocket(); // Ensure this returns a singleton socket instance
+    console.log("LOCATION",location);
 
-  
   const [queues, setQueues] = useState({
     nextQueueRacik: [],
     nextQueueNonRacik: [],
@@ -28,9 +27,8 @@ const [times, setTimes] = useState({
    processTimeRacik: 10,
   pickupTimeNon: 10,
   pickupTimeRacik: 10
-});   
-
-function calculateTime(verifLength,processLengthNon, processLengthRacik, pickupLengthNon, pickupLengthRacik) {
+});    
+  function calculateTime(verifLength,processLengthNon, processLengthRacik, pickupLengthNon, pickupLengthRacik) {
   const verifTime = verifLength < 3 ? 10 : verifLength * 10;
   const processTimeNon = processLengthNon < 3 ? 10 : (processLengthNon * 10);
   const processTimeRacik =processLengthRacik< 3 ? 10 : (processLengthRacik * 10)
@@ -39,16 +37,19 @@ function calculateTime(verifLength,processLengthNon, processLengthRacik, pickupL
   return { verifTime, processTimeNon,processTimeRacik, pickupTimeNon,pickupTimeRacik };
 }
 
-const handleGetResponses = (payload) => {
+useEffect(() => {
+  if (!socket) return; // Exit if socket is not initialized
+
+  const handleGetResponses = (payload) => {
     console.log("? GOT RESP", payload);
 
     const dateString = new Date().toISOString().split('T')[0];
 
-    // Extract and filter verification data
+    // Process verificationData
     const verificationData = payload.data.verificationData
-    .sort((a, b) => ( // Sort by timestamp (oldest first)
-    new Date(a.waiting_verification_stamp) - new Date(b.waiting_verification_stamp)
-  ))
+      .sort((a, b) => (
+        new Date(a.waiting_verification_stamp) - new Date(b.waiting_verification_stamp)
+      ))
       .map(task => ({
         queueNumber: task.queue_number,
         type: task.status_medicine,
@@ -61,6 +62,7 @@ const handleGetResponses = (payload) => {
         patient_name: task.patient_name
       }));
 
+    // Process medicineData
     const medicineData = payload.data.medicineData
       .map(task => ({
         queueNumber: task.queue_number,
@@ -69,22 +71,20 @@ const handleGetResponses = (payload) => {
         patient_name: task.patient_name
       }));
 
+    // Process pickupData
     const pickupData = payload.data.pickupData
       .map(task => ({
         queueNumber: task.queue_number,
         type: task.status_medicine,
         patient_name: task.patient_name,
-isYesterday: new Date(new Date(task.waiting_pickup_medicine_stamp).setHours(0,0,0,0)) == 
-             new Date(new Date().setHours(0,0,0,0) - 86400000),
+        isYesterday: new Date(new Date(task.waiting_pickup_medicine_stamp).setHours(0,0,0,0)) == 
+                     new Date(new Date().setHours(0,0,0,0) - 86400000),
         status: task.status === "waiting_pickup_medicine" ? "Menunggu"
           : task.status === "called_pickup_medicine" ? "Dipanggil"
           : task.status === "pending_pickup_medicine" ? "Terlewat"
           : task.status === "recalled_pickup_medicine" ? "Dipanggil"
           : "-",
-
       }));
-
-    console.log("DATA", pickupData, verificationData, medicineData);
 
     setQueues({
       verificationQueue: verificationData,
@@ -97,46 +97,27 @@ isYesterday: new Date(new Date(task.waiting_pickup_medicine_stamp).setHours(0,0,
       pickupNonRacik: pickupData.filter(task => task.type === "Non - Racikan"),
     });
 
-   const newTimes = calculateTime(
-    verificationData.length,
-    medicineData.filter(task => task.type === "Non - Racikan").length,
-    medicineData.filter(task => task.type === "Racikan").length,
-    pickupData.filter(task => task.type === "Non - Racikan").length,
-    pickupData.filter(task => task.type === "Racikan").length
-  );
-
-  setTimes(newTimes);
-  console.log("Time Estimates:", newTimes);
+    const newTimes = calculateTime(
+      verificationData.length,
+      medicineData.filter(task => task.type === "Non - Racikan").length,
+      medicineData.filter(task => task.type === "Racikan").length,
+      pickupData.filter(task => task.type === "Non - Racikan").length,
+      pickupData.filter(task => task.type === "Racikan").length
+    );
+    setTimes(newTimes);
   };
 
-useEffect(() => {
-  if (socket) {
-    socket.on('get_responses', handleGetResponses, console.log("GET RESPONSES FE"));
+  // Set up listener
+  socket.on('get_responses', handleGetResponses);
 
-  }
+  // Request initial data
+  socket.emit('get_initial_responses', { location }, console.log("GET INITIAL DATA"));
 
-  // Cleanup to avoid multiple listeners
+  // Cleanup
   return () => {
-    if (socket) {
-      socket.off('get_responses', handleGetResponses);
-    }
-
-
+    socket.off('get_responses', handleGetResponses);
   };
-}, []); // Run only once on mount
-
-
-
-useEffect(() => {
-  const interval = setInterval(() => {
-    if (new Date().toDateString() !== currentDate) {
-      setCurrentDate(new Date().toDateString());
-      window.location.reload();
-    }
-  }, 3600000);
-  return () => clearInterval(interval);
-}, [currentDate]);
-
+}, [socket, location]); // Re-run if `socket` or `location` changes
   // Status color helpers
   const getStatusColor = (status) => {
     switch(status) {

@@ -121,7 +121,7 @@ class MedicineTask {
   }
   }
 
-  static async getMedicineToday(){
+  static async getMedicineToday(location){
   const pool = await getDb();
   const conn = await pool.getConnection(); // ? Explicit connection
 
@@ -142,10 +142,11 @@ class MedicineTask {
         WHERE date(mt.waiting_medicine_stamp) = CURRENT_DATE
 AND (pt.status IS NULL OR 
        (pt.status != 'completed_medicine' AND pt.status LIKE 'waiting_medicine'))
+       AND mt.lokasi = ?
          ORDER BY 
     da.queue_number;
       `;
-      const [rows] = await conn.execute(query);
+      const [rows] = await conn.execute(query,[location]);
       return rows;
     } catch (error) {
       throw error;
@@ -154,8 +155,9 @@ AND (pt.status IS NULL OR
   }
   }
 
+
   
-  static async getMedicineByDate(date){
+  static async getMedicineByDate(location,date){
   const pool = await getDb();
   const conn = await pool.getConnection(); // ? Explicit connection
 
@@ -177,10 +179,12 @@ AND (pt.status IS NULL OR
         WHERE date(mt.waiting_medicine_stamp) = ?
 AND (pt.status IS NULL OR 
        (pt.status != 'completed_medicine' AND pt.status LIKE 'waiting_medicine'))
+       AND mt.lokasi = ?
          ORDER BY 
     da.queue_number;
       `;
-      const [rows] = await conn.execute(query, [date]);
+      const values = [date,location]
+      const [rows] = await connection.execute(query, values);
       return rows;
     } catch (error) {
       throw error;

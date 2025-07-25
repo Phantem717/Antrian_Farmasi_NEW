@@ -7,6 +7,21 @@ const MedicineTask = require('../models/medicineTask');
 const createMedicineTask = async (req, res) => {
   try {
     const data = req.body;
+    let location = data.lokasi
+   
+      if(location.toLowerCase() == "bpjs"){
+        location = "Lantai 1 BPJS" 
+      }
+      if(location.toLowerCase() == "gmcb"){
+        location = "Lantai 1 GMCB" 
+
+      }
+       if(location.toLowerCase() == "lt3"){
+        location = "Lantai 3 GMCB" 
+
+      }
+      data.lokasi = location;
+      
     console.log("MEDICINE",data);
     const result = await MedicineTask.create(data);
     const io = req.app.get('socketio');
@@ -31,7 +46,21 @@ const createMedicineTask = async (req, res) => {
 
 const getMedicineToday = async (req,res) => {
   try {
-     const tasks = await MedicineTask.getMedicineToday();
+     let { NOP, Executor, Executor_Names, status  } = req.body;
+     let { category } = req.params;
+     let location = category;
+ if(location.toLowerCase() == "bpjs"){
+      location = "Lantai 1 BPJS" 
+    }
+    if(location.toLowerCase() == "gmcb"){
+      location = "Lantai 1 GMCB" 
+
+    }
+     if(location.toLowerCase() == "lt3"){
+      location = "Lantai 3 GMCB" 
+
+    } 
+     const tasks = await MedicineTask.getMedicineToday(location);
     res.status(200).json({ data: tasks });
   } catch (error) {
      console.error('Error retrieving Medicine Tasks:', error.message);
@@ -70,8 +99,20 @@ const getAllMedicineTasks = async (req, res) => {
 
 const getAllMedicineByDate = async (req, res) => {
   try {
-    const {date} = req.params;
-    const tasks = await MedicineTask.getMedicineByDate(date);
+    const {date, category} = req.params;
+    let location = category;
+      if(location.toLowerCase() == "bpjs"){
+        location = "Lantai 1 BPJS" 
+      }
+      if(location.toLowerCase() == "gmcb"){
+        location = "Lantai 1 GMCB" 
+
+      }
+       if(location.toLowerCase() == "lt3"){
+        location = "Lantai 3 GMCB" 
+
+      }
+    const tasks = await MedicineTask.getMedicineByDate(category,date);
     console.log("TASKS",tasks);
     if(!tasks){
             return res.status(404).json({ message: "Medicine Task not found" });

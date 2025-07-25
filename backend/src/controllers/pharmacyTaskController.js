@@ -8,8 +8,20 @@ const { generateFourDigitNumber } = require('../handler/generate'); // Import fu
  */
 const createPharmacyTask = async (req, res) => {
   try {
-    const { NOP, status, medicine_type,lokasi } = req.body;
+    let { NOP, status, medicine_type,lokasi } = req.body;
+    let location = lokasi;
+ if(location.toLowerCase() == "bpjs"){
+      location = "Lantai 1 BPJS" 
+    }
+    if(location.toLowerCase() == "gmcb"){
+      location = "Lantai 1 GMCB" 
 
+    }
+     if(location.toLowerCase() == "lt3"){
+      location = "Lantai 3 GMCB" 
+
+    } 
+    lokasi = location;
     // Validasi input
     if (!NOP || !status || !medicine_type) {
       return res.status(400).json({ message: "Booking ID, status, dan medicine_type wajib diisi." });
@@ -87,8 +99,21 @@ const getAllPharmacyTasks = async (req, res) => {
 
 const getAllPharmacyTasksByStatus = async (req, res) => {
   try {
-    const status = req.params.status;
-    const tasks = await PharmacyTask.getAllByStatus(status);
+    let {status,category} = req.params;
+    let location = category;
+    if(location.toLowerCase() == "bpjs"){
+      location = "Lantai 1 BPJS" 
+    }
+    if(location.toLowerCase() == "gmcb"){
+      location = "Lantai 1 GMCB" 
+
+    }
+     if(location.toLowerCase() == "lt3"){
+      location = "Lantai 3 GMCB" 
+
+    } 
+    console.log("TEST",status,location);
+    const tasks = await PharmacyTask.getAllByStatus(location,status);
     res.status(200).json({ data: tasks });
   } catch (error) {
     console.error('Error retrieving all pharmacy tasks:', error);

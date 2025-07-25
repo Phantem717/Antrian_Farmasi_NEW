@@ -11,6 +11,7 @@ const {
   getAllAppointments,
   getLatestAntrian,
   updateMedicineType,
+  getAllAppointmentsByLocation,
   updatePhoneNumber
 } = require('../controllers/doctorAppointmentsController');
     
@@ -35,5 +36,5 @@ router.patch('/:NOP/status_medicine', updateStatusMedicine);
 
 // Endpoint untuk menghapus appointment berdasarkan NOP
 router.delete('/:NOP', deleteAppointment);
-
+router.get('/:category',getAllAppointmentsByLocation);
 module.exports = router;

@@ -41,7 +41,7 @@ import PrintIcon from '@mui/icons-material/Print';
 import PrintAntrian from "@/app/utils/api/printAntrian";
   const allowedLokets = ["Loket 2", "Loket 3"];
 
-const DaftarAntrian = ({ selectedQueueIds, setSelectedQueueIds, onSelectQueue, setSelectedLoket,setSelectedQueue2,selectedQueue2 }) => {  
+const DaftarAntrian = ({location, selectedQueueIds, setSelectedQueueIds, onSelectQueue, setSelectedLoket,setSelectedQueue2,selectedQueue2 }) => {  
   dayjs.extend(customParseFormat);
   const dateFormat="YYYY-MM-DD"
   const [queueList, setQueueList] = useState([]);
@@ -59,6 +59,7 @@ const DaftarAntrian = ({ selectedQueueIds, setSelectedQueueIds, onSelectQueue, s
     const [date,setDate]= useState("");
   
   // ? Loket yang diizinkan untuk admin verifikasi
+  const allowedLokets = ["Loket 2", "Loket 3"];
   // ? Fetch Loket dari API
     let isMounted = true; // Track if component is mounted
 
@@ -107,10 +108,11 @@ const handleLoketUpdate = () => {
   try {
     let response;
     if (date) {
-      response = await VerificationAPI.getVerificationTasksByDate(new Date(date).toISOString().split('T')[0]);
+      response = await VerificationAPI.getVerificationTasksByDate(location,new Date(date).toISOString().split('T')[0]);
+      console.log("DATE")
     } else {
-      response = await VerificationAPI.getVerificationTasksToday();
-
+      response = await VerificationAPI.getVerificationTasksToday(location);
+      console.log("TODAY");
 
     }
 
@@ -394,13 +396,13 @@ Swal.fire({
   return (
     <Box sx={{ padding: "10px" }}>
       {visible &&
-                    <CreateInstanceForm  visible={visible} 
+                    <CreateInstanceForm location={location}  visible={visible} 
         onClose={handleCloseBarcodeScanner} />
       
       }
 
       {phoneVisible &&
-      <PhoneEditForm visible={phoneVisible} onClose={handleClosePhoneForm} selectedQueue={phoneQueue}/>
+      <PhoneEditForm location={location} visible={phoneVisible} onClose={handleClosePhoneForm} selectedQueue={phoneQueue}/>
       }
 
       <Typography variant="h4" align="center" sx={{ marginBottom: "20px" }}>

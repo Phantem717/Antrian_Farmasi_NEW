@@ -6,7 +6,7 @@ import Swal from "sweetalert2";
 import {getSocket} from "@/app/utils/api/socket";
 import DoctorAppointmentAPI from "@/app/utils/api/Doctor_Appoinment";
 import WA_API from "@/app/utils/api/WA";
-const PilihAksi = ({ selectedQueue,selectedQueueIds = [], setSelectedQueueIds, onStatusUpdate, setSelectedQueue2,selectedQueue2 }) => {
+const PilihAksi = ({location, selectedQueue,selectedQueueIds = [], setSelectedQueueIds, onStatusUpdate, setSelectedQueue2,selectedQueue2 }) => {
   console.log("QUEUS",selectedQueue2);
 const socket = getSocket();
   const [isCompleteServiceEnabled, setIsCompleteServiceEnabled] = useState(false);
@@ -123,8 +123,8 @@ const socket = getSocket();
       setSelectedQueue2([]); // ✅ Reset pilihan setelah pemanggilan
       
       setSelectedQueueIds([]);
-      socket.emit('update_pickup');
-        socket.emit('update_display', console.log("EMIT UPDATE"));
+      socket.emit('update_pickup', {location});
+        socket.emit('update_display', {location},console.log("EMIT UPDATE"));
 
       onStatusUpdate();
       

@@ -38,7 +38,7 @@ import { Form } from "antd";
 import { SearchOutlined, CloseOutlined } from '@ant-design/icons';
 
 import { getSocket } from '@/app/utils/api/socket';
-const DaftarAntrian = ({ selectedQueueIds, setSelectedQueueIds, setSelectedQueue, setSelectedLoket,setSelectedQueue2,selectedQueue2 }) => {
+const DaftarAntrian = ({location, selectedQueueIds, setSelectedQueueIds, setSelectedQueue, setSelectedLoket,setSelectedQueue2,selectedQueue2 }) => {
     const [searchText, setSearchText] = useState('');
     const [currentDate,setCurrentDate]= useState(new Date().getDate());
  dayjs.extend(customParseFormat);
@@ -163,10 +163,10 @@ const handleLoketUpdate = () => {
 async function getInitalData(){
   let response;
   if(date){
-    response = await PickupAPI.getPickupByDate(date);
+    response = await PickupAPI.getPickupByDate(location,date);
   }
   else{
-    response = await PickupAPI.getPickupToday();
+    response = await PickupAPI.getPickupToday(location);
   }
     processQueue(response);
 }

@@ -11,7 +11,7 @@ import { DatePicker } from "antd";
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 
-export default function DaftarAntrian({ scanResult, setIsDeleted }) {
+export default function DaftarAntrian({location, scanResult, setIsDeleted }) {
     dayjs.extend(customParseFormat);
     const dateFormat = "YYYY-MM-DD";
     const socket = getSocket();
@@ -53,10 +53,10 @@ useEffect(() => {
         setLoading(true);
         try {
             if(selectedDate){
-                response = await MedicineAPI.getMedicineByDate(selectedDate);
+                response = await MedicineAPI.getMedicineByDate(location,selectedDate);
             }
             else{
-                response = await MedicineAPI.getMedicineToday();
+                response = await MedicineAPI.getMedicineToday(location);
 
             }
             processQueue(response);

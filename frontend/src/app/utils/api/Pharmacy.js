@@ -18,9 +18,9 @@ const PharmacyAPI = {
         }
     },
 
-     getAllPharmacyTasksByStatus: async (status) => {
+     getAllPharmacyTasksByStatus: async (category,status) => {
         try {
-            const response = await axios.get(`${BASE_URL}/api/pharmacy-tasks/status/${status}`);
+            const response = await axios.get(`${BASE_URL}/api/pharmacy-tasks/status/${status}/${category}`);
             return response.data;
         } catch (error) {
             console.error('Error fetching all pharmacy tasks:', error);

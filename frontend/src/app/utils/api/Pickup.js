@@ -54,18 +54,18 @@ const PickupAPI = {
         }
     },
 
-    getPickupToday: async() => {
+    getPickupToday: async(category) => {
         try {
-            const response = await axios.get(`${BASE_URL}/api/pickup-task/today/now`);
+            const response = await axios.get(`${BASE_URL}/api/pickup-task/today/now/${category}`);
             return response.data;        } catch (error) {
             console.error(`Error fetching pickup task with Booking ID ${NOP}:`, error);
             throw error;
         }
     }
 ,
- getPickupByDate: async(date) => {
+ getPickupByDate: async(category,date) => {
         try {
-            const response = await axios.get(`${BASE_URL}/api/pickup-task/by-date/${encodeURIComponent(date)}`);
+            const response = await axios.get(`${BASE_URL}/api/pickup-task/by-date/${encodeURIComponent(date)}/${category}`);
             return response.data;        
         } catch (error) {
             console.error(`Error fetching pickup task with Booking ID ${NOP}:`, error);

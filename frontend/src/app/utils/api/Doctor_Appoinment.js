@@ -17,6 +17,15 @@ const DoctorAppointmentAPI = {
         }
     },
 
+    getAppointmentByLocation: async(location)=> {
+ try {
+            const response = await axios.get(`${BASE_URL}/api/doctor-appointments/${encodeURIComponent(location)}`);
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching all appointments:', error);
+            throw error;
+        }
+    },
     // 2. Get Single Appointment by Booking ID
     getAppointmentByNOP: async (NOP) => {
         try {

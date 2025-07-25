@@ -35,7 +35,7 @@ class VerificationTask {
         SELECT loket_name 
         FROM Loket 
         WHERE status = "active" 
-        AND (loket_name = "Loket 1" OR loket_name = "Loket 2") 
+        AND (loket_name = "Loket 2" OR loket_name = "Loket 3") 
         LIMIT 1;
     `);
     const activeLoket = loket[0].loket_name;
@@ -141,7 +141,7 @@ ORDER BY vt.waiting_verification_stamp ASC;
   }
   }
 
-  static async getToday(){
+  static async getToday(location){
   const pool = await getDb();
   const conn = await pool.getConnection(); // ? Explicit connection
 
@@ -167,10 +167,11 @@ WHERE (da.queue_number LIKE 'RC%' OR da.queue_number LIKE 'NR%')
   AND DATE(vt.waiting_verification_stamp) = CURRENT_DATE
   AND (pt.status IS NULL OR 
        (pt.status != 'completed_verification' AND pt.status LIKE '%verification%'))
+  AND vt.lokasi = ?
 ORDER BY vt.waiting_verification_stamp ASC;
       `;
 
-      const [rows] = await conn.execute(query);
+      const [rows] = await conn.execute(query,[location]);
       return rows;
     } catch (error) {
       throw error;
@@ -180,7 +181,7 @@ ORDER BY vt.waiting_verification_stamp ASC;
   }
   
   
-  static async getByDate(date){
+  static async getByDate(location,date){
   const pool = await getDb();
   const conn = await pool.getConnection(); // ? Explicit connection
 
@@ -206,10 +207,14 @@ WHERE (da.queue_number LIKE 'RC%' OR da.queue_number LIKE 'NR%')
   AND vt.waiting_verification_stamp IS NOT NULL
   AND (pt.status IS NULL OR 
        (pt.status != 'completed_verification' AND pt.status LIKE '%verification%'))
+       AND vt.lokasi = ?
 ORDER BY vt.waiting_verification_stamp ASC;
       `;
-
-      const [rows] = await conn.execute(query, [date]);
+      const values = [
+        date,
+        location
+      ]
+      const [rows] = await connection.execute(query, values);
       return rows;
     } catch (error) {
       throw error;

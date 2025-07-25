@@ -14,7 +14,7 @@ import CreateAntrianAPI from "@/app/utils/api/createAntrian";
 import PrintAntrian from "@/app/utils/api/printAntrian";
 // import VerificationAPI from "../../../utils/api/Verification";
 
-const PilihAksi = ({ selectedQueueIds = [], setSelectedQueueIds, selectedQueue2 = [] , setSelectedQueue2}) => {  
+const PilihAksi = ({location, selectedQueueIds = [], setSelectedQueueIds, selectedQueue2 = [] , setSelectedQueue2}) => {  
   const [isDeleted, setIsDeleted] = useState(false); // ✅ Untuk menghapus input scanner
    const [scanResult, setScanResult] = useState(""); // ✅ Simpan hasil scan
  
@@ -168,7 +168,7 @@ console.log("PILIH TOMBOL CONNECTED");
       setSelectedQueue2([]); // ✅ Reset pilihan setelah pemanggilan
 
       setSelectedQueueIds([]); // ✅ Reset setelah update
-                socket.emit('update_verif');
+                socket.emit('update_verif', {location});
 
     } catch (error) {
       console.error("❌ Error saat memperbarui status:", error);
@@ -299,9 +299,9 @@ console.log("PILIH TOMBOL CONNECTED");
       setSelectedQueue2([]); // ✅ Reset pilihan setelah pemanggilan
 
       setSelectedQueueIds([]); // ✅ Reset setelah update
-   socket.emit('update_proses');
-            socket.emit('update_verif');
-                                            socket.emit('update_display', console.log("EMIT UPDATE"));
+   socket.emit('update_proses', {location});
+            socket.emit('update_verif', {location});
+                                            socket.emit('update_display',{location}, console.log("EMIT UPDATE"));
 
 
     } catch (error) {
@@ -331,7 +331,7 @@ console.log("PILIH TOMBOL CONNECTED");
   }, [isDeleted]);
   return (
     <div>
-     <BarcodeScanner onScanResult={handleScanResult} handleBulkPharmacyUpdate = {handleBulkPharmacyUpdate} />
+     <BarcodeScanner location={location}onScanResult={handleScanResult} handleBulkPharmacyUpdate = {handleBulkPharmacyUpdate} />
 
         <Box
       sx={{

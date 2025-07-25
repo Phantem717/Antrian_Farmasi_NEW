@@ -27,7 +27,7 @@ class PickupTask {
         SELECT loket_name 
         FROM Loket 
         WHERE status = "active" 
-        AND (loket_name = "Loket 3" OR loket_name = "Loket 4") 
+        AND (loket_name = "Loket 1" OR loket_name = "Loket 4") 
         LIMIT 1;
     `);
     const activeLoket = loket[0].loket_name;
@@ -121,7 +121,7 @@ class PickupTask {
   }
   }
 
-  static async getPickupToday(){
+  static async getPickupToday(location){
   const pool = await getDb();
   const conn = await pool.getConnection(); // ? Explicit connection
 
@@ -142,10 +142,11 @@ class PickupTask {
           WHERE date(pt.waiting_pickup_medicine_stamp) = CURRENT_DATE
  AND (ph.status IS NULL OR 
        (ph.status != 'completed_pickup_medicine' AND ph.status LIKE '%pickup%'))
+       AND pt.lokasi = ?
           ORDER BY 
     da.queue_number;
       `;
-      const [rows] = await conn.execute(query);
+      const [rows] = await conn.execute(query,[location]);
       return rows;
     } catch (error) {
       throw error;
@@ -154,7 +155,7 @@ class PickupTask {
   }
   }
 
-   static async getPickupDisplay(){
+   static async getPickupDisplay(location){
   const pool = await getDb();
   const conn = await pool.getConnection(); // ? Explicit connection
 
@@ -175,10 +176,11 @@ FROM Pickup_Task pt
 WHERE date(pt.waiting_pickup_medicine_stamp) = CURRENT_DATE 
   AND (ph.status IS NULL OR 
        (ph.status != 'completed_pickup_medicine' AND ph.status LIKE '%pickup%'))
+  AND pt.lokasi = ?
 ORDER BY 
   da.queue_number;
       `;
-      const [rows] = await conn.execute(query);
+      const [rows] = await conn.execute(query,[location]);
       return rows;
     } catch (error) {
       throw error;
@@ -187,7 +189,7 @@ ORDER BY
   }
   }
 
-   static async getPickupByDate(date){
+   static async getPickupByDate(location,date){
   const pool = await getDb();
   const conn = await pool.getConnection(); // ? Explicit connection
 
@@ -208,10 +210,16 @@ ORDER BY
           WHERE date(pt.waiting_pickup_medicine_stamp) = ?
            AND (ph.status IS NULL OR 
        (ph.status != 'completed_pickup_medicine' AND ph.status LIKE '%pickup%'))
+              AND pt.lokasi = ?
+
           ORDER BY 
     da.queue_number;
       `;
-      const [rows] = await conn.execute(query,[date]);
+      const values = [
+        date,
+        location
+      ]
+      const [rows] = await connection.execute(query,values);
       return rows;
     } catch (error) {
       throw error;

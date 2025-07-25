@@ -8,7 +8,20 @@ const {getCurrentTimestamp}  = require('../handler/timeHandler')
  */
 const createPickupTask = async (req, res) => {
   try {
-    const data = req.body;
+    let data = req.body;
+    let location = data.lokasi;
+     if(location.toLowerCase() == "bpjs"){
+      location = "Lantai 1 BPJS" 
+    }
+    if(location.toLowerCase() == "gmcb"){
+      location = "Lantai 1 GMCB" 
+
+    }
+     if(location.toLowerCase() == "lt3"){
+      location = "Lantai 3 GMCB" 
+
+    } 
+    data.lokasi = location;
     const result = await PickupTask.create(data);
     const io = req.app.get('socketio');
 
@@ -63,7 +76,21 @@ const getAllPickupTasks = async (req, res) => {
 
 const getAllPickupToday= async (req, res) => {
   try {
-    const tasks = await PickupTask.getPickupToday();
+        let location = req.params.category;
+
+     if(location.toLowerCase() == "bpjs"){
+      location = "Lantai 1 BPJS" 
+    }
+    if(location.toLowerCase() == "gmcb"){
+      location = "Lantai 1 GMCB" 
+
+    }
+     if(location.toLowerCase() == "lt3"){
+      location = "Lantai 3 GMCB" 
+
+    } 
+    
+    const tasks = await PickupTask.getPickupToday(location);
     res.status(200).json({ data: tasks });
   } catch (error) {
     console.error('Error retrieving Pickup Tasks:', error.message);
@@ -84,8 +111,19 @@ const getAllPickupDisplay= async (req, res) => {
 
 const getAllPickupByDate = async (req, res) => {
   try {
-    const {date} = req.params;
-    const tasks = await PickupTask.getPickupByDate(date);
+  const { date,category } = req.params;
+    let location = category;
+    if(location.toLowerCase() == "bpjs"){
+      location = "Lantai 1 BPJS" 
+    }
+    if(location.toLowerCase() == "gmcb"){
+      location = "Lantai 1 GMCB" 
+
+    }
+     if(location.toLowerCase() == "lt3"){
+      location = "Lantai 3 GMCB" 
+
+    }     const tasks = await PickupTask.getPickupByDate(location,date);
     if(!tasks){
     res.status(404).json({message: 'PickupNotFOund'});
     }

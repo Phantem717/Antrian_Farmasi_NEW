@@ -17,7 +17,7 @@ router.get('/:NOP', getMedicineTaskByNOP);
 router.get('/', getAllMedicineTasks);
 router.put('/:NOP', updateMedicineTask);
 router.delete('/:NOP', deleteMedicineTask);
-router.get('/today/now',getMedicineToday);
-router.get('/by-date/:date',getAllMedicineByDate);
+router.get('/today/now/:category',getMedicineToday);
+router.get('/by-date/:date/:category',getAllMedicineByDate);
 
 module.exports = router;

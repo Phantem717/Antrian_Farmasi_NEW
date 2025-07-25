@@ -25,13 +25,13 @@ const Location = () => {
     {
       title: "Farmasi Umum GMCB",
       image: "/images/umum.png",
-      route: '/login/bpjs/admin-verif-b',
+      route: '/login/gmcb/admin-verif-b',
       imageSize: 240
     },
     {
       title: "Farmasi Lantai 3 GMCB",
       image: "/images/umum.png", // Make sure this image exists
-      route: '/login/bpjs/admin-verif-b',
+      route: '/login/lt3/admin-verif-b',
       imageSize: 240
     }
   ];
