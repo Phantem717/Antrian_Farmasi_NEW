@@ -123,8 +123,8 @@ const socket = getSocket();
       setSelectedQueue2([]); // ✅ Reset pilihan setelah pemanggilan
       
       setSelectedQueueIds([]);
-      socket.emit('update_pickup');
-        socket.emit('update_display', console.log("EMIT UPDATE"));
+      socket.emit('update_pickup', {location});
+        socket.emit('update_display', {location},console.log("EMIT UPDATE"));
 
       onStatusUpdate();
       

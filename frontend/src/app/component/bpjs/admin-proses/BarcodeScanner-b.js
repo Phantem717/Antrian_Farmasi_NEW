@@ -100,10 +100,10 @@ export default function BarcodeScanner({location, onScanResult }) {
                 const doctorResponse = await DoctorAppointmentAPI.getAppointmentByNOP(NOP);
                 console.log("DOCRESP", doctorResponse);
                
-                socket.emit('update_display');
-                socket.emit('update_proses');
+                socket.emit('update_display',{location});
+                socket.emit('update_proses',{location});
 
-                socket.emit('update_pickup');
+                socket.emit('update_pickup',{location});
 
                 Swal.fire({
                     icon: "success",

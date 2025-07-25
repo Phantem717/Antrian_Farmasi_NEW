@@ -2,16 +2,18 @@
 import QueueCall from '@/app/component/display/bpjs/QueueCall_b';
 import ServingQueue from '@/app/component/display/bpjs/ServingQueue_b';
 import MissQueue from '@/app/component/display/bpjs/MissQueue_b';
-import NextQueue from '@/app/component/display/bpjs/NextQueue_miss';
+import NextQueue from '@/app/component/display/bpjs/NextQueue_b';
 import InfoBar from '@/app/component/display/bpjs/InfoBar_b';
 import MarqueeFooter from '@/app/component/display/bpjs/MarqueeFooter_b';
 import React, { useState,useEffect } from "react";
 import {getSocket} from "@/app/utils/api/socket";
 import responses from "@/app/utils/api/responses";
 import { getReactRender } from 'antd/es/config-provider/UnstableContext';
+import { use } from 'react'; // Next.js 14+
 
 
-export default function BPJS_Pickup_Miss() {
+export default function Display({params}) {
+  const {category} = use(params);
 
     return (
       <div className="bg-white h-screen min-w-screen flex flex-col">
@@ -19,8 +21,8 @@ export default function BPJS_Pickup_Miss() {
         <div className="flex-1 overflow-auto p-4">
           <InfoBar />
           <div className="flex flex-row gap-4 mb-4 h-[calc(100%-3rem)]">
-            <NextQueue lokasi="Lantai 1 BPJS" />
-            <QueueCall lokasi="Lantai 1 BPJS" />
+            <NextQueue lokasi={category} />
+            <QueueCall lokasi={category} />
           </div>
         </div>
         

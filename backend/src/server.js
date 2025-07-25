@@ -73,6 +73,6 @@ app.use('/api/check',checkRegistrationRoute);
   const PORT = process.env.PORT || 5000;
 const HOST = process.env.HOST
   server.listen(PORT, HOST, () => {
-    console.log(`✅ Server berjalan pada ${PORT}`,loginRoutes);
+    console.log(`✅ Server berjalan pada ${PORT} ${HOST}`,loginRoutes);
   });
 })();

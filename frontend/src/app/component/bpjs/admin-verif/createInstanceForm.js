@@ -288,8 +288,8 @@ if(!inputValue.startsWith("NOP") && inputValue.length != 19) {
             PRB: PRB,
             switch_WA: localStorage.getItem('waToggleState')
         }
-      socket.emit('update_verif');
-      socket.emit('update_display');
+      socket.emit('update_verif',{location});
+      socket.emit('update_display',{location});
       const WARESP =await WA_API.sendWAAntrian(WAPayload);
       const PRINTRESP= await PrintAntrian.printAntrian(printPayload);
                   await new Promise(resolve => setTimeout(resolve, 1000)); // 1-second delay

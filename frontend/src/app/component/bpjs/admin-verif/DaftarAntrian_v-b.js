@@ -382,7 +382,7 @@ Swal.fire({
       }
 
       {phoneVisible &&
-      <PhoneEditForm visible={phoneVisible} onClose={handleClosePhoneForm} selectedQueue={phoneQueue}/>
+      <PhoneEditForm location={location} visible={phoneVisible} onClose={handleClosePhoneForm} selectedQueue={phoneQueue}/>
       }
 
       <Typography variant="h4" align="center" sx={{ marginBottom: "20px" }}>

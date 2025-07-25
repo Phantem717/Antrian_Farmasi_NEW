@@ -137,7 +137,7 @@ class PickupTask {
     }
   }
 
-   static async getPickupDisplay(){
+   static async getPickupDisplay(location){
      try {
       const connection = getDb();
       const query = `
@@ -157,10 +157,11 @@ WHERE (date(pt.waiting_pickup_medicine_stamp) = CURRENT_DATE
    OR date(pt.waiting_pickup_medicine_stamp) = CURRENT_DATE - INTERVAL 1 DAY)
   AND (ph.status IS NULL OR 
        (ph.status != 'completed_pickup_medicine' AND ph.status LIKE '%pickup%'))
+  AND pt.lokasi = ?
 ORDER BY 
   da.queue_number;
       `;
-      const [rows] = await connection.execute(query);
+      const [rows] = await connection.execute(query,[location]);
       return rows;
     } catch (error) {
       throw error;

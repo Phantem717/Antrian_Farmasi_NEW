@@ -98,6 +98,7 @@ export default function BarcodeScanner({location, onScanResult, handleBulkPharma
 
         // Prepare WA payload
         const payload = {
+
             phone_number: doctorResponse.data.phone_number,
             patient_name: doctorResponse.data.patient_name,
             NOP: doctorResponse.data.NOP,
@@ -124,9 +125,9 @@ export default function BarcodeScanner({location, onScanResult, handleBulkPharma
         // Update local state by removing processed item
 
  socket.emit('update_display');
-        socket.emit('update_proses');
-        socket.emit('update_pickup');
-        socket.emit('update_verif');
+        socket.emit('update_proses', {location} );
+        socket.emit('update_pickup', {location} );
+        socket.emit('update_verif', {location} );
         return { success: true };
     };
 

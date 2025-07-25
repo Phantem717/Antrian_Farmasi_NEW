@@ -11,6 +11,7 @@ module.exports = {
     const { Server } = require('socket.io');
     const HOST = process.env.FE_HOST;
     const PORT = process.env.FE_PORT
+    console.log(HOST,PORT);
     io = new Server(server, {
       cors: {
         origin: `http://${HOST}:${PORT}`, // Change to frontend IP in production
@@ -27,9 +28,19 @@ module.exports = {
     
     // ? Tambahkan listener untuk koneksi baru
     io.on('connection', async (socket) => {
-     const getData = async () => {
+     const getData = async (location) => {
+
     try {
-      const data = await responseControl.getAllResponses("Lantai 1 BPJS");
+      if(location.toLowercase() == "bpjs"){
+        location = "Lantai 1 BPJS"
+      }
+      if(location.toLowercase() == "gmcb"){
+        location = "Lantai 1 GMCB"
+      }
+      if(location.toLowercase() == "lt3"){
+        location = "Lantai 3 GMCB"
+      }
+      const data = await responseControl.getAllResponses(location);
       socket.emit('get_responses', {
         message: '? Initial data fetched',
         data: data
@@ -44,11 +55,50 @@ module.exports = {
       });
     }
   };
-      getData();
-socket.on('update_display', async () => {
-  console.log("ON UPDATE"); // ?? Pastikan handler dipanggil
+
+  socket.on('get_initial_responses', async (payload) => {
+    const data = getData(payload.location);
 try {
-      const data = await responseControl.getAllResponses("Lantai 1 BPJS");
+  let location = payload.location;
+    if(location.toLowercase() == "bpjs"){
+        location = "Lantai 1 BPJS"
+      }
+      if(location.toLowercase() == "gmcb"){
+        location = "Lantai 1 GMCB"
+      }
+      if(location.toLowercase() == "lt3"){
+        location = "Lantai 3 GMCB"
+      }
+      const data = await responseControl.getAllResponses(location);
+      io.emit('get_responses', {
+        message: '? Initial data fetched',
+        data: data
+      });
+            // console.log("GET RESPONSE");
+
+    } catch (err) {
+      console.error('? Error fetching responses:', err.message);
+      io.emit('get_responses', {
+        message: '? Failed to fetch data',
+        error: err.message
+      });
+    }}
+    );
+socket.on('update_display', async (payload) => {
+  
+try {
+  let location = payload.location;
+    if(location.toLowercase() == "bpjs"){
+        location = "Lantai 1 BPJS"
+      }
+      if(location.toLowercase() == "gmcb"){
+        location = "Lantai 1 GMCB"
+      }
+      if(location.toLowercase() == "lt3"){
+        location = "Lantai 3 GMCB"
+      }
+  console.log("ON UPDATE"); // ?? Pastikan handler dipanggil
+      const data = await responseControl.getAllResponses(location);
       io.emit('get_responses', {
         message: '? Initial data fetched',
         data: data
@@ -63,9 +113,21 @@ try {
       });
     }});      
     
-    socket.on('update_proses', async () => {
+    socket.on('update_proses', async (payload) => {
+      
       try {
-      const data = await medControl.getMedicineToday();
+          let location = payload.location;
+    if(location.toLowercase() == "bpjs"){
+        location = "Lantai 1 BPJS"
+      }
+      if(location.toLowercase() == "gmcb"){
+        location = "Lantai 1 GMCB"
+      }
+      if(location.toLowercase() == "lt3"){
+        location = "Lantai 3 GMCB"
+      }
+  console.log("ON UPDATE"); // ?? Pastikan handler dipanggil
+      const data = await medControl.getMedicineToday(location);
       io.emit('get_responses_proses', {
         message: '? Initial data fetched',
         data: data
@@ -83,9 +145,20 @@ try {
     }
     });
 
-    socket.on('update_verif', async ()=>{
+    socket.on('update_verif', async (payload)=>{
       try {
-      const data = await VerificationTask.getAll();
+          let location = payload.location;
+    if(location.toLowercase() == "bpjs"){
+        location = "Lantai 1 BPJS"
+      }
+      if(location.toLowercase() == "gmcb"){
+        location = "Lantai 1 GMCB"
+      }
+      if(location.toLowercase() == "lt3"){
+        location = "Lantai 3 GMCB"
+      }
+  console.log("ON UPDATE"); // ?? Pastikan handler dipanggil
+      const data = await VerificationTask.getToday(location);
       io.emit('get_responses_verif', {
         message: '? Initial data fetched',
         data: data
@@ -104,9 +177,21 @@ try {
     });
 
     
-    socket.on('update_pickup', async () => {
+    socket.on('update_pickup', async (payload) => {
       try {
-      const data = await pickupControl.getPickupToday();
+          let location = payload.location;
+    if(location.toLowercase() == "bpjs"){
+        location = "Lantai 1 BPJS"
+      }
+      if(location.toLowercase() == "gmcb"){
+        location = "Lantai 1 GMCB"
+      }
+      if(location.toLowercase() == "lt3"){
+        location = "Lantai 3 GMCB"
+      }
+      
+  console.log("ON UPDATE"); // ?? Pastikan handler dipanggil
+      const data = await pickupControl.getPickupToday(location);
       io.emit('get_responses_pickup', {
         message: '? Initial data fetched',
         data: data

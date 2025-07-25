@@ -168,7 +168,7 @@ console.log("PILIH TOMBOL CONNECTED");
       setSelectedQueue2([]); // ✅ Reset pilihan setelah pemanggilan
 
       setSelectedQueueIds([]); // ✅ Reset setelah update
-                socket.emit('update_verif');
+                socket.emit('update_verif', {location});
 
     } catch (error) {
       console.error("❌ Error saat memperbarui status:", error);
@@ -299,9 +299,9 @@ console.log("PILIH TOMBOL CONNECTED");
       setSelectedQueue2([]); // ✅ Reset pilihan setelah pemanggilan
 
       setSelectedQueueIds([]); // ✅ Reset setelah update
-   socket.emit('update_proses');
-            socket.emit('update_verif');
-                                            socket.emit('update_display', console.log("EMIT UPDATE"));
+   socket.emit('update_proses', {location});
+            socket.emit('update_verif', {location});
+                                            socket.emit('update_display',{location}, console.log("EMIT UPDATE"));
 
 
     } catch (error) {

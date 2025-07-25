@@ -31,7 +31,7 @@ import VerificationAPI from "@/app/utils/api/Verification";
 import CheckRegistrationInfo from "@/app/utils/api/checkRegistrationInfo";
 import Item from "antd/es/list/Item";
 import { getSocket } from "@/app/utils/api/socket";
-export default function BarcodeScanner({ visible, onClose,selectedQueue }) {
+export default function BarcodeScanner({location, visible, onClose,selectedQueue }) {
   const [phoneNumber, setPhoneNumber] = useState(selectedQueue.phone_number);
   const inputRef = useRef(null);
   const socket = getSocket();
