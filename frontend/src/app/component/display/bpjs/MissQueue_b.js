@@ -5,6 +5,7 @@ import {getSocket} from "@/app/utils/api/socket";
 const MissQueue = ( {verificationData, pickupData}) => {
   const [verifQueues, setVerifQueues] = useState([]);
   const [obatQueues, setObatQueues] = useState([]);
+  const [currentDate, setCurrentDate] = useState(new Date().getDate());
   // const bottomRef= useRef<HTMLDivElement>(null);
   const scrollSpeed = 1;
   const verifRef = useRef(null);
@@ -39,6 +40,18 @@ const socket = getSocket();
     fetchMissedQueues();
   
   }, []);
+
+  
+useEffect(() => {
+  const interval = setInterval(() => {
+    if (new Date().toDateString() !== currentDate) {
+      setCurrentDate(new Date().toDateString());
+      window.location.reload();
+    }
+  }, 3600000);
+  return () => clearInterval(interval);
+}, [currentDate]);
+
 
   // ✅ Efek Scroll Otomatis
   const scrollAndReset = (ref) => {

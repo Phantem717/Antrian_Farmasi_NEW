@@ -8,6 +8,9 @@ import "@devnomic/marquee/dist/index.css";
 import { queue } from "jquery";
 
 const NextQueue = ({ verificationData, medicineData, pickupData }) => {
+  const [currentDate, setCurrentDate] = useState(new Date().getDate()); // [currentDate,setCurrentDate]
+    const socket = getSocket(); // Ensure this returns a singleton socket instance
+
   const [queues, setQueues] = useState({
     nextQueueRacik: [],
     nextQueueNonRacik: [],
@@ -34,11 +37,7 @@ const [times, setTimes] = useState({
   return { verifTime, processTimeNon,processTimeRacik, pickupTimeNon,pickupTimeRacik };
 }
 
-
-useEffect(() => {
-  const socket = getSocket(); // Ensure this returns a singleton socket instance
-
-  const handleGetResponses = (payload) => {
+const handleGetResponses = (payload) => {
     console.log("? GOT RESP", payload);
 
     const dateString = new Date().toISOString().split('T')[0];
@@ -108,6 +107,7 @@ isYesterday: new Date(new Date(task.waiting_pickup_medicine_stamp).setHours(0,0,
   console.log("Time Estimates:", newTimes);
   };
 
+useEffect(() => {
   if (socket) {
     socket.on('get_responses', handleGetResponses, console.log("GET RESPONSES FE"));
 
@@ -120,10 +120,22 @@ isYesterday: new Date(new Date(task.waiting_pickup_medicine_stamp).setHours(0,0,
     if (socket) {
       socket.off('get_responses', handleGetResponses);
     }
+
+
   };
 }, []); // Run only once on mount
 
 
+
+useEffect(() => {
+  const interval = setInterval(() => {
+    if (new Date().toDateString() !== currentDate) {
+      setCurrentDate(new Date().toDateString());
+      // Refresh logic here
+    }
+  }, 60000);
+  return () => clearInterval(interval);
+}, [currentDate]);
 
   // Status color helpers
   const getStatusColor = (status) => {

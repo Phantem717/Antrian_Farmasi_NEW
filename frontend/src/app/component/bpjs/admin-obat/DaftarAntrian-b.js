@@ -40,6 +40,7 @@ import { SearchOutlined, CloseOutlined } from '@ant-design/icons';
 import { getSocket } from '@/app/utils/api/socket';
 const DaftarAntrian = ({ selectedQueueIds, setSelectedQueueIds, setSelectedQueue, setSelectedLoket,setSelectedQueue2,selectedQueue2 }) => {
     const [searchText, setSearchText] = useState('');
+    const [currentDate,setCurrentDate]= useState(new Date().getDate());
  dayjs.extend(customParseFormat);
   const dateFormat="YYYY-MM-DD"
   const [rawQueueList,setRawQueueList]= useState([]);
@@ -226,6 +227,19 @@ useEffect(() => {
 const handleClearDate = () => {
   setDate(null);
 };
+
+
+useEffect(() => {
+  const interval = setInterval(() => {
+    if (new Date().toDateString() !== currentDate) {
+      setCurrentDate(new Date().toDateString());
+      window.location.reload();
+    }
+  }, 3600000);
+  return () => clearInterval(interval);
+}, [currentDate]);
+
+
 
 const changeDate = (date,dateString) => {
   console.log("date",date,dateString);

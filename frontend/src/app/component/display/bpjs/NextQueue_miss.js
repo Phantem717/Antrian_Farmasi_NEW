@@ -8,6 +8,8 @@ import "@devnomic/marquee/dist/index.css";
 import { queue } from "jquery";
 
 const NextQueue = ({ verificationData, medicineData, pickupData }) => {
+    const [currentDate, setCurrentDate] = useState(new Date().getDate()); // [currentDate,setCurrentDate]
+
   const [lastCalled, setLastCalled] = useState({
     racik: null,
     nonRacik: null
@@ -125,6 +127,16 @@ isYesterday: new Date(new Date(task.waiting_pickup_medicine_stamp).setHours(0,0,
   };
 }, []); // Run only once on mount
 
+
+useEffect(() => {
+  const interval = setInterval(() => {
+    if (new Date().toDateString() !== currentDate) {
+      setCurrentDate(new Date().toDateString());
+      window.location.reload();
+    }
+  }, 3600000);
+  return () => clearInterval(interval);
+}, [currentDate]);
 
 
   // Status color helpers

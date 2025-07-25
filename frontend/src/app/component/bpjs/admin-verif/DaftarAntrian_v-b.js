@@ -54,6 +54,7 @@ const DaftarAntrian = ({ selectedQueueIds, setSelectedQueueIds, onSelectQueue, s
   const [selectedFilter, setSelectedFilter] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
   const [phoneQueue, setPhoneQueue] =useState(null);
+  const [currentDate,setCurrentDate]= useState(new Date().getDate());
   const socket = getSocket();
     const [date,setDate]= useState("");
   
@@ -84,6 +85,19 @@ const DaftarAntrian = ({ selectedQueueIds, setSelectedQueueIds, onSelectQueue, s
       console.error("Error fetching lokets:", error);
     }
   };
+
+  
+useEffect(() => {
+  const interval = setInterval(() => {
+    if (new Date().toDateString() !== currentDate) {
+      setCurrentDate(new Date().toDateString());
+      window.location.reload();
+    }
+  }, 3600000);
+  return () => clearInterval(interval);
+}, [currentDate]);
+
+
 
 const handleLoketUpdate = () => {
     if (isMounted) fetchLokets();
