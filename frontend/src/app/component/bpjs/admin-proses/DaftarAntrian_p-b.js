@@ -20,7 +20,7 @@ export default function DaftarAntrian({ scanResult, setIsDeleted }) {
     const [selectedDate, setSelectedDate] = useState(null);
     const [loading, setLoading] = useState(true);
     const [searchText, setSearchText] = useState('');
-
+    const [currentDate,setCurrentDate] = useState(new Date().getDate());
     const handleSearch = (searchText) => {
         setSearchText(searchText);
     };
@@ -29,6 +29,19 @@ export default function DaftarAntrian({ scanResult, setIsDeleted }) {
         console.log("DATE",date);
         setSelectedDate(datestring || dayjs());
     };
+
+    
+useEffect(() => {
+  const interval = setInterval(() => {
+    if (new Date().toDateString() !== currentDate) {
+      setCurrentDate(new Date().toDateString());
+      window.location.reload();
+    }
+  }, 3600000);
+  return () => clearInterval(interval);
+}, [currentDate]);
+
+
 
     const handleSearchClear = () => {
         setSearchText('');

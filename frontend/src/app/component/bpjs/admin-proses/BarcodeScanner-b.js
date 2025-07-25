@@ -14,6 +14,7 @@ import {getSocket} from "@/app/utils/api/socket";
 export default function BarcodeScanner({ onScanResult }) {
     const [inputValue, setInputValue] = useState("");
     const [daftarAntrian, setDaftarAntrian] = useState([]);
+     
     const inputRef = useRef(null);
     const socket = getSocket();
 
