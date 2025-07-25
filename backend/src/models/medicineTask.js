@@ -23,7 +23,7 @@ class MedicineTask {
         SELECT loket_name 
         FROM Loket 
         WHERE status = "active" 
-        AND (loket_name = "Loket 3" OR loket_name = "Loket 4") 
+        AND (loket_name = "Loket 1" OR loket_name = "Loket 4") 
         LIMIT 1;
     `);
     const activeLoket = loket[0].loket_name;
@@ -106,7 +106,7 @@ class MedicineTask {
     }
   }
 
-  static async getMedicineToday(){
+  static async getMedicineToday(location){
      try {
       const connection = getDb();
       const query = `
@@ -125,10 +125,11 @@ class MedicineTask {
         WHERE date(mt.waiting_medicine_stamp) = CURRENT_DATE
 AND (pt.status IS NULL OR 
        (pt.status != 'completed_medicine' AND pt.status LIKE 'waiting_medicine'))
+       AND mt.lokasi = ?
          ORDER BY 
     da.queue_number;
       `;
-      const [rows] = await connection.execute(query);
+      const [rows] = await connection.execute(query,[location]);
       return rows;
     } catch (error) {
       throw error;
@@ -136,7 +137,7 @@ AND (pt.status IS NULL OR
   }
 
   
-  static async getMedicineByDate(date){
+  static async getMedicineByDate(location,date){
      try {
       const connection = getDb();
       const query = `
@@ -156,10 +157,12 @@ AND (pt.status IS NULL OR
         WHERE date(mt.waiting_medicine_stamp) = ?
 AND (pt.status IS NULL OR 
        (pt.status != 'completed_medicine' AND pt.status LIKE 'waiting_medicine'))
+       AND mt.lokasi = ?
          ORDER BY 
     da.queue_number;
       `;
-      const [rows] = await connection.execute(query, [date]);
+      const values = [date,location]
+      const [rows] = await connection.execute(query, values);
       return rows;
     } catch (error) {
       throw error;

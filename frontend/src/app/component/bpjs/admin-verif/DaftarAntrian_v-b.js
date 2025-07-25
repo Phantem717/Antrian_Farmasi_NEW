@@ -57,7 +57,7 @@ const DaftarAntrian = ({location, selectedQueueIds, setSelectedQueueIds, onSelec
     const [date,setDate]= useState("");
   
   // ? Loket yang diizinkan untuk admin verifikasi
-  const allowedLokets = ["Loket 1", "Loket 2"];
+  const allowedLokets = ["Loket 2", "Loket 3"];
   // ? Fetch Loket dari API
     let isMounted = true; // Track if component is mounted
 

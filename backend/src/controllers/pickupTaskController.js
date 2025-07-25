@@ -89,6 +89,7 @@ const getAllPickupToday= async (req, res) => {
       location = "Lantai 3 GMCB" 
 
     } 
+    
     const tasks = await PickupTask.getPickupToday(location);
     res.status(200).json({ data: tasks });
   } catch (error) {

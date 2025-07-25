@@ -24,7 +24,7 @@ class PickupTask {
         SELECT loket_name 
         FROM Loket 
         WHERE status = "active" 
-        AND (loket_name = "Loket 3" OR loket_name = "Loket 4") 
+        AND (loket_name = "Loket 1" OR loket_name = "Loket 4") 
         LIMIT 1;
     `);
     const activeLoket = loket[0].loket_name;

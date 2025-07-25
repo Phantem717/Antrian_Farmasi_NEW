@@ -99,6 +99,7 @@ export default function Admin({params}) {
                 onStatusUpdate={() => {}}
                 setSelectedQueue2={setSelectedQueue2}
                 selectedQueue2={selectedQueue2}
+                location={category}
               />
             </div>
 
@@ -111,6 +112,7 @@ export default function Admin({params}) {
               setSelectedLoket={setSelectedLoket} // ? FIXED: Prop Name Corrected
               setSelectedQueue2={setSelectedQueue2}
               selectedQueue2={selectedQueue2}
+              location={category}
               />
 
             </div>
