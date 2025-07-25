@@ -14,15 +14,15 @@ import { use } from 'react'; // Next.js 14+
 
 export default function Display({params}) {
   const {category} = use(params);
-
+  console.log(category);
     return (
       <div className="bg-white h-screen min-w-screen flex flex-col">
         {/* Header and content - use flex-1 to allow footer space */}
         <div className="flex-1 overflow-auto p-4">
           <InfoBar />
           <div className="flex flex-row gap-4 mb-4 h-[calc(100%-3rem)]">
-            <NextQueue lokasi={category} />
-            <QueueCall lokasi={category} />
+            <NextQueue location={category} />
+            <QueueCall location={category} />
           </div>
         </div>
         

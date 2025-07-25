@@ -7,7 +7,7 @@ import { Marquee } from "@devnomic/marquee";
 import "@devnomic/marquee/dist/index.css";
 import { queue } from "jquery";
 
-const NextQueue = ({ verificationData, medicineData, pickupData }) => {
+const NextQueue = ({location, verificationData, medicineData, pickupData }) => {
   const [lastCalled, setLastCalled] = useState({
     racik: null,
     nonRacik: null
@@ -110,6 +110,8 @@ isYesterday: new Date(new Date(task.waiting_pickup_medicine_stamp).setHours(0,0,
 };
 
   if (socket) {
+      socket.emit('get_initial_responses_pickup', { location }, console.log("GET INITIAL DATA"));
+
     socket.on('get_responses', handleGetResponses, console.log("GET RESPONSES FE"));
     socket.on('send_latest_pickup',(payload)=> handleLatestPickup(payload));
     // Optional: trigger the data on mount
@@ -123,7 +125,7 @@ isYesterday: new Date(new Date(task.waiting_pickup_medicine_stamp).setHours(0,0,
       socket.off('send_latest_pickup',handleLatestPickup)
     }
   };
-}, []); // Run only once on mount
+}, [socket,location]); // Run only once on mount
 
 
 

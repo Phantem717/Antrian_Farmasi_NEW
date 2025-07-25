@@ -9,6 +9,7 @@ import { queue } from "jquery";
 
 const NextQueue = ({location, verificationData, medicineData, pickupData }) => {
     const socket = getSocket(); // Ensure this returns a singleton socket instance
+    console.log("LOCATION",location);
 
   const [queues, setQueues] = useState({
     nextQueueRacik: [],
@@ -96,7 +97,6 @@ useEffect(() => {
       pickupNonRacik: pickupData.filter(task => task.type === "Non - Racikan"),
     });
 
-    // Calculate and set time estimates
     const newTimes = calculateTime(
       verificationData.length,
       medicineData.filter(task => task.type === "Non - Racikan").length,
@@ -111,7 +111,7 @@ useEffect(() => {
   socket.on('get_responses', handleGetResponses);
 
   // Request initial data
-  socket.emit('get_initial_responses', { location });
+  socket.emit('get_initial_responses', { location }, console.log("GET INITIAL DATA"));
 
   // Cleanup
   return () => {

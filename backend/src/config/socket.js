@@ -29,15 +29,15 @@ module.exports = {
     // ? Tambahkan listener untuk koneksi baru
     io.on('connection', async (socket) => {
      const getData = async (location) => {
-
+    console.log("SOCKET LCOATION",location);
     try {
-      if(location.toLowercase() == "bpjs"){
+      if(location == "bpjs"){
         location = "Lantai 1 BPJS"
       }
-      if(location.toLowercase() == "gmcb"){
+      if(location == "gmcb"){
         location = "Lantai 1 GMCB"
       }
-      if(location.toLowercase() == "lt3"){
+      if(location == "lt3"){
         location = "Lantai 3 GMCB"
       }
       const data = await responseControl.getAllResponses(location);
@@ -56,17 +56,47 @@ module.exports = {
     }
   };
 
+  socket.on('get_initial_responses_pickup', async (payload) => {
+    
+try {
+  let location = payload.location;
+    if(location == "bpjs"){
+        location = "Lantai 1 BPJS"
+      }
+      if(location == "gmcb"){
+        location = "Lantai 1 GMCB"
+      }
+      if(location == "lt3"){
+        location = "Lantai 3 GMCB"
+      }
+  console.log("ON UPDATE"); // ?? Pastikan handler dipanggil
+      const data = await responseControl.getAllResponses(location);
+      io.emit('get_responses', {
+        message: '? Initial data fetched',
+        data: data
+      });
+            // console.log("GET RESPONSE");
+
+    } catch (err) {
+      console.error('? Error fetching responses:', err.message);
+      io.emit('get_responses', {
+        message: '? Failed to fetch data',
+        error: err.message
+      });
+    }
+  });
+
   socket.on('get_initial_responses', async (payload) => {
     const data = getData(payload.location);
 try {
   let location = payload.location;
-    if(location.toLowercase() == "bpjs"){
+    if(location == "bpjs"){
         location = "Lantai 1 BPJS"
       }
-      if(location.toLowercase() == "gmcb"){
+      if(location == "gmcb"){
         location = "Lantai 1 GMCB"
       }
-      if(location.toLowercase() == "lt3"){
+      if(location == "lt3"){
         location = "Lantai 3 GMCB"
       }
       const data = await responseControl.getAllResponses(location);
@@ -88,13 +118,13 @@ socket.on('update_display', async (payload) => {
   
 try {
   let location = payload.location;
-    if(location.toLowercase() == "bpjs"){
+    if(location == "bpjs"){
         location = "Lantai 1 BPJS"
       }
-      if(location.toLowercase() == "gmcb"){
+      if(location == "gmcb"){
         location = "Lantai 1 GMCB"
       }
-      if(location.toLowercase() == "lt3"){
+      if(location == "lt3"){
         location = "Lantai 3 GMCB"
       }
   console.log("ON UPDATE"); // ?? Pastikan handler dipanggil
@@ -117,13 +147,13 @@ try {
       
       try {
           let location = payload.location;
-    if(location.toLowercase() == "bpjs"){
+    if(location == "bpjs"){
         location = "Lantai 1 BPJS"
       }
-      if(location.toLowercase() == "gmcb"){
+      if(location == "gmcb"){
         location = "Lantai 1 GMCB"
       }
-      if(location.toLowercase() == "lt3"){
+      if(location == "lt3"){
         location = "Lantai 3 GMCB"
       }
   console.log("ON UPDATE"); // ?? Pastikan handler dipanggil
@@ -148,13 +178,13 @@ try {
     socket.on('update_verif', async (payload)=>{
       try {
           let location = payload.location;
-    if(location.toLowercase() == "bpjs"){
+    if(location == "bpjs"){
         location = "Lantai 1 BPJS"
       }
-      if(location.toLowercase() == "gmcb"){
+      if(location == "gmcb"){
         location = "Lantai 1 GMCB"
       }
-      if(location.toLowercase() == "lt3"){
+      if(location == "lt3"){
         location = "Lantai 3 GMCB"
       }
   console.log("ON UPDATE"); // ?? Pastikan handler dipanggil
@@ -180,16 +210,16 @@ try {
     socket.on('update_pickup', async (payload) => {
       try {
           let location = payload.location;
-    if(location.toLowercase() == "bpjs"){
+    if(location == "bpjs"){
         location = "Lantai 1 BPJS"
       }
-      if(location.toLowercase() == "gmcb"){
+      if(locatio == "gmcb"){
         location = "Lantai 1 GMCB"
       }
-      if(location.toLowercase() == "lt3"){
+      if(location == "lt3"){
         location = "Lantai 3 GMCB"
       }
-      
+
   console.log("ON UPDATE"); // ?? Pastikan handler dipanggil
       const data = await pickupControl.getPickupToday(location);
       io.emit('get_responses_pickup', {

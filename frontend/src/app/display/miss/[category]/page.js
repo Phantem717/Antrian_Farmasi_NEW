@@ -12,8 +12,9 @@ import { getReactRender } from 'antd/es/config-provider/UnstableContext';
 import { use } from 'react'; // Next.js 14+
 
 
-export default function BPJS_Pickup_Miss() {
+export default function BPJS_Pickup_Miss({params}) {
   const {category} = use(params);
+  console.log(category);
 
     return (
       <div className="bg-white h-screen min-w-screen flex flex-col">
@@ -21,8 +22,8 @@ export default function BPJS_Pickup_Miss() {
         <div className="flex-1 overflow-auto p-4">
           <InfoBar />
           <div className="flex flex-row gap-4 mb-4 h-[calc(100%-3rem)]">
-            <NextQueue lokasi={category} />
-            <QueueCall lokasi={category} />
+            <NextQueue location={category} />
+            <QueueCall location={category} />
           </div>
         </div>
         
