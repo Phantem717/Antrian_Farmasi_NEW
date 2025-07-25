@@ -11,6 +11,7 @@ const NextQueue = ({ verificationData, medicineData, pickupData }) => {
   const [currentDate, setCurrentDate] = useState(new Date().getDate()); // [currentDate,setCurrentDate]
     const socket = getSocket(); // Ensure this returns a singleton socket instance
 
+  
   const [queues, setQueues] = useState({
     nextQueueRacik: [],
     nextQueueNonRacik: [],
@@ -27,8 +28,9 @@ const [times, setTimes] = useState({
    processTimeRacik: 10,
   pickupTimeNon: 10,
   pickupTimeRacik: 10
-});    const socket = getSocket();
-  function calculateTime(verifLength,processLengthNon, processLengthRacik, pickupLengthNon, pickupLengthRacik) {
+});   
+
+function calculateTime(verifLength,processLengthNon, processLengthRacik, pickupLengthNon, pickupLengthRacik) {
   const verifTime = verifLength < 3 ? 10 : verifLength * 10;
   const processTimeNon = processLengthNon < 3 ? 10 : (processLengthNon * 10);
   const processTimeRacik =processLengthRacik< 3 ? 10 : (processLengthRacik * 10)
@@ -111,8 +113,6 @@ useEffect(() => {
   if (socket) {
     socket.on('get_responses', handleGetResponses, console.log("GET RESPONSES FE"));
 
-    // Optional: trigger the data on mount
- 
   }
 
   // Cleanup to avoid multiple listeners
@@ -131,9 +131,9 @@ useEffect(() => {
   const interval = setInterval(() => {
     if (new Date().toDateString() !== currentDate) {
       setCurrentDate(new Date().toDateString());
-      // Refresh logic here
+      window.location.reload();
     }
-  }, 60000);
+  }, 3600000);
   return () => clearInterval(interval);
 }, [currentDate]);
 
