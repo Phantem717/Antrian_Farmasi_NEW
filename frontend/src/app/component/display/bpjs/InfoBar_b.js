@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 
-const InfoBar_b = () => {
+const InfoBar_b = ({location}) => {
   const [time, setTime] = useState(null);
 
   useEffect(() => {
@@ -40,7 +40,7 @@ const InfoBar_b = () => {
 
       {/* Nama Layanan */}
       <div style={{color:"black", textAlign: "center", fontWeight: "bold", fontSize: "1.8rem" }}>
-        Layanan<br />Farmasi
+        Layanan Farmasi {location}
       </div>
 
       {/* Logo */}

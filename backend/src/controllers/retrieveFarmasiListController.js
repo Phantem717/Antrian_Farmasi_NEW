@@ -131,7 +131,7 @@ const getFarmasiList = async (req, res) => {
         patient_name: farmasiArray.payload.patient_name ?? "-",
         farmasi_queue_number: farmasiArray.payload.farmasi_queue_number ?? "-",
         medicine_type: statusMedicine ?? "-",
-        
+        location: "Lantai 1 BPJS",
         SEP: farmasiArray.payload.sep_no ?? "-",
         tanggal_lahir: farmasiArray.payload?.patient_date_of_birth ?? null,
         queue_number: farmasiArray.payload.farmasi_queue_number ?? null,
