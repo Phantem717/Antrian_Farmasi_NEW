@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { get } from 'jquery';
 
 const HOST = process.env.NEXT_PUBLIC_API_HOST; // 🔥 Pastikan server bisa diakses dari IP lain
 const PORT = process.env.NEXT_PUBLIC_API_PORT
@@ -15,19 +16,19 @@ const LogsAPI = {
             throw error;
         }
     },
-     getAllLogsToday: async () => {
+     getAllLogsToday: async (location) => {
         try {
-            const response = await axios.get(`${BASE_URL}/api/logs/today/now`);
+            const response = await axios.get(`${BASE_URL}/api/logs/today/now/${location}`);
             return response.data;
         } catch (error) {
             console.error('Error fetching all appointments:', error);
             throw error;
         }
     },
-    getByPeriod: async (period) => {
+    getByPeriod: async (location,period) => {
 try {
   
-     const response = await axios.get(`${BASE_URL}/api/logs/period/${encodeURIComponent(period)}`);
+     const response = await axios.get(`${BASE_URL}/api/logs/period/${encodeURIComponent(period)}/${location}`);
      console.log("RESP PERIOD",response);
             return response.data;
 } catch (error) {
@@ -36,9 +37,9 @@ try {
 }
     },
 
-    getLogsByDate: async (date) => {
+    getLogsByDate: async (location,date) => {
         try {
-             const response = await axios.get(`${BASE_URL}/api/logs/by-date/${encodeURIComponent(date)}`);
+             const response = await axios.get(`${BASE_URL}/api/logs/by-date/${encodeURIComponent(date)}/${location}`);
             console.log("VERIF",response.data);
             return response.data;
         } catch (error) {
@@ -47,9 +48,9 @@ try {
         }
     },
 
-    getMedicineType : async () => {
+    getMedicineType : async (location) => {
         try {
-            const response = await axios.get(`${BASE_URL}/api/logs/total-medicine`);
+            const response = await axios.get(`${BASE_URL}/api/logs/total-medicine/${location}`);
             return response.data;
         } catch (error) {
             console.error('Error fetching Type:', error);
@@ -57,9 +58,9 @@ try {
         }
     },
 
-    getDataPerHour : async () => {
+    getDataPerHour : async (location) => {
         try {
-            const response = await axios.get(`${BASE_URL}/api/logs/data-per-hour`);
+            const response = await axios.get(`${BASE_URL}/api/logs/data-per-hour/${location}`);
             return response.data;
         } catch (error) {
             console.error('Error fetching Data Per Hour:', error);
@@ -67,15 +68,45 @@ try {
         }
     },
 
-    getAvgServiceTime : async () => {
+    getAvgServiceTime : async (location) => {
         try {
-            const response = await axios.get(`${BASE_URL}/api/logs/service-time`);
+            const response = await axios.get(`${BASE_URL}/api/logs/service-time/${location}`);
             return response.data;
         } catch (error) {
             console.error('Error fetching Data Per Hour:', error);
             throw error;
         }
-    }
+    },
+
+    getAvgServiceTimeByDate : async (fromDate,toDate,location) => {
+        try {
+            const response = await axios.get(`${BASE_URL}/api/logs/service-time/${encodeURIComponent(fromDate)}/${encodeURIComponent(toDate)}/${location}`);
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching Data Per Hour:', error);
+            throw error;
+        }
+    },
+
+    getDataPerHourByDate : async (fromDate,toDate,location) => {
+        try {
+            const response = await axios.get(`${BASE_URL}/api/logs/data-per-hour/${encodeURIComponent(fromDate)}/${encodeURIComponent(toDate)}/${location}`);
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching Data Per Hour:', error);
+            throw error;
+        }
+    },
+
+    getTotalMedicineTypeByDate : async (fromDate,toDate,location) => {
+        try {
+            const response = await axios.get(`${BASE_URL}/api/logs/total-medicine/${encodeURIComponent(fromDate)}/${encodeURIComponent(toDate)}/${location}`);
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching Data Per Hour:', error);
+            throw error;
+        }
+    },
 
 
     

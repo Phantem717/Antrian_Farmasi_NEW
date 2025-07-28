@@ -26,7 +26,11 @@ const getAllLogs = async (req, res) => {
 
 const getLogsToday = async (req,res)=>{
   try {
-        const allLogs = await logs.getToday();
+    let location = req.params.category
+    if(location == "bpjs"){location = "Lantai 1 BPJS"}
+    if(location == "gmcb"){location = "Lantai 1 GMCB"}
+    if(location == "lt3"){location = "Lantai 3 GMCB"}
+        const allLogs = await logs.getToday(location);
 
     res.status(200).json({ 
       message: "List of all Logs",
@@ -44,8 +48,12 @@ const getLogsToday = async (req,res)=>{
 
 const getLogsByDate = async (req,res)=>{
   try {
-    const {date} = req.params
-        const allLogs = await logsTask.getByDate(date);
+    const {date,category} = req.params
+    let location = category;
+    if(location == "bpjs"){location = "Lantai 1 BPJS"}
+    if(location == "gmcb"){location = "Lantai 1 GMCB"}
+    if(location == "lt3"){location = "Lantai 3 GMCB"}
+        const allLogs = await logsTask.getByDate(location,date);
         if(!allLogs){
           return res.status(404).json({message: "Log Not Found"})
         }
@@ -64,8 +72,12 @@ const getLogsByDate = async (req,res)=>{
 }
 const getByPeriod = async (req,res) => {
   try {
-    const {period} = req.params
-    const response = await logsTask.getByTimePeriod(period);
+    const {period,category} = req.params
+     let location = category;
+    if(location == "bpjs"){location = "Lantai 1 BPJS"}
+    if(location == "gmcb"){location = "Lantai 1 GMCB"}
+    if(location == "lt3"){location = "Lantai 3 GMCB"}
+    const response = await logsTask.getByTimePeriod(location,period);
     console.log("FILTER",response);
     if(!response){
        return res.status(404).json({ 
@@ -88,7 +100,11 @@ const getByPeriod = async (req,res) => {
 }
 const getTotalMedicineType = async (req, res) => {
   try {
-    const totalMed = await logs.getTotalMedicineType();
+    let location = req.params.category;
+    if(location == "bpjs"){location = "Lantai 1 BPJS"}
+    if(location == "gmcb"){location = "Lantai 1 GMCB"}
+    if(location == "lt3"){location = "Lantai 3 GMCB"}
+    const totalMed = await logs.getTotalMedicineType(location);
 
     res.status(200).json({ 
       message: "Total Medicine",
@@ -104,7 +120,11 @@ const getTotalMedicineType = async (req, res) => {
 };
 const getAvgServiceTime = async (req, res) => {
   try {
-    const serviceTime = await logs.getAvgServiceTime();
+    let location = req.params.category;
+    if(location == "bpjs"){location = "Lantai 1 BPJS"}
+    if(location == "gmcb"){location = "Lantai 1 GMCB"}
+    if(location == "lt3"){location = "Lantai 3 GMCB"}
+    const serviceTime = await logs.getAvgServiceTime(location);
 
     res.status(200).json({ 
       message: "Total Service Time",
@@ -121,8 +141,84 @@ const getAvgServiceTime = async (req, res) => {
 
 const getDataPerHour = async (req,res)=>{
   try {
-    const dataPerHour = await logs.getDataPerHour();
+    let location = req.params.category;
+    if(location == "bpjs"){location = "Lantai 1 BPJS"}
+    if(location == "gmcb"){location = "Lantai 1 GMCB"}
+    if(location == "lt3"){location = "Lantai 3 GMCB"}
+    const dataPerHour = await logs.getDataPerHour(location);
 
+    res.status(200).json({ 
+      message: "Total Data Per Hour",
+      data: dataPerHour
+    });
+  } catch (error) {
+    console.error("Error fetching hour logs:", error);
+    res.status(500).json({ 
+      message: "Failed to fetch logs", 
+      error: error.message 
+    });
+  }
+}
+
+const getDataPerHourByDate = async (req,res)=>{
+  try {
+    const {fromDate,toDate,category} = req.params
+    
+    let location = category;
+    if(location == "bpjs"){location = "Lantai 1 BPJS"}
+    if(location == "gmcb"){location = "Lantai 1 GMCB"}
+    if(location == "lt3"){location = "Lantai 3 GMCB"}
+    console.log("DATE",fromDate,toDate,location);
+    const dataPerHour = await logsTask.getDataPerHourByDate(fromDate,toDate,location);
+    console.log("DATA PER HOUR",dataPerHour);
+    res.status(200).json({ 
+      message: "Total Data Per Hour",
+      data: dataPerHour
+    });
+  } catch (error) {
+    console.error("Error fetching hour logs:", error);
+    res.status(500).json({ 
+      message: "Failed to fetch logs", 
+      error: error.message 
+    });
+  }
+}
+
+const getAvgServiceTimeByDate = async (req,res)=>{
+  try {
+    const {fromDate,toDate,category} = req.params
+    let location = category;
+    if(location == "bpjs"){location = "Lantai 1 BPJS"}
+    if(location == "gmcb"){location = "Lantai 1 GMCB"}
+    if(location == "lt3"){location = "Lantai 3 GMCB"}
+        console.log("AVG APRAM",fromDate,toDate,location);
+
+    const dataPerHour = await logsTask.getAvgServiceTimeByDate(fromDate,toDate,location);
+    console.log("AVG SERVICE",dataPerHour);
+    res.status(200).json({ 
+      message: "Total Data Per Hour",
+      data: dataPerHour
+    });
+  } catch (error) {
+    console.error("Error fetching hour logs:", error);
+    res.status(500).json({ 
+      message: "Failed to fetch logs", 
+      error: error.message 
+    });
+  }
+}
+
+const getTotalMedicineTypeByDate = async (req,res)=>{
+  try {
+    const {fromDate,toDate,category} = req.params
+    let location = category;
+    if(location == "bpjs"){location = "Lantai 1 BPJS"}
+    if(location == "gmcb"){location = "Lantai 1 GMCB"}
+    if(location == "lt3"){location = "Lantai 3 GMCB"}
+        console.log("TYPE PARAM",fromDate,toDate,location);
+
+    const dataPerHour = await logsTask.getTotalMedicineTypeByDate(fromDate,toDate,location);
+    console.log("MEDICINE",dataPerHour);
     res.status(200).json({ 
       message: "Total Data Per Hour",
       data: dataPerHour
@@ -143,5 +239,8 @@ module.exports = {
   getDataPerHour,
  getLogsToday,
  getLogsByDate,
- getByPeriod
+ getByPeriod,
+ getDataPerHourByDate,
+ getAvgServiceTimeByDate,
+ getTotalMedicineTypeByDate
 };

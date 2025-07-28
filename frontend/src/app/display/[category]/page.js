@@ -19,7 +19,7 @@ export default function Display({params}) {
       <div className="bg-white h-screen min-w-screen flex flex-col">
         {/* Header and content - use flex-1 to allow footer space */}
         <div className="flex-1 overflow-auto p-4">
-          <InfoBar />
+          <InfoBar location={category}/>
           <div className="flex flex-row gap-4 mb-4 h-[calc(100%-3rem)]">
             <NextQueue location={category} />
             <QueueCall location={category} />

@@ -14,7 +14,7 @@ import { LeftCircleOutlined } from "@ant-design/icons";
 const { Sider } = Layout;
 import { Switch } from 'antd';
 
-const Sidebar = ({ collapsed, setCollapsed, isLocation }) => {
+const Sidebar = ({lokasi, collapsed, setCollapsed, isLocation }) => {
   const router = useRouter();
   const pathname = usePathname(); // Ambil path URL saat ini
   const [isWhatsAppEnabled, setIsWhatsAppEnabled] = React.useState(() => {
@@ -31,14 +31,15 @@ const Sidebar = ({ collapsed, setCollapsed, isLocation }) => {
   };
 
   // Mapping URL ke key Menu
+ 
   const menuKeyMapping = {
-    "/login/bpjs/admin-verif-b": "1",
-    "/login/bpjs/admin-proses-b": "2",
-    "/login/bpjs/admin-obat-b": "3",
+    [`/login/${lokasi}/admin-verif-b`]: "1",
+    [`/login/${lokasi}/admin-proses-b`]: "2",
+    [`/login/${lokasi}/admin-obat-b`]: "3",
     "/manajemen-akun": "4",
     "/kinerja-pelayanan": "5",
     "/login/bpjs/edit-marquee-b": "6",
-    "/login/logs": "8"
+    [`/login/${lokasi}/logs`]: "8"
   };
   // Tentukan menu yang aktif berdasarkan pathname
   const currentSelectedKey = menuKeyMapping[pathname] || "1"; // Default ke Admin Verifikasi jika tidak cocok
@@ -65,26 +66,29 @@ const Sidebar = ({ collapsed, setCollapsed, isLocation }) => {
       key: "1",
       icon: <UserOutlined />,
       label: "Admin Verifikasi",
-      onClick: () => router.push("/login/bpjs/admin-verif-b"),
+      onClick: () => router.push(`/login/${lokasi}/admin-verif-b`),
     },
     {
       key: "2",
       icon: <VideoCameraOutlined />,
       label: "Admin Proses Obat",
-      onClick: () => router.push("/login/bpjs/admin-proses-b"),
+      onClick: () => router.push(`/login/${lokasi}/admin-proses-b`),
     },
     {
       key: "3",
       icon: <SettingOutlined />,
       label: "Admin Obat",
-      onClick: () => router.push("/login/bpjs/admin-obat-b"),
+      onClick: () =>{
+        console.log("URL",`${lokasi}`,`/login/${lokasi}/admin-obat-b`);
+        router.push(`/login/${lokasi}/admin-obat-b`)
+      } ,
     },
   
     {
       key: "8",
       icon: <SettingOutlined />,
       label: "View Logs",
-      onClick: () => router.push("/login/logs"),
+      onClick: () => router.push(`/login/${lokasi}/logs`),
     },
   ];
 

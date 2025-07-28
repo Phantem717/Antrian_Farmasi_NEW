@@ -2,17 +2,27 @@ import React, {useState, useEffect} from "react";
 import { Column } from '@ant-design/plots';
 import { Box, Paper, Typography } from "@mui/material";
 import LogsAPI from "@/app/utils/api/Logs";
-const BardataPerHour = () => {
+const BardataPerHour = ({isSubmit,fromDate,toDate,location}) => {
   const [dataPerHour,setdataPerHour] = useState([]);
       
       useEffect(() => {
       const fetchList = async() => {
   
           try {
-      const response = await LogsAPI.getDataPerHour();
+      if(isSubmit == true){
+                  console.log("BAR DATA AVG TRU");
+
+        const response = await LogsAPI.getDataPerHourByDate(fromDate,toDate,location);
+        setdataPerHour(response.data);
+      }else{
+                  console.log("SUBMIT DATA FALSE");
+
+  const response = await LogsAPI.getDataPerHour(location);
       setdataPerHour(response.data);
+      }
+    
   
-  
+      console.log("BAR DATA PER HOUR",dataPerHour);
       }
       catch (err) {
           setError(err.message || "Failed to load data");

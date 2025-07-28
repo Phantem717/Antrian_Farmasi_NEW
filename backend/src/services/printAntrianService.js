@@ -43,7 +43,7 @@ let urlprinter = "";
         },
         htmlContent: {
           judul: {
-            judultext: "Farmasi BPJS",
+            judultext: `Farmasi ${payload.lokasi}`,
             queuenumber: payload.queue_number
           },
           content: {

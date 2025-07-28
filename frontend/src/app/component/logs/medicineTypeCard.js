@@ -3,8 +3,7 @@ import { Box, Paper } from "@mui/material";
 import { Progress } from 'antd';
 import { Pie } from '@ant-design/plots';
 import LogsAPI from "@/app/utils/api/Logs";
-const MedicineTypeCard = () => {
-    // console.log("COUNT",medicineType);
+const MedicineTypeCard = ({isSubmit,fromDate,toDate,location}) => {
     // Safely handle medicineType data
     const [medicineType,setMedicineType] = useState([]);
     
@@ -12,14 +11,21 @@ const MedicineTypeCard = () => {
     const fetchList = async() => {
 
         try {
-    const response = await LogsAPI.getMedicineType();
-    setMedicineType(response.data);
+          if(isSubmit == true){
+                      console.log("SUBMIT MED TRU");
 
+            const response = await LogsAPI.getTotalMedicineTypeByDate(fromDate,toDate,location);
+            setMedicineType(response.data);
+          }
+          else{
+          const response = await LogsAPI.getMedicineType(location);
+          setMedicineType(response.data);
+          }
+              console.log("COUNT",medicineType);
 
     }
     catch (err) {
-        setError(err.message || "Failed to load data");
-        message.error("Failed to load logs data");
+        console.error(err.message || "Failed to load data");
       } finally {
       }
     }

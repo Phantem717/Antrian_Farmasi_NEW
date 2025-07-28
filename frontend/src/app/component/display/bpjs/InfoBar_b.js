@@ -1,9 +1,22 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 
-const InfoBar_b = () => {
+const InfoBar_b = ({location}) => {
   const [time, setTime] = useState(null);
+  const [currLoc,setCurrLoc] = useState();
+  function assignLocation(location){
+    if(location == 'bpjs'){
+      setCurrLoc("Lantai 1 BPJS");
+    }
+    if(location == 'gmcb'){
+      setCurrLoc("Lantai 1 GMCB");
+    }
+    if(location == 'lt3'){
+      setCurrLoc("Lantai 3 GMCB");
+    }
+  }
 
+  
   useEffect(() => {
     const updateClock = () => {
       setTime(new Date());
@@ -12,9 +25,14 @@ const InfoBar_b = () => {
     return () => clearInterval(timerId);
   }, []);
 
+  useEffect(() => {
+    assignLocation(location);
+  },[])
+
   if (!time) {
     return null;
   }
+
 
   return (
     <div
@@ -40,7 +58,7 @@ const InfoBar_b = () => {
 
       {/* Nama Layanan */}
       <div style={{color:"black", textAlign: "center", fontWeight: "bold", fontSize: "1.8rem" }}>
-        Layanan<br />Farmasi
+        Layanan Farmasi <br/>{currLoc}
       </div>
 
       {/* Logo */}
