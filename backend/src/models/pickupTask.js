@@ -219,7 +219,7 @@ ORDER BY
         date,
         location
       ]
-      const [rows] = await connection.execute(query,values);
+      const [rows] = await conn.execute(query,values);
       return rows;
     } catch (error) {
       throw error;
