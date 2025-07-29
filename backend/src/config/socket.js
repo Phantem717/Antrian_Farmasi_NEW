@@ -213,7 +213,7 @@ try {
     if(location == "bpjs"){
         location = "Lantai 1 BPJS"
       }
-      if(locatio == "gmcb"){
+      if(location == "gmcb"){
         location = "Lantai 1 GMCB"
       }
       if(location == "lt3"){

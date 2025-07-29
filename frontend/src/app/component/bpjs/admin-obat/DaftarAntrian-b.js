@@ -215,8 +215,11 @@ const getEarliestTimestamp = (item) => {
     }
   };
 useEffect(() => {
-  getInitalData();
+  
+
+   getInitalData();
   socket.on('get_responses_pickup',(payload)=>{
+    console.log("PROCESSUS",payload);
     processQueue(payload);
   })
 

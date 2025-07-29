@@ -255,7 +255,9 @@ const handleLoketChange = async (loketName) => {
     }
   
     try {
-      for (const NOP of selectedQueueIds) {
+      for
+       (const NOP of selectedQueueIds) {
+      
         await DoctorAppointmentAPI.deleteAppointment(NOP);
         await VerificationAPI.deleteVerificationTask(NOP);
         await PharmacyAPI.deletePharmacyTask(NOP);
