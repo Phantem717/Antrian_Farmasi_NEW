@@ -383,9 +383,10 @@ AND (Date(vt.waiting_verification_stamp) BETWEEN ? AND ?)
   }
 
   static async getDataPerHourByDate(fromDate,toDate,location) {
-    try {
 const pool = await getDb();
   const conn = await pool.getConnection(); // ? Explicit connection
+
+    try {
 
       const query = `SELECT 
       HOUR(completed_pickup_medicine_stamp) AS hour_of_day,

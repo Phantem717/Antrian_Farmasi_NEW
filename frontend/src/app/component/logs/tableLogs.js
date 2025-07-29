@@ -256,8 +256,7 @@ const handleFilterChange = (value) => {
             <TableCell align="center"><strong>No. Rekam Medis</strong></TableCell>
             <TableCell align="center"><strong>Status Medicine</strong></TableCell> 
             <TableCell align="center"><strong>Waiting Verification</strong></TableCell> 
-   
-
+  
             <TableCell align="center"><strong>Completed Verification</strong></TableCell> 
             <TableCell align="center"><strong>Waiting Medicine</strong></TableCell> 
             <TableCell align="center"><strong>Completed Medicine</strong></TableCell> 
