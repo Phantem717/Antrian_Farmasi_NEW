@@ -220,7 +220,9 @@ useEffect(() => {
     processQueue(payload);
   })
 
-  
+    return () => {
+            socket.off('get_responses_pickup');
+        };
 }, [selectedStatus, selectedLoketLocal, date]); // Add date to dependencies
 
 // Add a clear date function
