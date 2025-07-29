@@ -3,83 +3,50 @@ import { Column } from '@ant-design/plots';
 import { Box, Paper, Typography } from "@mui/material";
 import LogsAPI from "@/app/utils/api/Logs";
 
-const AvgServiceTime = ({isSubmit,setIsSubmit,fromDate,toDate,location}) => {
-  const [avgTime, setAvgTime] = useState([]);
+const AvgServiceTime = ({isSubmit, setIsSubmit, fromDate, toDate, location}) => {
+  const [avgTime, setAvgTime] = useState({
+    racikan: 0,
+    nonracikan: 0
+  });
   
   useEffect(() => {
     const fetchList = async () => {
       try {
-        // Make sure to call the function with parentheses
         if(fromDate && toDate){
-          console.log("SUBMIT AVG TRU");
-          const response = await LogsAPI.getAvgServiceTimeByDate(fromDate,toDate,location); 
-          console.log("SERVICE TIME",response);
-          const payload ={
-            racikan : {
-             time: response.data[0]['AVG PROCESSING TIME - RACIKAN (MINUTES)'],
-             type: 'Racikan'
-            },
-            nonracikan : {
-            time: response.data[0]['AVG PROCESSING TIME - NON-RACIKAN (MINUTES)'],
-             type: 'Non - Racikan'
-            }
-           }
-           setAvgTime(payload);
-        }else{
-                    console.log("SUBMIT AVG FALSE");
-
-const response = await LogsAPI.getAvgServiceTime(location); 
-        console.log("SERVICE TIME",response);
-         const payload ={
-       racikan : {
-        time: response.data[0]['AVG PROCESSING TIME - RACIKAN (MINUTES)'],
-        type: 'Racikan'
-       },
-       nonracikan : {
- time: response.data[0]['AVG PROCESSING TIME - NON-RACIKAN (MINUTES)'],
-        type: 'Non - Racikan'
-       }
-      }
-        setAvgTime(payload);
-        setIsSubmit(false);
+          const response = await LogsAPI.getAvgServiceTimeByDate(fromDate, toDate, location); 
+          setAvgTime({
+            racikan: response.data[0]['AVG PROCESSING TIME - RACIKAN (MINUTES)'],
+            nonracikan: response.data[0]['AVG PROCESSING TIME - NON-RACIKAN (MINUTES)']
+          });
+        } else {
+          const response = await LogsAPI.getAvgServiceTime(location);
+          setAvgTime({
+            racikan: response.data[0]['AVG PROCESSING TIME - RACIKAN (MINUTES)'],
+            nonracikan: response.data[0]['AVG PROCESSING TIME - NON-RACIKAN (MINUTES)']
+          });
+          setIsSubmit(false);
         }
-        
       } catch (err) {
         console.error("Error fetching average service time:", err);
       }
     };
     
     fetchList();
-  }, []);
+  }, [isSubmit, fromDate, toDate, location, setIsSubmit]);
 
-  // Improved data conversion and fallback
-  const convertToNumber = (value) => {
-    if (value === null || value === undefined) return 0;
-    if (typeof value === 'number') return value;
-    if (typeof value === 'string') {
-      // Handle different number formats
-      const num = parseFloat(value.replace(',', '.').replace(/[^0-9.-]/g, ''));
-      return isNaN(num) ? 0 : num;
-    }
-    return 0;
-  };
-
-  // Safely prepare chart data
+  // Convert to numbers safely
+  const racikanTime = Math.round(parseFloat(avgTime.racikan)) || 0;
+  const nonracikanTime =Math.round(parseFloat(avgTime.nonracikan))  || 0;
+  console.log(racikanTime, nonracikanTime);
   const chartData = [
-    {
-      type: 'Racikan',
-      time: convertToNumber(avgTime?.racik?.time ?? avgTime?.racikan?.time ?? avgTime?.racikan ?? 0),
-    },
-    {
-      type: 'Non-Racikan',
-      time: convertToNumber(avgTime?.nonracik?.time ?? avgTime?.nonracikan?.time ?? avgTime?.nonracikan ?? 0),
-    }
+    { type: 'Racikan', value: racikanTime },
+    { type: 'Non-Racikan', value: nonracikanTime }
   ];
 
   const config = {
     data: chartData,
     xField: 'type',
-    yField: 'time',
+    yField: 'value',  // Changed from 'time' to 'value'
     seriesField: 'type',
     color: ['#1890ff', '#52c41a'],
     barStyle: {
@@ -87,7 +54,7 @@ const response = await LogsAPI.getAvgServiceTime(location);
     },
     label: {
       position: 'top',
-      formatter: (datum) => `${Math.round(datum.time)} mins`,
+      formatter: (datum) => `${Math.round(datum)} mins`,  // Changed to datum.value
       style: {
         fontSize: 12,
         fill: '#000',
@@ -95,7 +62,7 @@ const response = await LogsAPI.getAvgServiceTime(location);
       },
     },
     yAxis: {
-      min: 0, // Ensure chart starts at 0
+      min: 0,
       title: {
         text: 'Minutes',
         style: {
@@ -103,15 +70,13 @@ const response = await LogsAPI.getAvgServiceTime(location);
         },
       },
     },
-    tooltip: {
-      showTitle: true,
-      formatter: (datum) => {
-        return {
-          name: datum.type,
-          value: `${datum.time.toFixed(1)} minutes`,
-        };
-      },
-    },
+     formatter: (data) => {
+    console.log("Tooltip Data:", data); // Debug actual structure
+    return {
+      name: data.type,
+      value: `${(data.value || 0).toFixed(1)} minutes`,
+    };
+  },
   };
 
   return (
@@ -120,7 +85,7 @@ const response = await LogsAPI.getAvgServiceTime(location);
         <Typography variant="h6" gutterBottom>
           Average Processing Time
         </Typography>
-        {chartData.some(item => item.time > 0) ? (
+        {chartData.some(item => item.value > 0) ? (
           <Column {...config} />
         ) : (
           <Typography variant="body1" align="center" sx={{ mt: 4 }}>

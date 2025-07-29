@@ -101,17 +101,13 @@ x:{
         fontWeight: 'bold',
       },
     },
-    tooltip: {
-      showMarkers: false,
-      domStyles: {
-        'g2-tooltip-title': {
-          fontSize: '16px',
-        },
-        'g2-tooltip-list-item': {
-          fontSize: '14px',
-        },
-      },
-    },
+   formatter: (data) => {
+    console.log("Tooltip Data:", data); // Debug actual structure
+    return {
+      name: data.type,
+      value: `${(data.value || 0).toFixed(1)} minutes`,
+    };
+  },
   };
 
   return (
