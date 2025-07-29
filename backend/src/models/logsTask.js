@@ -364,22 +364,21 @@ AND pt.lokasi = ?
   const conn = await pool.getConnection(); // ? Explicit connection
 
     try {
-      const query = `SELECT 
-    AVG(CASE WHEN da.status_medicine = 'Racikan' 
-             THEN TIMESTAMPDIFF(MINUTE, vt.waiting_verification_stamp, pa.completed_pickup_medicine_stamp) 
-             ELSE NULL END) AS 'AVG PROCESSING TIME - RACIKAN (MINUTES)',
-    AVG(CASE WHEN da.status_medicine != 'Racikan' OR da.status_medicine IS NULL
-             THEN TIMESTAMPDIFF(MINUTE, vt.waiting_verification_stamp, pa.completed_pickup_medicine_stamp) 
-             ELSE NULL END) AS 'AVG PROCESSING TIME - NON-RACIKAN (MINUTES)'
-    
+      const query = `SELECT
+  AVG(CASE WHEN da.status_medicine = 'Racikan' 
+    THEN TIMESTAMPDIFF(MINUTE, vt.waiting_verification_stamp, pa.completed_pickup_medicine_stamp)
+    ELSE NULL END) AS 'AVG PROCESSING TIME - RACIKAN (MINUTES)',
+  AVG(CASE WHEN da.status_medicine != 'Racikan' OR da.status_medicine IS NULL
+    THEN TIMESTAMPDIFF(MINUTE, vt.waiting_verification_stamp, pa.completed_pickup_medicine_stamp)
+    ELSE NULL END) AS 'AVG PROCESSING TIME - NON-RACIKAN (MINUTES)'
 FROM Doctor_Appointments da
 LEFT JOIN Verification_Task vt ON da.NOP = vt.NOP
 LEFT JOIN Pharmacy_Task pt ON da.NOP = pt.NOP
 LEFT JOIN Medicine_Task mt ON da.NOP = mt.NOP
 LEFT JOIN Pickup_Task pa ON da.NOP = pa.NOP
-WHERE pt.status = 'completed_pickup_medicine'
+WHERE pt.status = 'completed_pickup_medicine' 
 AND pt.lokasi = ?
-AND (Date(vt.waiting_verification_stamp) BETWEEN ? AND ?)
+AND (DATE(vt.waiting_verification_stamp) BETWEEN ? AND ?);
   `;
   
   const [rows] = await conn.execute(query,[location,fromDate,toDate]);

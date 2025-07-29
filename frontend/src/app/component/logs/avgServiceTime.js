@@ -36,7 +36,7 @@ const response = await LogsAPI.getAvgServiceTime(location);
         type: 'Racikan'
        },
        nonracikan : {
- time: response.data[0]['AVG PROCESSING TIME - NON-RACIKAN (MINUTES)'],
+        time: response.data[0]['AVG PROCESSING TIME - NON-RACIKAN (MINUTES)'],
         type: 'Non - Racikan'
        }
       }
