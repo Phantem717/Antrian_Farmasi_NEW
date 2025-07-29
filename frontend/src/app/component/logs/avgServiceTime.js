@@ -3,14 +3,14 @@ import { Column } from '@ant-design/plots';
 import { Box, Paper, Typography } from "@mui/material";
 import LogsAPI from "@/app/utils/api/Logs";
 
-const AvgServiceTime = ({isSubmit,fromDate,toDate,location}) => {
+const AvgServiceTime = ({isSubmit,setIsSubmit,fromDate,toDate,location}) => {
   const [avgTime, setAvgTime] = useState([]);
   
   useEffect(() => {
     const fetchList = async () => {
       try {
         // Make sure to call the function with parentheses
-        if(isSubmit == true){
+        if(fromDate && toDate){
           console.log("SUBMIT AVG TRU");
           const response = await LogsAPI.getAvgServiceTimeByDate(fromDate,toDate,location); 
           console.log("SERVICE TIME",response);
@@ -41,6 +41,7 @@ const response = await LogsAPI.getAvgServiceTime(location);
        }
       }
         setAvgTime(payload);
+        setIsSubmit(false);
         }
         
       } catch (err) {

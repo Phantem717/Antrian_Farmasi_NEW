@@ -76,8 +76,15 @@ export default function Logs({params}) {
     if (!filters.fromDate || !filters.toDate) return;
     
     // Trigger refresh by updating the key and isSubmit state
-    setIsSubmit(prev => !prev);
+    setIsSubmit(true);
   };
+
+  const handleClear = async () => {
+    setFilters({ fromDate: null, toDate: null });
+  setIsSubmit(false);
+  setIsSubmit(true);
+  };  
+
   return (
     <Layout style={{ minheight: "100vh", overflow: "hidden" }}>
       <Sidebar  lokasi={category} collapsed={collapsed} setCollapsed={setCollapsed} />
@@ -119,6 +126,7 @@ export default function Logs({params}) {
             required
             onChange={changeFromDate} 
                 maxDate={dayjs(new Date().toISOString(), dateFormat)}
+        value={filters.fromDate ? dayjs(filters.fromDate) : null}
 
             />  </div>
  
@@ -135,9 +143,14 @@ export default function Logs({params}) {
             required
             onChange={changeToDate} 
                 maxDate={dayjs(new Date().toISOString(), dateFormat)}
+                    value={filters.toDate ? dayjs(filters.toDate) : null}
 
-            />  </div>
+            />  
  
+            </div>
+
+
+    
 </Box>
           <Button
           color="primary"
@@ -145,11 +158,25 @@ export default function Logs({params}) {
           type="submit"
           size="large"
           >Submit</Button>
+
+          {(filters.fromDate || filters.toDate) && (
+                <Button
+                  color="secondary"
+                  variant="contained"
+                  size="large"
+                  onClick={handleClear}
+                >
+                  Clear
+                </Button>
+              )}
           </form>
       <MedicineTypeCard 
             key={`medicine-${isSubmit}`}
             isSubmit={isSubmit}
+                                    setIsSubmit={setIsSubmit}
+
             fromDate={filters.fromDate}
+
             toDate={filters.toDate}
             location={category}
           />
@@ -157,6 +184,7 @@ export default function Logs({params}) {
           <BarChart 
             key={`chart-${isSubmit}`}
             isSubmit={isSubmit}
+            setIsSubmit={setIsSubmit}
             fromDate={filters.fromDate}
             toDate={filters.toDate}
             location={category}
@@ -165,6 +193,8 @@ export default function Logs({params}) {
           <AvgServiceTime
             key={`avg-${isSubmit}`}
             isSubmit={isSubmit}
+                        setIsSubmit={setIsSubmit}
+
             fromDate={filters.fromDate}
             toDate={filters.toDate}
             location={category}
