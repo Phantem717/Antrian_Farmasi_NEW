@@ -19,13 +19,16 @@ export default function Antrian({ params }) {
   console.log(category);
   
   async function insertAll(payload){
+    
+  }
+
+  async function handleButtonJaminan(){
 
   }
 
-  async function handleButton(){
-
+   async function handleButtonUmum(){
+    
   }
-
   return (
     <div className="bg-white h-screen min-w-screen flex flex-col">
       {/* Header and content - use flex-1 to allow footer space */}
@@ -36,7 +39,12 @@ export default function Antrian({ params }) {
                 size='large'
                 color='primary'
                 variant='solid'
-            >Ambil Antrian</Button>
+            >Resep Jaminan</Button>
+         <Button
+                size='large'
+                color='primary'
+                variant='solid'
+            >Resep Umum</Button>
         
         </div>
       </div>

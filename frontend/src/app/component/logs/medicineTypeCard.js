@@ -32,9 +32,11 @@ const MedicineTypeCard = ({isSubmit,setIsSubmit,fromDate,toDate,location}) => {
     fetchList();
     },[])
     
-    const racikanCount = medicineType?.[1]?.booking_count || 0;
-    const nonRacikanCount = medicineType?.[0]?.booking_count || 0;
+    const racikanCount = medicineType?.[1]?.booking_count ;
+    const nonRacikanCount = medicineType?.[0]?.booking_count ;
     const total = racikanCount + nonRacikanCount;
+
+    console.log("TOTAL",total,racikanCount,nonRacikanCount);
     const config = {
         data: [
         {type: 'Racikan', value: racikanCount},
@@ -59,6 +61,7 @@ const MedicineTypeCard = ({isSubmit,setIsSubmit,fromDate,toDate,location}) => {
         rowPadding: 5,
       },
     },
+   
     annotations: [
       {
         type: 'text',

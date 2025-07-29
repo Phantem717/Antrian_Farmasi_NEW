@@ -5,29 +5,27 @@ import LogsAPI from "@/app/utils/api/Logs";
 
 const AvgServiceTime = ({isSubmit, setIsSubmit, fromDate, toDate, location}) => {
   const [avgTime, setAvgTime] = useState({
-    racikan: { time: 0, type: 'Racikan' },
-    nonracikan: { time: 0, type: 'Non - Racikan' }
+    racikan: 0,
+    nonracikan: 0
   });
-  const [loading, setLoading] = useState(false);
-
+  
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
+    const fetchList = async () => {
       try {
-        const response = fromDate && toDate
-          ? await LogsAPI.getAvgServiceTimeByDate(fromDate, toDate, location)
-          : await LogsAPI.getAvgServiceTime(location);
-        
-        setAvgTime({
-          racikan: {
-            time: response.data[0]['AVG PROCESSING TIME - RACIKAN (MINUTES)'],
-            type: 'Racikan'
-          },
-          nonracikan: {
-            time: response.data[0]['AVG PROCESSING TIME - NON-RACIKAN (MINUTES)'],
-            type: 'Non - Racikan'
-          }
-        });
+        if(fromDate && toDate){
+          const response = await LogsAPI.getAvgServiceTimeByDate(fromDate, toDate, location); 
+          setAvgTime({
+            racikan: response.data[0]['AVG PROCESSING TIME - RACIKAN (MINUTES)'],
+            nonracikan: response.data[0]['AVG PROCESSING TIME - NON-RACIKAN (MINUTES)']
+          });
+        } else {
+          const response = await LogsAPI.getAvgServiceTime(location);
+          setAvgTime({
+            racikan: response.data[0]['AVG PROCESSING TIME - RACIKAN (MINUTES)'],
+            nonracikan: response.data[0]['AVG PROCESSING TIME - NON-RACIKAN (MINUTES)']
+          });
+          setIsSubmit(false);
+        }
       } catch (err) {
         console.error("Error fetching data:", err);
       } finally {
@@ -36,24 +34,22 @@ const AvgServiceTime = ({isSubmit, setIsSubmit, fromDate, toDate, location}) => 
       }
     };
     
-    fetchData();
+    fetchList();
   }, [isSubmit, fromDate, toDate, location, setIsSubmit]);
 
+  // Convert to numbers safely
+  const racikanTime = Math.round(parseFloat(avgTime.racikan)) ;
+  const nonracikanTime =Math.round(parseFloat(avgTime.nonracikan)) ;
+  console.log(racikanTime, nonracikanTime);
   const chartData = [
-    {
-      type: 'Racikan',
-      time: Number(avgTime.racikan.time) || 0
-    },
-    {
-      type: 'Non-Racikan',
-      time: Number(avgTime.nonracikan.time) || 0
-    }
+    { type: 'Racikan', value: racikanTime },
+    { type: 'Non-Racikan', value: nonracikanTime }
   ];
 
   const config = {
     data: chartData,
     xField: 'type',
-    yField: 'time',
+    yField: 'value',  // Changed from 'time' to 'value'
     seriesField: 'type',
     color: ['#1890ff', '#52c41a'],
     barStyle: {
@@ -61,7 +57,7 @@ const AvgServiceTime = ({isSubmit, setIsSubmit, fromDate, toDate, location}) => 
     },
     label: {
       position: 'top',
-      formatter: (data) => `${Math.round(data.time)} mins`,
+      formatter: (datum) => `${Math.round(datum)} mins`,  // Changed to datum.value
       style: {
         fontSize: 12,
         fill: '#000',
@@ -77,13 +73,13 @@ const AvgServiceTime = ({isSubmit, setIsSubmit, fromDate, toDate, location}) => 
         },
       },
     },
-    tooltip: {
-      showTitle: true,
-      formatter: (data) => ({
-        name: data.type,
-        value: `${data.time.toFixed(1)} minutes`
-      }),
-    },
+     formatter: (data) => {
+    console.log("Tooltip Data:", data); // Debug actual structure
+    return {
+      name: data.type,
+      value: `${(data.value || 0).toFixed(1)} minutes`,
+    };
+  },
   };
 
   return (
@@ -92,9 +88,7 @@ const AvgServiceTime = ({isSubmit, setIsSubmit, fromDate, toDate, location}) => 
         <Typography variant="h6" gutterBottom>
           Average Processing Time
         </Typography>
-        {loading ? (
-          <Typography>Loading...</Typography>
-        ) : chartData.some(item => item.time > 0) ? (
+        {chartData.some(item => item.value > 0) ? (
           <Column {...config} />
         ) : (
           <Typography variant="body1" align="center" sx={{ mt: 4 }}>
