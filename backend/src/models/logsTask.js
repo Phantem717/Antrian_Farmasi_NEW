@@ -408,6 +408,71 @@ const pool = await getDb();
   }
    
   }
+
+   static async getTotalMedicineTypeByDate(fromDate,toDate,location){
+    const pool = await getDb();
+  const conn = await pool.getConnection(); // ? Explicit connection
+
+    try {
+      const query = `  
+    SELECT 
+    da.status_medicine,
+    COUNT(DISTINCT da.NOP) AS booking_count
+FROM 
+    Doctor_Appointments da
+    INNER JOIN Pharmacy_Task pt ON da.NOP = pt.NOP
+    INNER JOIN Verification_Task vt ON da.NOP = vt.NOP
+WHERE 
+    pt.medicine_type IN ('Non - Racikan', 'Racikan')
+    AND pt.lokasi = ?
+    AND DATE(vt.waiting_verification_stamp) BETWEEN ? AND ?
+GROUP BY 
+    da.status_medicine;`;
+          const values = [location,fromDate,toDate];
+          const [rows] = await conn.execute(query,values);
+          return rows;
+    } catch (error) {
+      return error;
+    }finally {
+    conn.release(); // ?? Critical cleanup
+  }
+   
+    
+   
+  }
+
+   static async getTodayMedicineType(location){
+    try {
+const pool = await getDb();
+  const conn = await pool.getConnection(); // ? Explicit connection
+      const query = `  
+      SELECT 
+    AVG(CASE WHEN da.status_medicine = 'Racikan' 
+             THEN TIMESTAMPDIFF(MINUTE, vt.waiting_verification_stamp, pa.completed_pickup_medicine_stamp) 
+             ELSE NULL END) AS 'AVG PROCESSING TIME - RACIKAN (MINUTES)',
+    AVG(CASE WHEN da.status_medicine != 'Racikan' OR da.status_medicine IS NULL
+             THEN TIMESTAMPDIFF(MINUTE, vt.waiting_verification_stamp, pa.completed_pickup_medicine_stamp) 
+             ELSE NULL END) AS 'AVG PROCESSING TIME - NON-RACIKAN (MINUTES)'
+    
+FROM Doctor_Appointments da
+LEFT JOIN Verification_Task vt ON da.NOP = vt.NOP
+LEFT JOIN Pharmacy_Task pt ON da.NOP = pt.NOP
+LEFT JOIN Medicine_Task mt ON da.NOP = mt.NOP
+LEFT JOIN Pickup_Task pa ON da.NOP = pa.NOP
+WHERE pt.medicine_type LIKE 'Non - Racikan' OR pt.medicine_type LIKE 'Racikan'
+AND pt.lokasi = ?
+`;
+          const [rows] = await conn.execute(query,[location]);
+          return rows;
+    } catch (error) {
+      return error;
+    }
+    finally{
+          conn.release(); // ?? Critical cleanup
+
+    }
+   
+  }
 }
 
 module.exports = logsTask;
