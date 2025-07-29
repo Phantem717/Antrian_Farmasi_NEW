@@ -211,10 +211,17 @@ const getEarliestTimestamp = (item) => {
     }
   };
 useEffect(() => {
-  getInitalData();
+  
+
+   getInitalData();
   socket.on('get_responses_pickup',(payload)=>{
+    console.log("PROCESSUS",payload);
     processQueue(payload);
   })
+
+    return () => {
+            socket.off('get_responses_pickup');
+        };
 
   
 }, [selectedStatus, selectedLoketLocal, date]); // Add date to dependencies
