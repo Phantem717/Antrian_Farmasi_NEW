@@ -110,7 +110,7 @@ export default function BarcodeScanner({location, visible, onClose,selectedQueue
             switch_WA: localStorage.getItem('waToggleState')
         };
 
-              socket.emit('update_verif');
+              socket.emit('update_verif',{location});
 
       const WARESP =await WA_API.sendWAAntrian(WAPayload);
                   await new Promise(resolve => setTimeout(resolve, 1000)); // 1-second delay

@@ -86,7 +86,7 @@ FROM Doctor_Appointments da
 WHERE da.queue_number LIKE 'RC%' OR da.queue_number LIKE 'NR%'
 AND da.lokasi = ?
 ORDER BY da.queue_number`;
-      const [rows] = await connection.execute(query, [location]);
+      const [rows] = await conn.execute(query, [location]);
       return rows;
     } catch (error) {
       throw error;

@@ -193,7 +193,7 @@ const getAvgServiceTimeByDate = async (req,res)=>{
     if(location == "lt3"){location = "Lantai 3 GMCB"}
         console.log("AVG APRAM",fromDate,toDate,location);
 
-    const dataPerHour = await logsTask.getAvgServiceTime(fromDate,toDate,location);
+    const dataPerHour = await logsTask.getAvgServiceTimeByDate(fromDate,toDate,location);
     console.log("AVG SERVICE",dataPerHour);
     res.status(200).json({ 
       message: "Total Data Per Hour",
