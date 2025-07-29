@@ -77,7 +77,7 @@ export default function Admin({params}) {
   };
   return (
     <Layout style={{ height: "100vh", overflow: "hidden" }}>
-      <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
+      <Sidebar  lokasi={category} collapsed={collapsed} setCollapsed={setCollapsed} />
 
       <Layout
         style={{

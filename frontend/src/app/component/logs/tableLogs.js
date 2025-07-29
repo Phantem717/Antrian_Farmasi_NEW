@@ -1,6 +1,5 @@
 //src\components\admin\DisplayAntrian.js
 import React, { useState, useEffect } from "react";
-import { DatePicker } from "antd";
 
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
@@ -18,13 +17,15 @@ import {
   Typography,
   Checkbox,
 } from "@mui/material";
-import { ConstructionOutlined } from "@mui/icons-material";
+import { DatePicker } from "antd";
+
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import LogsAPI from "@/app/utils/api/Logs";
 const tableLogs = ({
     selectedQueueIds,// ?? Mengirim daftar nomor yang dipilih
-    setSelectedQueueIds, // ?? Agar bisa diperbarui dari DaftarAntrian
+    setSelectedQueueIds,
+    location // ?? Agar bisa diperbarui dari DaftarAntrian
 }) => {
    dayjs.extend(customParseFormat);
     const dateFormat="YYYY-MM-DD"
@@ -78,9 +79,7 @@ const ExportToExcel = ({ data, fileName }) => {
  useEffect(() => {
     const fetchInitialData = async () => {
       try {
-        const response = await LogsAPI.getAllLogsToday();
-        console.log("TABLELOGS",response.data);
-
+        const response = await LogsAPI.getAllLogsToday(location);
         setQueueList(response.data);
         setFilteredData(response.data);
       } catch (err) {
@@ -101,7 +100,7 @@ const ExportToExcel = ({ data, fileName }) => {
 
         // Apply period filter if selected
         if (selectedFilter) {
-          const response = await LogsAPI.getByPeriod(selectedFilter);
+          const response = await LogsAPI.getByPeriod(location,selectedFilter);
                     console.log("SELECTED",selectedFilter,response);
 
           data = response.data;
@@ -109,7 +108,7 @@ const ExportToExcel = ({ data, fileName }) => {
 
         // Apply date filter if selected
         if (date) {
-          const response = await LogsAPI.getLogsByDate(date);
+          const response = await LogsAPI.getLogsByDate(location,date);
           console.log("SELECTED DATE",date,response);
 
           data = response.data;

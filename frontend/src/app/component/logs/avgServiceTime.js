@@ -3,24 +3,53 @@ import { Column } from '@ant-design/plots';
 import { Box, Paper, Typography } from "@mui/material";
 import LogsAPI from "@/app/utils/api/Logs";
 
-const AvgServiceTime = () => {
+const AvgServiceTime = ({isSubmit,setIsSubmit,fromDate,toDate,location}) => {
   const [avgTime, setAvgTime] = useState([]);
   useEffect(() => {
-  const fetchList = async () => {
-    try {
-      const response = await LogsAPI.getAvgServiceTime();
-      console.log("API Response:", response.data[0]);
-      
-      setAvgTime({
-        racikan: response.data[0]['AVG PROCESSING TIME - RACIKAN (MINUTES)'],
-        nonracikan: response.data[0]['AVG PROCESSING TIME - NON-RACIKAN (MINUTES)']
-      });
-    } catch (err) {
-      console.error("Fetch error:", err);
-    }
-  };
-  fetchList();
-}, []);
+    const fetchList = async () => {
+      try {
+        // Make sure to call the function with parentheses
+        if(fromDate && toDate){
+          console.log("SUBMIT AVG TRU");
+          const response = await LogsAPI.getAvgServiceTimeByDate(fromDate,toDate,location); 
+          console.log("SERVICE TIME",response);
+          const payload ={
+            racikan : {
+             time: response.data[0]['AVG PROCESSING TIME - RACIKAN (MINUTES)'],
+             type: 'Racikan'
+            },
+            nonracikan : {
+            time: response.data[0]['AVG PROCESSING TIME - NON-RACIKAN (MINUTES)'],
+             type: 'Non - Racikan'
+            }
+           }
+           setAvgTime(payload);
+        }else{
+                    console.log("SUBMIT AVG FALSE");
+
+const response = await LogsAPI.getAvgServiceTime(location); 
+        console.log("SERVICE TIME",response);
+         const payload ={
+       racikan : {
+        time: response.data[0]['AVG PROCESSING TIME - RACIKAN (MINUTES)'],
+        type: 'Racikan'
+       },
+       nonracikan : {
+ time: response.data[0]['AVG PROCESSING TIME - NON-RACIKAN (MINUTES)'],
+        type: 'Non - Racikan'
+       }
+      }
+        setAvgTime(payload);
+        setIsSubmit(false);
+        }
+        
+      } catch (err) {
+        console.error("Error fetching average service time:", err);
+      }
+    };
+    
+    fetchList();
+  }, []);
 
   // Improved data conversion and fallback
 const convertToNumber = (value) => {

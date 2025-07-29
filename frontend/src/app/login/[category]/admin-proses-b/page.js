@@ -72,7 +72,7 @@ export default function Admin({params}) {
 
   return (
     <Layout style={{ height: "150vh", overflow: "hidden" }}>
-      <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
+      <Sidebar  lokasi={category} collapsed={collapsed} setCollapsed={setCollapsed} />
       <Layout style={{ marginLeft: siderWidth, display: "flex", flexDirection: "column" }}>
         <Header style={{height: "50vh"}} />
         <MovingText />
