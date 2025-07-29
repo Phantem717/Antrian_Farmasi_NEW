@@ -359,6 +359,7 @@ AND pt.lokasi = ?
   }
 
    static async getAvgServiceTimeByDate(fromDate,toDate,location){
+    console.log("FROM DATE",fromDate,toDate,location);
     const pool = await getDb();
   const conn = await pool.getConnection(); // ? Explicit connection
 
