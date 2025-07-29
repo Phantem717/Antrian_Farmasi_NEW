@@ -20,7 +20,7 @@ const Sidebar = ({lokasi, collapsed, setCollapsed, isLocation }) => {
   const [isWhatsAppEnabled, setIsWhatsAppEnabled] = React.useState(() => {
     if (typeof window !== 'undefined') { // Check for SSR
       const savedState = localStorage.getItem('waToggleState');
-      return savedState ? savedState === 'true' : false; // Default true if no saved state
+      return savedState ? savedState === 'true' : true; // Default true if no saved state
     }
     return true; // Fallback for SSR
   });
