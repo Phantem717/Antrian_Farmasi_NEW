@@ -120,12 +120,13 @@ const socket = getSocket();
       if (statusType === "call" ) {
         setIsCompleteServiceEnabled(true);
       }
+       socket.emit('update_pickup', {location});
+        socket.emit('update_display', {location},console.log("EMIT UPDATE"));
+
       setSelectedQueue2([]); // ✅ Reset pilihan setelah pemanggilan
       
       setSelectedQueueIds([]);
-      socket.emit('update_pickup', {location});
-        socket.emit('update_display', {location},console.log("EMIT UPDATE"));
-
+     
       onStatusUpdate();
       
 
