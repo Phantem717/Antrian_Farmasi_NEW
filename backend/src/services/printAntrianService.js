@@ -14,18 +14,18 @@ let message = "";
 let urlprinter = "";
  if(payload.medicine_type == "Racikan" || payload.queue_number.startsWith("RC")){
  message = "Mohon Menunggu 30 menit sampai 1 jam Karena Obat Anda Adalah Racikan";
- urlprinter="172.16.31.4";
+ urlprinter="172.16.26.78";
  }
 
  else if(payload.medicine_type.startsWith("Non")  || payload.queue_number.startsWith("NR")){
     message = "Mohon Menunggu Bentar Obat anda adalah Non - Racikan"
-    urlprinter="172.16.26.203";
+    urlprinter="172.16.26.78";
 
  }
  
  else{
     message = "Obat Anda Tidak Ada Resepnya"
-        urlprinter="172.16.26.203";
+        urlprinter="172.16.26.78";
 
  }
  let PRB= "";
