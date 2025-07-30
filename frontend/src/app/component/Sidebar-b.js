@@ -7,6 +7,7 @@ import {
   SettingOutlined,
   PoweroffOutlined,
   EditOutlined,
+  AreaChartOutlined 
 } from "@ant-design/icons";
 import { useRouter, usePathname } from "next/navigation";
 import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
@@ -86,7 +87,7 @@ const Sidebar = ({lokasi, collapsed, setCollapsed, isLocation }) => {
   
     {
       key: "8",
-      icon: <SettingOutlined />,
+      icon: <AreaChartOutlined />,
       label: "View Logs",
       onClick: () => router.push(`/login/${lokasi}/logs`),
     },
