@@ -124,7 +124,8 @@ export default function BarcodeScanner({location, onScanResult, handleBulkPharma
        
         // Update local state by removing processed item
 
- socket.emit('update_display');
+        
+        socket.emit('update_display',{location});
         socket.emit('update_proses', {location} );
         socket.emit('update_pickup', {location} );
         socket.emit('update_verif', {location} );
