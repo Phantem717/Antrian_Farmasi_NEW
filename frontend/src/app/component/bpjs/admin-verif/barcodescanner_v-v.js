@@ -123,8 +123,6 @@ export default function BarcodeScanner({location, onScanResult, handleBulkPharma
         // Emit socket events
        
         // Update local state by removing processed item
-
-        
         socket.emit('update_display',{location});
         socket.emit('update_proses', {location} );
         socket.emit('update_pickup', {location} );
