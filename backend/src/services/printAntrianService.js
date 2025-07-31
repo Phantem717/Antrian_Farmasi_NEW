@@ -56,9 +56,11 @@ let urlprinter = "";
             "No SEP": payload.SEP,
             "Tipe Obat" : payload.medicine_type,
             Nama : payload.patient_name,
+            "Doctor Name": payload.doctor_name,
             // "No Antrian" : payload.queue_number,
             "Kode Reservasi" : payload.barcode,
             qrcodedata:payload.barcode,
+
     //   base64Barcode: payload.barcode
           },
           Note: {
