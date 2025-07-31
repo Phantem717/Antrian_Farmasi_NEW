@@ -353,7 +353,8 @@ const changeDate = (date,dateString) => {
     SEP: payload.sep_no || "-",
     tanggal_lahir: payload.patient_date_of_birth || null,
     queue_number : payload.queue_number || "-",
-    patient_name: payload.patient_name || "-"
+    patient_name: payload.patient_name || "-",
+    lokasi: location
   }
 
   console.log("PRINT PAYLOAD",payload);

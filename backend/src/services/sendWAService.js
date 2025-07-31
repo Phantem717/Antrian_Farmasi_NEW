@@ -24,11 +24,11 @@ async function sendWAVerif(payload){
         change_queue_message= `_Nomor Antrian anda telah berubah/diganti dari *${payload.prev_queue_number}* menjadi *${payload.queue_number}*_`
       }
   const url = path;
-console.log("PHONE_NUMBER",payload.phone_number);
+console.log("PHONE_NUMBER",payload.phone_number,payload.switch_WA);
   const response = await axios.post(
     url,
     {
-phone: (payload.switch_WA === true || payload.switch_WA === 'true') ? payload.phone_number : "081286968913",      
+phone: payload.phone_number,      
       // phone: payload.phone_number,
 
       message : `*Notifikasi Sistem Otomatis*
@@ -73,11 +73,11 @@ async function sendWAProses(payload){
 
     const url = path;
     const url_local = `http:/192.168.6.85/api/v1/integration/whatsappweb/hello/send-text`;
-console.log("PHONE_NUMBER",payload.phone_number);
+console.log("PHONE_NUMBER",payload.phone_number,payload.switch_WA);
     const response = await axios.post(
       url,
       {
-phone: (payload.switch_WA === true || payload.switch_WA === 'true') ? payload.phone_number : "081286968913",        // phone: payload.phone_number,
+phone:  payload.phone_number ,        // phone: payload.phone_number,
 
       message: `Notifikasi Sistem Otomatis
 
@@ -133,11 +133,11 @@ async function sendWAAntrian(payload){
 
         }
     const url = path;
-console.log("PHONE_NUMBER",payload.phone_number);
+console.log("PHONE_NUMBER",payload.phone_number,payload.switch_WA);
     const response = await axios.post(
       url,
       {
-phone: (payload.switch_WA === true || payload.switch_WA === 'true') ? payload.phone_number : "081286968913",        // phone: payload.phone_number,
+phone: payload.phone_number ,        // phone: payload.phone_number,
 
         message : `
 Notifikasi Sistem Otomatis
@@ -185,7 +185,7 @@ console.log("PHONE_NUMBER_PICKUP",payload.phone_number);
     const response = await axios.post(
       url,
       {
-phone: (payload.switch_WA === true || payload.switch_WA === 'true') ? payload.phone_number : "081286968913",        // phone: payload.phone_number,
+phone: payload.phone_number ,        // phone: payload.phone_number,
         message : `*Notifikasi Sistem Otomatis*
 
 Terima kasih telah menunggu.

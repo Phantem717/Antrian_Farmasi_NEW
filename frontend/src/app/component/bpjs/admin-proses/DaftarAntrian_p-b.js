@@ -53,12 +53,15 @@ useEffect(() => {
         setLoading(true);
         try {
             if(selectedDate){
+                                console.log("DATE",selectedDate);
+
                 response = await MedicineAPI.getMedicineByDate(location,selectedDate);
             }
             else{
                 response = await MedicineAPI.getMedicineToday(location);
 
             }
+            console.log("RESP",response);
             processQueue(response);
         } catch (error) {
             console.error("Gagal mengambil data antrian:", error);
