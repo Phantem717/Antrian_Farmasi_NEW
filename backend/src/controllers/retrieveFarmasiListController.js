@@ -135,8 +135,8 @@ const getFarmasiList = async (req, res) => {
         SEP: farmasiArray.payload.sep_no ?? "-",
         tanggal_lahir: farmasiArray.payload?.patient_date_of_birth ?? null,
         queue_number: farmasiArray.payload.farmasi_queue_number ?? null,
-        PRB: farmasiArray.payload.PRB ?? null
-
+        PRB: farmasiArray.payload.PRB ?? null,
+        doctor_name: farmasiArray.payload.doctor_name ?? null
       }
 const print = await retryOperation(
     () => printAntrianFarmasi(printPayload),

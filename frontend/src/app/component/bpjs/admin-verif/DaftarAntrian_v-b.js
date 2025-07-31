@@ -525,6 +525,7 @@ Swal.fire({
               <TableCell align="center"><strong>ID Booking</strong></TableCell>
               <TableCell align="center"><strong>Nama Pasien</strong></TableCell>
               <TableCell align="center"><strong>Nomor SEP</strong></TableCell>
+              <TableCell align="center"><strong>Nama Dokter</strong></TableCell>
               <TableCell align="center"><strong>No. Rekam Medis</strong></TableCell>
               <TableCell align="center"><strong>Status</strong></TableCell>
               <TableCell align="center"><strong>Status Medicine</strong></TableCell> 
@@ -551,6 +552,7 @@ return (
     <TableCell align="center">{item.NOP}</TableCell>
     <TableCell align="center">{item.patient_name}</TableCell>
     <TableCell align="center">{item.sep_no}</TableCell>
+    <TableCell align="center">{item.doctor_name}</TableCell>
     <TableCell align="center">{item.medical_record_no || "-"}</TableCell>
     <TableCell align="center">
       {item.status.replace("_verification", "")}
