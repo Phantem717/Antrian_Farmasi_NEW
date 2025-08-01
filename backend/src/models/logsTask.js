@@ -413,7 +413,9 @@ AND (DATE(vt.waiting_verification_stamp) BETWEEN ? AND ?);
     } catch (error) {
       return error;
 
-    }
+    }finally {
+    conn.release(); // ?? Critical cleanup
+  }
    
   }
 

@@ -296,7 +296,9 @@ ORDER BY
       return result;
     } catch (error) {
       throw error;
-    }
+    }finally {
+    conn.release(); // ?? Critical cleanup
+  }
   }
 }
 

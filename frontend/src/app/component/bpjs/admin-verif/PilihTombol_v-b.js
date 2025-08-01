@@ -22,10 +22,7 @@ const PilihAksi = ({location, selectedQueueIds = [], setSelectedQueueIds, select
  console.log("QUEUE4",selectedQueue2);
   const socket = getSocket();
   useEffect(()=>{
-   
-    socket.on('connect',()=>{
-console.log("PILIH TOMBOL CONNECTED");
-    });
+ 
 
     socket.emit('test_pilih', {
       message: "Update Called",
@@ -62,21 +59,8 @@ console.log("PILIH TOMBOL CONNECTED");
 
 
             console.log("SCOKET EMITTED",queue);
-            socket.on("connect_error", (err) => {
-              // the reason of the error, for example "xhr poll error"
-              console.log(err.message);
             
-              // some additional description, for example the status code of the initial HTTP response
-              console.log(err.description);
-            
-              // some additional context, for example the XMLHttpRequest object
-              console.log(err.context);
-            });
-            socket.on('queue_called', (payload) => {
-              // the reason of the error, for example "xhr poll error"
-              console.log("MEssage",payload.message,payload.data);
-            
-            });
+           
             
 
         })

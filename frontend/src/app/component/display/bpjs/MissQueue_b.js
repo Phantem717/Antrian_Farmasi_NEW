@@ -31,6 +31,8 @@ const socket = getSocket();
 
 
         });
+
+        return () => socket.off('get_responses_bpjs');
        
       } catch (error) {
         console.error("❌ Error fetching missed queues:", error);
