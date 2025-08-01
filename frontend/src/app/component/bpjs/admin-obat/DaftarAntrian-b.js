@@ -500,7 +500,7 @@ const hasYesterdayItems = queueList.some(item => item.isYesterday);
 
         <TableRow key={item.NOP} hover>
            
-          <TableCell align="center">
+          <TableCell  align="center">
             <Checkbox
               checked={selectedQueueIds.includes(item.NOP)}
               onChange={() => handleSelectQueue(item.NOP, item)}
@@ -508,27 +508,27 @@ const hasYesterdayItems = queueList.some(item => item.isYesterday);
             
           </TableCell>
           {hasYesterdayItems && (
-        <TableCell align="center">
+        <TableCell style={{ fontWeight: 'bold' }} align="center">
           {item.isYesterday ? (
             <span className="text-red-600 font-bold">KEMARIN</span>
           ) : null}
         </TableCell>
       )}
-                <TableCell align="center" className='font-bold'>{item.queue_number}</TableCell>
+                <TableCell style={{ fontWeight: 'bold' }} align="center" className='font-bold'>{item.queue_number}</TableCell>
                 
-                <TableCell align="center" className='font-bold'>{item.NOP}</TableCell>
-                <TableCell align="center" className='font-bold'>{item.patient_name}</TableCell>
-                <TableCell align="center" className='font-bold'>{item.sep_no}</TableCell>
-                <TableCell align="center" className='font-bold'>
+                <TableCell style={{ fontWeight: 'bold' }} align="center" className='font-bold'>{item.NOP}</TableCell>
+                <TableCell style={{ fontWeight: 'bold' }} align="center" className='font-bold'>{item.patient_name}</TableCell>
+                <TableCell style={{ fontWeight: 'bold' }} align="center" className='font-bold'>{item.sep_no}</TableCell>
+                <TableCell style={{ fontWeight: 'bold' }} align="center" className='font-bold'>
                   {item.medical_record_no || "-"}
                 </TableCell>
-                <TableCell align="center" className='font-bold'>{item.status}</TableCell>
-                <TableCell align="center" className='font-bold'>
+                <TableCell style={{ fontWeight: 'bold' }} align="center" className='font-bold'>{item.status}</TableCell>
+                <TableCell style={{ fontWeight: 'bold' }} align="center" className='font-bold'>
                   {item.status_medicine === "Racikan"
                     ? "Racikan"
                     : item.status_medicine === "Non - Racikan" ? "Non - Racikan" : "Tidak Ada Resep"}
                 </TableCell>
-                 <TableCell align="center" className='font-bold'>
+                 <TableCell style={{ fontWeight: 'bold' }} align="center" className='font-bold'>
                                                             {item.waiting_pickup_medicine_stamp ? new Date(item.waiting_pickup_medicine_stamp).toLocaleString("id-ID", {
                                                                 dateStyle: "medium",
                                                                 timeStyle: "short",

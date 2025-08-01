@@ -548,19 +548,19 @@ return (
 </Button>
     </TableCell>
    
-    <TableCell align="center" className='font-bold'>{item.queue_number}</TableCell>
-    <TableCell align="center" className='font-bold'>{item.NOP}</TableCell>
-    <TableCell align="center" className='font-bold'>{item.patient_name}</TableCell>
-    <TableCell align="center" className='font-bold'>{item.sep_no}</TableCell>
-    <TableCell align="center" className='font-bold'>{item.doctor_name}</TableCell>
-    <TableCell align="center" className='font-bold'>{item.medical_record_no || "-"}</TableCell>
-    <TableCell align="center" className='font-bold'>
+    <TableCell align="center" style={{ fontWeight: 'bold' }} className='font-bold'>{item.queue_number}</TableCell>
+    <TableCell align="center" style={{ fontWeight: 'bold' }} className='font-bold'>{item.NOP}</TableCell>
+    <TableCell align="center" style={{ fontWeight: 'bold' }} className='font-bold'>{item.patient_name}</TableCell>
+    <TableCell align="center" style={{ fontWeight: 'bold' }} className='font-bold'>{item.sep_no}</TableCell>
+    <TableCell align="center" style={{ fontWeight: 'bold' }} className='font-bold'>{item.doctor_name}</TableCell>
+    <TableCell align="center" style={{ fontWeight: 'bold' }} className='font-bold'>{item.medical_record_no || "-"}</TableCell>
+    <TableCell align="center" style={{ fontWeight: 'bold' }} className='font-bold'>
       {item.status.replace("_verification", "")}
     </TableCell>
-    <TableCell align="center" className='font-bold'>
+    <TableCell align="center" style={{ fontWeight: 'bold' }} className='font-bold'>
     {item.status_medicine === "Tidak ada Resep" ? "Tidak ada Resep" : item.status_medicine === "Racikan" ? "Racikan" : item.status_medicine}
     </TableCell>
-     <TableCell align="center" className='font-bold'>
+     <TableCell align="center" style={{ fontWeight: 'bold' }} className='font-bold'>
       <div className="flex flex-row items-center h-full " style={{gap:"1px", minWidth:"120px"}}>
  <Button onClick={(e)=>handleUpdatePhone(item)} className="p-0 m-0">
             <EditIcon className="p-0 m-0"></EditIcon>
@@ -574,7 +574,7 @@ return (
       </div>
    
     </TableCell>
-     <TableCell align="center" className='font-bold'>
+     <TableCell align="center" style={{ fontWeight: 'bold' }} className='font-bold'>
      {item.waiting_verification_stamp 
                 ? new Date(item.waiting_verification_stamp).toLocaleString("id-ID", {
                     dateStyle: "medium",
