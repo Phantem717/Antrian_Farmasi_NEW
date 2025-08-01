@@ -28,7 +28,7 @@ async function initDb() {
     pool = mysql.createPool({
       ...dbConfig,
       waitForConnections: true,
-      connectionLimit: 10,
+      connectionLimit: 20,
       enableKeepAlive: true,
   idleTimeout: 30000,            // 30 seconds idle
   queueLimit: 0,               // Prevent infinite queues
