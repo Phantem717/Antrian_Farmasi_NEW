@@ -22,7 +22,7 @@ const socket = getSocket();
 
  useEffect(() => {
     const shouldEnable = selectedQueue2.some(queue => 
-      queue.status === "waiting_pickup_medicine" || 
+      queue.status === "pending_pickup_medicine" || 
       queue.status === "called_pickup_medicine" ||
       queue.status === "recalled_pickup_medicine"
     );
