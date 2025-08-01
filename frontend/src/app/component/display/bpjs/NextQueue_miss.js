@@ -31,10 +31,10 @@ processTimeRacik: 10,
 
 const socket = getSocket();
   function calculateTime(processLengthNon, processLengthRacik, pickupLengthNon, pickupLengthRacik) {
-  const processTimeNon = processLengthNon < 3 ? 10 : (Math.floor(processLengthNon * 15));
-  const processTimeRacik =processLengthRacik< 3 ? 10 : (Math.floor(processLengthRacik * 15));
-  const pickupTimeNon = pickupLengthNon < 3 ? 10 : (Math.floor(pickupLengthNon * 15));
-  const pickupTimeRacik = pickupLengthRacik < 3 ? 10 : (Math.floor(pickupLengthRacik * 15));
+  const processTimeNon = processLengthNon < 3 ? 10 : (Math.floor(processLengthNon * 20));
+  const processTimeRacik =processLengthRacik< 3 ? 10 : (Math.floor(processLengthRacik * 20));
+  const pickupTimeNon = pickupLengthNon < 3 ? 10 : (Math.floor(pickupLengthNon * 20));
+  const pickupTimeRacik = pickupLengthRacik < 3 ? 10 : (Math.floor(pickupLengthRacik * 20));
   return {  processTimeNon,processTimeRacik, pickupTimeNon,pickupTimeRacik };
 }
 
