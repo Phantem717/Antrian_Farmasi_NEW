@@ -138,6 +138,7 @@ const getFarmasiList = async (req, res) => {
         PRB: farmasiArray.payload.PRB ?? null,
         doctor_name: farmasiArray.payload.doctor_name ?? null
       }
+      
 const print = await retryOperation(
     () => printAntrianFarmasi(printPayload),
     3, // max retries
