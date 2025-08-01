@@ -20,13 +20,15 @@ const socket = getSocket();
     recall: "recalled_pickup_medicine",
   };
 
-  useEffect(() => {
-    selectedQueue2.map((queue) => {
-      if (queue.status === "waiting_pickup_medicine") {
-        setIsCompleteServiceEnabled(true);
-      }
-    })
-  },[selectedQueue2])
+ useEffect(() => {
+    const shouldEnable = selectedQueue2.some(queue => 
+      queue.status === "waiting_pickup_medicine" || 
+      queue.status === "called_pickup_medicine" ||
+      queue.status === "recalled_pickup_medicine"
+    );
+    setIsCompleteServiceEnabled(shouldEnable);
+  }, [selectedQueue2]); // Re-run whenever selectedQueue2 changes
+
   // ✅ Fungsi untuk Update Status ke API Pickup & Pharmacy
   const handleStatusUpdate = async (statusType) => {
     if (!selectedQueue) {
@@ -97,6 +99,8 @@ const socket = getSocket();
               switch_WA: localStorage.getItem('waToggleState')
 
           }
+
+
           console.log("PAYLOAD PICKUP",payload)
         if (queue === selectedQueue2[0]) { // Only for first item
           console.log("CALLED");
