@@ -10,7 +10,6 @@ import DaftarAntrian from "@/app/component/bpjs/admin-verif/DaftarAntrian_v-b";
 import MovingText from "@/app/component/bpjs/admin-verif/Movingtext_v";
 import Sidebar from "@/app/component/Sidebar-b";
 import CreateInstanceForm from "@/app/component/bpjs/admin-verif/createInstanceForm";
-import QueueCall from "@/app/component/display/QueueCall";
 const { Content } = Layout;
 import {getSocket} from "@/app/utils/api/socket";
 import { useRouter, usePathname } from "next/navigation";
