@@ -30,11 +30,11 @@ const [times, setTimes] = useState({
 });    
  function calculateTime(verifLength, processLengthNon, processLengthRacik, pickupLengthNon, pickupLengthRacik) {
   // Divide all multipliers by 2 for faster speed
-  const verifTime = verifLength < 3 ? 5 : verifLength * 5;
-  const processTimeNon = processLengthNon < 3 ? 5 : (processLengthNon * 5);
-  const processTimeRacik = processLengthRacik < 3 ? 5 : (processLengthRacik * 5);
-  const pickupTimeNon = pickupLengthNon < 3 ? 5 : (pickupLengthNon * 5);
-  const pickupTimeRacik = pickupLengthRacik < 3 ? 5 : (pickupLengthRacik * 5);
+  const verifTime = verifLength < 3 ? 5 : verifLength * 10;
+  const processTimeNon = processLengthNon < 3 ? 5 : (processLengthNon * 10);
+  const processTimeRacik = processLengthRacik < 3 ? 5 : (processLengthRacik * 10);
+  const pickupTimeNon = pickupLengthNon < 3 ? 5 : (pickupLengthNon * 10);
+  const pickupTimeRacik = pickupLengthRacik < 3 ? 5 : (pickupLengthRacik * 10);
   return { verifTime, processTimeNon, processTimeRacik, pickupTimeNon, pickupTimeRacik };
 }
 

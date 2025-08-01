@@ -514,21 +514,21 @@ const hasYesterdayItems = queueList.some(item => item.isYesterday);
           ) : null}
         </TableCell>
       )}
-                <TableCell align="center">{item.queue_number}</TableCell>
+                <TableCell align="center" className='font-bold'>{item.queue_number}</TableCell>
                 
-                <TableCell align="center">{item.NOP}</TableCell>
-                <TableCell align="center">{item.patient_name}</TableCell>
-                <TableCell align="center">{item.sep_no}</TableCell>
-                <TableCell align="center">
+                <TableCell align="center" className='font-bold'>{item.NOP}</TableCell>
+                <TableCell align="center" className='font-bold'>{item.patient_name}</TableCell>
+                <TableCell align="center" className='font-bold'>{item.sep_no}</TableCell>
+                <TableCell align="center" className='font-bold'>
                   {item.medical_record_no || "-"}
                 </TableCell>
-                <TableCell align="center">{item.status}</TableCell>
-                <TableCell align="center">
+                <TableCell align="center" className='font-bold'>{item.status}</TableCell>
+                <TableCell align="center" className='font-bold'>
                   {item.status_medicine === "Racikan"
                     ? "Racikan"
                     : item.status_medicine === "Non - Racikan" ? "Non - Racikan" : "Tidak Ada Resep"}
                 </TableCell>
-                 <TableCell align="center">
+                 <TableCell align="center" className='font-bold'>
                                                             {item.waiting_pickup_medicine_stamp ? new Date(item.waiting_pickup_medicine_stamp).toLocaleString("id-ID", {
                                                                 dateStyle: "medium",
                                                                 timeStyle: "short",

@@ -248,13 +248,13 @@ useEffect(() => {
                             ) : queueList.length > 0 ? (
                                 queueList.map((item, index) => (
                                     <TableRow key={index}>
-                                        <TableCell align="center">{item.NOP}</TableCell>
-                                        <TableCell align="center">{item.queue_number}</TableCell>
-                                        <TableCell align="center">{item.patient_name}</TableCell>
-                                        <TableCell align="center">{item.medical_record_no}</TableCell>
-                                        <TableCell align="center">{item.status}</TableCell>
-                                        <TableCell align="center">{item.medicine_type}</TableCell>
-                                        <TableCell align="center">
+                                        <TableCell align="center" className='font-bold'>{item.NOP}</TableCell>
+                                        <TableCell align="center" className='font-bold'>{item.queue_number}</TableCell>
+                                        <TableCell align="center" className='font-bold'>{item.patient_name}</TableCell>
+                                        <TableCell align="center" className='font-bold'>{item.medical_record_no}</TableCell>
+                                        <TableCell align="center" className='font-bold'>{item.status}</TableCell>
+                                        <TableCell align="center" className='font-bold'>{item.medicine_type}</TableCell>
+                                        <TableCell align="center" className='font-bold'>
                                             {item.timestamp ? new Date(item.timestamp).toLocaleString("id-ID", {
                                                 dateStyle: "medium",
                                                 timeStyle: "short",
@@ -264,7 +264,7 @@ useEffect(() => {
                                 ))
                             ) : (
                                 <TableRow>
-                                    <TableCell colSpan={7} align="center">Tidak ada antrean waiting_medicine untuk tanggal {selectedDate}.</TableCell>
+                                    <TableCell colSpan={7} align="center" className='font-bold'>Tidak ada antrean waiting_medicine untuk tanggal {selectedDate}.</TableCell>
                                 </TableRow>
                             )}
                         </TableBody>

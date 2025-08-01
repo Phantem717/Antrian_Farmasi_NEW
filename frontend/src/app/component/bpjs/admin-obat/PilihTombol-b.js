@@ -62,6 +62,10 @@ const socket = getSocket();
             NOP: selectedQueue.NOP,
             body: requestBody,
           });
+          
+            if (queue.status != "waiting_pickup_medicine" ) {
+        setIsCompleteServiceEnabled(true);
+      }
       
           await Promise.all([
             PickupAPI.updatePickupTask(queue.NOP, requestBody),
@@ -118,9 +122,7 @@ const socket = getSocket();
       });
 
       // ✅ Jika "PANGGIL NOMOR" ditekan, aktifkan "SELESAIKAN LAYANAN"
-      if (queue.status != "waiting_pickup_medicine" ) {
-        setIsCompleteServiceEnabled(true);
-      }
+    
        socket.emit('update_pickup', {location});
         socket.emit('update_display', {location},console.log("EMIT UPDATE"));
 
