@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { Box, Button } from "@mui/material";
 import PickupAPI from "@/app/utils/api/Pickup";
 import PharmacyAPI from "@/app/utils/api/Pharmacy";
@@ -20,6 +20,13 @@ const socket = getSocket();
     recall: "recalled_pickup_medicine",
   };
 
+  useEffect(() => {
+    selectedQueue2.map((queue) => {
+      if (queue.status === "waiting_pickup_medicine") {
+        setIsCompleteServiceEnabled(true);
+      }
+    })
+  },[selectedQueue2])
   // ✅ Fungsi untuk Update Status ke API Pickup & Pharmacy
   const handleStatusUpdate = async (statusType) => {
     if (!selectedQueue) {
@@ -66,7 +73,7 @@ const socket = getSocket();
             if (queue.status != "waiting_pickup_medicine" ) {
         setIsCompleteServiceEnabled(true);
       }
-      
+
           await Promise.all([
             PickupAPI.updatePickupTask(queue.NOP, requestBody),
             PharmacyAPI.updatePharmacyTask(queue.NOP, requestBody),
