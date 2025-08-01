@@ -24,7 +24,7 @@ async function sendWAVerif(payload){
         change_queue_message= `_Nomor Antrian anda telah berubah/diganti dari *${payload.prev_queue_number}* menjadi *${payload.queue_number}*_`
       }
   const url = path;
-console.log("PHONE_NUMBER",payload.phone_number);
+console.log("PHONE_NUMBER",payload.phone_number,payload.switch_WA ,typeof payload.switch_WA); 
   const response = await axios.post(
     url,
     {
