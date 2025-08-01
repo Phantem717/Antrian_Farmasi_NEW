@@ -6,6 +6,7 @@ import Swal from "sweetalert2";
 import {getSocket} from "@/app/utils/api/socket";
 import DoctorAppointmentAPI from "@/app/utils/api/Doctor_Appoinment";
 import WA_API from "@/app/utils/api/WA";
+import { queue } from "jquery";
 const PilihAksi = ({location, selectedQueue,selectedQueueIds = [], setSelectedQueueIds, onStatusUpdate, setSelectedQueue2,selectedQueue2 }) => {
   console.log("QUEUS",selectedQueue2);
 const socket = getSocket();
@@ -117,7 +118,7 @@ const socket = getSocket();
       });
 
       // ✅ Jika "PANGGIL NOMOR" ditekan, aktifkan "SELESAIKAN LAYANAN"
-      if (statusType === "call" ) {
+      if (queue.status != "waiting_pickup_medicine" ) {
         setIsCompleteServiceEnabled(true);
       }
        socket.emit('update_pickup', {location});
