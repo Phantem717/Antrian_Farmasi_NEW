@@ -541,7 +541,7 @@ Swal.fire({
               // console.log("VERIFKEY",item.booking_id);
 return (
               
-  <TableRow key={item.NOP} hover>
+  <TableRow  key={item.NOP} hover>
     <TableCell align="center" className="flex flex-row justify-center items-center">
       <Checkbox checked={selectedQueueIds.includes(item.NOP)} onChange={() => handleSelectQueue(item.NOP)} />
         <Button onClick={()=>handlePrintFunction(item)}>      <PrintIcon className="flex items-middle" ></PrintIcon>
@@ -576,11 +576,9 @@ return (
     </TableCell>
      <TableCell align="center" style={{ fontWeight: 'bold' }} className='font-bold'>
      {item.waiting_verification_stamp 
-                ? new Date(item.waiting_verification_stamp).toLocaleString("id-ID", {
-                    dateStyle: "medium",
-                    timeStyle: "short",
-                })
-                : "-"}
+                      ? dayjs(item.waiting_verification_stamp , "YYYY-MM-DD HH:mm:ss").format("DD MMM YYYY HH:mm")
+    
+                    : "-"}
                     </TableCell>
   </TableRow>
 )

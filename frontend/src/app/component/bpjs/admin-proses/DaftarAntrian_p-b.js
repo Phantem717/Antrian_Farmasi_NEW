@@ -255,10 +255,10 @@ useEffect(() => {
                                         <TableCell style={{ fontWeight: 'bold' }} align="center" className='font-bold'>{item.status}</TableCell>
                                         <TableCell style={{ fontWeight: 'bold' }} align="center" className='font-bold'>{item.medicine_type}</TableCell>
                                         <TableCell style={{ fontWeight: 'bold' }} align="center" className='font-bold'>
-                                            {item.timestamp ? new Date(item.timestamp).toLocaleString("id-ID", {
-                                                dateStyle: "medium",
-                                                timeStyle: "short",
-                                            }) : "-"}
+                                            {item.timestamp 
+                                                                 ? dayjs(item.timestamp , "YYYY-MM-DD HH:mm:ss").format("DD MMM YYYY HH:mm")
+                                               
+                                                               : "-"}
                                         </TableCell>
                                     </TableRow>
                                 ))

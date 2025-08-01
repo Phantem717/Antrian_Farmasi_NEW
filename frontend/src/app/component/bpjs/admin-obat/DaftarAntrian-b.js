@@ -529,10 +529,10 @@ const hasYesterdayItems = queueList.some(item => item.isYesterday);
                     : item.status_medicine === "Non - Racikan" ? "Non - Racikan" : "Tidak Ada Resep"}
                 </TableCell>
                  <TableCell style={{ fontWeight: 'bold' }} align="center" className='font-bold'>
-                                                            {item.waiting_pickup_medicine_stamp ? new Date(item.waiting_pickup_medicine_stamp).toLocaleString("id-ID", {
-                                                                dateStyle: "medium",
-                                                                timeStyle: "short",
-                                                            }) : "-"}
+                                                          {item.waiting_pickup_medicine_stamp 
+                                                                               ? dayjs(item.waiting_pickup_medicine_stamp , "YYYY-MM-DD HH:mm:ss").format("DD MMM YYYY HH:mm")
+                                                             
+                                                                             : "-"}
                                                         </TableCell>
               </TableRow>
             ))}
