@@ -8,6 +8,7 @@ const { getCurrentTimestamp, convertToJakartaTime } = require('../handler/timeHa
 const { createAntrianFarmasi } = require('../services/createFarmasiQueueService');
 const { createVerificationTaskInternal } = require('./verificationTaskController');
 const { printAntrianFarmasi } = require('../services/printAntrianService');
+const {getAllResponses} = require('../controllers/responsesController')
 let io;
 let shouldEmit;
 
@@ -157,9 +158,10 @@ const print = await retryOperation(
           message: 'Print Error'
         });
       }
+      const data = await getAllResponses("Lantai 1 BPJS");
        io.emit('insert_appointment', {
     message: 'Doctor Created Successfully',
-    data: existingDoctorAppointment
+    data: data
   });
     }
   
