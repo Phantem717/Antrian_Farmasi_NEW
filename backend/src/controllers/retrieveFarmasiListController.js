@@ -2,6 +2,7 @@ const VerificationTask = require('../models/verificationTask');
 const MedicineTask = require('../models/medicineTask');
 const DoctorAppointment = require('../models/doctorAppointments');
 const PharmacyTask = require('../models/pharmacyTask');
+const {getAllResponses}= require('../controllers/responsesController')
 const sendWA = require('../services/sendWAService');
 const { checkQueue, fetchRegistrationData, sendToWA } = require('../services/BarcodeService');
 const { getCurrentTimestamp, convertToJakartaTime } = require('../handler/timeHandler');
@@ -154,9 +155,10 @@ const print = await retryOperation(
         });
       }
     }
+    const getResp = await getAllResponses(payload.location);
      io.emit('insert_appointment',{
       message: 'Doctor Created Succesfully',
-      data: existingDoctorAppointment
+      data: getResp
     });
 
     return res.status(201).json({
