@@ -117,7 +117,7 @@ const getVerificationToday = async (req,res) => {
 
     } 
     const tasks = await VerificationTask.getToday(location);
-console.log("TASLS",tasks)
+// console.log("TASLS",tasks)
     // 🔹 Filter hanya status dari "waiting_verification" sampai "completed_verification"
     const validStatuses = [
       "waiting_verification",
