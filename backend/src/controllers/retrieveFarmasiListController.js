@@ -156,7 +156,7 @@ const print = await retryOperation(
       }
     }
     
-    });
+    
    io.emit('insert_appointment',{
       message: 'Doctor Created Succesfully 2',
       data: existingDoctorAppointment
