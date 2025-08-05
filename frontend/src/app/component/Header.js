@@ -16,7 +16,7 @@ const Header = () => {
         padding: 3,
         width: '100%',
         position: 'relative',
-        backgroundColor: 'white', // Warna latar belakang header (opsional)
+        backgroundColor: '#F0F0F0', // Warna latar belakang header (opsional)
       }}
     >
       {/* Atur box untuk logo */}

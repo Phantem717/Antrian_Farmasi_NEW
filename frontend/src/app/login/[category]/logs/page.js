@@ -105,7 +105,7 @@ export default function Logs({params}) {
           style={{
             flex: 1,
             padding: "24px",
-            background: "#fff",
+            background: "#F0F0F0",
             overflow: "hidden",
             display: "flex",
             flexDirection: "column",

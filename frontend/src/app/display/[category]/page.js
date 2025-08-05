@@ -15,7 +15,7 @@ export default function Display({params}) {
   const {category} = use(params);
   console.log(category);
     return (
-      <div className="bg-gray-300 h-screen min-w-screen flex flex-col">
+      <div className="bg-gray-200 h-screen min-w-screen flex flex-col">
         {/* Header and content - use flex-1 to allow footer space */}
         <div className="flex-1 overflow-auto p-4">
           <InfoBar location={category}/>

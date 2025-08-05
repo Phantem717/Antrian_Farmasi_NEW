@@ -28,7 +28,7 @@ const [times, setTimes] = useState({
   pickupTimeNon: 10,
   pickupTimeRacik: 10
 });    
- function calculateTime(verifLength, processLengthNon, processLengthRacik, pickupLengthNon, pickupLengthRacik) {
+  function calculateTime(verifLength, processLengthNon, processLengthRacik, pickupLengthNon, pickupLengthRacik) {
   // Divide all multipliers by 2 for faster speed
   const verifTime = verifLength < 3 ? 5 : Math.floor(verifLength * 1);
   const processTimeNon = processLengthNon < 3 ? 5 : (Math.floor(processLengthNon * 1));
@@ -148,7 +148,7 @@ useEffect(() => {
   const renderQueueItems = (queues, isRacikan = true) => {
     if (queues.length === 0) {
       return (
-        <div className="bg-white text-black p-4 shadow text-center font-bold text-2xl w-full">
+        <div className="bg-gray-100 text-black p-4 shadow text-center font-bold text-2xl w-full">
           Belum Ada Antrian
         </div>
       );
@@ -157,7 +157,7 @@ useEffect(() => {
     return queues.map((queue, index) => (
       <div
         key={`${queue.queueNumber}-${index}-${isRacikan ? 'racik' : 'nonracik'}`}
-        className="bg-white text-green-700 text-6xl font-extrabold p-4 shadow border-2 border-black rounded w-full"
+        className="bg-gray-100 text-green-700 text-6xl font-extrabold p-4 shadow border-2 border-black rounded w-full"
         style={{ 
           height: '160px',
           marginBottom: '8px',
@@ -204,7 +204,7 @@ useEffect(() => {
       
       <div className="flex gap-4 mt-4 flex-wrap">
         {/* Racikan Section */}
-        <div className="flex-1 min-w-[300px] bg-white p-2 rounded-md shadow-md overflow-hidden">
+        <div className="flex-1 min-w-[300px] bg-gray-100 p-2 rounded-md shadow-md overflow-hidden">
           <p className="text-2xl font-extrabold text-center text-green-700 uppercase">Racikan</p>
           {queuesRacik.length > 4 ? 
             renderMarqueeSection(queuesRacik, times.processTimeRacik, true) :
@@ -215,7 +215,7 @@ useEffect(() => {
         </div>
 
         {/* Non-Racikan Section */}
-        <div className="flex-1 min-w-[300px] bg-white p-2 rounded-md shadow-md overflow-hidden">
+        <div className="flex-1 min-w-[300px] bg-gray-100 p-2 rounded-md shadow-md overflow-hidden">
           <p className="text-2xl font-extrabold text-center text-green-700 uppercase">Non-Racikan</p>
           {queuesNonRacik.length > 4 ? 
             renderMarqueeSection(queuesNonRacik, times.processTimeNon, false) :
@@ -233,7 +233,7 @@ useEffect(() => {
   const renderQueueItems = () => {
     if (queues.length === 0) {
       return (
-        <div className="bg-white text-black p-2 shadow text-center font-bold text-2xl">
+        <div className="bg-gray-100 text-black p-2 shadow text-center font-bold text-2xl">
           Belum Ada Antrian
         </div>
       );
@@ -242,7 +242,7 @@ useEffect(() => {
     return queues.map((queue, index) => (
       <div 
         key={`${queue.queueNumber}-${index}`}
-        className="flex items-center flex-col justify-between bg-white text-green-700 text-6xl font-extrabold p-4 shadow text-center border-2 border-black rounded w-full"
+        className="flex items-center flex-col justify-between bg-gray-100 text-green-700 text-6xl font-extrabold p-4 shadow text-center border-2 border-black rounded w-full"
       >
         <div className="flex flex-row gap-5 justify-around w-full h-1/6">
           <div className={`flex-1 text-4xl text-left items-middle ${getStatusColor(queue.status)}`}>
@@ -266,7 +266,7 @@ useEffect(() => {
     <div className={`p-4 flex-1 min-w-0 ${bgColor} rounded-lg shadow-md`} style={{ height: "1180px" }}>
       <p className="text-2xl font-bold text-white text-center uppercase">{title}</p>
       <div className="flex gap- mt-2">
-        <div className="bg-white p-2 rounded-md shadow-md w-full h-full">
+        <div className="bg-gray-100 p-2 rounded-md shadow-md w-full h-full">
           {queues.length > 5 ? (
             <Marquee 
               fade={false} 
@@ -294,9 +294,9 @@ const QueueSectionPickup = ({ title, queuesRacik, queuesNonRacik, bgColor }) => 
     <p className="text-2xl font-bold text-white text-center uppercase">{title}</p>
     <div className="flex flex-wrap gap-2 mt-2 overflow-x-hidden">
       {/* Racikan */}
-      <div className="flex-1 min-w-[300px] bg-white p-2 rounded-md shadow-md" style={{height: `1120px`}}>
+      <div className="flex-1 min-w-[300px] bg-gray-100 p-2 rounded-md shadow-md" style={{height: `1120px`}}>
         <p className="text-2xl font-extrabold text-center text-green-700 uppercase">Racikan</p>
-        <div className="bg-white rounded-md p-2">
+        <div className="bg-gray-100 rounded-md p-2">
           {queuesRacik.length > 0 ? (
               <Marquee fade={true} direction="up" className="gap-[3rem]" innerClassName="gap-[3rem] [--gap:3rem]"       
               style={{ '--duration': `${times.pickupTimeRacik}s`,     height: `1060px` // Dynamic height
@@ -306,7 +306,7 @@ const QueueSectionPickup = ({ title, queuesRacik, queuesNonRacik, bgColor }) => 
                 {queuesRacik.map((queue, index) => (
                   <div
                     key={index}
-                    className={`uppercase bg-white p-4 shadow font-extrabold rounded mb-1 flex flex-col items-center justify-center text-center ${getStatusColourBorder(queue.status)}`}
+                    className={`uppercase bg-gray-100 p-4 shadow font-extrabold rounded mb-1 flex flex-col items-center justify-center text-center ${getStatusColourBorder(queue.status)}`}
                     style={{ minHeight: "140px" }}
                   >
                     <div className="flex flex-col font-extrabold">
@@ -326,7 +326,7 @@ const QueueSectionPickup = ({ title, queuesRacik, queuesNonRacik, bgColor }) => 
               </div>
             </Marquee>
           ) : (
-            <div className="bg-white text-black p-2 shadow text-center font-bold text-2xl h-full flex items-center justify-center">
+            <div className="bg-gray-100 text-black p-2 shadow text-center font-bold text-2xl h-full flex items-center justify-center">
               Belum Ada Antrian
             </div>
           )}
@@ -334,9 +334,9 @@ const QueueSectionPickup = ({ title, queuesRacik, queuesNonRacik, bgColor }) => 
       </div>
 
       {/* Non-Racikan */}
-      <div className="flex-1 min-w-[300px] bg-white p-2 rounded-md shadow-md" style={{height: `1120px`}}>
+      <div className="flex-1 min-w-[300px] bg-gray-100 p-2 rounded-md shadow-md" style={{height: `1120px`}}>
         <p className="text-2xl font-extrabold text-center text-green-700 uppercase">Non-Racikan</p>
-        <div className="bg-white rounded-md p-2" style={{ height: "1000px" }}>
+        <div className="bg-gray-100 rounded-md p-2" style={{ height: "1000px" }}>
           {queuesNonRacik.length > 0 ? (
             <Marquee
               direction="up"
@@ -348,7 +348,7 @@ const QueueSectionPickup = ({ title, queuesRacik, queuesNonRacik, bgColor }) => 
                 {queuesNonRacik.map((queue, index) => (
                   <div
                     key={index}
-                    className={`uppercase bg-white p-4 shadow font-extrabold rounded mb-1 flex flex-col items-center justify-center text-center ${getStatusColourBorder(queue.status)}`}
+                    className={`uppercase bg-gray-100 p-4 shadow font-extrabold rounded mb-1 flex flex-col items-center justify-center text-center ${getStatusColourBorder(queue.status)}`}
                     style={{ minHeight: "140px" }}
                   >
                    <div className="flex flex-col font-extrabold">
@@ -368,7 +368,7 @@ const QueueSectionPickup = ({ title, queuesRacik, queuesNonRacik, bgColor }) => 
               </div>
             </Marquee>
           ) : (
-            <div className="bg-white text-black p-2 shadow text-center font-bold text-2xl h-full flex items-center justify-center">
+            <div className="bg-gray-100 text-black p-2 shadow text-center font-bold text-2xl h-full flex items-center justify-center">
               Belum Ada Antrian
             </div>
           )}
@@ -378,7 +378,7 @@ const QueueSectionPickup = ({ title, queuesRacik, queuesNonRacik, bgColor }) => 
   </div>
 );
   return (
-   <div className="bg-white p-4 shadow-lg border border-green-700 w-full "  style={{ minHeight: "300px" }}>
+   <div className="bg-gray-100 p-4 shadow-lg border border-green-700 w-full "  style={{ minHeight: "300px" }}>
       <div className="flex w-full gap-4 flex-wrap justify-center">
         <QueueSectionVerification 
           title="Proses Pengecekan Ketersediaan Obat" 

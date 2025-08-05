@@ -221,7 +221,7 @@ const QueuePickup = ({ title, queuesRacik, queuesNonRacik, bgColor }) => {
   const renderQueueItem = (queue, isRacikan = true) => (
     <div
       key={`${queue.queueNumber}-${isRacikan ? 'racik' : 'nonracik'}`}
-      className="bg-white text-green-700 text-6xl font-extrabold p-4 shadow border-2 border-black rounded w-full"
+      className="bg-gray-100 text-green-700 text-6xl font-extrabold p-4 shadow border-2 border-black rounded w-full"
       style={{ 
         height: '160px', 
         marginBottom: '8px', 
@@ -243,7 +243,7 @@ const QueuePickup = ({ title, queuesRacik, queuesNonRacik, bgColor }) => {
   const renderQueueList = (queues, isRacikan = true) => {
     if (queues.length === 0) {
       return (
-        <div className="bg-white text-black p-4 shadow text-center font-bold text-2xl w-full">
+        <div className="bg-gray-100 text-black p-4 shadow text-center font-bold text-2xl w-full">
           Belum Ada Antrian
         </div>
       );
@@ -283,7 +283,7 @@ const QueuePickup = ({ title, queuesRacik, queuesNonRacik, bgColor }) => {
 
       <div className="flex gap-4 mt-4 flex-wrap">
         {/* Racikan Section */}
-        <div className="flex-1 min-w-[300px] bg-white p-2 rounded-md shadow-md overflow-hidden">
+        <div className="flex-1 min-w-[300px] bg-gray-100 p-2 rounded-md shadow-md overflow-hidden">
           <p className="text-2xl font-extrabold text-center text-green-700 uppercase">Racikan</p>
           {queuesRacik.length > 3 ? 
             renderMarqueeSection(queuesRacik, times.processTimeRacik, true) :
@@ -294,7 +294,7 @@ const QueuePickup = ({ title, queuesRacik, queuesNonRacik, bgColor }) => {
         </div>
 
         {/* Non-Racikan Section */}
-        <div className="flex-1 min-w-[300px] bg-white p-2 rounded-md shadow-md overflow-hidden">
+        <div className="flex-1 min-w-[300px] bg-gray-100 p-2 rounded-md shadow-md overflow-hidden">
           <p className="text-2xl font-extrabold text-center text-green-700 uppercase">Non-Racikan</p>
           {queuesNonRacik.length > 3 ? 
             renderMarqueeSection(queuesNonRacik, times.processTimeNon, false) :
@@ -311,7 +311,7 @@ const QueuePickupTerlewat = ({ title, queuesRacik, queuesNonRacik, bgColor }) =>
   const renderQueueItem = (queue, isRacikan = true) => (
     <div
       key={`${queue.queueNumber}-${isRacikan ? 'racik' : 'nonracik'}`}
-      className={`uppercase bg-white p-4 shadow font-extrabold rounded mb-1 flex flex-col items-center justify-center text-center ${getStatusColourBorder(queue.status)}`}
+      className={`uppercase bg-gray-100 p-4 shadow font-extrabold rounded mb-1 flex flex-col items-center justify-center text-center ${getStatusColourBorder(queue.status)}`}
       style={{ minHeight: "140px" }}
     >
       <div className="flex flex-col font-extrabold">
@@ -331,7 +331,7 @@ const QueuePickupTerlewat = ({ title, queuesRacik, queuesNonRacik, bgColor }) =>
   const renderQueueList = (queues, isRacikan = true) => {
     if (queues.length === 0) {
       return (
-        <div className="bg-white text-black p-2 shadow text-center font-bold text-2xl h-full flex items-center justify-center">
+        <div className="bg-gray-100 text-black p-2 shadow text-center font-bold text-2xl h-full flex items-center justify-center">
           Belum Ada Antrian
         </div>
       );
@@ -360,9 +360,9 @@ const QueuePickupTerlewat = ({ title, queuesRacik, queuesNonRacik, bgColor }) =>
   );
 
   const renderQueueSection = (queues, duration, label, isRacikan = true) => (
-    <div className="flex-1 min-w-[300px] bg-white p-2 rounded-md shadow-md" style={{ height: '1120px' }}>
+    <div className="flex-1 min-w-[300px] bg-gray-100 p-2 rounded-md shadow-md" style={{ height: '1120px' }}>
       <p className="text-2xl font-extrabold text-center text-green-700 uppercase">{label}</p>
-      <div className="bg-white rounded-md p-2">
+      <div className="bg-gray-100 rounded-md p-2">
         {queues.length > 4 ? 
           renderMarqueeSection(queues, duration, isRacikan) :
           <div style={{ height: '1060px', overflowY: 'auto' }}>
@@ -384,7 +384,7 @@ const QueuePickupTerlewat = ({ title, queuesRacik, queuesNonRacik, bgColor }) =>
   );
 };
   return (
-   <div className="bg-white p-4 shadow-lg border border-green-700 w-full "  style={{ minHeight: "300px" }}>
+   <div className="bg-gray-100 p-4 shadow-lg border border-green-700 w-full "  style={{ minHeight: "300px" }}>
       
         <div className="flex flex-wrap flex-row gap-2">
   <QueuePickup
