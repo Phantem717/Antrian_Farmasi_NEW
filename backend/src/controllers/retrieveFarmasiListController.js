@@ -155,12 +155,12 @@ const print = await retryOperation(
         });
       }
     }
-    const getResp = await getAllResponses(payload.location);
-     io.emit('insert_appointment',{
-      message: 'Doctor Created Succesfully',
-      data: getResp
+    
     });
-
+   io.emit('insert_appointment',{
+      message: 'Doctor Created Succesfully 2',
+      data: existingDoctorAppointment
+    });
     return res.status(201).json({
       message: "Data berhasil diproses",
       doctor_appointment: existingDoctorAppointment,
