@@ -160,6 +160,8 @@ const print = await retryOperation(
       }
     }
 
+    console.log('shouldEmit', shouldEmit);
+
   if (shouldEmit) {
   io.emit('insert_appointment', {
     message: 'Doctor Created Successfully',

@@ -106,7 +106,7 @@ useEffect(() => {
   };
 
   // Set up listener
-  socket.on('get_responses', handleGetResponses);
+  // socket.on('get_responses', handleGetResponses);
   socket.on('insert_appointment', handleGetResponses);
 
   // Request initial data

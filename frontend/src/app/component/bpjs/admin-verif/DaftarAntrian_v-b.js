@@ -170,7 +170,7 @@ useEffect(() => {
     }
   };
 
-  // fetchData();
+   fetchData();
   socket.on('update_daftar_verif',fetchData);
 
     return () => {
