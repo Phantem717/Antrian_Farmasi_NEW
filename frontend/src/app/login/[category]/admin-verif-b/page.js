@@ -93,7 +93,7 @@ export default function Admin({params}) {
           style={{
             flex: 1,
             padding: "24px",
-            background: "#fff",
+            background: "#EDEDED",
             overflow: "hidden",
             display: "flex",
             flexDirection: "column",
