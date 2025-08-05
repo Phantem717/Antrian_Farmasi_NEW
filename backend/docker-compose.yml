@@ -63,7 +63,7 @@ services:
     volumes:
       - redis_data:/data
     restart: unless-stopped
-    
+
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     container_name: phpmyadmin_container_farmasi
@@ -84,3 +84,4 @@ networks:
 
 volumes:
   mysql_data_farmasi:
+  redis_data:
