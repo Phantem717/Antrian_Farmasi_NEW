@@ -25,7 +25,10 @@ if(location.toLowerCase() == "bpjs"){
     const result = await DoctorAppointment.create(appointmentData);
     const io = req.app.get('socketio');
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 230ff5889b109ba63631e7a9f7699fc3e44da87f
     //PUT IN FRONTEND TO DISPLAY DATA
     // socket.on("new_doctor_appointment", (result) => {
     //   console.log("?? Got new booking from server!", result);

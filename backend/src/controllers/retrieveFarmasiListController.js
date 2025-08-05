@@ -10,6 +10,8 @@ const { createAntrianFarmasi } = require('../services/createFarmasiQueueService'
 const { createVerificationTaskInternal } = require('./verificationTaskController');
 const { printAntrianFarmasi } = require('../services/printAntrianService');
 let io;
+let shouldEmit = false;
+
 async function retryOperation(operation, maxRetries = 3, delayMs = 1000) {
   let lastError;
   
@@ -102,6 +104,8 @@ const getFarmasiList = async (req, res) => {
     let payload = {};
 
     if (!existingDoctorAppointment && !existingPharmacyTask && !existingVerificationTask) {
+        shouldEmit = true;
+
       payload = {
         sep_no: farmasiArray.payload.sep_no ?? null,
         queue_number: farmasiArray.payload.farmasi_queue_number ?? null,
@@ -155,12 +159,15 @@ const print = await retryOperation(
         });
       }
     }
-    
-    
-   io.emit('insert_appointment',{
-      message: 'Doctor Created Succesfully 2',
-      data: existingDoctorAppointment
-    });
+
+  if (shouldEmit) {
+  io.emit('insert_appointment', {
+    message: 'Doctor Created Successfully',
+    data: existingDoctorAppointment
+  });
+}
+
+
     return res.status(201).json({
       message: "Data berhasil diproses",
       doctor_appointment: existingDoctorAppointment,
