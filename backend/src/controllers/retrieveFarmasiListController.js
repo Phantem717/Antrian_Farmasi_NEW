@@ -157,17 +157,12 @@ const print = await retryOperation(
           message: 'Print Error'
         });
       }
-    }
-    else{
-      shouldEmit = false;
-    }
-    console.log('shouldEmit', shouldEmit);
-  if (shouldEmit) {
-  io.emit('insert_appointment', {
+       io.emit('insert_appointment', {
     message: 'Doctor Created Successfully',
     data: existingDoctorAppointment
   });
-}
+    }
+  
 
     return res.status(201).json({
       message: "Data berhasil diproses",
