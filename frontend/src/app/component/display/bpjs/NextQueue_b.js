@@ -41,6 +41,7 @@ const [times, setTimes] = useState({
 useEffect(() => {
   if (!socket) return; // Exit if socket is not initialized
 
+  
   const handleGetResponses = (payload) => {
     console.log("? GOT RESP", payload);
 
@@ -97,7 +98,6 @@ useEffect(() => {
       pickupRacik: pickupData.filter(task => task.type === "Racikan"),
       pickupNonRacik: pickupData.filter(task => task.type === "Non - Racikan"),
     });
-
     const newTimes = calculateTime(
       verificationData.length,
       medicineData.filter(task => task.type === "Non - Racikan").length,
