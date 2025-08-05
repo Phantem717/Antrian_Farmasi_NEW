@@ -9,7 +9,7 @@ const { createAntrianFarmasi } = require('../services/createFarmasiQueueService'
 const { createVerificationTaskInternal } = require('./verificationTaskController');
 const { printAntrianFarmasi } = require('../services/printAntrianService');
 let io;
-let shouldEmit = false;
+let shouldEmit;
 
 async function retryOperation(operation, maxRetries = 3, delayMs = 1000) {
   let lastError;
@@ -157,6 +157,9 @@ const print = await retryOperation(
           message: 'Print Error'
         });
       }
+    }
+    else{
+      shouldEmit = false;
     }
     console.log('shouldEmit', shouldEmit);
   if (shouldEmit) {
