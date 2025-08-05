@@ -238,7 +238,7 @@ const handleLoketChange = async (loketName) => {
   
   useEffect(() => {
   fetchLokets();
-    // socket.on('insert_appointment',fetchQueueList)
+    socket.on('insert_appointment',fetchQueueList)
 
   return () => {
     isMounted = false;
