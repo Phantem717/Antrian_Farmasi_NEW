@@ -65,13 +65,14 @@ const Location = () => {
         <Content style={{
           flex: 1,
           padding: "24px",
-          background: "#fff",
+          background: "#F0F0F0",
           overflow: "hidden",
           display: "flex",
           flexDirection: "column",
           gap: "100px",
           justifyContent: "center",
-          alignItems: "center"
+          alignItems: "center",
+          backgroundColor: "#F0F0F0",
         }}>
           <div className="text-black text-6xl font-bold uppercase"> 
             Layanan Antrian Farmasi RS Santo Carolus
@@ -85,7 +86,8 @@ const Location = () => {
                 className="hover:scale-105 hover:shadow-xl hover:border-4 hover:border-blue-500"
                 hoverable
                 onClick={() => router.push(card.route)}
-              >
+                
+    >
                 <div className="flex justify-center">
                   <Image
                     src={card.image}

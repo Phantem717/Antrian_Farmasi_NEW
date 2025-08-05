@@ -41,7 +41,7 @@ const InfoBar_b = ({location}) => {
         justifyContent: "space-between",
         alignItems: "center",
         padding: "10px 20px",
-        backgroundColor: "#ffffff",
+        backgroundColor: "#F0F0F)",
         borderBottom: "2px solid #e0e0e0",
         border: "2px solid #d3d3d3", // Tambahkan border tepi
         borderRadius: "8px", // Opsional: membuat sudut border melengkung

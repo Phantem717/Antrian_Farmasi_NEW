@@ -76,7 +76,7 @@ export default function Admin({params}) {
       <Layout style={{ marginLeft: siderWidth, display: "flex", flexDirection: "column" }}>
         <Header style={{height: "50vh"}} />
         <MovingText />
-        <Content style={{ flex: 1, padding: "24px", background: "#fff", overflow: "hidden", display: "flex", flexDirection: "column" }}>
+        <Content style={{ flex: 1, padding: "24px", background: "#F0F0F0", overflow: "hidden", display: "flex", flexDirection: "column" }}>
           <div style={{ display: "flex", gap: "24px", flex: 1 }}>
             <div style={{ flex: "1", display: "flex", flexDirection: "column", alignItems: "center", marginTop: "100px" }}>
               <BarcodeScanner 

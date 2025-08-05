@@ -83,7 +83,7 @@ const AvgServiceTime = ({isSubmit, setIsSubmit, fromDate, toDate, location}) => 
   };
 
   return (
-    <Box sx={{ p: 2, width: "600px" }}>
+    <Box sx={{ p: 2, width: "600px", backgroundColor: "#f0f0f0" }}>
       <Paper elevation={3} sx={{ p: 2, minHeight: '400px' }}>
         <Typography variant="h6" gutterBottom>
           Average Processing Time
