@@ -49,9 +49,6 @@ useEffect(() => {
 
     // Process verificationData
     const verificationData = payload.data.verificationData
-      .sort((a, b) => (
-        new Date(a.waiting_verification_stamp) - new Date(b.waiting_verification_stamp)
-      ))
       .map(task => ({
         queueNumber: task.queue_number,
         type: task.status_medicine,
