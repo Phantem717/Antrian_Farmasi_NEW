@@ -114,7 +114,7 @@ const getAllMedicineByDate = async (req, res) => {
       }
       console.log("LOCATION",location,date);
     const tasks = await MedicineTask.getMedicineByDate(location,date);
-    console.log("TASKS",tasks);
+    // console.log("TASKS",tasks);
     if(!tasks){
             return res.status(404).json({ message: "Medicine Task not found" });
 

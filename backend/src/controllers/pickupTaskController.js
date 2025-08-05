@@ -126,7 +126,7 @@ const getAllPickupByDate = async (req, res) => {
     }     
     
     const tasks = await PickupTask.getPickupByDate(location,date);
-    console.log("TASKS PICKUP",tasks);
+    // console.log("TASKS PICKUP",tasks);
     if(!tasks){
     res.status(404).json({message: 'PickupNotFOund'});
     }
