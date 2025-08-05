@@ -158,7 +158,7 @@ const print = await retryOperation(
           message: 'Print Error'
         });
       }
-    }
+    
        io.emit('insert_appointment', {
 
     message: 'Doctor Created Successfully',
