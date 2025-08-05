@@ -25,10 +25,6 @@ if(location.toLowerCase() == "bpjs"){
     const result = await DoctorAppointment.create(appointmentData);
     const io = req.app.get('socketio');
 
-    io.emit('insert_appointment',{
-      message: 'Doctor Created Succesfully',
-      data: result
-    });
 
     //PUT IN FRONTEND TO DISPLAY DATA
     // socket.on("new_doctor_appointment", (result) => {
