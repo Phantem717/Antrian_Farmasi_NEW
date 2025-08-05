@@ -5,8 +5,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      dns: 8.8.8.8 
     container_name: backend_container_farmasi
+    dns: 8.8.8.8 
     ports:
       - "5000:5000"
     environment:
