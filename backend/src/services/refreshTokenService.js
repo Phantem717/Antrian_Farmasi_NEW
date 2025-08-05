@@ -4,7 +4,7 @@ require('dotenv').config({ path: './.env' }); // Or just require('dotenv').confi
 const BASE_URL= process.env.API_URL
 async function login(username,password){
     try {
-    const url = `https://rscarolus.com/api/v1/auth/login`
+    const url = `http://192.168.6.86/api/v1/auth/login`
     const response = await axios.post(url, {
         username,password
     });
