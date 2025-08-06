@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
-      
+    dns: 8.8.8.8
     environment:
       - HOST=0.0.0.0 # Pastikan container mendengarkan di semua alamat
       - NODE_ENV=production
