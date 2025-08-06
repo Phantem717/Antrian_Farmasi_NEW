@@ -158,11 +158,13 @@ const print = await retryOperation(
           message: 'Print Error'
         });
       }
-    
+
+      const data = await getAllResponses("Lantai 1 BPJS");
+
        io.emit('insert_appointment', {
 
     message: 'Doctor Created Successfully',
-    data: existingDoctorAppointment
+    data: data
   });
     }
   
