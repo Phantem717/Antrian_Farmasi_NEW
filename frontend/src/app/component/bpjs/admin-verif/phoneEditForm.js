@@ -92,6 +92,7 @@ export default function BarcodeScanner({location, visible, onClose,selectedQueue
         timer: 1500,
         showConfirmButton: false,
       });
+      console.log("PAYLOAD",selectedQueue);
       onClose?.();
        const WAPayload = {
             phone_number: phoneNumber ?? "-",
