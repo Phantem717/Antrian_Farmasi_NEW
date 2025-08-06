@@ -123,7 +123,10 @@ const getAllPickupByDate = async (req, res) => {
      if(location.toLowerCase() == "lt3"){
       location = "Lantai 3 GMCB" 
 
-    }     const tasks = await PickupTask.getPickupByDate(location,date);
+    }     
+    
+    const tasks = await PickupTask.getPickupByDate(location,date);
+    // console.log("TASKS PICKUP",tasks);
     if(!tasks){
     res.status(404).json({message: 'PickupNotFOund'});
     }

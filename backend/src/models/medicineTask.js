@@ -185,6 +185,7 @@ AND (pt.status IS NULL OR
       `;
       const values = [date,location]
       const [rows] = await conn.execute(query, values);
+      console.log("rows",rows,values);
       return rows;
     } catch (error) {
       throw error;

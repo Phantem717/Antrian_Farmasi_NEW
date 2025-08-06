@@ -7,6 +7,7 @@ console.log(HOST,PORT)
 const BASE_URL = `http://${HOST}:${PORT}`; // Base URL API
 const BPJSBarcodeAPI = {
     // 1. Check Queue by Booking ID
+    
     checkQueue: async (NOP) => {
         try {
             const response = await axios.get(`${BASE_URL}/api/bpjs/barcode/check`, {

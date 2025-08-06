@@ -46,21 +46,30 @@ useEffect(() => {
     console.log("? GOT RESP", payload);
 
     // Extract and filter verification data
-    const pickupData = payload.data.pickupData
-      .map(task => ({
-        queueNumber: task.queue_number,
-        type: task.status_medicine,
-        patient_name: task.patient_name,
-isYesterday: new Date(new Date(task.waiting_pickup_medicine_stamp).setHours(0,0,0,0)) == 
-             new Date(new Date().setHours(0,0,0,0) - 86400000),
-        status: task.status === "waiting_pickup_medicine" ? "Menunggu"
-          : task.status === "called_pickup_medicine" ? "Dipanggil"
-          : task.status === "pending_pickup_medicine" ? "Terlewat"
-          : task.status === "recalled_pickup_medicine" ? "Dipanggil"
-          : "-",
-          waiting_pickup_medicine_stamp: new Date(task.waiting_pickup_medicine_stamp)
 
-      }));
+   const yesterday = new Date();
+yesterday.setDate(yesterday.getDate() - 1);
+yesterday.setHours(0, 0, 0, 0);
+
+const pickupData = payload.data.pickupData.map(task => {
+  const taskDate = new Date(task.waiting_pickup_medicine_stamp);
+  taskDate.setHours(0, 0, 0, 0);
+  
+  return {
+    queueNumber: task.queue_number,
+    type: task.status_medicine,
+    patient_name: task.patient_name,
+    isYesterday: taskDate.getTime() === yesterday.getTime(),
+    status: task.status === "waiting_pickup_medicine" ? "Menunggu"
+      : task.status === "called_pickup_medicine" ? "Dipanggil"
+      : task.status === "pending_pickup_medicine" ? "Terlewat"
+      : task.status === "recalled_pickup_medicine" ? "Dipanggil"
+      : "-",
+    waiting_pickup_medicine_stamp: new Date(task.waiting_pickup_medicine_stamp)
+  };
+});
+    console.log("DATE", pickupData.map(task =>new Date(new Date(task.waiting_pickup_medicine_stamp).setHours(0,0,0,0))),new Date(new Date().setHours(0,0,0,0) - 86400000),pickupData.map(task =>new Date(new Date(task.waiting_pickup_medicine_stamp).setHours(0,0,0,0))) == yesterday);
+
 
     console.log("DATA", pickupData);
 

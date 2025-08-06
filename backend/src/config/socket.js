@@ -87,7 +87,7 @@ try {
   });
 
   socket.on('get_initial_responses', async (payload) => {
-    const data = getData(payload.location);
+    const data =await getData(payload.location);
 try {
   let location = payload.location;
     if(location == "bpjs"){

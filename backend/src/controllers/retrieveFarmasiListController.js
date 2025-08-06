@@ -8,7 +8,10 @@ const { getCurrentTimestamp, convertToJakartaTime } = require('../handler/timeHa
 const { createAntrianFarmasi } = require('../services/createFarmasiQueueService');
 const { createVerificationTaskInternal } = require('./verificationTaskController');
 const { printAntrianFarmasi } = require('../services/printAntrianService');
+const {getAllResponses} = require('../controllers/responsesController')
 let io;
+let shouldEmit;
+
 async function retryOperation(operation, maxRetries = 3, delayMs = 1000) {
   let lastError;
   
@@ -101,6 +104,8 @@ const getFarmasiList = async (req, res) => {
     let payload = {};
 
     if (!existingDoctorAppointment && !existingPharmacyTask && !existingVerificationTask) {
+        shouldEmit = true;
+
       payload = {
         sep_no: farmasiArray.payload.sep_no ?? null,
         queue_number: farmasiArray.payload.farmasi_queue_number ?? null,
@@ -135,9 +140,10 @@ const getFarmasiList = async (req, res) => {
         SEP: farmasiArray.payload.sep_no ?? "-",
         tanggal_lahir: farmasiArray.payload?.patient_date_of_birth ?? null,
         queue_number: farmasiArray.payload.farmasi_queue_number ?? null,
-        PRB: farmasiArray.payload.PRB ?? null
-
+        PRB: farmasiArray.payload.PRB ?? null,
+        doctor_name: farmasiArray.payload.doctor_name ?? null
       }
+      
 const print = await retryOperation(
     () => printAntrianFarmasi(printPayload),
     3, // max retries
@@ -152,11 +158,13 @@ const print = await retryOperation(
           message: 'Print Error'
         });
       }
+      const data = await getAllResponses("Lantai 1 BPJS");
+       io.emit('insert_appointment', {
+    message: 'Doctor Created Successfully',
+    data: data
+  });
     }
-     io.emit('insert_appointment',{
-      message: 'Doctor Created Succesfully',
-      data: existingDoctorAppointment
-    });
+  
 
     return res.status(201).json({
       message: "Data berhasil diproses",

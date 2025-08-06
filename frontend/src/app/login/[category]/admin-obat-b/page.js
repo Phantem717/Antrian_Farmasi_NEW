@@ -119,8 +119,9 @@ export default function Admin({params}) {
           </div>
         </Content>
 
-        <Footer />
       </Layout>
+        <Footer />
+
     </Layout>
   );
 }

@@ -170,7 +170,7 @@ useEffect(() => {
     }
   };
 
-  fetchData();
+  // fetchData();
   socket.on('update_daftar_verif',fetchData);
 
     return () => {
@@ -353,7 +353,8 @@ const changeDate = (date,dateString) => {
     SEP: payload.sep_no || "-",
     tanggal_lahir: payload.patient_date_of_birth || null,
     queue_number : payload.queue_number || "-",
-    patient_name: payload.patient_name || "-"
+    patient_name: payload.patient_name || "-",
+    lokasi: location
   }
 
   console.log("PRINT PAYLOAD",payload);
@@ -524,6 +525,7 @@ Swal.fire({
               <TableCell align="center"><strong>ID Booking</strong></TableCell>
               <TableCell align="center"><strong>Nama Pasien</strong></TableCell>
               <TableCell align="center"><strong>Nomor SEP</strong></TableCell>
+              <TableCell align="center"><strong>Nama Dokter</strong></TableCell>
               <TableCell align="center"><strong>No. Rekam Medis</strong></TableCell>
               <TableCell align="center"><strong>Status</strong></TableCell>
               <TableCell align="center"><strong>Status Medicine</strong></TableCell> 
@@ -539,45 +541,44 @@ Swal.fire({
               // console.log("VERIFKEY",item.booking_id);
 return (
               
-  <TableRow key={item.NOP} hover>
+  <TableRow  key={item.NOP} hover>
     <TableCell align="center" className="flex flex-row justify-center items-center">
       <Checkbox checked={selectedQueueIds.includes(item.NOP)} onChange={() => handleSelectQueue(item.NOP)} />
         <Button onClick={()=>handlePrintFunction(item)}>      <PrintIcon className="flex items-middle" ></PrintIcon>
 </Button>
     </TableCell>
    
-    <TableCell align="center">{item.queue_number}</TableCell>
-    <TableCell align="center">{item.NOP}</TableCell>
-    <TableCell align="center">{item.patient_name}</TableCell>
-    <TableCell align="center">{item.sep_no}</TableCell>
-    <TableCell align="center">{item.medical_record_no || "-"}</TableCell>
-    <TableCell align="center">
+    <TableCell align="center" style={{ fontWeight: 'bold' }} className='font-bold'>{item.queue_number}</TableCell>
+    <TableCell align="center" style={{ fontWeight: 'bold' }} className='font-bold'>{item.NOP}</TableCell>
+    <TableCell align="center" style={{ fontWeight: 'bold' }} className='font-bold'>{item.patient_name}</TableCell>
+    <TableCell align="center" style={{ fontWeight: 'bold' }} className='font-bold'>{item.sep_no}</TableCell>
+    <TableCell align="center" style={{ fontWeight: 'bold' }} className='font-bold'>{item.doctor_name}</TableCell>
+    <TableCell align="center" style={{ fontWeight: 'bold' }} className='font-bold'>{item.medical_record_no || "-"}</TableCell>
+    <TableCell align="center" style={{ fontWeight: 'bold' }} className='font-bold'>
       {item.status.replace("_verification", "")}
     </TableCell>
-    <TableCell align="center">
+    <TableCell align="center" style={{ fontWeight: 'bold' }} className='font-bold'>
     {item.status_medicine === "Tidak ada Resep" ? "Tidak ada Resep" : item.status_medicine === "Racikan" ? "Racikan" : item.status_medicine}
     </TableCell>
-     <TableCell align="center" >
+     <TableCell align="center" style={{ fontWeight: 'bold' }} className='font-bold'>
       <div className="flex flex-row items-center h-full " style={{gap:"1px", minWidth:"120px"}}>
  <Button onClick={(e)=>handleUpdatePhone(item)} className="p-0 m-0">
             <EditIcon className="p-0 m-0"></EditIcon>
 
      </Button>
 
-      <div>
+      <div className='font-bold'>
     {item.phone_number}
 
     </div>
       </div>
    
     </TableCell>
-     <TableCell align="center">
+     <TableCell align="center" style={{ fontWeight: 'bold' }} className='font-bold'>
      {item.waiting_verification_stamp 
-                ? new Date(item.waiting_verification_stamp).toLocaleString("id-ID", {
-                    dateStyle: "medium",
-                    timeStyle: "short",
-                })
-                : "-"}
+                      ? dayjs(item.waiting_verification_stamp , "YYYY-MM-DD HH:mm:ss").format("DD MMM YYYY HH:mm")
+    
+                    : "-"}
                     </TableCell>
   </TableRow>
 )

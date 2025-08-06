@@ -157,6 +157,7 @@ ORDER BY vt.waiting_verification_stamp ASC;
   da.farmasi_queue_number,
   da.patient_date_of_birth,
   da.status_medicine,
+  da.doctor_name,
   da.phone_number,
   pt.status,
   pt.medicine_type
@@ -197,6 +198,7 @@ ORDER BY vt.waiting_verification_stamp ASC;
   da.patient_date_of_birth,
   da.status_medicine,
   da.phone_number,
+  da.doctor_name,
   pt.status,
   pt.medicine_type
 FROM Verification_Task vt

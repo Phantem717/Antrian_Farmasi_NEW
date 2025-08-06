@@ -162,7 +162,7 @@ const fetchActiveLoket = async () => {
       socket.off('update_status_type',handleQueueUpdate);
       socket.off('send_queues_pickup_frontendBPJS',handleQueueUpdate);
       socket.off('send_queues_verif_frontend_BPJS',handleQueueUpdate);
-
+      socket.off('send_queues',handleQueueUpdate);
       socket.disconnect();
     };
   }, [socket]); // Only runs once

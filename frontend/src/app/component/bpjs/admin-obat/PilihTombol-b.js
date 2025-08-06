@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { Box, Button } from "@mui/material";
 import PickupAPI from "@/app/utils/api/Pickup";
 import PharmacyAPI from "@/app/utils/api/Pharmacy";
@@ -6,6 +6,7 @@ import Swal from "sweetalert2";
 import {getSocket} from "@/app/utils/api/socket";
 import DoctorAppointmentAPI from "@/app/utils/api/Doctor_Appoinment";
 import WA_API from "@/app/utils/api/WA";
+import { queue } from "jquery";
 const PilihAksi = ({location, selectedQueue,selectedQueueIds = [], setSelectedQueueIds, onStatusUpdate, setSelectedQueue2,selectedQueue2 }) => {
   console.log("QUEUS",selectedQueue2);
 const socket = getSocket();
@@ -18,6 +19,15 @@ const socket = getSocket();
     complete: "completed_pickup_medicine",
     recall: "recalled_pickup_medicine",
   };
+
+ useEffect(() => {
+    const shouldEnable = selectedQueue2.some(queue => 
+      queue.status === "pending_pickup_medicine" || 
+      queue.status === "called_pickup_medicine" ||
+      queue.status === "recalled_pickup_medicine"
+    );
+    setIsCompleteServiceEnabled(shouldEnable);
+  }, [selectedQueue2]); // Re-run whenever selectedQueue2 changes
 
   // ✅ Fungsi untuk Update Status ke API Pickup & Pharmacy
   const handleStatusUpdate = async (statusType) => {
@@ -61,7 +71,11 @@ const socket = getSocket();
             NOP: selectedQueue.NOP,
             body: requestBody,
           });
-      
+          
+            if (queue.status != "waiting_pickup_medicine" ) {
+        setIsCompleteServiceEnabled(true);
+      }
+
           await Promise.all([
             PickupAPI.updatePickupTask(queue.NOP, requestBody),
             PharmacyAPI.updatePharmacyTask(queue.NOP, requestBody),
@@ -85,6 +99,8 @@ const socket = getSocket();
               switch_WA: localStorage.getItem('waToggleState')
 
           }
+
+
           console.log("PAYLOAD PICKUP",payload)
         if (queue === selectedQueue2[0]) { // Only for first item
           console.log("CALLED");
@@ -117,9 +133,7 @@ const socket = getSocket();
       });
 
       // ✅ Jika "PANGGIL NOMOR" ditekan, aktifkan "SELESAIKAN LAYANAN"
-      if (statusType === "call" ) {
-        setIsCompleteServiceEnabled(true);
-      }
+    
        socket.emit('update_pickup', {location});
         socket.emit('update_display', {location},console.log("EMIT UPDATE"));
 

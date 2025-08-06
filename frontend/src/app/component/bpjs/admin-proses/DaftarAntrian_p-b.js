@@ -53,12 +53,15 @@ useEffect(() => {
         setLoading(true);
         try {
             if(selectedDate){
+                                console.log("DATE",selectedDate);
+
                 response = await MedicineAPI.getMedicineByDate(location,selectedDate);
             }
             else{
                 response = await MedicineAPI.getMedicineToday(location);
 
             }
+            console.log("RESP",response);
             processQueue(response);
         } catch (error) {
             console.error("Gagal mengambil data antrian:", error);
@@ -245,23 +248,23 @@ useEffect(() => {
                             ) : queueList.length > 0 ? (
                                 queueList.map((item, index) => (
                                     <TableRow key={index}>
-                                        <TableCell align="center">{item.NOP}</TableCell>
-                                        <TableCell align="center">{item.queue_number}</TableCell>
-                                        <TableCell align="center">{item.patient_name}</TableCell>
-                                        <TableCell align="center">{item.medical_record_no}</TableCell>
-                                        <TableCell align="center">{item.status}</TableCell>
-                                        <TableCell align="center">{item.medicine_type}</TableCell>
-                                        <TableCell align="center">
-                                            {item.timestamp ? new Date(item.timestamp).toLocaleString("id-ID", {
-                                                dateStyle: "medium",
-                                                timeStyle: "short",
-                                            }) : "-"}
+                                        <TableCell style={{ fontWeight: 'bold' }} align="center" className='font-bold'>{item.NOP}</TableCell>
+                                        <TableCell style={{ fontWeight: 'bold' }} align="center" className='font-bold'>{item.queue_number}</TableCell>
+                                        <TableCell style={{ fontWeight: 'bold' }} align="center" className='font-bold'>{item.patient_name}</TableCell>
+                                        <TableCell style={{ fontWeight: 'bold' }} align="center" className='font-bold'>{item.medical_record_no}</TableCell>
+                                        <TableCell style={{ fontWeight: 'bold' }} align="center" className='font-bold'>{item.status}</TableCell>
+                                        <TableCell style={{ fontWeight: 'bold' }} align="center" className='font-bold'>{item.medicine_type}</TableCell>
+                                        <TableCell style={{ fontWeight: 'bold' }} align="center" className='font-bold'>
+                                            {item.timestamp 
+                                                                 ? dayjs(item.timestamp , "YYYY-MM-DD HH:mm:ss").format("DD MMM YYYY HH:mm")
+                                               
+                                                               : "-"}
                                         </TableCell>
                                     </TableRow>
                                 ))
                             ) : (
                                 <TableRow>
-                                    <TableCell colSpan={7} align="center">Tidak ada antrean waiting_medicine untuk tanggal {selectedDate}.</TableCell>
+                                    <TableCell style={{ fontWeight: 'bold' }} colSpan={7} align="center" className='font-bold'>Tidak ada antrean waiting_medicine untuk tanggal {selectedDate}.</TableCell>
                                 </TableRow>
                             )}
                         </TableBody>

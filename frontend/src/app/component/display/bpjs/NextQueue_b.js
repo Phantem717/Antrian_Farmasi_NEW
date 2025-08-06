@@ -28,7 +28,11 @@ const [times, setTimes] = useState({
   pickupTimeNon: 10,
   pickupTimeRacik: 10
 });    
+<<<<<<< HEAD
   function calculateTime(verifLength, processLengthNon, processLengthRacik, pickupLengthNon, pickupLengthRacik) {
+=======
+ function calculateTime(verifLength, processLengthNon, processLengthRacik, pickupLengthNon, pickupLengthRacik) {
+>>>>>>> prod
   // Divide all multipliers by 2 for faster speed
   const verifTime = verifLength < 3 ? 5 : Math.floor(verifLength * 1);
   const processTimeNon = processLengthNon < 3 ? 5 : (Math.floor(processLengthNon * 1));
@@ -109,7 +113,7 @@ useEffect(() => {
   };
 
   // Set up listener
-  socket.on('get_responses', handleGetResponses);
+  // socket.on('get_responses', handleGetResponses);
   socket.on('insert_appointment', handleGetResponses);
 
   // Request initial data

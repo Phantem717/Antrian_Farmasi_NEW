@@ -14,7 +14,7 @@ let message = "";
 let urlprinter = "";
  if(payload.medicine_type == "Racikan" || payload.queue_number.startsWith("RC")){
  message = "Mohon Menunggu 30 menit sampai 1 jam Karena Obat Anda Adalah Racikan";
- urlprinter="172.16.26.78";
+ urlprinter="172.16.31.4";
  }
 
  else if(payload.medicine_type.startsWith("Non")  || payload.queue_number.startsWith("NR")){
@@ -56,9 +56,11 @@ let urlprinter = "";
             "No SEP": payload.SEP,
             "Tipe Obat" : payload.medicine_type,
             Nama : payload.patient_name,
+            "Doctor Name": payload.doctor_name,
             // "No Antrian" : payload.queue_number,
             "Kode Reservasi" : payload.barcode,
             qrcodedata:payload.barcode,
+
     //   base64Barcode: payload.barcode
           },
           Note: {

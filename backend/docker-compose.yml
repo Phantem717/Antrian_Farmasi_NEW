@@ -31,7 +31,8 @@ services:
       - DB_PASSWORD=secret
       - DB_NAME=farmasi_queue_db
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     networks:
       - farmasi_network
     restart: always
@@ -49,6 +50,19 @@ services:
     networks:
       - farmasi_network
     restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root --password=secret || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
@@ -70,3 +84,4 @@ networks:
 
 volumes:
   mysql_data_farmasi:
+  redis_data:

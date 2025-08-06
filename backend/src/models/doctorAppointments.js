@@ -80,7 +80,8 @@ ORDER BY da.queue_number`;
 
   static async findAllByLocation(location) {
     try {
-      const connection = getDb();
+ const pool = await getDb();
+  const conn = await pool.getConnection(); // ? Explicit connection
       const query = `SELECT * 
 FROM Doctor_Appointments da
 WHERE da.queue_number LIKE 'RC%' OR da.queue_number LIKE 'NR%'
@@ -90,7 +91,9 @@ ORDER BY da.queue_number`;
       return rows;
     } catch (error) {
       throw error;
-    }
+    }finally {
+    conn.release(); // ?? Critical cleanup
+  }
   }
 
   /**
