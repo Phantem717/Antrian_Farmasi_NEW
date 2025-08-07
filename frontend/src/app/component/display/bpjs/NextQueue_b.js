@@ -10,6 +10,7 @@ import { queue } from "jquery";
 const NextQueue = ({location, verificationData, medicineData, pickupData }) => {
     const socket = getSocket(); // Ensure this returns a singleton socket instance
     console.log("LOCATION",location);
+    const [currentDate, setCurrentDate] = useState(new Date().getDate()); // [currentDate,setCurrentDate]
 
   const [queues, setQueues] = useState({
     nextQueueRacik: [],
@@ -139,6 +140,19 @@ useEffect(() => {
       default: return '';
     }
   };
+
+  
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (new Date().toDateString() !== currentDate) {
+        setCurrentDate(new Date().toDateString());
+        window.location.reload();
+      }
+    }, 3600000);
+    return () => clearInterval(interval);
+  }, [currentDate]);
+  
+  
 
   // Queue section components
  const QueueSection = ({ title, queuesRacik, queuesNonRacik, bgColor }) => {
