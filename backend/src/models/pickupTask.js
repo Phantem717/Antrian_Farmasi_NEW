@@ -26,8 +26,7 @@ class PickupTask {
       const [loket] = await conn.execute(`
         SELECT loket_name 
         FROM Loket 
-        WHERE status = "active" 
-        AND (loket_name = "Loket 1" OR loket_name = "Loket 4") 
+        WHERE loket_name = 'Loket 1'
         LIMIT 1;
     `);
     const activeLoket = loket[0].loket_name;
