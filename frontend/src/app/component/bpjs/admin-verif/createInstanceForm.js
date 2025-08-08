@@ -285,7 +285,7 @@ if(!inputValue.startsWith("NOP") && inputValue.length != 19) {
             tanggal_lahir: DOB ?? "-",
             queue_number: queueNumberData.data.queue_number ?? null,
             PRB: PRB,
-            switch_WA: localStorage.getItem('waToggleState'),
+            switch_WA: localStorage.getItem('waToggleState') || "true",
             lokasi: location
         }
       socket.emit('update_verif',{location});

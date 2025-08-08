@@ -109,7 +109,7 @@ const socket = getSocket();
               queue_number: doctorResponse.data.queue_number,
               NOP : doctorResponse.data.NOP,
               waiting_pickup_medicine_stamp: queue.waiting_pickup_medicine_stamp,
-              switch_WA: localStorage.getItem('waToggleState')
+              switch_WA: localStorage.getItem('waToggleState') || "true"
 
           }
 

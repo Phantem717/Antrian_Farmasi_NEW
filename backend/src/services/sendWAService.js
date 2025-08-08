@@ -24,7 +24,7 @@ async function sendWAVerif(payload){
         change_queue_message= `_Nomor Antrian anda telah berubah/diganti dari *${payload.prev_queue_number}* menjadi *${payload.queue_number}*_`
       }
   const url = path;
-console.log("PHONE_NUMBER",payload.phone_number,payload.switch_WA ,typeof payload.switch_WA); 
+console.log("PHONE_NUMBER_VERIF",payload.phone_number,payload.switch_WA,"SWITCH TEST: ", payload.switch_WA ? payload.phone_number : "test");
   const response = await axios.post(
     url,
     {
@@ -73,7 +73,7 @@ async function sendWAProses(payload){
 
     const url = path;
     const url_local = `http:/192.168.6.85/api/v1/integration/whatsappweb/hello/send-text`;
-console.log("PHONE_NUMBER",payload.phone_number);
+console.log("PHONE_NUMBER_PROSES",payload.phone_number,payload.switch_WA,"SWITCH TEST: ", payload.switch_WA ? payload.phone_number : "test");
     const response = await axios.post(
       url,
       {
@@ -133,7 +133,7 @@ async function sendWAAntrian(payload){
 
         }
     const url = path;
-console.log("PHONE_NUMBER",payload.phone_number);
+console.log("PHONE_NUMBER_ANTRIAN",payload.phone_number,payload.switch_WA,"SWITCH TEST: ", payload.switch_WA ? payload.phone_number : "test");
     const response = await axios.post(
       url,
       {
@@ -181,7 +181,7 @@ async function sendWAPickup(payload){
         const { timestamp, signature } = generateSignature(consID2, password);
 
     const url = path;
-console.log("PHONE_NUMBER_PICKUP",payload.phone_number);
+console.log("PHONE_NUMBER_PICKUP",payload.phone_number,payload.switch_WA,"SWITCH TEST: ", payload.switch_WA ? payload.phone_number : "test");
     const response = await axios.post(
       url,
       {

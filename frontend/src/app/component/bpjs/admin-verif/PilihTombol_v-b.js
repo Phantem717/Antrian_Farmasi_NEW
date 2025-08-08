@@ -251,7 +251,7 @@ const PilihAksi = ({location, selectedQueueIds = [], setSelectedQueueIds, select
                 docter: doctorResponse.data.doctor_name,
                 nik: doctorResponse.data.nik,
                 prev_queue_number: queue.queue_number || "-",
-                switch_WA: localStorage.getItem('waToggleState')
+                switch_WA: localStorage.getItem('waToggleState') || "true"
 
     
     
