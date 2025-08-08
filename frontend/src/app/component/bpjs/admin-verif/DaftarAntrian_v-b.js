@@ -81,6 +81,7 @@ const DaftarAntrian = ({location, selectedQueueIds, setSelectedQueueIds, onSelec
       if (activeLoket) {
         setSelectedLoketLocal(prev => prev || activeLoket.loket_name);
         setSelectedLoket(prev => prev || activeLoket.loket_name);
+        console.log("activeLoket.loket_name",activeLoket.loket_name);
       }
     } catch (error) {
       console.error("Error fetching lokets:", error);
@@ -214,7 +215,7 @@ const handleLoketChange = async (loketName) => {
   // ? Fungsi memilih / membatalkan pilihan nomor antrian
   const handleSelectQueue = (queueId) => {
     const selected = queueList.find((item) => item.NOP === queueId);
-    console.log("SELECTED", selected);
+    console.log("SELECTED", selected,queueList);
     onSelectQueue(selected || null);
   
     // Update selectedQueueIds

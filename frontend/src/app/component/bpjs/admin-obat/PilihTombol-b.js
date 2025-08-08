@@ -2,6 +2,7 @@ import React, { useState,useEffect } from "react";
 import { Box, Button } from "@mui/material";
 import PickupAPI from "@/app/utils/api/Pickup";
 import PharmacyAPI from "@/app/utils/api/Pharmacy";
+import LoketAPI from "@/app/utils/api/Loket";
 import Swal from "sweetalert2";
 import {getSocket} from "@/app/utils/api/socket";
 import DoctorAppointmentAPI from "@/app/utils/api/Doctor_Appoinment";
@@ -54,9 +55,20 @@ const socket = getSocket();
       //   PharmacyAPI.updatePharmacyTask(selectedQueue.NOP, requestBody),
       // ]);
       if(statusType == "call" || statusType === "recall"){
-        socket.emit('call_queues_pickup', {
-          data:selectedQueue2, lokasi: "Lantai 1 BPJS"
-        });
+          const respLoket = await LoketAPI.getAllLokets();
+          const respData = respLoket.data;
+            const loket = respData.filter(loket => loket.status === "active" && (loket.loket_name === "Loket 1" || loket.loket_name == "Loket 4"))[0].loket_name;
+          
+            const updatedQueues = selectedQueue2.map(queue => ({
+      ...queue,
+      loket: loket
+    }));
+           
+       
+    socket.emit('call_queues_pickup', {
+      data: updatedQueues,
+      lokasi: "Lantai 1 BPJS"
+    });
 
         
       }
@@ -82,6 +94,7 @@ const socket = getSocket();
           ]);
           if(statusType == "call"){
             const doctorResponse = await DoctorAppointmentAPI.getAppointmentByNOP(queue.NOP);
+          
             console.log("DOCRESP",doctorResponse);
           
 
