@@ -183,7 +183,7 @@ useEffect(() => {
           {queue.queueNumber}
         </div>
         <div className="mt-2 w-full bg-green-400 px-4 py-2 text-black text-center text-3xl truncate whitespace-nowrap overflow-hidden leading-tight">
-          {queue.patient_name}
+          {hideName(queue.patient_name)}
         </div>
       </div>
     ));
@@ -239,7 +239,17 @@ useEffect(() => {
     </div>
   );
 };
+function hideName(name){
+    if (!name) return "";
 
+  return name
+    .split(" ") // Split into words
+    .map(word => {
+      if (word.length <= 2) return word; // Keep short words as-is
+      return word.slice(0, 2) + "*".repeat(word.length - 2); // Mask after 2 chars
+    })
+    .join(" "); // Rejoin into a single string
+}
  const QueueSectionVerification = ({ title, queues, bgColor }) => {
   const renderQueueItems = () => {
     if (queues.length === 0) {
@@ -267,7 +277,7 @@ useEffect(() => {
           </div>
         </div>
         <div className={`flex-1 text-4xl text-center bg-green-400 mt-2 w-full p-1 text-black`}>
-          {queue.patient_name}
+          {hideName(queue.patient_name)}
         </div>
       </div>
     ));

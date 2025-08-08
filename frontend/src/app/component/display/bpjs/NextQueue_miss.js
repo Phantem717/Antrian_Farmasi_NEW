@@ -38,6 +38,17 @@ const socket = getSocket();
   return {  processTimeNon,processTimeRacik, pickupTimeNon,pickupTimeRacik };
 }
 
+function hideName(name){
+    if (!name) return "";
+
+  return name
+    .split(" ") // Split into words
+    .map(word => {
+      if (word.length <= 2) return word; // Keep short words as-is
+      return word.slice(0, 2) + "*".repeat(word.length - 2); // Mask after 2 chars
+    })
+    .join(" "); // Rejoin into a single string
+}
 
 useEffect(() => {
   const socket = getSocket(); // Ensure this returns a singleton socket instance
@@ -206,7 +217,7 @@ const QueuePickup = ({ title, queuesRacik, queuesNonRacik, bgColor }) => {
         {item ? (
           <div className="text-white text-center mt-2">
             <div className="text-6xl font-extrabold">{item.queue_number}</div>
-            <div className="text-2xl font-extrabold truncate mt-2">{item.patient_name}</div>
+            <div className="text-2xl font-extrabold truncate mt-2">{hideName(item.patient_name)}</div>
             <div className="text-2xl font-extrabold truncate mt-2">
               {formatDateTime(item.waiting_pickup_medicine_stamp)}
             </div>
@@ -235,7 +246,7 @@ const QueuePickup = ({ title, queuesRacik, queuesNonRacik, bgColor }) => {
         {queue.queueNumber}
       </div>
       <div className="mt-2 w-full bg-green-400 px-4 py-2 text-black text-center text-3xl truncate whitespace-nowrap overflow-hidden leading-tight">
-        {queue.patient_name}
+        {hideName(queue.patient_name)}
       </div>
     </div>
   );
@@ -323,7 +334,7 @@ const QueuePickupTerlewat = ({ title, queuesRacik, queuesNonRacik, bgColor }) =>
         </div>
       </div>
       <div className="text-center text-bold mt-2 w-full bg-green-400 px-4 py-2 text-black text-3xl truncate whitespace-nowrap overflow-hidden leading-tight">
-        {queue.patient_name}
+        {hideName(queue.patient_name)}
       </div>
     </div>
   );
