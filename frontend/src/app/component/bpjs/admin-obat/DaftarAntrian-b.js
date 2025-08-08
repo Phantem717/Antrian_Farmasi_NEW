@@ -278,6 +278,7 @@ const changeDate = (date,dateString) => {
 
       // ? Jika ada antrian yang dipilih, simpan ke selectedQueue
       if (newSelection.length > 0) {
+        
         setSelectedQueue(queueData);
       } else {
         setSelectedQueue(null);
