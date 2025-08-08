@@ -32,9 +32,9 @@ const [times, setTimes] = useState({
   function calculateTime(verifLength, processLengthNon, processLengthRacik, pickupLengthNon, pickupLengthRacik) {
   // Divide all multipliers by 2 for faster speed
   const verifTime = verifLength < 3 ? 5 : Math.floor(verifLength * 1);
-  const processTimeNon = processLengthNon < 3 ? 5 : (Math.floor(processLengthNon * 1));
+  const processTimeNon = processLengthNon < 3 ? 5 : (Math.floor(processLengthNon * 0.25));
   const processTimeRacik = processLengthRacik < 3 ? 5 : (Math.floor(processLengthRacik * 1));
-  const pickupTimeNon = pickupLengthNon < 3 ? 5 : (Math.floor(pickupLengthNon * 1));
+  const pickupTimeNon = pickupLengthNon < 3 ? 5 : (Math.floor(pickupLengthNon * 0.25));
   const pickupTimeRacik = pickupLengthRacik < 3 ? 5 : (Math.floor(pickupLengthRacik * 1));
   return { verifTime, processTimeNon, processTimeRacik, pickupTimeNon, pickupTimeRacik };
 }
