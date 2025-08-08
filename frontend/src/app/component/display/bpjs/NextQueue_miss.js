@@ -250,7 +250,7 @@ const QueuePickup = ({ title, queuesRacik, queuesNonRacik, bgColor }) => {
       <div className="mt-2 w-full bg-green-400 px-4 py-2 text-black text-center text-3xl truncate whitespace-nowrap overflow-hidden leading-tight">
         {/* {hideName(queue.patient_name)}
          */}
-         {item.patient_name}
+         {queue.patient_name}
       </div>
     </div>
   );
@@ -339,7 +339,7 @@ const QueuePickupTerlewat = ({ title, queuesRacik, queuesNonRacik, bgColor }) =>
       </div>
       <div className="text-center text-bold mt-2 w-full bg-green-400 px-4 py-2 text-black text-3xl truncate whitespace-nowrap overflow-hidden leading-tight">
         {/* {hideName(queue.patient_name)} */}
-        {item.patient_name}
+        {queue.patient_name}
       </div>
     </div>
   );
