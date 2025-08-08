@@ -9,6 +9,7 @@ import { queue } from "jquery";
 
 const NextQueue = ({location, verificationData, medicineData, pickupData }) => {
     const [currentDate, setCurrentDate] = useState(new Date().getDate()); // [currentDate,setCurrentDate]
+    const [hideName, setHideName] = useState(localStorage.getItem('nameToggleState')); // [hideName,setHideName]
 
   const [lastCalled, setLastCalled] = useState({
     racik: null,
@@ -38,7 +39,7 @@ const socket = getSocket();
   return {  processTimeNon,processTimeRacik, pickupTimeNon,pickupTimeRacik };
 }
 
-function hideName(name){
+function hideNameAction(name){
     if (!name) return "";
 
   return name
@@ -52,7 +53,16 @@ function hideName(name){
 
 useEffect(() => {
   const socket = getSocket(); // Ensure this returns a singleton socket instance
+socket.on('send_nameToggle', (payload) => {
+  if (hideName !== payload.data) {  // Only refresh if state actually changed
+    setHideName(payload.data);
+    localStorage.setItem('nameToggleState', payload.data.toString());
+    window.location.reload();
+  }
 
+    return () => socket.off('toggleName', handleToggle);
+
+});
   const handleGetResponses = (payload) => {
     console.log("? GOT RESP", payload);
 
@@ -217,7 +227,8 @@ const QueuePickup = ({ title, queuesRacik, queuesNonRacik, bgColor }) => {
         {item ? (
           <div className="text-white text-center mt-2">
             <div className="text-6xl font-extrabold">{item.queue_number}</div>
-            <div className="text-2xl font-extrabold truncate mt-2">{hideName(item.patient_name)}</div>
+            <div className="text-2xl font-extrabold truncate mt-2">         {hideName == 'true' ? hideNameAction(item.patient_name) : item.patient_name}
+</div>
             <div className="text-2xl font-extrabold truncate mt-2">
               {formatDateTime(item.waiting_pickup_medicine_stamp)}
             </div>
@@ -246,7 +257,7 @@ const QueuePickup = ({ title, queuesRacik, queuesNonRacik, bgColor }) => {
         {queue.queueNumber}
       </div>
       <div className="mt-2 w-full bg-green-400 px-4 py-2 text-black text-center text-3xl truncate whitespace-nowrap overflow-hidden leading-tight">
-        {hideName(queue.patient_name)}
+         {hideName == 'true' ? hideNameAction(queue.patient_name) : queue.patient_name}
       </div>
     </div>
   );
@@ -334,7 +345,7 @@ const QueuePickupTerlewat = ({ title, queuesRacik, queuesNonRacik, bgColor }) =>
         </div>
       </div>
       <div className="text-center text-bold mt-2 w-full bg-green-400 px-4 py-2 text-black text-3xl truncate whitespace-nowrap overflow-hidden leading-tight">
-        {hideName(queue.patient_name)}
+         {hideName == 'true' ? hideNameAction(queue.patient_name) : queue.patient_name}
       </div>
     </div>
   );

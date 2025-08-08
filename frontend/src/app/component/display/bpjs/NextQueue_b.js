@@ -11,7 +11,8 @@ const NextQueue = ({location, verificationData, medicineData, pickupData }) => {
     const socket = getSocket(); // Ensure this returns a singleton socket instance
     console.log("LOCATION",location);
     const [currentDate, setCurrentDate] = useState(new Date().getDate()); // [currentDate,setCurrentDate]
-
+    const [hideName, setHideName] = useState(localStorage.getItem('nameToggleState')); // [hideName,setHideName]
+    console.log(hideName)
   const [queues, setQueues] = useState({
     nextQueueRacik: [],
     nextQueueNonRacik: [],
@@ -41,7 +42,17 @@ const [times, setTimes] = useState({
 
 useEffect(() => {
   if (!socket) return; // Exit if socket is not initialized
+socket.on('send_nameToggle', (payload) => {
+  console.log("TOGGLE NAME",payload);
+  if (hideName !== payload.data) {  // Only refresh if state actually changed
+    setHideName(payload.data);
+    localStorage.setItem('nameToggleState', payload.data.toString());
+    window.location.reload();
+  }
 
+    return () => socket.off('toggleName', handleToggle);
+
+});
   
   const handleGetResponses = (payload) => {
     console.log("? GOT RESP", payload);
@@ -183,7 +194,8 @@ useEffect(() => {
           {queue.queueNumber}
         </div>
         <div className="mt-2 w-full bg-green-400 px-4 py-2 text-black text-center text-3xl truncate whitespace-nowrap overflow-hidden leading-tight">
-          {hideName(queue.patient_name)}
+         {hideName == 'true' ? hideNameAction(queue.patient_name) : queue.patient_name}
+         
         </div>
       </div>
     ));
@@ -239,7 +251,7 @@ useEffect(() => {
     </div>
   );
 };
-function hideName(name){
+function hideNameAction(name){
     if (!name) return "";
 
   return name
@@ -277,7 +289,7 @@ function hideName(name){
           </div>
         </div>
         <div className={`flex-1 text-4xl text-center bg-green-400 mt-2 w-full p-1 text-black`}>
-          {hideName(queue.patient_name)}
+         {hideName == 'true' ? hideNameAction(queue.patient_name) : queue.patient_name}
         </div>
       </div>
     ));
@@ -340,7 +352,8 @@ const QueueSectionPickup = ({ title, queuesRacik, queuesNonRacik, bgColor }) => 
                     <div className={`text-3xl ${getStatusColor(queue.status)}`}>{queue.status}</div>
                     </div>
                       <div className="text-center mt-2 w-full bg-green-400 px-4 py-2 text-black text-3xl truncate whitespace-nowrap overflow-hidden leading-tight">
-{queue.patient_name}</div>
+         {hideName == 'true' ? hideNameAction(queue.patient_name) : queue.patient_name}
+</div>
                     
                   </div>
                 ))}
@@ -382,7 +395,8 @@ const QueueSectionPickup = ({ title, queuesRacik, queuesNonRacik, bgColor }) => 
                     <div className={`text-3xl ${getStatusColor(queue.status)}`}>{queue.status}</div>
                     </div>
                       <div className="text-center text-bold mt-2 w-full bg-green-400 px-4 py-2 text-black text-3xl truncate whitespace-nowrap overflow-hidden leading-tight">
-{queue.patient_name}</div>
+         {hideName == 'true' ? hideNameAction(queue.patient_name) : queue.patient_name}
+</div>
                     
                   </div>
                 ))}

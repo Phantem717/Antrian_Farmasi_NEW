@@ -240,6 +240,13 @@ try {
     }
     });
 
+    socket.on('toggleName', (payload) => {
+      console.log("PAYLOAD",payload.message,payload.data);
+      io.emit('send_nameToggle', {
+        message: payload.message,
+        data: payload.data
+      });
+    })
     socket.on('update_latest_pickup', (payload) => {
       console.log("PAYLOAD",payload.message,payload.data);
       io.emit('send_latest_pickup', {
