@@ -26,25 +26,13 @@ const Sidebar = ({lokasi, collapsed, setCollapsed, isLocation }) => {
     return true; // Fallback for SSR
   });
 
-  const [isNameEnabled, setIsNameEnabled] = React.useState(() => {
-    if (typeof window !== 'undefined') { // Check for SSR
-      const savedState = localStorage.getItem('waToggleState');
-      return savedState ? savedState === 'true' : true; // Default true if no saved state
-    }
-    return true; // Fallback for SSR
-  });
  const onChange = (checked) => {
     setIsWhatsAppEnabled(checked);
     localStorage.setItem('waToggleState', checked.toString());
     // Add your WhatsApp API call here if needed
   };
 
-  const onChangeName = (nameChecked) => {
-    setIsWhatsAppEnabled(nameChecked);
-    localStorage.setItem('nameToggleState', nameChecked.toString());
-    // Add your WhatsApp API call here if needed
-  }
-
+  
   // Mapping URL ke key Menu
  
   const menuKeyMapping = {
