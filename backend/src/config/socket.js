@@ -313,6 +313,7 @@ try {
           io.emit('send_queues_pickup_frontend_LT3', { data: queueDataLT3 });
 
         }
+        
         if(payload.lokasi == "Lantai 1 GMCB"){
           queueDataGMCB.push(payload.data);
 
