@@ -52,7 +52,7 @@ export default function Admin({params}) {
     }
   },[useTokenCheck,router]) 
   return (
-    <Layout style={{ height: "100vh", overflow: "hidden" }}>
+    <Layout style={{ height: "100vh", overflow: "hidden", backgroundColor: "#f0f0f0" }}  className="bg-gray-300">
       <Sidebar lokasi={category} collapsed={collapsed} setCollapsed={setCollapsed} />
 
       <Layout

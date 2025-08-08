@@ -11,7 +11,6 @@ import responses from "@/app/utils/api/responses";
 import { getReactRender } from 'antd/es/config-provider/UnstableContext';
 import { use } from 'react'; // Next.js 14+
 
-
 export default function Display({params}) {
   const {category} = use(params);
   console.log(category);
