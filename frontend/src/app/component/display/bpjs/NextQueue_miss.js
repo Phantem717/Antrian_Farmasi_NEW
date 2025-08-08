@@ -156,7 +156,7 @@ useEffect(() => {
       setCurrentDate(new Date().toDateString());
       window.location.reload();
     }
-  }, 3600000);
+  }, 300000);
   return () => clearInterval(interval);
 }, [currentDate]);
 
@@ -217,7 +217,9 @@ const QueuePickup = ({ title, queuesRacik, queuesNonRacik, bgColor }) => {
         {item ? (
           <div className="text-white text-center mt-2">
             <div className="text-6xl font-extrabold">{item.queue_number}</div>
-            <div className="text-2xl font-extrabold truncate mt-2">{hideName(item.patient_name)}</div>
+            {/* <div className="text-2xl font-extrabold truncate mt-2">{hideName(item.patient_name)}</div> */}
+                        <div className="text-2xl font-extrabold truncate mt-2">{item.patient_name}</div>
+
             <div className="text-2xl font-extrabold truncate mt-2">
               {formatDateTime(item.waiting_pickup_medicine_stamp)}
             </div>
@@ -246,7 +248,9 @@ const QueuePickup = ({ title, queuesRacik, queuesNonRacik, bgColor }) => {
         {queue.queueNumber}
       </div>
       <div className="mt-2 w-full bg-green-400 px-4 py-2 text-black text-center text-3xl truncate whitespace-nowrap overflow-hidden leading-tight">
-        {hideName(queue.patient_name)}
+        {/* {hideName(queue.patient_name)}
+         */}
+         {item.patient_name}
       </div>
     </div>
   );
@@ -334,7 +338,8 @@ const QueuePickupTerlewat = ({ title, queuesRacik, queuesNonRacik, bgColor }) =>
         </div>
       </div>
       <div className="text-center text-bold mt-2 w-full bg-green-400 px-4 py-2 text-black text-3xl truncate whitespace-nowrap overflow-hidden leading-tight">
-        {hideName(queue.patient_name)}
+        {/* {hideName(queue.patient_name)} */}
+        {item.patient_name}
       </div>
     </div>
   );

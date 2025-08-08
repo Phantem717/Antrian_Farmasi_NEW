@@ -148,7 +148,7 @@ useEffect(() => {
         setCurrentDate(new Date().toDateString());
         window.location.reload();
       }
-    }, 3600000);
+    }, 300000);
     return () => clearInterval(interval);
   }, [currentDate]);
   
@@ -183,7 +183,8 @@ useEffect(() => {
           {queue.queueNumber}
         </div>
         <div className="mt-2 w-full bg-green-400 px-4 py-2 text-black text-center text-3xl truncate whitespace-nowrap overflow-hidden leading-tight">
-          {hideName(queue.patient_name)}
+          {/* {hideName(queue.patient_name)} */}
+          {item.patient_name}
         </div>
       </div>
     ));
@@ -277,7 +278,8 @@ function hideName(name){
           </div>
         </div>
         <div className={`flex-1 text-4xl text-center bg-green-400 mt-2 w-full p-1 text-black`}>
-          {hideName(queue.patient_name)}
+          {/* {hideName(queue.patient_name)} */}
+          {item.patient_name}
         </div>
       </div>
     ));
