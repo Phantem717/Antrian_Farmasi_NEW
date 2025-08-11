@@ -11,6 +11,7 @@ async function sendWAVerif(payload){
     try {
       const { timestamp, signature } = generateSignature(consID2, password);
       let duration = "";
+      
 
       if (payload?.medicine_type?.trim() === "Racikan") {
         duration = "60 Menit"
@@ -197,7 +198,7 @@ Dokter : *${payload.docter}*
 Obat : *${payload.medicine_type}*
 No. Antrian : *${payload.queue_number}*
 
-*Saat ini _Obat Telah Selesai_ disiapkan, dan dapat diambil di Loket 3.*
+*Saat ini _Obat Telah Selesai_ disiapkan, dan dapat diambil di Loket 1.*
 
 *Mohon menunjukkan WA ini untuk mengambil obat.*
 

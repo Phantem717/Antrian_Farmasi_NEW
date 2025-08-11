@@ -96,7 +96,8 @@ const socket = getSocket();
             const doctorResponse = await DoctorAppointmentAPI.getAppointmentByNOP(queue.NOP);
           
             console.log("DOCRESP",doctorResponse);
-          
+                      const loket = respData.filter(loket => loket.status === "active" && (loket.loket_name === "Loket 1" || loket.loket_name == "Loket 4"))[0].loket_name;
+
 
             const payload = {
               phone_number: doctorResponse.data.phone_number,
@@ -109,7 +110,8 @@ const socket = getSocket();
               queue_number: doctorResponse.data.queue_number,
               NOP : doctorResponse.data.NOP,
               waiting_pickup_medicine_stamp: queue.waiting_pickup_medicine_stamp,
-              switch_WA: localStorage.getItem('waToggleState') || "true"
+              switch_WA: localStorage.getItem('waToggleState') || "true",
+              loket: loket
 
           }
 
