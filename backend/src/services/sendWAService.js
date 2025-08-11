@@ -86,7 +86,7 @@ Kami dari Farmasi Rawat Jalan BPJS RS St. Carolus menginformasikan bahwa :
     
 Nama Pasien : *${payload.patient_name}*
 No Registrasi : *${payload.NOP}*        
-Dokter : *${payload.doctor_name}*      
+Dokter : *${payload.docter}*      
 Obat : *${payload.medicine_type}*
 No. Antrian : *${payload.queue_number}*
 

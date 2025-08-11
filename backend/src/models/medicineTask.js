@@ -133,6 +133,9 @@ class MedicineTask {
           da.sep_no,
           da.medical_record_no,
           da.queue_number,
+          da.phone_number,
+          da.doctor_name,
+
           da.status_medicine,
           pt.status,
           pt.medicine_type
@@ -170,6 +173,8 @@ AND (pt.status IS NULL OR
           da.medical_record_no,
           da.queue_number,
           da.status_medicine,
+          da.phone_number,
+          da.doctor_name,
           pt.status,
           pt.medicine_type
         FROM Medicine_Task mt

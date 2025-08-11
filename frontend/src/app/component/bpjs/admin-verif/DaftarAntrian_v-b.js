@@ -48,11 +48,12 @@ const DaftarAntrian = ({location, selectedQueueIds, setSelectedQueueIds, onSelec
   const [rawQueueList,setRawQueueList]= useState([]);
       const [searchText, setSearchText] = useState('');
   const [visible,setVisible]=useState(false);
-  const [phoneVisible,setPhoneVisible] = useState(false);
   const [lokets, setLokets] = useState([]);
   const [selectedLoketLocal, setSelectedLoketLocal] = useState("");
   const [selectedFilter, setSelectedFilter] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
+    const [phoneVisible,setPhoneVisible] = useState(false);
+
   const [phoneQueue, setPhoneQueue] =useState(null);
   const [currentDate,setCurrentDate]= useState(new Date().getDate());
   const socket = getSocket();
@@ -310,9 +311,6 @@ const handleSearchClear = () => {
   };
 
   
- const handleClosePhoneForm = () => {
-    setPhoneVisible(false);
-  };
 // Add a clear date function
 const handleClearDate = () => {
   setDate(null);
@@ -323,6 +321,10 @@ const changeDate = (date,dateString) => {
   setDate(dateString);
 }
 
+
+ const handleClosePhoneForm = () => {
+    setPhoneVisible(false);
+  };
   async function handleUpdatePhone(selectedQueue){
     try {
       console.log(selectedQueue);
