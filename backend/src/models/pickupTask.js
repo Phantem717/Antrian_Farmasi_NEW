@@ -132,6 +132,8 @@ class PickupTask {
           da.sep_no,
           da.medical_record_no,
           da.queue_number,
+           da.phone_number,
+          da.doctor_name,
           da.status_medicine,
           ph.status,
           ph.medicine_type
@@ -201,6 +203,8 @@ ORDER BY
           da.medical_record_no,
           da.queue_number,
           da.status_medicine,
+           da.phone_number,
+          da.doctor_name,
           ph.status,
           ph.medicine_type
         FROM Pickup_Task pt

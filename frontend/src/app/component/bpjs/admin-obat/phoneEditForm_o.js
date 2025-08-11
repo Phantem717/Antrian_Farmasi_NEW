@@ -94,7 +94,7 @@ export default function BarcodeScanner({location, visible, onClose,selectedQueue
       });
       console.log("PAYLOAD",selectedQueue);
       onClose?.();
-       const WAPayload = {
+         const WAPayload = {
             phone_number: phoneNumber ?? "-",
             NOP: selectedQueue.NOP?? "-",
             docter: selectedQueue.doctor_name??"-",
@@ -103,17 +103,18 @@ export default function BarcodeScanner({location, visible, onClose,selectedQueue
             barcode:selectedQueue.NOP ?? "-",
             patient_name: selectedQueue.patient_name ?? "-",
             farmasi_queue_number: selectedQueue.queue_number ?? "-",
-            medicine_type: selectedQueue.status_medicine ?? "-",
+            medicine_type: selectedQueue.medicine_type ?? "-",
             
             rm: selectedQueue.medical_record_no??"-",
             tanggal_lahir:  selectedQueue.patient_date_of_birth??"-",
             queue_number: selectedQueue.queue_number ?? null,
-            switch_WA: localStorage.getItem('waToggleState') || "true"
+            switch_WA: localStorage.getItem('waToggleState')
         };
 
-              socket.emit('update_verif',{location});
 
-      const WARESP =await WA_API.sendWAAntrian(WAPayload);
+              socket.emit('update_pickup',{location});
+
+      const WARESP =await WA_API.sendWAPickup(WAPayload);
                   await new Promise(resolve => setTimeout(resolve, 1000)); // 1-second delay
 
       console.log("RESP ERROR",WARESP.data)

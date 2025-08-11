@@ -45,7 +45,7 @@ export default function Admin({params}) {
   const [selectedQueueIds, setSelectedQueueIds] = useState([]); 
   const [selectedQueue2,setSelectedQueue2] = useState([]);
   const checkResponse = useTokenCheck();
- 
+  
   useEffect(( )=> {
     if(    !checkResponse){
       router.push("/login"); // Arahkan ke halaman login
@@ -99,6 +99,7 @@ export default function Admin({params}) {
                 onStatusUpdate={() => {}}
                 setSelectedQueue2={setSelectedQueue2}
                 selectedQueue2={selectedQueue2}
+                selectedLoket={selectedLoket}
                 location={category}
               />
             </div>

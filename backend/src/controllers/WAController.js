@@ -47,7 +47,7 @@ const sendWAAntrianController  = async (req,res) => {
                 return res.status(400).json({ message: "Payload incomplete. Required: phone_number, NOP, queue_number, patient_name." });
               }
           
-              const payload = { phone_number, NOP, queue_number, patient_name,docter,nik,rm,sep,medicine_type,switch_WA,looket  };
+              const payload = { phone_number, NOP, queue_number, patient_name,docter,nik,rm,sep,medicine_type,switch_WA,loket  };
             const data = await sendWAPickup(payload);
         
             res.status(200).json({ data });
