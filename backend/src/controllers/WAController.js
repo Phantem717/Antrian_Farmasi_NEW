@@ -40,14 +40,14 @@ const sendWAAntrianController  = async (req,res) => {
 
     const sendWAPickupController  = async (req,res) => {
         try {
-            const { phone_number, NOP, queue_number, patient_name,docter,nik,rm,sep,medicine_type,switch_WA } = req.body;
+            const { phone_number, NOP, queue_number, patient_name,docter,nik,rm,sep,medicine_type,switch_WA,loket } = req.body;
     
             // Check if required fields exist
             if (!phone_number || !NOP || !queue_number|| !patient_name || !docter ||!medicine_type) {
                 return res.status(400).json({ message: "Payload incomplete. Required: phone_number, NOP, queue_number, patient_name." });
               }
           
-              const payload = { phone_number, NOP, queue_number, patient_name,docter,nik,rm,sep,medicine_type,switch_WA  };
+              const payload = { phone_number, NOP, queue_number, patient_name,docter,nik,rm,sep,medicine_type,switch_WA,looket  };
             const data = await sendWAPickup(payload);
         
             res.status(200).json({ data });
