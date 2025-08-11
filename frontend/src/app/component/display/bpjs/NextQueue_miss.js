@@ -307,7 +307,7 @@ const QueuePickup = ({ title, queuesRacik, queuesNonRacik, bgColor }) => {
 
   return (
     <div className={`p-4 flex-1 min-w-0 ${bgColor} rounded-lg shadow-md overflow-hidden`} style={{ minHeight: "1200px" }}>
-      <p className="text-2xl font-bold text-white text-center uppercase">{title}</p>
+      <p className="text-4xl font-extrabold text-white text-center uppercase">{title}</p>
       
       <div className="flex gap-4 mb-4 mt-2">
         {renderLastCalled('racik')}
@@ -408,7 +408,7 @@ const QueuePickupTerlewat = ({ title, queuesRacik, queuesNonRacik, bgColor }) =>
 
   return (
     <div className={`p-4 flex-1 min-w-0 ${bgColor} rounded-lg shadow-md`} style={{ minHeight: "1200px" }}>
-      <p className="text-2xl font-bold text-white text-center uppercase">{title}</p>
+      <p className="text-4xl font-extrabold text-white text-center uppercase">{title}</p>
       <div className="flex flex-wrap gap-2 mt-2 overflow-x-hidden">
         {renderQueueSection(queuesRacik, times.pickupTimeRacik, "Racikan", true)}
         {renderQueueSection(queuesNonRacik, times.pickupTimeNon, "Non-Racikan", false)}
