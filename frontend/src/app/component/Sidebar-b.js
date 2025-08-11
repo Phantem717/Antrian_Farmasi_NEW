@@ -14,8 +14,9 @@ import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
 import { LeftCircleOutlined } from "@ant-design/icons";
 const { Sider } = Layout;
 import { Switch } from 'antd';
-
+import { getSocket } from "@/app/utils/api/socket";
 const Sidebar = ({lokasi, collapsed, setCollapsed, isLocation }) => {
+  const socket = getSocket();
   const router = useRouter();
   const pathname = usePathname(); // Ambil path URL saat ini
   const [isWhatsAppEnabled, setIsWhatsAppEnabled] = React.useState(() => {
@@ -25,6 +26,23 @@ const Sidebar = ({lokasi, collapsed, setCollapsed, isLocation }) => {
     }
     return true; // Fallback for SSR
   });
+
+  
+  const [isNameEnabled, setIsNameEnabled] = React.useState(() => {
+    if (typeof window !== 'undefined') { // Check for SSR
+      const savedState = localStorage.getItem('nameToggleState');
+      return savedState ? savedState === 'true' : true; // Default true if no saved state
+    }
+    return true; // Fallback for SSR
+  });
+  const onChangeName = (nameChecked) => {
+    setIsNameEnabled(nameChecked);
+    console.log("NAME CHECKED",nameChecked);
+    const payload = nameChecked;
+    socket.emit('toggleName', {data: nameChecked}, console.log("TOGGLE NAME"));
+    localStorage.setItem('nameToggleState', nameChecked.toString());
+    // Add your WhatsApp API call here if needed
+  }
 
  const onChange = (checked) => {
     setIsWhatsAppEnabled(checked);
@@ -189,7 +207,7 @@ const Sidebar = ({lokasi, collapsed, setCollapsed, isLocation }) => {
             onClick: handleLogout,
             style: { fontSize: "18px", fontWeight: "bold", color: "#ff4d4f", height: "60px", lineHeight: "60px" },
           },
-         {
+ {
   key: "9",
   label: (
     <div style={{ 
@@ -221,7 +239,41 @@ const Sidebar = ({lokasi, collapsed, setCollapsed, isLocation }) => {
     margin: 0,
     padding: 0
   }
+},
+{
+  key: "10",
+  label: (
+    <div style={{ 
+      display: 'flex', 
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      padding: '0 16px',
+      height: '100%',
+      
+    }}>
+      <span style={{ 
+        fontSize: '18px',
+        color: 'rgba(255, 255, 255, 0.65)'
+      }}>
+        Hide Nama Pasien
+      </span>
+      <Switch 
+        checked={isNameEnabled}
+        onChange={onChangeName}
+         style={{
+    backgroundColor: isNameEnabled ? "#0033ff" : "#ccc"  // Customize "on" and "off" colors
+  }}
+      />
+    </div>
+  ),
+  style: { 
+    height: '60px', 
+    lineHeight: '60px',
+    margin: 0,
+    padding: 0
+  }
 }
+
           
         ]}
 
