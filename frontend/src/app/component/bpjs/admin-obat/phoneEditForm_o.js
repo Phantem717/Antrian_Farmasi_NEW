@@ -103,7 +103,7 @@ export default function BarcodeScanner({location, visible, onClose,selectedQueue
             barcode:selectedQueue.NOP ?? "-",
             patient_name: selectedQueue.patient_name ?? "-",
             farmasi_queue_number: selectedQueue.queue_number ?? "-",
-            medicine_type: selectedQueue.status_medicine ?? "-",
+            medicine_type: selectedQueue.medicine_type ?? "-",
             
             rm: selectedQueue.medical_record_no??"-",
             tanggal_lahir:  selectedQueue.patient_date_of_birth??"-",

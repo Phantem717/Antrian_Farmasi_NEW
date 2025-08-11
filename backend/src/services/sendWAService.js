@@ -1,5 +1,6 @@
 const axios = require('axios');
 require('dotenv').config({ path: './.env' }); // Or just require('dotenv').config();
+const { getCurrentTimestamp, convertToJakartaTime } = require('../handler/timeHandler');
 
 const generateSignature = require('../utils/signature');
 const password = process.env.PASSWORD ;
@@ -12,7 +13,6 @@ async function sendWAVerif(payload){
       const { timestamp, signature } = generateSignature(consID2, password);
       let duration = "";
       
-
       if (payload?.medicine_type?.trim() === "Racikan") {
         duration = "60 Menit"
       }
@@ -24,17 +24,27 @@ async function sendWAVerif(payload){
       if(payload?.prev_queue_number?.trim() != "-" ){
         change_queue_message= `_Nomor Antrian anda telah berubah/diganti dari *${payload.prev_queue_number}* menjadi *${payload.queue_number}*_`
       }
-  const url = path;
-console.log("PHONE_NUMBER_VERIF",payload.phone_number,payload.switch_WA,"SWITCH TEST: ", payload.switch_WA ? payload.phone_number : "test");
-  const response = await axios.post(
-    url,
-    {
-phone: payload.phone_number ,      
-      // phone: payload.phone_number,
+  
+      const currentTime = getCurrentTimestamp().split(' ')[1].substring(0, 2);
+        let messageNext;
+        console.log("TIMESTAMP",currentTime >= 20 ? true : false);
+        console.log("PHONE_NUMBER_PICKUP",payload.phone_number);
+        if(currentTime >= 20 == true ){
+          messageNext= "Terima kasih telah menunggu, Karena sudah diluar jam kerja farmasi, obat anda dapat diambil di hari berikutnya pada jam 08.00-10.00."
+        }
+        else{
+          messageNext = "Terima kasih telah menunggu."
 
-      message : `*Notifikasi Sistem Otomatis*
+        }
+        const url = path;
 
-Terimakasih telah menunggu.
+    const response = await axios.post(
+      url,
+      {
+phone: payload.phone_number,        // phone: payload.phone_number,
+        message : `*Notifikasi Sistem Otomatis*
+
+${messageNext}
 Kami dari Farmasi Rawat Jalan BPJS RS St. Carolus menginformasikan bahwa:    
 
 Nama Pasien : *${payload.patient_name}*
@@ -87,7 +97,7 @@ Kami dari Farmasi Rawat Jalan BPJS RS St. Carolus menginformasikan bahwa :
     
 Nama Pasien : *${payload.patient_name}*
 No Registrasi : *${payload.NOP}*        
-Dokter : *${payload.doctor_name}*      
+Dokter : *${payload.docter}*      
 Obat : *${payload.medicine_type}*
 No. Antrian : *${payload.queue_number}*
 
@@ -180,16 +190,26 @@ Terima kasih.
 async function sendWAPickup(payload){
     try {
         const { timestamp, signature } = generateSignature(consID2, password);
+        const currentTime = getCurrentTimestamp().split(' ')[1].substring(0, 2);
+        let messageNext;
+        console.log("TIMESTAMP",currentTime >= 20 ? true : false);
+        console.log("PHONE_NUMBER_PICKUP",payload.phone_number);
+        if(currentTime >= 20 == true ){
+          messageNext= "Terima kasih telah menunggu, Karena sudah diluar jam kerja farmasi, obat anda dapat diambil di hari berikutnya pada jam 08.00-10.00."
+        }
+        else{
+          messageNext = "Terima kasih telah menunggu."
 
-    const url = path;
-console.log("PHONE_NUMBER_PICKUP",payload.phone_number,payload.switch_WA,"SWITCH TEST: ", payload.switch_WA ? payload.phone_number : "test");
+        }
+        const url = path;
+
     const response = await axios.post(
       url,
       {
 phone: payload.phone_number,        // phone: payload.phone_number,
         message : `*Notifikasi Sistem Otomatis*
 
-Terima kasih telah menunggu.
+${messageNext}
 Kami dari Farmasi Rawat Jalan BPJS RS St. Carolus menginformasikan bahwa :        
 
 Nama Pasien : *${payload.patient_name}*

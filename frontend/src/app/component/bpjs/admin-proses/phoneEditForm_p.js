@@ -17,8 +17,6 @@ import Swal from "sweetalert2";
 Swal.mixin({
   zIndex: 2000
 });
-import PhoneEditForm from "@/app/component/bpjs/admin-proses/phoneEditForm_p";
-
 import CloseIcon from '@mui/icons-material/Close'; // Add this import
 import PrintAntrian from "@/app/utils/api/printAntrian";
 import { updateButtonStatus } from "@/app/utils/api/Button";
@@ -105,18 +103,18 @@ export default function BarcodeScanner({location, visible, onClose,selectedQueue
             barcode:selectedQueue.NOP ?? "-",
             patient_name: selectedQueue.patient_name ?? "-",
             farmasi_queue_number: selectedQueue.queue_number ?? "-",
-            medicine_type: selectedQueue.status_medicine ?? "-",
+            medicine_type: selectedQueue.medicine_type ?? "-",
             
             rm: selectedQueue.medical_record_no??"-",
             tanggal_lahir:  selectedQueue.patient_date_of_birth??"-",
             queue_number: selectedQueue.queue_number ?? null,
-            switch_WA: localStorage.getItem('waToggleState') || "true"
+            switch_WA: localStorage.getItem('waToggleState')
         };
 
-              socket.emit('update_verif',{location});
+              socket.emit('update_proses',{location});
 
-      const WARESP =await WA_API.sendWAAntrian(WAPayload);
-                  await new Promise(resolve => setTimeout(resolve, 1000)); // 1-second delay
+      const WARESP =await WA_API.sendWAProses(WAPayload);
+      await new Promise(resolve => setTimeout(resolve, 1000)); // 1-second delay
 
       console.log("RESP ERROR",WARESP.data)
      

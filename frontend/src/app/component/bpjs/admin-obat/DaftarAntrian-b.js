@@ -27,6 +27,7 @@ import DoctorAppointmentAPI from '@/app/utils/api/Doctor_Appoinment';
 import PharmacyAPI from '@/app/utils/api/Pharmacy';
 import VerificationAPI from '@/app/utils/api/Verification';
 import MedicineAPI from '@/app/utils/api/Medicine';
+
 import Swal from 'sweetalert2';
 // import DataTable from "datatables.net-dt";
 import $ from 'jquery';
@@ -36,12 +37,15 @@ import customParseFormat from 'dayjs/plugin/customParseFormat';
 // import "datatables.net-dt/css/dataTables.dataTables.css";
 import { Form } from "antd";
 import { SearchOutlined, CloseOutlined } from '@ant-design/icons';
+import PhoneEditForm from "@/app/component/bpjs/admin-obat/phoneEditForm_o";
+import EditIcon from '@mui/icons-material/Edit';
 
 import { getSocket } from '@/app/utils/api/socket';
 const DaftarAntrian = ({location, selectedQueueIds, setSelectedQueueIds, setSelectedQueue, setSelectedLoket,setSelectedQueue2,selectedQueue2 }) => {
     const [searchText, setSearchText] = useState('');
     const [currentDate,setCurrentDate]= useState(new Date().getDate());
-    
+    const [phoneVisible,setPhoneVisible] = useState(false);
+          const [phoneQueue, setPhoneQueue] =useState(null);
  dayjs.extend(customParseFormat);
   const dateFormat="YYYY-MM-DD"
   const [rawQueueList,setRawQueueList]= useState([]);
@@ -325,9 +329,28 @@ const handleSearchClear = () => {
   setSearchText('');
   // The useEffect will automatically reset to rawQueueList
 };
+ 
+ const handleClosePhoneForm = () => {
+    setPhoneVisible(false);
+  };
+  async function handleUpdatePhone(selectedQueue){
+    try {
+      console.log(selectedQueue);
+      setPhoneVisible(true);
+      setPhoneQueue(selectedQueue);
+      
+    } catch (error) {
+            console.error("Error Updating tasks:", error);
+
+    }
+  }
+
 const hasYesterdayItems = queueList.some(item => item.isYesterday);
   return (
     <Box sx={{ padding: "10px" }}>
+       {phoneVisible &&
+                                <PhoneEditForm location={location} visible={phoneVisible} onClose={handleClosePhoneForm} selectedQueue={phoneQueue}/>
+                                }
       <Typography variant="h4" align="center" sx={{ marginBottom: "20px" }}>
         Daftar Antrian Pengambilan Obat
       </Typography>
@@ -340,6 +363,7 @@ const hasYesterdayItems = queueList.some(item => item.isYesterday);
           marginBottom: "20px",
         }}
       >
+
       <Select
         value={selectedLoketLocal}
         onChange={(e) => handleLoketChange(e.target.value)}
@@ -484,6 +508,9 @@ const hasYesterdayItems = queueList.some(item => item.isYesterday);
                 <strong>No. Rekam Medis</strong>
               </TableCell>
               <TableCell align="center">
+                <strong>No Telepon</strong>
+              </TableCell>
+              <TableCell align="center">
                 <strong>Status</strong>
               </TableCell>
               <TableCell align="center">
@@ -523,6 +550,20 @@ const hasYesterdayItems = queueList.some(item => item.isYesterday);
                 <TableCell style={{ fontWeight: 'bold' }} align="center" className='font-bold'>
                   {item.medical_record_no || "-"}
                 </TableCell>
+                <TableCell align="center" style={{ fontWeight: 'bold' }} className='font-bold'>
+      <div className="flex flex-row items-center h-full " style={{gap:"1px", minWidth:"120px"}}>
+ <Button onClick={(e)=>handleUpdatePhone(item)} className="p-0 m-0">
+            <EditIcon className="p-0 m-0"></EditIcon>
+
+     </Button>
+
+      <div className='font-bold'>
+    {item.phone_number}
+
+    </div>
+      </div>
+   
+    </TableCell>  
                 <TableCell style={{ fontWeight: 'bold' }} align="center" className='font-bold'>{item.status}</TableCell>
                 <TableCell style={{ fontWeight: 'bold' }} align="center" className='font-bold'>
                   {item.status_medicine === "Racikan"

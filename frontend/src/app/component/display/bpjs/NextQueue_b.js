@@ -158,6 +158,7 @@ socket.on('send_nameToggle', (payload) => {
       if (new Date().toDateString() !== currentDate) {
         setCurrentDate(new Date().toDateString());
         window.location.reload();
+        localStorage.clear();
       }
     }, 300000);
     return () => clearInterval(interval);
@@ -223,7 +224,7 @@ socket.on('send_nameToggle', (payload) => {
 
   return (
     <div className={`p-4 flex-1 min-w-0 ${bgColor} rounded-lg shadow-md overflow-hidden`} style={{ minHeight: "1200px" }}>
-      <p className="text-2xl font-bold text-white text-center uppercase">{title}</p>
+      <p className="text-4xl font-extrabold text-white text-center uppercase">{title}</p>
       
       <div className="flex gap-4 mt-4 flex-wrap">
         {/* Racikan Section */}
@@ -297,7 +298,7 @@ function hideNameAction(name){
 
   return (
     <div className={`p-4 flex-1 min-w-0 ${bgColor} rounded-lg shadow-md`} style={{ height: "1180px" }}>
-      <p className="text-2xl font-bold text-white text-center uppercase">{title}</p>
+      <p className="text-4xl font-extrabold text-white text-center uppercase">{title}</p>
       <div className="flex gap- mt-2">
         <div className="bg-gray-100 p-2 rounded-md shadow-md w-full h-full">
           {queues.length > 5 ? (

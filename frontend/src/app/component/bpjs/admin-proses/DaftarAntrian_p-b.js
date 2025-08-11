@@ -10,6 +10,8 @@ import { SearchOutlined, CloseOutlined } from '@ant-design/icons';
 import { DatePicker } from "antd";
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
+import EditIcon from '@mui/icons-material/Edit';
+import PhoneEditForm from "@/app/component/bpjs/admin-proses/phoneEditForm_p";
 
 export default function DaftarAntrian({location, scanResult, setIsDeleted }) {
     dayjs.extend(customParseFormat);
@@ -21,6 +23,8 @@ export default function DaftarAntrian({location, scanResult, setIsDeleted }) {
     const [loading, setLoading] = useState(true);
     const [searchText, setSearchText] = useState('');
     const [currentDate,setCurrentDate] = useState(new Date().getDate());
+     const [phoneVisible,setPhoneVisible] = useState(false);
+      const [phoneQueue, setPhoneQueue] =useState(null);
     const handleSearch = (searchText) => {
         setSearchText(searchText);
     };
@@ -83,7 +87,10 @@ useEffect(() => {
                         medical_record_no: item.medical_record_no || "Tidak Diketahui",
                         status: item.status || "Menunggu",
                         medicine_type: item.medicine_type !== "Empty" ? item.medicine_type : "Belum Ditentukan",
-                        timestamp: item.waiting_medicine_stamp
+                        timestamp: item.waiting_medicine_stamp,
+                        phone_number: item.phone_number,
+                        doctor_name: item.doctor_name,
+                        queue_number: item.queue_number
                     }))
                     .sort((a, b) => {
                         const getTimestamp = (item) => {
@@ -167,6 +174,21 @@ useEffect(() => {
         applyFilters(rawQueueList, searchText);
     }, [searchText, rawQueueList]);
 
+    
+ const handleClosePhoneForm = () => {
+    setPhoneVisible(false);
+  };
+  async function handleUpdatePhone(selectedQueue){
+    try {
+      console.log(selectedQueue);
+      setPhoneVisible(true);
+      setPhoneQueue(selectedQueue);
+      
+    } catch (error) {
+            console.error("Error Updating tasks:", error);
+
+    }
+  }
     return (
         <Box sx={{ padding: "10px", overflow: "auto" }}>
             <Typography variant="h4" align="center" sx={{ marginBottom: "20px" }}>
@@ -228,6 +250,9 @@ useEffect(() => {
                 </div>
 
                 <Box sx={{ maxHeight: "600px", overflowY: "auto" }}>
+                    {phoneVisible &&
+                          <PhoneEditForm location={location} visible={phoneVisible} onClose={handleClosePhoneForm} selectedQueue={phoneQueue}/>
+                          }
                     <Table stickyHeader>
                         <TableHead>
                             <TableRow>
@@ -237,6 +262,7 @@ useEffect(() => {
                                 <TableCell align="center"><strong>No. Rekam Medis</strong></TableCell>
                                 <TableCell align="center"><strong>Status</strong></TableCell>
                                 <TableCell align="center"><strong>Jenis Obat</strong></TableCell>
+                                <TableCell align="center"><strong>Nomor Telepon</strong></TableCell>
                                 <TableCell align="center"><strong>Timestamp</strong></TableCell>
                             </TableRow>
                         </TableHead>
@@ -254,7 +280,20 @@ useEffect(() => {
                                         <TableCell style={{ fontWeight: 'bold' }} align="center" className='font-bold'>{item.medical_record_no}</TableCell>
                                         <TableCell style={{ fontWeight: 'bold' }} align="center" className='font-bold'>{item.status}</TableCell>
                                         <TableCell style={{ fontWeight: 'bold' }} align="center" className='font-bold'>{item.medicine_type}</TableCell>
-                                        <TableCell style={{ fontWeight: 'bold' }} align="center" className='font-bold'>
+ <TableCell align="center" style={{ fontWeight: 'bold' }} className='font-bold'>
+      <div className="flex flex-row items-center h-full " style={{gap:"1px", minWidth:"120px"}}>
+ <Button onClick={(e)=>handleUpdatePhone(item)} className="p-0 m-0">
+            <EditIcon className="p-0 m-0"></EditIcon>
+
+     </Button>
+
+      <div className='font-bold'>
+    {item.phone_number}
+
+    </div>
+      </div>
+   
+    </TableCell>                                        <TableCell style={{ fontWeight: 'bold' }} align="center" className='font-bold'>
                                             {item.timestamp 
                                                                  ? dayjs(item.timestamp , "YYYY-MM-DD HH:mm:ss").format("DD MMM YYYY HH:mm")
                                                
