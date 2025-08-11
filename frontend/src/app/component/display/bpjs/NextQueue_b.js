@@ -158,6 +158,7 @@ socket.on('send_nameToggle', (payload) => {
       if (new Date().toDateString() !== currentDate) {
         setCurrentDate(new Date().toDateString());
         window.location.reload();
+        localStorage.clear();
       }
     }, 3600000);
     return () => clearInterval(interval);
