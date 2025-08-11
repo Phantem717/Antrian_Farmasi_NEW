@@ -11,6 +11,7 @@ async function sendWAVerif(payload){
     try {
       const { timestamp, signature } = generateSignature(consID2, password);
       let duration = "";
+      
 
       if (payload?.medicine_type?.trim() === "Racikan") {
         duration = "60 Menit"
