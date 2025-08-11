@@ -38,6 +38,13 @@ const socket = getSocket();
   const pickupTimeRacik = pickupLengthRacik < 3 ? 10 : (Math.floor(pickupLengthRacik * 0.2));
   return {  processTimeNon,processTimeRacik, pickupTimeNon,pickupTimeRacik };
 }
+useEffect(() => {
+   setLastCalled(prev => ({
+  ...prev,
+  racik: localStorage.getItem('lastCalled_racikan') ? JSON.parse(localStorage.getItem('lastCalled_racikan')) :  prev.racik,
+  nonRacik: localStorage.getItem('lastCalled_nonracikan') ? JSON.parse(localStorage.getItem('lastCalled_nonracikan')) : prev.nonRacik
+}));
+},[])
 
 function hideNameAction(name){
     if (!name) return "";
@@ -139,6 +146,10 @@ const pickupData = payload.data.pickupData.map(task => {
   nonRacik: data.medicine_type !== "Racikan" ? data : prev.nonRacik
 }));
   console.log("last2",lastCalled);
+  localStorage.setItem('lastCalled_racikan', JSON.stringify(data.medicine_type === "Racikan"? data  : "-"));
+  localStorage.setItem('lastCalled_nonracikan', JSON.stringify(data.medicine_type !== "Racikan" ? data  : "-"));
+
+  console.log("LAST CALLED",localStorage.getItem('lastCalled_nonracikan'));
 };
 
   if (socket) {
