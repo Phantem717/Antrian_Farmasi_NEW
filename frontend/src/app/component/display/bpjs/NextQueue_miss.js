@@ -34,7 +34,7 @@ const socket = getSocket();
   function calculateTime(processLengthNon, processLengthRacik, pickupLengthNon, pickupLengthRacik) {
   const processTimeNon = processLengthNon < 3 ? 10 : (Math.floor(processLengthNon * 1.5));
   const processTimeRacik =processLengthRacik< 3 ? 10 : (Math.floor(processLengthRacik * 0.16));
-  const pickupTimeNon = pickupLengthNon < 3 ? 10 : (pickupLengthNon * 15);
+  const pickupTimeNon = pickupLengthNon < 3 ? 10 : (Math.floor(pickupLengthNon * 1.5));
   const pickupTimeRacik = pickupLengthRacik < 3 ? 10 : (Math.floor(pickupLengthRacik * 0.2));
   return {  processTimeNon,processTimeRacik, pickupTimeNon,pickupTimeRacik };
 }
@@ -120,19 +120,6 @@ const pickupData = payload.data.pickupData.map(task => {
 
   setTimes(newTimes);
 
-    // const calledRacik = pickupData
-    //     .filter(task => task.type === "Racikan" && task.status === "Dipanggil")
-    //     .sort((a, b) => new Date(b.calledTime) - new Date(a.calledTime))[0];
-      
-    //   const calledNonRacik = pickupData
-    //     .filter(task => task.type === "Non - Racikan" && task.status === "Dipanggil")
-    //     .sort((a, b) => new Date(b.calledTime) - new Date(a.calledTime))[0];
-
-    //   setLastCalled({
-    //     racik: calledRacik,
-    //     nonRacik: calledNonRacik
-    //   });
-    //     console.log("last",lastCalled);
 
   console.log("Time Estimates:", newTimes);
   };

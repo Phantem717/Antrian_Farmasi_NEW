@@ -57,14 +57,9 @@ const socket = getSocket();
       if(statusType == "call" || statusType === "recall"){
           const respLoket = await LoketAPI.getAllLokets();
           const respData = respLoket.data;
-            const loket = respData.filter(loket => loket.status === "active" && (loket.loket_name === "Loket 1" || loket.loket_name == "Loket 4"))[0].loket_name;
+          // const loket = respData.filter(loket => loket.status === "active" && (loket.loket_name === "Loket 1" || loket.loket_name == "Loket 4"))[0].loket_name;
+          const updatedQueues = selectedQueue2.map(queue => ({...queue,loket: selectedLoket}));
           
-            const updatedQueues = selectedQueue2.map(queue => ({
-      ...queue,
-      loket: loket
-    }));
-           
-       
     socket.emit('call_queues_pickup', {
       data: updatedQueues,
       lokasi: "Lantai 1 BPJS"
@@ -96,7 +91,7 @@ const socket = getSocket();
             const doctorResponse = await DoctorAppointmentAPI.getAppointmentByNOP(queue.NOP);
           
             console.log("DOCRESP",doctorResponse);
-                      const loket = respData.filter(loket => loket.status === "active" && (loket.loket_name === "Loket 1" || loket.loket_name == "Loket 4"))[0].loket_name;
+            // const loket = respData.filter(loket => loket.status === "active" && (loket.loket_name === "Loket 1" || loket.loket_name == "Loket 4"))[0].loket_name;
 
 
             const payload = {
@@ -111,7 +106,7 @@ const socket = getSocket();
               NOP : doctorResponse.data.NOP,
               waiting_pickup_medicine_stamp: queue.waiting_pickup_medicine_stamp,
               switch_WA: localStorage.getItem('waToggleState') || "true",
-              loket: loket
+              loket: selectedLoket
 
           }
 
@@ -128,7 +123,7 @@ const socket = getSocket();
 
       
             const sendResponse = await WA_API.sendWAPickup(payload);
-                              await new Promise(resolve => setTimeout(resolve, 1000)); // 1-second delay
+            await new Promise(resolve => setTimeout(resolve, 1000)); // 1-second delay
 
             // console.log("WA SENT",sendResponse);   
           }
