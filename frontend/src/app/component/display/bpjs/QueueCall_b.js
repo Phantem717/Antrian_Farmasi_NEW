@@ -139,17 +139,16 @@ const fetchActiveLoket = async () => {
 
   console.log(selectedLoketRef,"LKET",selectedLoket);
   useEffect(() => {
-   const handleQueueUpdate = (payload) => {
-    if (!payload.data) return;
+    const handleQueueUpdate = (payload) => {
+            // setLoading(true);
 
-    // Add new announcements to the speechQueue only if not currently speaking
-    if (!isSpeaking.current) {
-      setSpeechQueue(prev => [...prev, ...payload.data]);
-    } else {
-      // If currently speaking, queue the new announcements
-      setSpeechQueue(prev => [...prev, ...payload.data]);
-    }
-  };
+     const data =payload.data[0];
+      console.log("?? Received update_status_medicine_type:", payload.message, data,payload.data.loket);
+      if (!payload.data) return;
+      console.log("TRIGGERED");
+      setSpeechQueue(data);
+
+    };
     socket.on('send_queues_verif_frontend_BPJS', handleQueueUpdate);
   socket.on('send_queues_pickup_frontend_BPJS', handleQueueUpdate);
 
@@ -161,7 +160,7 @@ const fetchActiveLoket = async () => {
     return () => {
       socket.off('update_status_medicine_type', handleQueueUpdate);
       socket.off('update_status_type',handleQueueUpdate);
-      socket.off('send_queues_pickup_frontend_BPJS',handleQueueUpdate);
+      socket.off('send_queues_pickup_frontendBPJS',handleQueueUpdate);
       socket.off('send_queues_verif_frontend_BPJS',handleQueueUpdate);
       socket.off('send_queues',handleQueueUpdate);
       socket.disconnect();
@@ -169,17 +168,16 @@ const fetchActiveLoket = async () => {
   }, [socket]); // Only runs once
 
   useEffect(() => {
-  const processQueue = () => {
     if (speechQueue.length > 0 && !isSpeaking.current) {
       setVisible(true);
-      const [currentItem, ...remainingItems] = speechQueue;
-      announceQueue([currentItem]);
-      setSpeechQueue(remainingItems);
-    }
-  };
 
-  processQueue();
-}, [speechQueue]);
+      announceQueue(speechQueue);
+    }
+    else{
+      setVisible(false);
+    }
+  }, [speechQueue]);
+  
   if (!visible) return null;
 
  
