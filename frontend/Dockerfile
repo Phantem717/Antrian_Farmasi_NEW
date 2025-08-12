@@ -4,7 +4,7 @@ WORKDIR /app
 
 # Salin dependencies dan instal
 COPY package*.json ./
-RUN RUN npm install --legacy-peer-deps
+RUN npm install --legacy-peer-deps
 
 
 # Salin semua file
