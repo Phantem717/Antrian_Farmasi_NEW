@@ -218,7 +218,7 @@ Dokter : *${payload.docter}*
 Obat : *${payload.medicine_type}*
 No. Antrian : *${payload.queue_number}*
 
-*Saat ini _Obat Telah Selesai_ disiapkan, dan dapat diambil di Loket 1.*
+*Saat ini _Obat Telah Selesai_ disiapkan, dan dapat diambil di ${payload.loket}.*
 
 *Mohon menunjukkan WA ini untuk mengambil obat.*
 

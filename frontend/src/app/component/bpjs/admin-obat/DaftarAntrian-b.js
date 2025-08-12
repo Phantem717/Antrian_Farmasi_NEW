@@ -151,11 +151,11 @@ const handleLoketUpdate = () => {
   try {
     // ? Hanya update loket yang dipilih menjadi "active"
     await LoketAPI.updateLoket(loketId, loketName, selectedLoketData.description, "active");
-    for (const loket of lokets) {
-          if (loket.loket_id !== loketId) {
-            await LoketAPI.updateLoket(loket.loket_id, loket.loket_name, loket.description, "close");
-          }
-        }
+    // for (const loket of lokets) {
+    //       if (loket.loket_id !== loketId) {
+    //         await LoketAPI.updateLoket(loket.loket_id, loket.loket_name, loket.description, "close");
+    //       }
+    //     }
   socket.on('update_loket', handleLoketUpdate);
 
     console.log(`? Loket ${loketName} diaktifkan.`);
