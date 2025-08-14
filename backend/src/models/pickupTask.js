@@ -162,24 +162,26 @@ class PickupTask {
 
     try {
       const query = `
-       SELECT
-  pt.*, 
-  da.patient_name,
-  da.sep_no,
-  da.medical_record_no,
-  da.queue_number,
-  da.status_medicine,
-  ph.status,
-  ph.medicine_type
-FROM Pickup_Task pt
-  LEFT JOIN Doctor_Appointments da ON pt.NOP = da.NOP
-  LEFT JOIN Pharmacy_Task ph ON pt.NOP = ph.NOP
-          WHERE (date(pt.waiting_pickup_medicine_stamp) = CURRENT_DATE
-  AND (ph.status IS NULL OR 
+    SELECT
+          pt.*, 
+          da.patient_name,
+          da.sep_no,
+          da.medical_record_no,
+          da.queue_number,
+           da.phone_number,
+          da.doctor_name,
+          da.status_medicine,
+          ph.status,
+          ph.medicine_type
+        FROM Pickup_Task pt
+          LEFT JOIN Doctor_Appointments da ON pt.NOP = da.NOP
+          LEFT JOIN Pharmacy_Task ph ON pt.NOP = ph.NOP
+          WHERE (date(pt.waiting_pickup_medicine_stamp) = CURRENT_DATE OR AND ph.status = 'pending_pickup_medicine')
+ AND (ph.status IS NULL OR 
        (ph.status != 'completed_pickup_medicine' AND ph.status LIKE '%pickup%'))
-  AND pt.lokasi = ?
-ORDER BY 
-  da.queue_number;
+       AND pt.lokasi = ?
+          ORDER BY 
+    da.queue_number;
       `;
       const [rows] = await conn.execute(query,[location]);
       return rows;
