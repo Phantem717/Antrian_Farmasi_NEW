@@ -56,6 +56,8 @@ ${change_queue_message ? '\n' + change_queue_message + '\n' : ''}
 Saat ini sedang dilakukan *_Proses Penyiapan_* obat
 Obat anda akan siap dalam +/- ${duration}.
 
+*Maksimal Pengambilan Obat H+1 pada jam 08.00-12.00*
+
 Mohon menunggu informasi selanjutnya. 
 Terima kasih. 
 
@@ -164,6 +166,8 @@ No. Antrian : *${payload.queue_number}*
 *Saat ini sedang dilakukan _Pengecekan Ketersediaan_ obatnya, apakah obat tersedia atau ada hal lain.*
 
 Mohon menunggu informasi selanjutnya. 
+*Maksimal Pengambilan Obat H+1 pada jam 08.00-12.00*
+
 Terima kasih. 
 
 *pesan otomatis dari sistem, mohon tidak membalas*
@@ -221,6 +225,8 @@ No. Antrian : *${payload.queue_number}*
 *Saat ini _Obat Telah Selesai_ disiapkan, dan dapat diambil di ${payload.loket}.*
 
 *Mohon menunjukkan WA ini untuk mengambil obat.*
+*Maksimal Pengambilan Obat H+1 pada jam 08.00-12.00*
+
 
 Terima kasih. 
 
