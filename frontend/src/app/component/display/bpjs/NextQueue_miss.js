@@ -39,12 +39,15 @@ const socket = getSocket();
   return {  processTimeNon,processTimeRacik, pickupTimeNon,pickupTimeRacik };
 }
 useEffect(() => {
-   setLastCalled(prev => ({
-  ...prev,
-  racik: localStorage.getItem('lastCalled_racikan') ? JSON.parse(localStorage.getItem('lastCalled_racikan')) :  prev.racik,
-  nonRacik: localStorage.getItem('lastCalled_nonracikan') ? JSON.parse(localStorage.getItem('lastCalled_nonracikan')) : prev.nonRacik
-}));
-},[])
+  setLastCalled({
+    racik: localStorage.getItem('lastCalled_racikan') 
+      ? JSON.parse(localStorage.getItem('lastCalled_racikan')) 
+      : null,
+    nonRacik: localStorage.getItem('lastCalled_nonracikan') 
+      ? JSON.parse(localStorage.getItem('lastCalled_nonracikan')) 
+      : null
+  });
+}, []);
 
 function hideNameAction(name){
     if (!name) return "";
@@ -124,19 +127,25 @@ const pickupData = payload.data.pickupData.map(task => {
   console.log("Time Estimates:", newTimes);
   };
 
-     const handleLatestPickup = (payload) => {
-        const data = payload.data
-        console.log("PAYLOAD",data);
-  setLastCalled(prev => ({
-  ...prev,
-  racik: data.medicine_type === "Racikan" ? data : prev.racik,
-  nonRacik: data.medicine_type !== "Racikan" ? data : prev.nonRacik
-}));
-  console.log("last2",lastCalled);
-  localStorage.setItem('lastCalled_racikan', JSON.stringify(data.medicine_type === "Racikan"? data: data));
-  localStorage.setItem('lastCalled_nonracikan', JSON.stringify(data.medicine_type !== "Racikan" ? data  : data));
-
-  console.log("LAST CALLED",localStorage.getItem('lastCalled_nonracikan'));
+    const handleLatestPickup = (payload) => {
+  const data = payload.data;
+  console.log("PAYLOAD", data);
+  
+  setLastCalled(prev => {
+    const newState = {
+      racik: data.medicine_type === "Racikan" ? data : prev.racik,
+      nonRacik: data.medicine_type !== "Racikan" ? data : prev.nonRacik
+    };
+    
+    // Save to localStorage independently
+    if (data.medicine_type === "Racikan") {
+      localStorage.setItem('lastCalled_racikan', JSON.stringify(data));
+    } else {
+      localStorage.setItem('lastCalled_nonracikan', JSON.stringify(data));
+    }
+    
+    return newState;
+  });
 };
 
   if (socket) {
