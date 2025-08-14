@@ -46,6 +46,7 @@ const DaftarAntrian = ({location, selectedQueueIds, setSelectedQueueIds, setSele
     const [currentDate,setCurrentDate]= useState(new Date().getDate());
     const [phoneVisible,setPhoneVisible] = useState(false);
           const [phoneQueue, setPhoneQueue] =useState(null);
+          
  dayjs.extend(customParseFormat);
   const dateFormat="YYYY-MM-DD"
   const [rawQueueList,setRawQueueList]= useState([]);
@@ -310,9 +311,10 @@ const changeDate = (date,dateString) => {
   };
 
   const handleSelectAll = () => {
-    setSelectedQueueIds(rawQueueList.map((item) => item.NOP));
-    setSelectedQueue2(rawQueueList);
-  };
+  const allIds = queueList.map((item) => item.NOP);
+  setSelectedQueueIds(allIds);
+  setSelectedQueue2([...queueList]);
+};
   
 
   useEffect(() => {
@@ -489,10 +491,23 @@ const hasYesterdayItems = queueList.some(item => item.isYesterday);
          <Table stickyHeader>
           <TableHead>
             <TableRow>
-              <TableCell align="center">
-                <strong>Pilih</strong>
-            
-              </TableCell>
+             <TableCell align="center">
+  <strong>Pilih</strong>
+  <Checkbox
+    checked={selectedQueueIds.length > 0 && selectedQueueIds.length === queueList.length}
+    indeterminate={selectedQueueIds.length > 0 && selectedQueueIds.length < queueList.length}
+    onChange={() => {
+      if (selectedQueueIds.length === queueList.length) {
+        // If all are selected, deselect all
+        setSelectedQueueIds([]);
+        setSelectedQueue2([]);
+      } else {
+        // Otherwise select all
+        handleSelectAll();
+      }
+    }}
+  />
+</TableCell>
               {hasYesterdayItems && (
       <TableCell align="center">
         <strong>Kemarin?</strong>

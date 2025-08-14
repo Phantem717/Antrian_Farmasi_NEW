@@ -167,6 +167,7 @@ No. Antrian : *${payload.queue_number}*
 
 Mohon menunggu informasi selanjutnya. 
 *Maksimal Pengambilan Obat H+1 pada jam 08.00-12.00*
+*Jika Pasien PRB atau OAT Silakan Menuju Ke Loket 2*
 
 Terima kasih. 
 
