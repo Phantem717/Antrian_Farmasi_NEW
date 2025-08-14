@@ -35,7 +35,7 @@ const socket = getSocket();
   const processTimeNon = processLengthNon < 3 ? 10 : (Math.floor(processLengthNon * 1.5));
   const processTimeRacik =processLengthRacik< 3 ? 10 : (Math.floor(processLengthRacik * 0.16));
   const pickupTimeNon = pickupLengthNon < 3 ? 10 : (Math.floor(pickupLengthNon * 1.5));
-  const pickupTimeRacik = pickupLengthRacik < 3 ? 10 : (Math.floor(pickupLengthRacik * 0.2));
+  const pickupTimeRacik = pickupLengthRacik < 3 ? 10 : (Math.floor(pickupLengthRacik * 0.2) ) ;
   return {  processTimeNon,processTimeRacik, pickupTimeNon,pickupTimeRacik };
 }
 useEffect(() => {
@@ -133,8 +133,8 @@ const pickupData = payload.data.pickupData.map(task => {
   nonRacik: data.medicine_type !== "Racikan" ? data : prev.nonRacik
 }));
   console.log("last2",lastCalled);
-  localStorage.setItem('lastCalled_racikan', JSON.stringify(data.medicine_type === "Racikan"? data  : "-"));
-  localStorage.setItem('lastCalled_nonracikan', JSON.stringify(data.medicine_type !== "Racikan" ? data  : "-"));
+  localStorage.setItem('lastCalled_racikan', JSON.stringify(data.medicine_type === "Racikan"? data: data));
+  localStorage.setItem('lastCalled_nonracikan', JSON.stringify(data.medicine_type !== "Racikan" ? data  : data));
 
   console.log("LAST CALLED",localStorage.getItem('lastCalled_nonracikan'));
 };
