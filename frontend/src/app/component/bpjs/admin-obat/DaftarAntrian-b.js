@@ -308,6 +308,11 @@ const changeDate = (date,dateString) => {
     });
     
   };
+
+  const handleSelectAll = () => {
+    setSelectedQueueIds(rawQueueList.map((item) => item.NOP));
+    setSelectedQueue2(rawQueueList);
+  };
   
 
   useEffect(() => {
@@ -486,6 +491,10 @@ const hasYesterdayItems = queueList.some(item => item.isYesterday);
             <TableRow>
               <TableCell align="center">
                 <strong>Pilih</strong>
+                 <Checkbox
+              checked={selectedQueueIds.includes(item.NOP)}
+              onChange={() => handleSelectAll()}
+            />
               </TableCell>
               {hasYesterdayItems && (
       <TableCell align="center">
