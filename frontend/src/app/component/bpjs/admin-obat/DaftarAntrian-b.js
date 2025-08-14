@@ -491,10 +491,7 @@ const hasYesterdayItems = queueList.some(item => item.isYesterday);
             <TableRow>
               <TableCell align="center">
                 <strong>Pilih</strong>
-                 <Checkbox
-              checked={selectedQueueIds.includes(item.NOP)}
-              onChange={() => handleSelectAll()}
-            />
+            
               </TableCell>
               {hasYesterdayItems && (
       <TableCell align="center">
