@@ -440,12 +440,12 @@ const QueuePickupTerlewat = ({ title, queuesRacik, queuesNonRacik, bgColor }) =>
 
         />
 
-        <QueuePickupTerlewat
+        {/* <QueuePickupTerlewat
           title="Panggilan Obat Terlewat" 
           queuesRacik={queues.pickupTerlewatRacik} 
           queuesNonRacik={queues.pickupTerlewatNonRacik} 
           bgColor="bg-red-700" 
-        />
+        /> */}
 
         </div>
       
