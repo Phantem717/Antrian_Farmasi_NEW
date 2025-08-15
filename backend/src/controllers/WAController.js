@@ -1,4 +1,4 @@
-const {sendWAVerif,sendWAAntrian,sendWAProses,sendWAPickup} = require('../services/sendWAService')
+const {sendWAVerif,sendWAAntrian,sendWAProses,sendWAPickup,sendWACustom} = require('../services/sendWAService')
 
 const sendWAVerifController  = async (req,res) => {
     try {
@@ -76,5 +76,24 @@ const sendWAAntrianController  = async (req,res) => {
             }
           };
           
+          const sendWACustomController = async (req, res) => {
+            try {
+                const { phone_number,patient_name,message } = req.body;
+          console.log("PHONE BODY",req.body);
 
-module.exports = {sendWAVerifController,sendWAAntrianController,sendWAPickupController,sendWAProsesController}
+                // Check if required fields exist
+                if (!phone_number || !patient_name || !message) {
+                    return res.status(400).json({ message: "Payload incomplete. Required: phone_number, NOP, queue_number, patient_name." });
+                  }
+              
+                  const payload = { phone_number,  patient_name, message};
+              const data = await sendWAProses(payload);
+          
+              res.status(200).json({ data });
+            } catch (error) {
+              console.error('Error pada SendWAProsesController:', error.message);
+              res.status(500).json({ message: 'Gagal mengirim pesan', error: error.message });
+            }
+          };
+
+module.exports = {sendWAVerifController,sendWAAntrianController,sendWAPickupController,sendWAProsesController,sendWACustomController}
