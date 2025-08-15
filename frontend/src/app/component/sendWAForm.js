@@ -31,6 +31,8 @@ import WA_API from "@/app/utils/api/WA";
 import CreateAntrianAPI from "@/app/utils/api/createAntrian";
 import VerificationAPI from "@/app/utils/api/Verification";
 import CheckRegistrationInfo from "@/app/utils/api/checkRegistrationInfo";
+import { Input } from 'antd';
+const { TextArea } = Input;
 export default function sendWAForm({location, visible, onClose }) {
     const [data,setData] = useState([]);
   const [inputValue, setInputValue] = useState("");
@@ -57,7 +59,8 @@ export default function sendWAForm({location, visible, onClose }) {
   useEffect(()=>{
     const getAllData = async ()=>{
       const data = await VerificationAPI.getVerificationTasksToday(location);
-      setData(data);
+      console.log("DATA:",data);
+      setData(data.data);
     }
     getAllData();
   },[])
@@ -368,29 +371,36 @@ return (
           </IconButton>
 
          
-          <FormControl fullWidth>
-            <Select
-              value={type}
-              displayEmpty
-      onChange={handleChange}
-            >
-                {data.map((item) => (
-                  <MenuItem key={item} value={item.patient_name}>
-                    {item.patient_name}
-                  </MenuItem>
-                ))}
-              
-            </Select>
-
-            <TextField
-            label="No. Telepon"
-            variant="outlined"
-            size="small"
-            value={phoneNumber}
-            onChange={(e) => setPhoneNumber(e.target.value)}
-            aria-readonly
-          />
-          </FormControl>
+        <FormControl fullWidth>
+  <Select
+    value={type}
+    displayEmpty
+    onChange={handleChange}
+    inputProps={{ 'aria-label': 'Without label' }}
+  >
+    <MenuItem value="" disabled>
+      Select Patient
+    </MenuItem>
+    {data?.length > 0 ? (
+      data.map((item) => (
+        <MenuItem 
+          key={item.NOP} 
+          value={item.patient_name}
+          onClick={() => {
+            setPhoneNumber(item.phone_number || "");
+            setName(item.patient_name || "");
+            // Set other fields as needed
+          }}
+        >
+          {item.patient_name} - {item.queue_number}
+        </MenuItem>
+      ))
+    ) : (
+      <MenuItem disabled>Loading patients...</MenuItem>
+    )}
+  </Select>
+  <TextArea rows={5}/>
+</FormControl>
           <Button variant="contained" type="submit" color="primary" disabled={isBarcoded.current == false && isTyped.current == false}>
             Submit
           </Button>

@@ -113,7 +113,7 @@ const Sidebar = ({lokasi, collapsed, setCollapsed, isLocation }) => {
     },
    {
   key: "4",
-  icon: <SettingOutlined />,
+  icon: <EditOutlined />,
   label: "Send WA",
   onClick: () => setShowWAForm(true),
 },
