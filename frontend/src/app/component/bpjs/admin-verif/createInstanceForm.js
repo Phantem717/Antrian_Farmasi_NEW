@@ -83,7 +83,7 @@ export default function BarcodeScanner({location, visible, onClose }) {
       return false;
     }
 
-    if (cleanedBarcode.length !== 19) {
+    if (cleanedBarcode.length !== 18) {
       Swal.fire({
         icon: "error",
         title: "Data Bukan NOP/SEP",
