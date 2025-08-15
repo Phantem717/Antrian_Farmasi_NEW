@@ -326,29 +326,29 @@ const QueuePickup = ({ title, queuesRacik, queuesNonRacik, bgColor }) => {
         {renderLastCalled('nonracik')}
       </div>
 
-      <div className="flex gap-4 mt-4 flex-wrap">
+      {/* <div className="flex gap-4 mt-4 flex-wrap">
         {/* Racikan Section */}
-        <div className="flex-1 min-w-[300px] bg-gray-100 p-2 rounded-md shadow-md overflow-hidden">
-          <p className="text-2xl font-extrabold text-center text-green-700 uppercase">Racikan</p>
-          {queuesRacik.length > 3 ? 
-            renderMarqueeSection(queuesRacik, times.processTimeRacik, true) :
-            <div style={{ height: '1030px', overflowY: 'auto' }}>
-              {renderQueueList(queuesRacik, true)}
-            </div>
-          }
-        </div>
+        {/* <div className="flex-1 min-w-[300px] bg-gray-100 p-2 rounded-md shadow-md overflow-hidden"> */}
+          {/* <p className="text-2xl font-extrabold text-center text-green-700 uppercase">Racikan</p> */}
+          {/* {queuesRacik.length > 3 ?  */}
+            {/* renderMarqueeSection(queuesRacik, times.processTimeRacik, true) : */}
+            {/* <div style={{ height: '1030px', overflowY: 'auto' }}> */}
+              {/* {renderQueueList(queuesRacik, true)} */}
+            {/* </div> */}
+          {/* } */}
+        {/* </div> */}
 
         {/* Non-Racikan Section */}
-        <div className="flex-1 min-w-[300px] bg-gray-100 p-2 rounded-md shadow-md overflow-hidden">
-          <p className="text-2xl font-extrabold text-center text-green-700 uppercase">Non-Racikan</p>
-          {queuesNonRacik.length > 3 ? 
-            renderMarqueeSection(queuesNonRacik, times.processTimeNon, false) :
-            <div style={{ height: '1030px', overflowY: 'auto' }}>
-              {renderQueueList(queuesNonRacik, false)}
-            </div>
-          }
-        </div>
-      </div>
+        {/* <div className="flex-1 min-w-[300px] bg-gray-100 p-2 rounded-md shadow-md overflow-hidden"> */}
+          {/* <p className="text-2xl font-extrabold text-center text-green-700 uppercase">Non-Racikan</p> */}
+          {/* {queuesNonRacik.length > 3 ?  */}
+            {/* renderMarqueeSection(queuesNonRacik, times.processTimeNon, false) : */}
+            {/* <div style={{ height: '1030px', overflowY: 'auto' }}> */}
+              {/* {renderQueueList(queuesNonRacik, false)} */}
+            {/* </div> */}
+          {/* } */} 
+        {/* </div> */}
+      {/* </div> */}
     </div>
   );
 };
@@ -440,12 +440,12 @@ const QueuePickupTerlewat = ({ title, queuesRacik, queuesNonRacik, bgColor }) =>
 
         />
 
-        {/* <QueuePickupTerlewat
+        <QueuePickupTerlewat
           title="Panggilan Obat Terlewat" 
           queuesRacik={queues.pickupTerlewatRacik} 
           queuesNonRacik={queues.pickupTerlewatNonRacik} 
           bgColor="bg-red-700" 
-        /> */}
+        />
 
         </div>
       
