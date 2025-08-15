@@ -262,14 +262,14 @@ const PilihAksi = ({location, selectedQueueIds = [], setSelectedQueueIds, select
 
   const printPayload = {
               
-              phone_number: queue.phone_number,
-              barcode: queue.NOP,
-              patient_name: queue.patient_name,
-              farmasi_queue_number: queue.queue_number,
-              medicine_type: medicineType,
-              SEP: queue.sep_no,
+              phone_number: doctorResponse.data.phone_number,
+              barcode: doctorResponse.data.NOP,
+              patient_name: doctorResponse.data.patient_name,
+              farmasi_queue_number: doctorResponse.data.queue_number,
+              medicine_type: doctorResponse.data.status_medicine,
+              SEP:doctorResponse.data.sep_no,
               tanggal_lahir: queue.patient_date_of_birth,
-              queue_number: queue.queue_number,
+              queue_number: doctorResponse.data.queue_number,
               docter: queue.doctor_name
             }
             const printResp = await PrintAntrian.printAntrian(printPayload);

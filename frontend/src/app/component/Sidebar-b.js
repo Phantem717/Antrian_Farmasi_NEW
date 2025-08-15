@@ -1,4 +1,4 @@
-import React from "react";
+import {React,useState} from "react";
 import { Layout, Menu,Button  } from "antd";
 import Swal from "sweetalert2";
 import {
@@ -12,6 +12,7 @@ import {
 import { useRouter, usePathname } from "next/navigation";
 import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
 import { LeftCircleOutlined } from "@ant-design/icons";
+import SendWAForm from "@/app/component/sendWAForm";
 const { Sider } = Layout;
 import { Switch } from 'antd';
 import { getSocket } from "@/app/utils/api/socket";
@@ -19,7 +20,9 @@ const Sidebar = ({lokasi, collapsed, setCollapsed, isLocation }) => {
   const socket = getSocket();
   const router = useRouter();
   const pathname = usePathname(); // Ambil path URL saat ini
-  const [isWhatsAppEnabled, setIsWhatsAppEnabled] = React.useState(() => {
+  const [showWAForm, setShowWAForm] = useState(false);
+
+  const [isWhatsAppEnabled, setIsWhatsAppEnabled] = useState(() => {
     if (typeof window !== 'undefined') { // Check for SSR
       const savedState = localStorage.getItem('waToggleState');
       return savedState ? savedState === 'true' : true; // Default true if no saved state
@@ -28,7 +31,7 @@ const Sidebar = ({lokasi, collapsed, setCollapsed, isLocation }) => {
   });
 
   
-  const [isNameEnabled, setIsNameEnabled] = React.useState(() => {
+  const [isNameEnabled, setIsNameEnabled] = useState(() => {
     if (typeof window !== 'undefined') { // Check for SSR
       const savedState = localStorage.getItem('nameToggleState');
       return savedState ? savedState === 'true' : true; // Default true if no saved state
@@ -48,6 +51,10 @@ const Sidebar = ({lokasi, collapsed, setCollapsed, isLocation }) => {
     setIsWhatsAppEnabled(checked);
     localStorage.setItem('waToggleState', checked.toString());
     // Add your WhatsApp API call here if needed
+  };
+
+  const closeWaForm = () => {
+    setShowWAForm(false);
   };
 
   
@@ -104,12 +111,18 @@ const Sidebar = ({lokasi, collapsed, setCollapsed, isLocation }) => {
         router.push(`/login/${lokasi}/admin-obat-b`)
       } ,
     },
+   {
+  key: "4",
+  icon: <EditOutlined />,
+  label: "Send WA",
+  onClick: () => setShowWAForm(true),
+},
   
     {
       key: "8",
       icon: <AreaChartOutlined />,
       label: "View Logs",
-      onClick: () => router.push(`/login/${lokasi}/logs`),
+      onClick: () =><sendWAForm/>,
     },
   ];
 
@@ -130,6 +143,9 @@ const Sidebar = ({lokasi, collapsed, setCollapsed, isLocation }) => {
         // flexDirection: "column",
       }}
     >
+      {showWAForm &&<SendWAForm visible={showWAForm} onClose={closeWaForm} location={lokasi}/>}
+                  
+
       {/* Judul Sidebar */}
        <div
         style={{
@@ -282,6 +298,7 @@ const Sidebar = ({lokasi, collapsed, setCollapsed, isLocation }) => {
 
       <div>
         </div>
+
     </Sider>
   );
 };
