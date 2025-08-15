@@ -82,71 +82,15 @@ export default function sendWAForm({location, visible, onClose }) {
   }  
 }
 
-  async function validateBarcode(barcode) {
-      const cleanedBarcode = barcode.replace(/\s+/g, "");
-
-    if (!cleanedBarcode) {
-      Swal.fire({
-        icon: "error",
-        title: "Barcode kosong",
-        text: "Silakan scan barcode terlebih dahulu",
-        timer: 2000,
-        showConfirmButton: false,
-      });
-      return false;
-    }
-
-    if (!cleanedBarcode.startsWith("NOP") && cleanedBarcode.length !== 19) {
-      Swal.fire({
-        icon: "error",
-        title: "Data Bukan NOP/SEP",
-        text: "Barcode harus diawali dengan NOP atau memiliki panjang 19 karakter",
-        timer: 2000,
-        showConfirmButton: false,
-      });
-      return false;
-    }
-
-    return true;
-  }
+  
 
   const handleChange = (e) => {
     setType(e.target.value);
     isTyped.current = true;
   };
-  async function handleBarcodeEnter(e) {
-    if (e.key === "Enter") {
-      e.preventDefault();
-const barcode = inputValue.replace(/\s+/g, ""); // Removes ALL whitespace
-      
-      // Validate before making API call
-      if (!await validateBarcode(barcode)) {
-        return;
-      }
+  
 
-      try {
-        const data = await checkRegistration(barcode);
-        if (!data) {
-          Swal.fire({
-            icon: "error",
-            title: "Data tidak ditemukan",
-            text: "Barcode tidak terdaftar dalam sistem",
-            timer: 2000,
-            showConfirmButton: false,
-          });
-        }
-        isBarcoded.current = true;
-      } catch (error) {
-        Swal.fire({
-          icon: "error",
-          title: "Gagal memeriksa barcode",
-          text: error.message || "Terjadi kesalahan saat memeriksa barcode",
-          timer: 2000,
-          showConfirmButton: false,
-        });
-      }
-    }
-  }
+
   async function insertAll(payload) {
     const appointmentData = {
       sep_no: payload.sep_no,
@@ -190,30 +134,12 @@ const barcode = inputValue.replace(/\s+/g, ""); // Removes ALL whitespace
 
     return { doctorAppointment, pharmacyData, verificationData };
   }
-  async function checkRegistration(inputValue){
-    console.log(inputValue);
-   
-     const checkRegistrationResponse = await CheckRegistrationInfo.checkQueue(inputValue);
-   
-      console.log("CHECKRES",checkRegistrationResponse);
-      setDocter(checkRegistrationResponse.ParamedicName);
-      setNIK(checkRegistrationResponse.SSN);
-      setSEP(checkRegistrationResponse.NoSEP);
-      setPhoneNumber(checkRegistrationResponse.MobilePhoneNo1);
-      setName(checkRegistrationResponse.PatientName);
-      setMedical_record_no(checkRegistrationResponse.MedicalNo);
-      setDOB(checkRegistrationResponse.DateOfBirth);
-      setNOP(checkRegistrationResponse.RegistrationNo);
-      setPRB(checkRegistrationResponse.ProlanisPRB);
-
-
-    return checkRegistrationResponse;
-  }
+  
 
   async function handleSubmit(e) {
     e.preventDefault();
     try {
-        if (!inputValue || !type || !docter  || !phoneNumber ||!name ||!medical_record_no ||!DOB ||!NOP ) {
+        if (!!phoneNumber ||!name  ) {
               onClose?.();
           console.log(inputValue,type,docter,NIK,SEP,phoneNumber,name,medical_record_no,DOB,NOP,PRB);
         return Swal.fire({
