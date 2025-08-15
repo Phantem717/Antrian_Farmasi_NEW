@@ -31,12 +31,28 @@ processTimeRacik: 10,
 });    
 
 const socket = getSocket();
-  function calculateTime(processLengthNon, processLengthRacik, pickupLengthNon, pickupLengthRacik) {
-  const processTimeNon = processLengthNon < 3 ? 10 : (Math.floor(processLengthNon * 1.5));
-  const processTimeRacik =processLengthRacik< 3 ? 10 : (Math.floor(processLengthRacik * 0.16));
-  const pickupTimeNon = pickupLengthNon < 3 ? 10 : (Math.floor(pickupLengthNon * 1.5));
-  const pickupTimeRacik = pickupLengthRacik < 3 ? 10 : (Math.floor(pickupLengthRacik * 0.2) ) ;
-  return {  processTimeNon,processTimeRacik, pickupTimeNon,pickupTimeRacik };
+ function calculateTime(processLengthNon, processLengthRacik, pickupLengthNon, pickupLengthRacik) {
+  // Base configuration
+  const BASE_TIME = 10;  // Minimum time (seconds)
+  const MAX_TIME = 60;   // Maximum time (seconds)
+  
+  // Improved calculation using logarithmic scaling
+  const calculateDuration = (count) => {
+    if (count < 3) return BASE_TIME;
+    
+    // Logarithmic scaling (slows down growth as numbers increase)
+    const scaled = Math.log2(count) * 8;
+    
+    // Ensure value stays between BASE_TIME and MAX_TIME
+    return Math.min(MAX_TIME, Math.max(BASE_TIME, Math.floor(scaled)));
+  };
+
+  return {
+    processTimeNon: calculateDuration(processLengthNon),
+    processTimeRacik: calculateDuration(processLengthRacik),
+    pickupTimeNon: calculateDuration(pickupLengthNon),
+    pickupTimeRacik: calculateDuration(pickupLengthRacik)
+  };
 }
 useEffect(() => {
   setLastCalled({
