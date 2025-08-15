@@ -4,7 +4,6 @@ import {
   Box,
   Button,
   TextField,
-  Typography,
   FormControl,
   Select,
   MenuItem,
@@ -12,250 +11,107 @@ import {
   Backdrop,
   Fade,
   IconButton,
-  Dropdown 
+  Typography,
+  CircularProgress
 } from "@mui/material";
 import Swal from "sweetalert2";
-Swal.mixin({
-  zIndex: 2000
-});
 import { getSocket } from "@/app/utils/api/socket";
-import CloseIcon from '@mui/icons-material/Close'; // Add this import
-import PrintAntrian from "@/app/utils/api/printAntrian";
-import { updateButtonStatus } from "@/app/utils/api/Button";
-import BPJSBarcodeAPI from "@/app/utils/api/BPJS_Barcode";
-import PickupAPI from "@/app/utils/api/Pickup";
-import PharmacyAPI from "@/app/utils/api/Pharmacy";
-import MedicineAPI from "@/app/utils/api/Medicine";
-import DoctorAppointmentAPI from "@/app/utils/api/Doctor_Appoinment";
+import CloseIcon from '@mui/icons-material/Close';
 import WA_API from "@/app/utils/api/WA";
-import CreateAntrianAPI from "@/app/utils/api/createAntrian";
 import VerificationAPI from "@/app/utils/api/Verification";
-import CheckRegistrationInfo from "@/app/utils/api/checkRegistrationInfo";
 import { Input } from 'antd';
+
 const { TextArea } = Input;
-export default function sendWAForm({location, visible, onClose }) {
-    const [data,setData] = useState([]);
-  const [inputValue, setInputValue] = useState("");
+
+export default function SendWAForm({ location, visible, onClose }) {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [sending, setSending] = useState(false);
   const [name, setName] = useState("");
   const [type, setType] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
-    const [NOP, setNOP] = useState("");
-  const [SEP,setSEP] = useState("");
-  const [NIK,setNIK] = useState("");
-  const [medical_record_no,setMedical_record_no]= useState("");
-  const [DOB,setDOB] = useState("");
-  const [docter,setDocter] = useState("");
-  const [PRB,setPRB] = useState("");
-  const isBarcoded = useRef(false);
-  const inputRef = useRef(null);
-  const isTyped = useRef(false);
+  const [message, setMessage] = useState("");
   const socket = getSocket();
+
   useEffect(() => {
     if (visible) {
-      setTimeout(() => inputRef.current?.focus(), 100);
+      fetchData();
     }
   }, [visible]);
 
-  useEffect(()=>{
-    const getAllData = async ()=>{
-      const data = await VerificationAPI.getVerificationTasksToday(location);
-      console.log("DATA:",data);
-      setData(data.data);
-    }
-    getAllData();
-  },[])
-
-  async function clearField(){
-    setInputValue("");
-    setDOB("");
-    setName("");
-    setDocter("");
-    setMedical_record_no("");
-    setNIK("");
-    setNOP("");
-    setPhoneNumber("");
-    setSEP("");
-    setType("");
-    setPRB("");
-  if (inputRef.current) {
-    inputRef.current.focus();
-  }  
-}
-
-  
-
-  const handleChange = (e) => {
-    setType(e.target.value);
-    isTyped.current = true;
-  };
-  
-
-
-  async function insertAll(payload) {
-    const appointmentData = {
-      sep_no: payload.sep_no,
-      queue_number: payload.queue_number,
-      queue_status: payload.queue_status,
-      queue_type: payload.queue_type,
-      patient_name: payload.patient_name,
-      medical_record_no: payload.medical_record_no,
-      patient_date_of_birth: payload.patient_date_of_birth,
-      status_medicine: payload.statusMedicine,
-      lokasi: payload.location,
-      phone_number: payload.phone_number,
-      doctor_name: payload.doctor_name,
-      nik: payload.nik,
-      farmasi_queue_number: payload.farmasi_queue_number,
-      NOP: payload.NOP,
-      PRB: payload.PRB
-    };
-
-    const pharmacyPayload = {
-      NOP: payload.NOP,
-      status: "waiting_verification",
-      medicine_type: payload.statusMedicine,
-      lokasi: payload.location,
-    };
-
-    const taskData = {
-      NOP: payload.NOP,
-      Executor: "-",
-      Executor_Names: "-",
-      status: null,
-      location: location,
-    };
-
-    const [doctorAppointment,  pharmacyData, verificationData] = await Promise.all([
-      DoctorAppointmentAPI.createAppointment(appointmentData),
-      PharmacyAPI.createPharmacyTask(pharmacyPayload),
-            VerificationAPI.createVerificationTask(taskData),
-
-    ]);
-
-    return { doctorAppointment, pharmacyData, verificationData };
-  }
-  
-
-  async function handleSubmit(e) {
-    e.preventDefault();
+  const fetchData = async () => {
     try {
-        if (!!phoneNumber ||!name  ) {
-              onClose?.();
-          console.log(inputValue,type,docter,NIK,SEP,phoneNumber,name,medical_record_no,DOB,NOP,PRB);
-        return Swal.fire({
-          icon: "error",
-          title: "Input tidak lengkap",
-          text: `Mohon lengkapi semua data.`,
-          timer: 2000,
-          showConfirmButton: false,
-        });
+      setLoading(true);
+      const response = await VerificationAPI.getVerificationTasksToday(location);
+      setData(response.data || []);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Gagal memuat data",
+        text: error.message || "Terjadi kesalahan saat memuat data pasien",
+        timer: 2000,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePatientSelect = (patient) => {
+    setName(patient.patient_name);
+    setPhoneNumber(patient.phone_number || "");
+    setType(patient.NOP);
+    // Set other fields as needed
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSending(true);
+
+    try {
+      if (!name || !phoneNumber) {
+        throw new Error("Nama pasien dan nomor telepon harus diisi");
       }
 
-if(!inputValue.startsWith("NOP") && inputValue.length != 19) {
-   return Swal.fire({
-          icon: "error",
-          title: "Barcode Harus SEP atau NOP",
-          text: `Mohon lengkapi semua data.`,
-          timer: 2000,
-          
-          showConfirmButton: false,
-        });
-      }
-     
-      const medType = type === "racikan" ? "Racikan" : "Non - Racikan";
-      const queueNumber = await CreateAntrianAPI.createAntrian(medType);
-      const queueNumberData = queueNumber.data;
-      console.log("PREV PAYLOAD",queueNumberData.data.queue_number,medType,name);
-      const payload = {
-        sep_no: SEP??"-",
-        queue_number:queueNumberData.data.queue_number,
-        queue_status: "Menunggu",
-        queue_type: "Dokter",
-        patient_name: name,
-        medical_record_no: medical_record_no|| "-",
-        patient_date_of_birth: DOB || null,
-        statusMedicine: medType,
-        location: location,
+      const WAPayload = {
         phone_number: phoneNumber,
-        doctor_name: docter||"-",
-        nik: NIK||"-",
-        farmasi_queue_number: queueNumberData.data.queue_number,
-        NOP: inputValue,
-        PRB: PRB || null
+        patient_name: name,
+        message: message || "Mohon mengambil obat di loket farmasi"
       };
 
-      console.log("NEW PAYLOAD",payload);
-      await insertAll(payload);
-        Swal.fire({
+      const response = await WA_API.sendWAAntrian(WAPayload);
+      
+      Swal.fire({
         icon: "success",
         title: "Berhasil!",
-        text: `Data berhasil diproses.`,
+        text: "Pesan WhatsApp berhasil dikirim",
         timer: 1500,
         showConfirmButton: false,
       });
+
       onClose?.();
-       const WAPayload = {
-            phone_number: phoneNumber ?? "-",
-            NOP: inputValue ?? "-",
-            docter: docter??"-",
-            nik: NIK??"-",
-            sep: SEP??"-",
-            barcode: inputValue ?? "-",
-            patient_name: name ?? "-",
-            farmasi_queue_number: queueNumberData.data.queue_number ?? "-",
-            medicine_type: medType ?? "-",
-            
-            rm: medical_record_no??"-",
-            tanggal_lahir:  DOB??"-",
-            queue_number: queueNumberData.data.queue_number ?? null,
-            prev_queue_number: "-"
-        };
-
-           const printPayload = {
-            phone_number: phoneNumber ?? "-",
-            NOP: inputValue ?? "-",
-            docter: docter??"-",
-            nik: NIK??"-",
-            barcode: inputValue ?? "-",
-            patient_name:  name ?? "-",
-            farmasi_queue_number: queueNumberData.data.queue_number ?? "-",
-            medicine_type: medType ?? "-",
-            SEP:  SEP ?? "-",
-            tanggal_lahir: DOB ?? "-",
-            queue_number: queueNumberData.data.queue_number ?? null,
-            PRB: PRB,
-            switch_WA: localStorage.getItem('waToggleState') || "true",
-            lokasi: location
-        }
-      socket.emit('update_verif',{location});
-      socket.emit('update_display',{location});
-      const WARESP =await WA_API.sendWAAntrian(WAPayload);
-      const PRINTRESP= await PrintAntrian.printAntrian(printPayload);
-                  await new Promise(resolve => setTimeout(resolve, 1000)); // 1-second delay
-
-      console.log("RESP ERROR",WARESP.data,PRINTRESP.data)
-     
-
-
-    await clearField();
-
+      clearForm();
     } catch (error) {
-      console.error("Error saat memproses:", error);
-            onClose?.(); // Close modal after success
-
+      console.error("Error sending WA:", error);
       Swal.fire({
         icon: "error",
-        title: "Gagal Memproses!",
-        text: error.message || "Terjadi kesalahan",
+        title: "Gagal mengirim",
+        text: error.message || "Terjadi kesalahan saat mengirim WhatsApp",
         timer: 2000,
-        showConfirmButton: false,
       });
-      
-      await clearField();
+    } finally {
+      setSending(false);
     }
-  }
+  };
 
-return (
+  const clearForm = () => {
+    setName("");
+    setPhoneNumber("");
+    setType("");
+    setMessage("");
+  };
+
+  return (
     <Modal
       open={visible}
       onClose={onClose}
@@ -282,7 +138,6 @@ return (
             gap: 2,
           }}
         >
-          {/* Add close button at the top right */}
           <IconButton
             aria-label="close"
             onClick={onClose}
@@ -296,39 +151,71 @@ return (
             <CloseIcon />
           </IconButton>
 
-         
-        <FormControl fullWidth>
-  <Select
-    value={type}
-    displayEmpty
-    onChange={handleChange}
-    inputProps={{ 'aria-label': 'Without label' }}
-  >
-    <MenuItem value="" disabled>
-      Select Patient
-    </MenuItem>
-    {data?.length > 0 ? (
-      data.map((item) => (
-        <MenuItem 
-          key={item.NOP} 
-          value={item.patient_name}
-          onClick={() => {
-            setPhoneNumber(item.phone_number || "");
-            setName(item.patient_name || "");
-            // Set other fields as needed
-          }}
-        >
-          {item.patient_name} - {item.queue_number}
-        </MenuItem>
-      ))
-    ) : (
-      <MenuItem disabled>Loading patients...</MenuItem>
-    )}
-  </Select>
-  <TextArea rows={5}/>
-</FormControl>
-          <Button variant="contained" type="submit" color="primary" disabled={isBarcoded.current == false && isTyped.current == false}>
-            Submit
+          <Typography variant="h6" component="h2">
+            Kirim Pesan WhatsApp
+          </Typography>
+
+          <FormControl fullWidth>
+            <Select
+              value={type}
+              displayEmpty
+              onChange={(e) => setType(e.target.value)}
+              renderValue={(selected) => selected || "Pilih Pasien"}
+              disabled={loading}
+            >
+              <MenuItem value="" disabled>
+                {loading ? "Memuat data..." : "Pilih Pasien"}
+              </MenuItem>
+              {data.map((patient) => (
+                <MenuItem 
+                  key={patient.NOP} 
+                  value={patient.NOP}
+                  onClick={() => handlePatientSelect(patient)}
+                >
+                  {patient.patient_name} - {patient.queue_number}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <TextField
+            label="Nama Pasien"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            fullWidth
+            required
+          />
+
+          <TextField
+            label="Nomor Telepon"
+            value={phoneNumber}
+            onChange={(e) => setPhoneNumber(e.target.value)}
+            fullWidth
+            required
+            type="tel"
+          />
+
+          <TextArea
+            rows={4}
+            placeholder="Isi pesan (opsional)"
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+          />
+
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            disabled={!name || !phoneNumber || sending}
+            fullWidth
+            sx={{ mt: 2 }}
+          >
+            {sending ? (
+              <>
+                <CircularProgress size={24} sx={{ color: 'white', mr: 1 }} />
+                Mengirim...
+              </>
+            ) : "Kirim WhatsApp"}
           </Button>
         </Box>
       </Fade>

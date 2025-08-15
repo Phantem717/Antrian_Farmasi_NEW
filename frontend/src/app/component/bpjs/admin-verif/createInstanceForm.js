@@ -212,7 +212,7 @@ const barcode = inputValue.replace(/\s+/g, ""); // Removes ALL whitespace
         });
       }
 
-if(!inputValue.startsWith("NOP") && inputValue.length != 19) {
+if(inputValue.length != 18) {
    return Swal.fire({
           icon: "error",
           title: "Barcode Harus SEP atau NOP",
