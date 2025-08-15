@@ -104,6 +104,15 @@ const Sidebar = ({lokasi, collapsed, setCollapsed, isLocation }) => {
         router.push(`/login/${lokasi}/admin-obat-b`)
       } ,
     },
+     {
+      key: "4",
+      icon: <SettingOutlined />,
+      label: "Send WA",
+      onClick: () =>{
+        console.log("URL",`${lokasi}`,`/login/${lokasi}/admin-obat-b`);
+        router.push(`/login/${lokasi}/admin-obat-b`)
+      } ,
+    },
   
     {
       key: "8",
