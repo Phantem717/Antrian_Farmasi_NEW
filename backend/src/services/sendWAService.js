@@ -252,4 +252,37 @@ Terima kasih.
     }
 }
 
-module.exports = {sendWAProses,sendWAVerif,sendWAAntrian,sendWAPickup}
+async function sendWACustom(payload){
+    try {
+        const { timestamp, signature } = generateSignature(consID2, password);
+        const currentTime = getCurrentTimestamp().split(' ')[1].substring(0, 2);
+        console.log("TIMESTAMP",currentTime >= 20 ? true : false);
+        console.log("PHONE_NUMBER_PICKUP",payload.phone_number);
+             const url = path;
+
+    const response = await axios.post(
+      url,
+      {
+phone: payload.phone_number,        // phone: payload.phone_number,
+        message : payload.message
+
+    },
+      {
+        headers: {
+          'X-cons-id': consID2,
+          'X-timestamp': timestamp,
+          'X-signature': signature,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    console.log("WA RESPONSE:", response.data);
+    return response.data;
+    } catch (error) {
+        console.error('Error sending WhatsApp message Pikcup:', error.message);
+        throw error;
+    }
+}
+
+module.exports = {sendWAProses,sendWAVerif,sendWAAntrian,sendWAPickup,sendWACustom}
