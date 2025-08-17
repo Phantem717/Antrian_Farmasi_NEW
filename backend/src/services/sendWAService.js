@@ -258,7 +258,8 @@ async function sendWACustom(payload){
         const currentTime = getCurrentTimestamp().split(' ')[1].substring(0, 2);
         console.log("TIMESTAMP",currentTime >= 20 ? true : false);
         console.log("PHONE_NUMBER_PICKUP",payload.phone_number);
-             const url = path;
+      
+        const url = path;
 
     const response = await axios.post(
       url,
@@ -284,5 +285,7 @@ phone: payload.phone_number,        // phone: payload.phone_number,
         throw error;
     }
 }
+
+
 
 module.exports = {sendWAProses,sendWAVerif,sendWAAntrian,sendWAPickup,sendWACustom}

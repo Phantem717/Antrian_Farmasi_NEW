@@ -42,7 +42,16 @@ const WA_API = {
             console.error("Error In Fetching Responses: ",error);
             throw error;
         }
-    }
+    },
+    sendWACustom: async(payload)=> {
+        try {
+             const response = await axios.post(`${BASE_URL}/api/send/WA/custom`, payload);
+                        return response.data;
+        } catch (error) {
+            console.error("Error In Fetching Responses: ",error);
+            throw error;
+        }
+    },
 
     
 
