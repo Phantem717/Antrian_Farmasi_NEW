@@ -128,7 +128,7 @@ class VerificationTask {
 FROM Verification_Task vt
 LEFT JOIN Doctor_Appointments da ON vt.NOP = da.NOP
 LEFT JOIN Pharmacy_Task pt ON vt.NOP = pt.NOP
-WHERE (da.queue_number LIKE 'RC%' OR da.queue_number LIKE 'NR%') AND DATE(vt.waiting_verification_stamp) = CURRENT_DATE
+WHERE  DATE(vt.waiting_verification_stamp) = CURRENT_DATE
 ORDER BY vt.waiting_verification_stamp ASC;
       `;
 
@@ -164,8 +164,7 @@ ORDER BY vt.waiting_verification_stamp ASC;
 FROM Verification_Task vt
 LEFT JOIN Doctor_Appointments da ON vt.NOP = da.NOP
 LEFT JOIN Pharmacy_Task pt ON vt.NOP = pt.NOP
-WHERE (da.queue_number LIKE 'RC%' OR da.queue_number LIKE 'NR%') 
-  AND DATE(vt.waiting_verification_stamp) = CURRENT_DATE
+WHERE DATE(vt.waiting_verification_stamp) = CURRENT_DATE
   AND (pt.status IS NULL OR 
        (pt.status != 'completed_verification' AND pt.status LIKE '%verification%'))
   AND vt.lokasi = ?
