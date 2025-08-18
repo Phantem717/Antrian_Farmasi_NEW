@@ -212,16 +212,7 @@ const barcode = inputValue.replace(/\s+/g, ""); // Removes ALL whitespace
         });
       }
 
-if(!inputValue.startsWith("NOP") && inputValue.length != 19) {
-   return Swal.fire({
-          icon: "error",
-          title: "Barcode Harus SEP atau NOP",
-          text: `Mohon lengkapi semua data.`,
-          timer: 2000,
-          
-          showConfirmButton: false,
-        });
-      }
+
      
       const medType = type === "racikan" ? "Racikan" : "Non - Racikan";
       const queueNumber = await CreateAntrianAPI.createAntrian(medType);
