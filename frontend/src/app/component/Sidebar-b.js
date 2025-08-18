@@ -122,7 +122,7 @@ const Sidebar = ({lokasi, collapsed, setCollapsed, isLocation }) => {
       key: "8",
       icon: <AreaChartOutlined />,
       label: "View Logs",
-      onClick: () =><sendWAForm/>,
+      onClick: () =>        router.push(`/login/${lokasi}/logs`)
     },
   ];
 

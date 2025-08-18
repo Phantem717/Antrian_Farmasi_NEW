@@ -229,12 +229,12 @@ const QueuePickup = ({ title, queuesRacik, queuesNonRacik, bgColor }) => {
     const label = type === 'racik' ? 'Racikan' : 'Non-Racikan';
 
     return (
-      <div className="flex-1 bg-blue-600 p-4 rounded-lg">
-        <p className="text-2xl font-bold text-white text-center">Terakhir Dipanggil ({label})</p>
+      <div className="flex-1  bg-blue-600 p-4 rounded-lg" style={{ height: '500px' }}>
+        <p className="text-6xl font-bold text-white text-center">Terakhir Dipanggil ({label})</p>
         {item ? (
           <div className="text-white text-center mt-2">
-            <div className="text-6xl font-extrabold">{item.queue_number}</div>
-            <div className="text-2xl font-extrabold truncate mt-2">         {hideName == 'true' ? hideNameAction(item.patient_name) : item.patient_name}
+            <div className="text-9xl font-extrabold">{item.queue_number}</div>
+            <div className="text-6xl font-extrabold truncate mt-2">         {hideName == 'true' ? hideNameAction(item.patient_name) : item.patient_name}
 </div>
             <div className="text-2xl font-extrabold truncate mt-2">
               {formatDateTime(item.waiting_pickup_medicine_stamp)}
@@ -305,34 +305,34 @@ const QueuePickup = ({ title, queuesRacik, queuesNonRacik, bgColor }) => {
     <div className={`p-4 flex-1 min-w-0 ${bgColor} rounded-lg shadow-md overflow-hidden`} style={{ minHeight: "1200px" }}>
       <p className="text-4xl font-extrabold text-white text-center uppercase">{title}</p>
       
-      <div className="flex gap-4 mb-4 mt-2">
+      <div className="flex flex-col gap-4 mb-4 mt-2">
         {renderLastCalled('racik')}
         {renderLastCalled('nonracik')}
       </div>
 
-      <div className="flex gap-4 mt-4 flex-wrap">
+      {/* <div className="flex gap-4 mt-4 flex-wrap"> */}
         {/* Racikan Section */}
-        <div className="flex-1 min-w-[300px] bg-gray-100 p-2 rounded-md shadow-md overflow-hidden">
-          <p className="text-2xl font-extrabold text-center text-green-700 uppercase">Racikan</p>
-          {queuesRacik.length > 3 ? 
-            renderMarqueeSection(queuesRacik, times.processTimeRacik, true) :
-            <div style={{ height: '1030px', overflowY: 'auto' }}>
-              {renderQueueList(queuesRacik, true)}
-            </div>
-          }
-        </div>
+        {/* <div className="flex-1 min-w-[300px] bg-gray-100 p-2 rounded-md shadow-md overflow-hidden"> */}
+          {/* <p className="text-2xl font-extrabold text-center text-green-700 uppercase">Racikan</p> */}
+          {/* {queuesRacik.length > 3 ?  */}
+            {/* renderMarqueeSection(queuesRacik, times.processTimeRacik, true) : */}
+            {/* <div style={{ height: '1030px', overflowY: 'auto' }}> */}
+              {/* {renderQueueList(queuesRacik, true)} */}
+            {/* </div> */}
+          {/* } */}
+        {/* </div> */}
 
         {/* Non-Racikan Section */}
-        <div className="flex-1 min-w-[300px] bg-gray-100 p-2 rounded-md shadow-md overflow-hidden">
-          <p className="text-2xl font-extrabold text-center text-green-700 uppercase">Non-Racikan</p>
-          {queuesNonRacik.length > 3 ? 
-            renderMarqueeSection(queuesNonRacik, times.processTimeNon, false) :
-            <div style={{ height: '1030px', overflowY: 'auto' }}>
-              {renderQueueList(queuesNonRacik, false)}
-            </div>
-          }
-        </div>
-      </div>
+        {/* <div className="flex-1 min-w-[300px] bg-gray-100 p-2 rounded-md shadow-md overflow-hidden"> */}
+          {/* <p className="text-2xl font-extrabold text-center text-green-700 uppercase">Non-Racikan</p> */}
+          {/* {queuesNonRacik.length > 3 ?  */}
+            {/* renderMarqueeSection(queuesNonRacik, times.processTimeNon, false) : */}
+            {/* <div style={{ height: '1030px', overflowY: 'auto' }}> */}
+              {/* {renderQueueList(queuesNonRacik, false)} */}
+            {/* </div> */}
+          {/* } */}
+        {/* </div> */}
+      {/* </div> */}
     </div>
   );
 };
