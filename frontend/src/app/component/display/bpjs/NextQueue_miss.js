@@ -31,28 +31,12 @@ processTimeRacik: 10,
 });    
 
 const socket = getSocket();
- function calculateTime(processLengthNon, processLengthRacik, pickupLengthNon, pickupLengthRacik) {
-  // Base configuration
-  const BASE_TIME = 10;  // Minimum time (seconds)
-  const MAX_TIME = 60;   // Maximum time (seconds)
-  
-  // Improved calculation using logarithmic scaling
-  const calculateDuration = (count) => {
-    if (count < 3) return BASE_TIME;
-    
-    // Logarithmic scaling (slows down growth as numbers increase)
-    const scaled = Math.log2(count) * 8;
-    
-    // Ensure value stays between BASE_TIME and MAX_TIME
-    return Math.min(MAX_TIME, Math.max(BASE_TIME, Math.floor(scaled)));
-  };
-
-  return {
-    processTimeNon: calculateDuration(processLengthNon),
-    processTimeRacik: calculateDuration(processLengthRacik),
-    pickupTimeNon: calculateDuration(pickupLengthNon),
-    pickupTimeRacik: calculateDuration(pickupLengthRacik)
-  };
+  function calculateTime(processLengthNon, processLengthRacik, pickupLengthNon, pickupLengthRacik) {
+  const processTimeNon = processLengthNon < 3 ? 10 : (Math.floor(processLengthNon * 1.5));
+  const processTimeRacik =processLengthRacik< 3 ? 10 : (Math.floor(processLengthRacik * 0.16));
+  const pickupTimeNon = pickupLengthNon < 3 ? 10 : (Math.floor(pickupLengthNon * 1.5));
+  const pickupTimeRacik = pickupLengthRacik < 3 ? 10 : (Math.floor(pickupLengthRacik * 0.2) ) ;
+  return {  processTimeNon,processTimeRacik, pickupTimeNon,pickupTimeRacik };
 }
 useEffect(() => {
   setLastCalled({
@@ -245,12 +229,12 @@ const QueuePickup = ({ title, queuesRacik, queuesNonRacik, bgColor }) => {
     const label = type === 'racik' ? 'Racikan' : 'Non-Racikan';
 
     return (
-      <div className="flex-1 bg-blue-600 p-4 rounded-lg">
-        <p className="text-2xl font-bold text-white text-center">Terakhir Dipanggil ({label})</p>
+      <div className="flex-1  bg-blue-600 p-4 rounded-lg" style={{ height: '500px' }}>
+        <p className="text-6xl font-bold text-white text-center">Terakhir Dipanggil ({label})</p>
         {item ? (
           <div className="text-white text-center mt-2">
-            <div className="text-6xl font-extrabold">{item.queue_number}</div>
-            <div className="text-2xl font-extrabold truncate mt-2">         {hideName == 'true' ? hideNameAction(item.patient_name) : item.patient_name}
+            <div className="text-9xl font-extrabold">{item.queue_number}</div>
+            <div className="text-6xl font-extrabold truncate mt-2">         {hideName == 'true' ? hideNameAction(item.patient_name) : item.patient_name}
 </div>
             <div className="text-2xl font-extrabold truncate mt-2">
               {formatDateTime(item.waiting_pickup_medicine_stamp)}
@@ -321,12 +305,12 @@ const QueuePickup = ({ title, queuesRacik, queuesNonRacik, bgColor }) => {
     <div className={`p-4 flex-1 min-w-0 ${bgColor} rounded-lg shadow-md overflow-hidden`} style={{ minHeight: "1200px" }}>
       <p className="text-4xl font-extrabold text-white text-center uppercase">{title}</p>
       
-      <div className="flex gap-4 mb-4 mt-2">
+      <div className="flex flex-col gap-4 mb-4 mt-2">
         {renderLastCalled('racik')}
         {renderLastCalled('nonracik')}
       </div>
 
-      {/* <div className="flex gap-4 mt-4 flex-wrap">
+      {/* <div className="flex gap-4 mt-4 flex-wrap"> */}
         {/* Racikan Section */}
         {/* <div className="flex-1 min-w-[300px] bg-gray-100 p-2 rounded-md shadow-md overflow-hidden"> */}
           {/* <p className="text-2xl font-extrabold text-center text-green-700 uppercase">Racikan</p> */}
@@ -346,7 +330,7 @@ const QueuePickup = ({ title, queuesRacik, queuesNonRacik, bgColor }) => {
             {/* <div style={{ height: '1030px', overflowY: 'auto' }}> */}
               {/* {renderQueueList(queuesNonRacik, false)} */}
             {/* </div> */}
-          {/* } */} 
+          {/* } */}
         {/* </div> */}
       {/* </div> */}
     </div>
