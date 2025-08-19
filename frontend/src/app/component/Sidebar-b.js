@@ -34,7 +34,7 @@ const Sidebar = ({lokasi, collapsed, setCollapsed, isLocation }) => {
   const [isNameEnabled, setIsNameEnabled] = useState(() => {
     if (typeof window !== 'undefined') { // Check for SSR
       const savedState = localStorage.getItem('nameToggleState');
-      return savedState ? savedState === 'true' : true; // Default true if no saved state
+      return savedState ? savedState === 'true' : 'true'; // Default true if no saved state
     }
     return true; // Fallback for SSR
   });
