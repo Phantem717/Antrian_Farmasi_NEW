@@ -531,9 +531,9 @@ const hasYesterdayItems = queueList.some(item => item.isYesterday);
               <TableCell align="center">
                 <strong>No Telepon</strong>
               </TableCell>
-              <TableCell align="center">
+              {/* <TableCell align="center">
                 <strong>Status</strong>
-              </TableCell>
+              </TableCell> */}
               <TableCell align="center">
                 <strong>Status Medicine</strong>
               </TableCell>
@@ -585,7 +585,7 @@ const hasYesterdayItems = queueList.some(item => item.isYesterday);
       </div>
    
     </TableCell>  
-                <TableCell style={{ fontWeight: 'bold' }} align="center" className='font-bold'>{item.status}</TableCell>
+                {/* <TableCell style={{ fontWeight: 'bold' }} align="center" className='font-bold'>{item.status}</TableCell> */}
                 <TableCell style={{ fontWeight: 'bold' }} align="center" className='font-bold'>
                   {item.status_medicine === "Racikan"
                     ? "Racikan"
