@@ -530,7 +530,7 @@ Swal.fire({
               <TableCell align="center"><strong>Nomor SEP</strong></TableCell>
               <TableCell align="center"><strong>Nama Dokter</strong></TableCell>
               <TableCell align="center"><strong>No. Rekam Medis</strong></TableCell>
-              <TableCell align="center"><strong>Status</strong></TableCell>
+              {/* <TableCell align="center"><strong>Status</strong></TableCell> */}
               <TableCell align="center"><strong>Status Medicine</strong></TableCell> 
               <TableCell align="center"><strong>Phone Number</strong></TableCell>
                <TableCell align="center">
@@ -557,9 +557,9 @@ return (
     <TableCell align="center" style={{ fontWeight: 'bold' }} className='font-bold'>{item.sep_no}</TableCell>
     <TableCell align="center" style={{ fontWeight: 'bold' }} className='font-bold'>{item.doctor_name}</TableCell>
     <TableCell align="center" style={{ fontWeight: 'bold' }} className='font-bold'>{item.medical_record_no || "-"}</TableCell>
-    <TableCell align="center" style={{ fontWeight: 'bold' }} className='font-bold'>
+    {/* <TableCell align="center" style={{ fontWeight: 'bold' }} className='font-bold'>
       {item.status.replace("_verification", "")}
-    </TableCell>
+    </TableCell> */}
     <TableCell align="center" style={{ fontWeight: 'bold' }} className='font-bold'>
     {item.status_medicine === "Tidak ada Resep" ? "Tidak ada Resep" : item.status_medicine === "Racikan" ? "Racikan" : item.status_medicine}
     </TableCell>

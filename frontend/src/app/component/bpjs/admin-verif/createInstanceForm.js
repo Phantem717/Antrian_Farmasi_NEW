@@ -258,7 +258,7 @@ const barcode = inputValue.replace(/\s+/g, ""); // Removes ALL whitespace
             medicine_type: medType ?? "-",
             
             rm: medical_record_no??"-",
-            tanggal_lahir:  DOB??"-",
+            tanggal_lahir:  new Date(DOB).toISOString().split('T')[0]??"-",
             queue_number: queueNumberData.data.queue_number ?? null,
             prev_queue_number: "-"
         };
@@ -266,14 +266,14 @@ const barcode = inputValue.replace(/\s+/g, ""); // Removes ALL whitespace
            const printPayload = {
             phone_number: phoneNumber ?? "-",
             NOP: inputValue ?? "-",
-            docter: docter??"-",
+            doctor_name: docter??"-",
             nik: NIK??"-",
             barcode: inputValue ?? "-",
             patient_name:  name ?? "-",
             farmasi_queue_number: queueNumberData.data.queue_number ?? "-",
             medicine_type: medType ?? "-",
             SEP:  SEP ?? "-",
-            tanggal_lahir: DOB ?? "-",
+            tanggal_lahir: new Date(DOB).toISOString().split('T')[0] ?? "-",
             queue_number: queueNumberData.data.queue_number ?? null,
             PRB: PRB,
             switch_WA: localStorage.getItem('waToggleState') || "true",

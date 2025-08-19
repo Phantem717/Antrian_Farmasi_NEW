@@ -195,7 +195,7 @@ const PilihAksi = ({location, selectedQueueIds = [], setSelectedQueueIds, select
 
         selectedQueue2.map(async (queue) => {
           
-          if((queue.status_medicine == "Racikan" && medicineType == "Non - Racikan") || (queue.status_medicine == "Non - Racikan" && medicineType == "Racikan")){
+          if((queue.status_medicine == "Racikan" && medicineType == "Non - Racikan") || (queue.status_medicine == "Non - Racikan" && medicineType == "Racikan") || (queue.status_medicine == "-" )){
             const antrianResp = await CreateAntrianAPI.createAntrian(medicineType);
             console.log("MEDTYPE",medicineType);
             console.log("ANTRIAN RESP",antrianResp);
@@ -268,12 +268,12 @@ const PilihAksi = ({location, selectedQueueIds = [], setSelectedQueueIds, select
               farmasi_queue_number: doctorResponse.data.queue_number,
               medicine_type: doctorResponse.data.status_medicine,
               SEP:doctorResponse.data.sep_no,
-              tanggal_lahir: queue.patient_date_of_birth,
+              tanggal_lahir: new Date(queue.patient_date_of_birth).toISOString().split('T')[0],
               queue_number: doctorResponse.data.queue_number,
-              docter: queue.doctor_name
+              doctor_name: queue.doctor_name
             }
             const printResp = await PrintAntrian.printAntrian(printPayload);
-            console.log("PRINT AFTER CHANGE",printResp);
+            console.log("PRINT AFTER CHANGE",printResp,printPayload);
               console.log("WA SENT",sendResponse);    
 
         })

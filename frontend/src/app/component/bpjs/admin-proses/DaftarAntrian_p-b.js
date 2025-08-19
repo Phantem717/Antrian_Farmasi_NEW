@@ -260,7 +260,7 @@ useEffect(() => {
                                 <TableCell align="center"><strong>Nomor Antrian</strong></TableCell>
                                 <TableCell align="center"><strong>Nama Pasien</strong></TableCell>
                                 <TableCell align="center"><strong>No. Rekam Medis</strong></TableCell>
-                                <TableCell align="center"><strong>Status</strong></TableCell>
+                                {/* <TableCell align="center"><strong>Status</strong></TableCell> */}
                                 <TableCell align="center"><strong>Jenis Obat</strong></TableCell>
                                 <TableCell align="center"><strong>Nomor Telepon</strong></TableCell>
                                 <TableCell align="center"><strong>Timestamp</strong></TableCell>
@@ -278,7 +278,7 @@ useEffect(() => {
                                         <TableCell style={{ fontWeight: 'bold' }} align="center" className='font-bold'>{item.queue_number}</TableCell>
                                         <TableCell style={{ fontWeight: 'bold' }} align="center" className='font-bold'>{item.patient_name}</TableCell>
                                         <TableCell style={{ fontWeight: 'bold' }} align="center" className='font-bold'>{item.medical_record_no}</TableCell>
-                                        <TableCell style={{ fontWeight: 'bold' }} align="center" className='font-bold'>{item.status}</TableCell>
+                                        {/* <TableCell style={{ fontWeight: 'bold' }} align="center" className='font-bold'>{item.status}</TableCell> */}
                                         <TableCell style={{ fontWeight: 'bold' }} align="center" className='font-bold'>{item.medicine_type}</TableCell>
  <TableCell align="center" style={{ fontWeight: 'bold' }} className='font-bold'>
       <div className="flex flex-row items-center h-full " style={{gap:"1px", minWidth:"120px"}}>

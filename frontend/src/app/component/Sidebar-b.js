@@ -123,7 +123,6 @@ const Sidebar = ({lokasi, collapsed, setCollapsed, isLocation }) => {
       icon: <AreaChartOutlined />,
       label: "View Logs",
       onClick: () =>        router.push(`/login/${lokasi}/logs`)
-
     },
   ];
 
