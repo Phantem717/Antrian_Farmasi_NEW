@@ -9,8 +9,13 @@ import { queue } from "jquery";
 
 const NextQueue = ({location, verificationData, medicineData, pickupData }) => {
     const [currentDate, setCurrentDate] = useState(new Date().getDate()); // [currentDate,setCurrentDate]
-    const [hideName, setHideName] = useState(localStorage.getItem('nameToggleState')); // [hideName,setHideName]
-
+  const [hideName, setHideName] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const storedValue = localStorage.getItem('nameToggleState');
+      return storedValue ? storedValue === 'true' : true; // Default true
+    }
+    return true; // Fallback for SSR
+  });
   const [lastCalled, setLastCalled] = useState({
     racik: null,
     nonRacik: null
@@ -62,17 +67,19 @@ function hideNameAction(name){
 }
 
 useEffect(() => {
-  const socket = getSocket(); // Ensure this returns a singleton socket instance
-socket.on('send_nameToggle', (payload) => {
-  if (hideName !== payload.data) {  // Only refresh if state actually changed
-    setHideName(payload.data);
-    localStorage.setItem('nameToggleState', payload.data.toString());
-    window.location.reload();
-  }
+  const socket = getSocket();
+    
+    const handleNameToggle = (payload) => {
+      const newValue = payload.data.toString() === 'true';
+      if (hideName !== newValue) {
+        setHideName(newValue);
+        localStorage.setItem('nameToggleState', newValue.toString());
+        // State update will trigger re-render automatically
+      }
+    };
 
-    return () => socket.off('toggleName', handleToggle);
+    socket.on('send_nameToggle', handleNameToggle);
 
-});
   const handleGetResponses = (payload) => {
     console.log("? GOT RESP", payload);
 
@@ -156,12 +163,15 @@ const pickupData = payload.data.pickupData.map(task => {
     // Optional: trigger the data on mount
  
   }
-
+  
+ 
   // Cleanup to avoid multiple listeners
   return () => {
     if (socket) {
       socket.off('get_responses', handleGetResponses);
       socket.off('send_latest_pickup',handleLatestPickup)
+            socket.off('send_nameToggle', handleNameToggle);
+
     }
   };
 }, [socket,location]); // Run only once on mount

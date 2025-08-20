@@ -30,20 +30,19 @@ const Sidebar = ({lokasi, collapsed, setCollapsed, isLocation }) => {
     return true; // Fallback for SSR
   });
 
-  
-  const [isNameEnabled, setIsNameEnabled] = useState(() => {
-    if (typeof window !== 'undefined') { // Check for SSR
+    const [isNameEnabled, setIsNameEnabled] = useState(() => {
+    if (typeof window !== 'undefined') {
       const savedState = localStorage.getItem('nameToggleState');
-      return savedState ? savedState === 'true' : 'true'; // Default true if no saved state
+      // Ensure boolean conversion
+      return savedState !== null ? savedState === 'true' : true; // Default true
     }
-    return true; // Fallback for SSR
+    return true;
   });
   const onChangeName = (nameChecked) => {
-    setIsNameEnabled(nameChecked);
-    console.log("NAME CHECKED",nameChecked);
-    const payload = nameChecked;
-    socket.emit('toggleName', {data: nameChecked}, console.log("TOGGLE NAME"));
+   setIsNameEnabled(nameChecked);
     localStorage.setItem('nameToggleState', nameChecked.toString());
+    socket.emit('toggleName', { data: nameChecked });
+    
     // Add your WhatsApp API call here if needed
   }
 
