@@ -90,13 +90,13 @@ const pickupData = payload.data.pickupData.map(task => {
 
     console.log("DATA", pickupData);
 
-    setQueues(prev => ({
-  ...prev, // keep old keys
-  pickupRacik: pickupData.filter(task => task.type == "Racikan" && task.status != "Terlewat"),
-  pickupNonRacik: pickupData.filter(task => task.type == "Non - Racikan" && task.status != "Terlewat"),
-  pickupTerlewatRacik: pickupData.filter(task => task.type == "Racikan" && task.status == "Terlewat"),
-  pickupTerlewatNonRacik: pickupData.filter(task => task.type == "Non - Racikan" && task.status == "Terlewat"),
-}));
+    setQueues({
+    
+      pickupRacik: pickupData.filter(task => task.type == "Racikan" && task.status != "Terlewat"),
+      pickupNonRacik: pickupData.filter(task => task.type == "Non - Racikan" && task.status != "Terlewat"),
+        pickupTerlewatRacik: pickupData.filter(task => task.type == "Racikan" && task.status == "Terlewat"),
+      pickupTerlewatNonRacik: pickupData.filter(task => task.type == "Non - Racikan"  && task.status == "Terlewat"),
+    });
 
    const newTimes = calculateTime(
   
@@ -325,7 +325,7 @@ function hideNameAction(name){
       <p className="text-4xl font-extrabold text-white text-center uppercase">{title}</p>
       <div className="flex gap- mt-2">
         <div className="bg-gray-100 p-2 rounded-md shadow-md w-full h-full">
-          {queues?.length > 5 ? (
+          {queues.length > 5 ? (
             <Marquee 
               fade={false} 
               direction="up"
