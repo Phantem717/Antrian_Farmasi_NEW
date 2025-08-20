@@ -11,13 +11,8 @@ const NextQueue = ({location, verificationData, medicineData, pickupData }) => {
     const socket = getSocket(); // Ensure this returns a singleton socket instance
     console.log("LOCATION",location);
     const [currentDate, setCurrentDate] = useState(new Date().getDate()); // [currentDate,setCurrentDate]
- const [hideName, setHideName] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const storedValue = localStorage.getItem('nameToggleState');
-      return storedValue ? storedValue === 'true' : true; // Default true
-    }
-    return true; // Fallback for SSR
-  });    console.log(hideName)
+    const [hideName, setHideName] = useState(localStorage.getItem('nameToggleState')); // [hideName,setHideName]
+    console.log(hideName)
   const [queues, setQueues] = useState({
     nextQueueRacik: [],
     nextQueueNonRacik: [],
@@ -46,115 +41,96 @@ const [times, setTimes] = useState({
 }
 
 useEffect(() => {
-  const socket = getSocket();
-    
-    const handleNameToggle = (payload) => {
-      const newValue = payload.data.toString() === 'true';
-      if (hideName !== newValue) {
-        setHideName(newValue);
-        localStorage.setItem('nameToggleState', newValue.toString());
-        // State update will trigger re-render automatically
-      }
-    };
+  if (!socket) return; // Exit if socket is not initialized
+socket.on('send_nameToggle', (payload) => {
+  console.log("TOGGLE NAME",payload);
+  if (hideName !== payload.data) {  // Only refresh if state actually changed
+    setHideName(payload.data);
+    localStorage.setItem('nameToggleState', payload.data.toString());
+    window.location.reload();
+  }
 
-    socket.on('send_nameToggle', handleNameToggle);
+    return () => socket.off('toggleName', handleToggle);
 
+});
+  
   const handleGetResponses = (payload) => {
     console.log("? GOT RESP", payload);
 
-    // Extract and filter verification data
+    const dateString = new Date().toISOString().split('T')[0];
 
-   const yesterday = new Date();
-yesterday.setDate(yesterday.getDate() - 1);
-yesterday.setHours(0, 0, 0, 0);
+    // Process verificationData
+    const verificationData = payload.data.verificationData
+      .map(task => ({
+        queueNumber: task.queue_number,
+        type: task.status_medicine,
+        status: task.status === "waiting_verification" ? "Menunggu"
+          : task.status === "called_verification" ? "Dipanggil"
+          : task.status === "pending_verification" ? "Terlewat"
+          : task.status === "recalled_verification" ? "Dipanggil"
+          : task.status === "processed_verification" ? "Verifikasi"
+          : "-",
+        patient_name: task.patient_name
+      }));
 
-const pickupData = payload.data.pickupData.map(task => {
-  const taskDate = new Date(task.waiting_pickup_medicine_stamp);
-  taskDate.setHours(0, 0, 0, 0);
-  
-  return {
-    queueNumber: task.queue_number,
-    type: task.status_medicine,
-    patient_name: task.patient_name,
-    isYesterday: taskDate.getTime() === yesterday.getTime(),
-    status: task.status === "waiting_pickup_medicine" ? "Menunggu"
-      : task.status === "called_pickup_medicine" ? "Dipanggil"
-      : task.status === "pending_pickup_medicine" ? "Terlewat"
-      : task.status === "recalled_pickup_medicine" ? "Dipanggil"
-      : "-",
-    waiting_pickup_medicine_stamp: new Date(task.waiting_pickup_medicine_stamp)
-  };
-});
-    console.log("DATE", pickupData.map(task =>new Date(new Date(task.waiting_pickup_medicine_stamp).setHours(0,0,0,0))),new Date(new Date().setHours(0,0,0,0) - 86400000),pickupData.map(task =>new Date(new Date(task.waiting_pickup_medicine_stamp).setHours(0,0,0,0))) == yesterday);
+    // Process medicineData
+    const medicineData = payload.data.medicineData
+      .map(task => ({
+        queueNumber: task.queue_number,
+        type: task.status_medicine,
+        status: task.status,
+        patient_name: task.patient_name
+      }));
 
-
-    console.log("DATA", pickupData);
+    // Process pickupData
+    const pickupData = payload.data.pickupData
+      .map(task => ({
+        queueNumber: task.queue_number,
+        type: task.status_medicine,
+        patient_name: task.patient_name,
+        isYesterday: new Date(new Date(task.waiting_pickup_medicine_stamp).setHours(0,0,0,0)) == 
+                     new Date(new Date().setHours(0,0,0,0) - 86400000),
+        status: task.status === "waiting_pickup_medicine" ? "Menunggu"
+          : task.status === "called_pickup_medicine" ? "Dipanggil"
+          : task.status === "pending_pickup_medicine" ? "Terlewat"
+          : task.status === "recalled_pickup_medicine" ? "Dipanggil"
+          : "-",
+      }));
 
     setQueues({
-    
-      pickupRacik: pickupData.filter(task => task.type == "Racikan" && task.status != "Terlewat"),
-      pickupNonRacik: pickupData.filter(task => task.type == "Non - Racikan" && task.status != "Terlewat"),
-        pickupTerlewatRacik: pickupData.filter(task => task.type == "Racikan" && task.status == "Terlewat"),
-      pickupTerlewatNonRacik: pickupData.filter(task => task.type == "Non - Racikan"  && task.status == "Terlewat"),
+      verificationQueue: verificationData,
+      pickupQueue: pickupData,
+      nextQueueRacik: verificationData.filter(task => task.type === "Racikan"),
+      nextQueueNonRacik: verificationData.filter(task => task.type === "Non - Racikan"),
+      medicineRacik: medicineData.filter(task => task.type === "Racikan"),
+      medicineNonRacik: medicineData.filter(task => task.type === "Non - Racikan"),
+      pickupRacik: pickupData.filter(task => task.type === "Racikan"),
+      pickupNonRacik: pickupData.filter(task => task.type === "Non - Racikan"),
     });
-
-   const newTimes = calculateTime(
-  
-   
-    pickupData.filter(task => task.type == "Non - Racikan" != "Terlewat").length,
-    pickupData.filter(task => task.type == "Racikan" != "Terlewat").length,
-     pickupData.filter(task => task.type == "Racikan" && task.status == "Terlewat").length,
-    pickupData.filter(task => task.type == "Non - Racikan"  && task.status == "Terlewat").length,
-  );
-
-  setTimes(newTimes);
-
-
-  console.log("Time Estimates:", newTimes);
+    const newTimes = calculateTime(
+      verificationData.length,
+      medicineData.filter(task => task.type === "Non - Racikan").length,
+      medicineData.filter(task => task.type === "Racikan").length,
+      pickupData.filter(task => task.type === "Non - Racikan").length,
+      pickupData.filter(task => task.type === "Racikan").length
+    );
+    setTimes(newTimes);
   };
 
-    const handleLatestPickup = (payload) => {
-  const data = payload.data;
-  console.log("PAYLOAD", data);
-  
-  setLastCalled(prev => {
-    const newState = {
-      racik: data.medicine_type === "Racikan" ? data : prev.racik,
-      nonRacik: data.medicine_type !== "Racikan" ? data : prev.nonRacik
-    };
-    
-    // Save to localStorage independently
-    if (data.medicine_type === "Racikan") {
-      localStorage.setItem('lastCalled_racikan', JSON.stringify(data));
-    } else {
-      localStorage.setItem('lastCalled_nonracikan', JSON.stringify(data));
-    }
-    
-    return newState;
-  });
-};
+  // Set up listener
+   socket.on('get_responses', handleGetResponses);
+  socket.on('insert_appointment', handleGetResponses);
 
-  if (socket) {
-      socket.emit('get_initial_responses_pickup', { location }, console.log("GET INITIAL DATA"));
+  // Request initial data
+  socket.emit('get_initial_responses', { location }, console.log("GET INITIAL DATA"));
 
-    socket.on('get_responses', handleGetResponses, console.log("GET RESPONSES FE"));
-    socket.on('send_latest_pickup',(payload)=> handleLatestPickup(payload));
-    // Optional: trigger the data on mount
- 
-  }
-  
- 
-  // Cleanup to avoid multiple listeners
+  // Cleanup
   return () => {
-    if (socket) {
-      socket.off('get_responses', handleGetResponses);
-      socket.off('send_latest_pickup',handleLatestPickup)
-            socket.off('send_nameToggle', handleNameToggle);
+    socket.off('get_responses', handleGetResponses);
+      socket.off('insert_appointment', handleGetResponses);
 
-    }
   };
-}, [socket,location]); // Run only once on mount
- // Re-run if `socket` or `location` changes
+}, [socket, location]); // Re-run if `socket` or `location` changes
   // Status color helpers
   const getStatusColor = (status) => {
     switch(status) {
@@ -441,7 +417,7 @@ const QueueSectionPickup = ({ title, queuesRacik, queuesNonRacik, bgColor }) => 
    <div className="bg-gray-100 p-4 shadow-lg border border-green-700 w-full "  style={{ minHeight: "300px" }}>
       <div className="flex w-full gap-4 flex-wrap justify-center">
         <QueueSectionVerification 
-          title="Proses Pengecekan Ketersediaan Resep" 
+          title="Proses Pengecekan Ketersediaan Obat" 
           queues={queues.verificationQueue} 
           bgColor="bg-green-700"
         />
