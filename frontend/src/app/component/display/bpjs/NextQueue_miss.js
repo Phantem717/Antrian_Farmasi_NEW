@@ -182,7 +182,8 @@ useEffect(() => {
     if (new Date().toDateString() !== currentDate) {
       setCurrentDate(new Date().toDateString());
 localStorage.removeItem('lastCalled_racikan');
-localStorage.removeItem('lastCalled_nonracikan');      setLastCalled({ racik: null, nonRacik: null });
+localStorage.removeItem('lastCalled_nonracikan');     
+ setLastCalled({ racik: null, nonRacik: null });
       window.location.reload();
       
     }
