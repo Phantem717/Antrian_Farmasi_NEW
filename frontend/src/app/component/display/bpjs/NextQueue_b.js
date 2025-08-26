@@ -10,7 +10,7 @@ import { queue } from "jquery";
 const NextQueue = ({location, verificationData, medicineData, pickupData }) => {
     const socket = getSocket(); // Ensure this returns a singleton socket instance
     console.log("LOCATION",location);
-    const [currentDate, setCurrentDate] = useState(new Date().getDate()); // [currentDate,setCurrentDate]
+    const [currentDate, setCurrentDate] = useState(new Date().toDateString()); // [currentDate,setCurrentDate]
     const [hideName, setHideName] = useState(localStorage.getItem('nameToggleState')); // [hideName,setHideName]
     console.log(hideName)
   const [queues, setQueues] = useState({
@@ -49,6 +49,7 @@ socket.on('send_nameToggle', (payload) => {
     localStorage.setItem('nameToggleState', payload.data.toString());
     window.location.reload();
   }
+
 
     return () => socket.off('toggleName', handleToggle);
 

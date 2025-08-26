@@ -8,7 +8,7 @@ import "@devnomic/marquee/dist/index.css";
 import { queue } from "jquery";
 
 const NextQueue = ({location, verificationData, medicineData, pickupData }) => {
-    const [currentDate, setCurrentDate] = useState(new Date().getDate()); // [currentDate,setCurrentDate]
+    const [currentDate, setCurrentDate] = useState(new Date().toDateString()); // [currentDate,setCurrentDate]
   const [hideName, setHideName] = useState(() => {
     if (typeof window !== 'undefined') {
       const storedValue = localStorage.getItem('nameToggleState');
