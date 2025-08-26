@@ -195,7 +195,8 @@ const PilihAksi = ({location, selectedQueueIds = [], setSelectedQueueIds, select
 
         selectedQueue2.map(async (queue) => {
           
-          if((queue.status_medicine == "Racikan" && medicineType == "Non - Racikan") || (queue.status_medicine == "Non - Racikan" && medicineType == "Racikan") || (queue.status_medicine == "-" )){
+          if((queue.status_medicine == "Racikan" && medicineType == "Non - Racikan") || (queue.status_medicine == "Non - Racikan" && medicineType == "Racikan") ||   queue.queue_number.startsWith("TR-")   // force refresh for TR queues
+){
             const antrianResp = await CreateAntrianAPI.createAntrian(medicineType);
             console.log("MEDTYPE",medicineType);
             console.log("ANTRIAN RESP",antrianResp);

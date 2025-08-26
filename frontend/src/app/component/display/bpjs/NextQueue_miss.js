@@ -181,7 +181,10 @@ useEffect(() => {
   const interval = setInterval(() => {
     if (new Date().toDateString() !== currentDate) {
       setCurrentDate(new Date().toDateString());
+            localStorage.clear();
+      setLastCalled({ racik: null, nonRacik: null });
       window.location.reload();
+      
     }
   }, 300000);
   return () => clearInterval(interval);
