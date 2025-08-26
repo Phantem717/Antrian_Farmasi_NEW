@@ -39,8 +39,15 @@ const socket = getSocket();
   function calculateTime(processLengthNon, processLengthRacik, pickupLengthNon, pickupLengthRacik) {
   const processTimeNon = processLengthNon < 3 ? 10 : (Math.floor(processLengthNon * 1.5));
   const processTimeRacik =processLengthRacik< 3 ? 10 : (Math.floor(processLengthRacik * 0.16));
-  const pickupTimeNon = pickupLengthNon < 3 ? 10 : (Math.floor(pickupLengthNon * 1.5));
-  const pickupTimeRacik = pickupLengthRacik < 3 ? 10 : (Math.floor(pickupLengthRacik * 0.2) ) ;
+const pickupTimeNon = Math.min(
+  pickupLengthNon < 3 ? 10 : Math.floor(pickupLengthNon * 1.5),
+  80
+);
+
+const pickupTimeRacik = Math.min(
+  pickupLengthRacik < 3 ? 10 : Math.floor(pickupLengthRacik * 0.2),
+  80
+);
   return {  processTimeNon,processTimeRacik, pickupTimeNon,pickupTimeRacik };
 }
 useEffect(() => {
