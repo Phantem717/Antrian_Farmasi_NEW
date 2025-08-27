@@ -87,7 +87,7 @@ const sendWAAntrianController  = async (req,res) => {
                   }
               
                   const payload = { phone_number,  patient_name, message};
-              const data = await sendWAProses(payload);
+              const data = await sendWACustom(payload);
           
               res.status(200).json({ data });
             } catch (error) {

@@ -6,7 +6,7 @@ import { getSocket } from "@/app/utils/api/socket";
 import { Marquee } from "@devnomic/marquee";
 import "@devnomic/marquee/dist/index.css";
 import { queue } from "jquery";
-
+import { Carousel } from "antd";
 const NextQueue = ({location, verificationData, medicineData, pickupData }) => {
     const [currentDate, setCurrentDate] = useState(new Date().toDateString()); // [currentDate,setCurrentDate]
   const [hideName, setHideName] = useState(() => {
