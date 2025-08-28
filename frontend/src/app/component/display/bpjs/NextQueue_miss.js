@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState,useMemo } from "react";
 import VerificationAPI from "@/app/utils/api/Verification";
 import MedicineAPI from "@/app/utils/api/Medicine";
 import PickupAPI from "@/app/utils/api/Pickup";
@@ -8,6 +8,7 @@ import "@devnomic/marquee/dist/index.css";
 import { queue } from "jquery";
 import { Carousel } from "antd";
 const NextQueue = ({location, verificationData, medicineData, pickupData }) => {
+
     const [currentDate, setCurrentDate] = useState(new Date().toDateString()); // [currentDate,setCurrentDate]
   const [hideName, setHideName] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -332,37 +333,29 @@ const QueuePickup = ({ title, queuesRacik, queuesNonRacik, bgColor }) => {
         {renderLastCalled('nonracik')}
       </div>
 
-      {/* <div className="flex gap-4 mt-4 flex-wrap"> */}
-        {/* Racikan Section */}
-        {/* <div className="flex-1 min-w-[300px] bg-gray-100 p-2 rounded-md shadow-md overflow-hidden"> */}
-          {/* <p className="text-2xl font-extrabold text-center text-green-700 uppercase">Racikan</p> */}
-          {/* {queuesRacik.length > 3 ?  */}
-            {/* renderMarqueeSection(queuesRacik, times.processTimeRacik, true) : */}
-            {/* <div style={{ height: '1030px', overflowY: 'auto' }}> */}
-              {/* {renderQueueList(queuesRacik, true)} */}
-            {/* </div> */}
-          {/* } */}
-        {/* </div> */}
-
-        {/* Non-Racikan Section */}
-        {/* <div className="flex-1 min-w-[300px] bg-gray-100 p-2 rounded-md shadow-md overflow-hidden"> */}
-          {/* <p className="text-2xl font-extrabold text-center text-green-700 uppercase">Non-Racikan</p> */}
-          {/* {queuesNonRacik.length > 3 ?  */}
-            {/* renderMarqueeSection(queuesNonRacik, times.processTimeNon, false) : */}
-            {/* <div style={{ height: '1030px', overflowY: 'auto' }}> */}
-              {/* {renderQueueList(queuesNonRacik, false)} */}
-            {/* </div> */}
-          {/* } */}
-        {/* </div> */}
-      {/* </div> */}
     </div>
   );
 };
+
 const QueuePickupTerlewat = ({ title, queuesRacik, queuesNonRacik, bgColor }) => {
+  const chunkArray = (arr, size) => {
+    return arr.reduce((chunks, item, i) => {
+      if (i % size === 0) {
+        chunks.push([item]);
+      } else {
+        chunks[chunks.length - 1].push(item);
+      }
+      return chunks;
+    }, []);
+  };
+
+  // ✅ Memoize so chunks are stable and don’t reset carousel
+ const chunkedRacik = useMemo(() => chunkArray(queuesRacik, 5), [queuesRacik]);
+const chunkedNonRacik = useMemo(() => chunkArray(queuesNonRacik, 5), [queuesNonRacik]);
   const renderQueueItem = (queue, isRacikan = true) => (
     <div
-      key={`${queue.queueNumber}-${isRacikan ? 'racik' : 'nonracik'}`}
-      className={`uppercase bg-gray-100 p-4 shadow font-extrabold rounded mb-1 flex flex-col items-center justify-center text-center ${getStatusColourBorder(queue.status)}`}
+      key={`${queue.queueNumber}-${isRacikan ? "racik" : "nonracik"}`}
+      className={`w-full uppercase bg-gray-100 p-4 shadow font-extrabold rounded mb-1 flex flex-col items-center justify-center text-center ${getStatusColourBorder(queue.status)}`}
       style={{ minHeight: "140px" }}
     >
       <div className="flex flex-col font-extrabold">
@@ -373,8 +366,10 @@ const QueuePickupTerlewat = ({ title, queuesRacik, queuesNonRacik, bgColor }) =>
           {queue.queueNumber}
         </div>
       </div>
-      <div className="text-center text-bold mt-2 w-full bg-green-400 px-4 py-2 text-black text-3xl truncate whitespace-nowrap overflow-hidden leading-tight">
-         {hideName == 'true' || hideName ? hideNameAction(queue.patient_name) : queue.patient_name}
+      <div className="text-center text-bold mt-2 w-[450px] bg-green-400 px-4 py-2 text-black text-3xl truncate whitespace-nowrap overflow-hidden leading-tight">
+        {hideName == "true" || hideName
+          ? hideNameAction(queue.patient_name)
+          : queue.patient_name}
       </div>
     </div>
   );
@@ -387,7 +382,6 @@ const QueuePickupTerlewat = ({ title, queuesRacik, queuesNonRacik, bgColor }) =>
         </div>
       );
     }
-
     return (
       <div className="flex flex-col gap-2">
         {queues.map((queue) => renderQueueItem(queue, isRacikan))}
@@ -395,41 +389,75 @@ const QueuePickupTerlewat = ({ title, queuesRacik, queuesNonRacik, bgColor }) =>
     );
   };
 
-  const renderMarqueeSection = (queues, duration, isRacikan = true) => (
-    <Marquee
-      fade={true}
-      direction="up"
-      className="gap-[3rem]"
-      innerClassName="gap-[3rem] [--gap:3rem]"
-      style={{
-        '--duration': `${duration}s`,
-        height: '1060px'
-      }}
-    >
-      {renderQueueList(queues, isRacikan)}
-    </Marquee>
-  );
+const renderMarqueeSection = (chunkedQueues, duration, isRacikan = true) => (
+  <Carousel
+    autoplay
+    effect="scroll"
+    autoplaySpeed={5000}
+    dots
+    infinite={true}
+    slidesToShow={1}
+    draggable={false}
+    adaptiveHeight={false} // ❌ prevent snapping
+    className="gap-[3rem]"
+    style={{ "--duration": `${duration}s`, height: "1060px", width: "100%" }}
+  >
+    {chunkedQueues.map((group) => (
+<div key={group.map(q => q.queueNumber).join("_")}>
+        <div style={{ height: "1060px", textAlign: "center" }}>
+          <div className="flex flex-col gap-2">
+            {group.map((queue) => renderQueueItem(queue, isRacikan))}
+          </div>
+        </div>
+      </div>
+    ))}
+  </Carousel>
+);
 
-  const renderQueueSection = (queues, duration, label, isRacikan = true) => (
-    <div className="flex-1 min-w-[300px] bg-gray-100 p-2 rounded-md shadow-md" style={{ height: '1120px' }}>
-      <p className="text-2xl font-extrabold text-center text-green-700 uppercase">{label}</p>
+
+  const renderQueueSection = (queues, chunked, duration, label, isRacikan = true) => (
+    <div
+      className="flex-1 min-w-[300px] bg-gray-100 p-2 rounded-md shadow-md"
+      style={{ height: "1120px" }}
+    >
+      <p className="text-2xl font-extrabold text-center text-green-700 uppercase">
+        {label}
+      </p>
       <div className="bg-gray-100 rounded-md p-2">
-        {queues.length > 4 ? 
-          renderMarqueeSection(queues, duration, isRacikan) :
-          <div style={{ height: '1060px', overflowY: 'auto' }}>
+        {queues.length > 4 ? (
+          renderMarqueeSection(chunked, duration, isRacikan)
+        ) : (
+          <div style={{ height: "1060px", overflowY: "auto" }}>
             {renderQueueList(queues, isRacikan)}
           </div>
-        }
+        )}
       </div>
     </div>
   );
 
   return (
-    <div className={`p-4 flex-1 min-w-0 ${bgColor} rounded-lg shadow-md`} style={{ minHeight: "1200px" }}>
-      <p className="text-4xl font-extrabold text-white text-center uppercase">{title}</p>
+    <div
+      className={`p-4 flex-1 min-w-0 ${bgColor} rounded-lg shadow-md`}
+      style={{ minHeight: "1200px" }}
+    >
+      <p className="text-4xl font-extrabold text-white text-center uppercase">
+        {title}
+      </p>
       <div className="flex flex-wrap gap-2 mt-2 overflow-x-hidden">
-        {renderQueueSection(queuesRacik, times.pickupTimeRacik, "Racikan", true)}
-        {renderQueueSection(queuesNonRacik, times.pickupTimeNon, "Non-Racikan", false)}
+        {renderQueueSection(
+          queuesRacik,
+          chunkedRacik,
+          times.pickupTimeRacik,
+          "Racikan",
+          true
+        )}
+        {renderQueueSection(
+          queuesNonRacik,
+          chunkedNonRacik,
+          times.pickupTimeNon,
+          "Non-Racikan",
+          false
+        )}
       </div>
     </div>
   );
@@ -454,7 +482,7 @@ const QueuePickupTerlewat = ({ title, queuesRacik, queuesNonRacik, bgColor }) =>
         />
 
         </div>
-      
+  
 
       
       </div>

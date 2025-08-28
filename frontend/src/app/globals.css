@@ -26,3 +26,15 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.ant-carousel {
+  width: 100%;
+}
+
+.ant-carousel .slick-slider,
+.ant-carousel .slick-list,
+.ant-carousel .slick-track,
+.ant-carousel .slick-slide {
+  transition: transform 0.5s ease-in-out !important;
+   
+}
