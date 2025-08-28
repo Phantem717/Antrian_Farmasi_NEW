@@ -389,6 +389,20 @@ const chunkedNonRacik = useMemo(() => chunkArray(queuesNonRacik, 5), [queuesNonR
     );
   };
 
+  // const renderMarqueeSection = (queues, duration, isRacikan = true) => (
+  //   <Marquee
+  //     fade={true}
+  //     direction="up"
+  //     className="gap-[3rem]"
+  //     innerClassName="gap-[3rem] [--gap:3rem]"
+  //     style={{
+  //       '--duration': `${duration}s`,
+  //       height: '1060px'
+  //     }}
+  //   >
+  //     {renderQueueList(queues, isRacikan)}
+  //   </Marquee>
+  // );
 const renderMarqueeSection = (chunkedQueues, duration, isRacikan = true) => (
   <Carousel
     autoplay
