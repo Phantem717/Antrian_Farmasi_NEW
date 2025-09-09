@@ -197,7 +197,7 @@ localStorage.removeItem('lastCalled_nonracikan');
     }
   }, 300000);
   return () => clearInterval(interval);
-}, [currentDate]);
+}, []);
 
 
   // Status color helpers

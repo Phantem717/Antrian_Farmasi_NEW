@@ -1,0 +1,36 @@
+name: Auto Deploy to Server
+
+on:
+  push:
+    branches: [ main ]  # Change this to your default branch if different
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Deploy to server
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SSH_KEY }}
+        script: |
+          # Navigate to your project directory
+          cd /home/sirs/Antrian_Farmasi_NEW || exit 1
+          
+          # Stash any local changes (in case of conflicts)
+          git stash
+          
+          # Pull latest changes
+          git pull
+          
+          # Restart services with docker-compose
+          docker-compose down
+          docker-compose up -d --build
+          
+          # Check if containers are running
+          docker-compose ps
+          
+          # Optional: Clean up unused images
+          docker image prune -f

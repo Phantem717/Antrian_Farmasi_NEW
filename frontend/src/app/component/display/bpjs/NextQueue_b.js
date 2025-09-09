@@ -154,18 +154,18 @@ socket.on('send_nameToggle', (payload) => {
   };
 
   
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (new Date().toDateString() !== currentDate) {
-        setCurrentDate(new Date().toDateString());
-        window.location.reload();
-      }
-    }, 300000);
-    return () => clearInterval(interval);
-  }, [currentDate]);
-  
-  
+useEffect(() => {
+  const interval = setInterval(() => {
+    const today = new Date().toDateString();
+    if (today !== localStorage.getItem("lastDate")) {
+      localStorage.setItem("lastDate", today);
+      window.location.reload();
+    }
+  }, 300000); // check every 5 mins
 
+  return () => clearInterval(interval);
+}, []);
+  
   // Queue section components
  const QueueSection = ({ title, queuesRacik, queuesNonRacik, bgColor }) => {
   const renderQueueItems = (queues, isRacikan = true) => {
