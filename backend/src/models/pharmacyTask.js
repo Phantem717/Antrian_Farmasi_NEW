@@ -6,9 +6,9 @@ class PharmacyTask {
    * Membuat record task farmasi baru.
    * @param {Object} taskData - Data task yang akan disimpan.
    */
-  static async create(taskData) {
+  static async create(taskData, conn = nul) {
   const pool = await getDb();
-  const conn = await pool.getConnection(); // ? Explicit connection
+  const connection =conn || await pool.getConnection(); // ? Explicit connection
 
     try {
       const query = `
@@ -21,12 +21,12 @@ class PharmacyTask {
         taskData.medicine_type,
         taskData.lokasi
       ];
-      const [result] = await conn.execute(query, values);
+      const [result] = await connection.execute(query, values);
       return result;
     } catch (error) {
       throw error;
     }finally {
-    conn.release(); // ?? Critical cleanup
+    if (!conn) connection.release(); // only release if we created it
   }
   }
 
