@@ -60,12 +60,15 @@ async function insertAll(payload) {
     lokasi: payload.location
   };
 
-  let [doctorAppointment, verificationData, pharmacyData] = await Promise.all([
-    DoctorAppointment.create(doctorAppointmentData),
-    createVerificationTaskInternal(payload.NOP, "-", "-", "waiting_verification", payload.location),
-    PharmacyTask.create(pharmacyPayload)
-  ]);
+const [doctorAppointment, pharmacyData] = await Promise.all([
+  DoctorAppointment.create(doctorAppointmentData),
+  PharmacyTask.create(pharmacyPayload)
+]);
 
+// then verification, since it depends on pharmacy
+const verificationData = await createVerificationTaskInternal(
+  payload.NOP, "-", "-", "waiting_verification", payload.location
+);
   return { doctorAppointment, pharmacyData, verificationData };
 }
 
