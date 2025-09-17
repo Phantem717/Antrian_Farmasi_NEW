@@ -27,8 +27,9 @@ class DoctorAppointment {
           nik,
           farmasi_queue_number,
           NOP,
-          PRB
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?)
+          PRB,
+          total_medicine
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?,?)
       `;
       const values = [
         appointmentData.sep_no,
@@ -45,7 +46,8 @@ class DoctorAppointment {
         appointmentData.nik,
         appointmentData.farmasi_queue_number,
         appointmentData.NOP,
-        appointmentData.PRB
+        appointmentData.PRB,
+        appointmentData.total_medicine
 
       ];
       const [result] = await connection.execute(query, values);

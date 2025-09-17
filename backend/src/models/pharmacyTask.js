@@ -6,7 +6,7 @@ class PharmacyTask {
    * Membuat record task farmasi baru.
    * @param {Object} taskData - Data task yang akan disimpan.
    */
-  static async create(taskData, conn = nul) {
+  static async create(taskData, conn = null) {
   const pool = await getDb();
   const connection =conn || await pool.getConnection(); // ? Explicit connection
 

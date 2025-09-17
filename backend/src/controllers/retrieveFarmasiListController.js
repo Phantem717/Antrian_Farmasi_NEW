@@ -58,7 +58,8 @@ async function insertAll(payload) {
       nik: payload.nik || "-",
       farmasi_queue_number: payload.farmasi_queue_number || "-",
       NOP: payload.NOP || "-",
-      PRB: payload.PRB || null
+      PRB: payload.PRB || null,
+      total_medicine:  payload.total_medicine || 0
     };
 
     const pharmacyPayload = {
@@ -138,7 +139,8 @@ const getFarmasiList = async (req, res) => {
         nik: farmasiArray.payload.nik ?? "-",
         farmasi_queue_number: farmasiArray.payload.farmasi_queue_number ?? "-",
         NOP: farmasiArray.payload.NOP ?? null,
-        PRB: farmasiArray.payload.PRB ?? null
+        PRB: farmasiArray.payload.PRB ?? null,
+        total_medicine: farmasiArray.payload.total_medicine ?? 0
       };
 
       result = await insertAll(payload);
