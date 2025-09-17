@@ -173,7 +173,7 @@ const barcode = inputValue.replace(/\s+/g, ""); // Removes ALL whitespace
   PharmacyAPI.createPharmacyTask(pharmacyPayload)
 ]);
 // then verification, since it depends on pharmacy
-const verificationData = await createVerificationTaskInternal(
+const verificationData = await VerificationAPI.createVerificationTask(
   payload.NOP, "-", "-", "waiting_verification", payload.location
 );
     return { doctorAppointment, pharmacyData, verificationData };
