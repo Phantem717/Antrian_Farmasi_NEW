@@ -157,8 +157,7 @@ socket.on('send_nameToggle', (payload) => {
 useEffect(() => {
   const interval = setInterval(() => {
     const today = new Date().toDateString();
-    if (today !== localStorage.getItem("lastDate")) {
-      localStorage.setItem("lastDate", today);
+    if (new Date().toDateString() !== today) {
       window.location.reload();
     }
   }, 300000); // check every 5 mins
