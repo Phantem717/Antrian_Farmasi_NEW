@@ -174,8 +174,7 @@ const barcode = inputValue.replace(/\s+/g, ""); // Removes ALL whitespace
 ]);
 // then verification, since it depends on pharmacy
 const verificationData = await VerificationAPI.createVerificationTask(
-  payload.NOP, "-", "-", "waiting_verification", payload.location
-);
+taskData);
     return { doctorAppointment, pharmacyData, verificationData };
   }
   async function checkRegistration(inputValue){
