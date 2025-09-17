@@ -169,10 +169,9 @@ const barcode = inputValue.replace(/\s+/g, ""); // Removes ALL whitespace
     };
 
   const [doctorAppointment, pharmacyData] = await Promise.all([
-  DoctorAppointment.create(doctorAppointmentData),
-  PharmacyTask.create(pharmacyPayload)
+  DoctorAppointmentAPI.create(doctorAppointmentData),
+  PharmacyAPI.create(pharmacyPayload)
 ]);
-
 // then verification, since it depends on pharmacy
 const verificationData = await createVerificationTaskInternal(
   payload.NOP, "-", "-", "waiting_verification", payload.location
