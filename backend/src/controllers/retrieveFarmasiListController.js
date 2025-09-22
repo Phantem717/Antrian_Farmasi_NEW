@@ -9,6 +9,8 @@ const { getCurrentTimestamp, convertToJakartaTime } = require('../handler/timeHa
 const { createAntrianFarmasi } = require('../services/createFarmasiQueueService');
 const { createVerificationTaskInternal } = require('./verificationTaskController');
 const { printAntrianFarmasi } = require('../services/printAntrianService');
+const { getDb } = require('../config/db');
+
 let io;
 let shouldEmit;
 
@@ -33,43 +35,56 @@ async function retryOperation(operation, maxRetries = 3, delayMs = 1000) {
 }
 
 
+
 async function insertAll(payload) {
-  const doctorAppointmentData = {
-    sep_no: payload.sep_no || null,
-    queue_number: payload.queue_number || null,
-    queue_status: payload.queue_status || null,
-    queue_type: payload.queue_type || null,
-    patient_name: payload.patient_name || null,
-    medical_record_no: payload.medical_record_no || null,
-    patient_date_of_birth: payload.patient_date_of_birth || null,
-    status_medicine: payload.statusMedicine,
-    lokasi: payload.location || null,
-    phone_number: payload.phone_number|| "-",
-    doctor_name: payload.doctor_name || "-",
-    nik: payload.nik || "-",
-    farmasi_queue_number: payload.farmasi_queue_number || "-",
-    NOP: payload.NOP || "-",
-            PRB: payload.PRB || null
+  const pool = await getDb();
+  const conn = await pool.getConnection();
 
-  };
+  try {
+    await conn.beginTransaction();
 
-  const pharmacyPayload = {
-    NOP: payload.NOP,
-    status: "waiting_verification",
-    medicine_type: payload.statusMedicine,
-    lokasi: payload.location
-  };
+    const doctorAppointmentData = {
+      sep_no: payload.sep_no || null,
+      queue_number: payload.queue_number || null,
+      queue_status: payload.queue_status || null,
+      queue_type: payload.queue_type || null,
+      patient_name: payload.patient_name || null,
+      medical_record_no: payload.medical_record_no || null,
+      patient_date_of_birth: payload.patient_date_of_birth || null,
+      status_medicine: payload.statusMedicine,
+      lokasi: payload.location || null,
+      phone_number: payload.phone_number || "-",
+      doctor_name: payload.doctor_name || "-",
+      nik: payload.nik || "-",
+      farmasi_queue_number: payload.farmasi_queue_number || "-",
+      NOP: payload.NOP || "-",
+      PRB: payload.PRB || null,
+      total_medicine:  payload.total_medicine || 0
+    };
 
-const [doctorAppointment, pharmacyData] = await Promise.all([
-  DoctorAppointment.create(doctorAppointmentData),
-  PharmacyTask.create(pharmacyPayload)
-]);
+    const pharmacyPayload = {
+      NOP: payload.NOP,
+      status: "waiting_verification",
+      medicine_type: payload.statusMedicine,
+      lokasi: payload.location
+    };
+    const pharmacyData = await PharmacyTask.create(pharmacyPayload, conn);
+  const verificationData = await VerificationTask.create({
+      NOP: payload.NOP,
+      lokasi: payload.location
+    }, conn);
 
-// then verification, since it depends on pharmacy
-const verificationData = await createVerificationTaskInternal(
-  payload.NOP, "-", "-", "waiting_verification", payload.location
-);
-  return { doctorAppointment, pharmacyData, verificationData };
+    const doctorAppointment = await DoctorAppointment.create(doctorAppointmentData, conn);
+  
+    await conn.commit();
+
+    return { doctorAppointment, pharmacyData, verificationData };
+  } catch (error) {
+    await conn.rollback();
+    throw error;
+  } finally {
+    conn.release();
+  }
 }
 
 const getFarmasiList = async (req, res) => {
@@ -124,7 +139,8 @@ const getFarmasiList = async (req, res) => {
         nik: farmasiArray.payload.nik ?? "-",
         farmasi_queue_number: farmasiArray.payload.farmasi_queue_number ?? "-",
         NOP: farmasiArray.payload.NOP ?? null,
-        PRB: farmasiArray.payload.PRB ?? null
+        PRB: farmasiArray.payload.PRB ?? null,
+        total_medicine: farmasiArray.payload.total_medicine ?? 0
       };
 
       result = await insertAll(payload);
@@ -152,7 +168,6 @@ const print = await retryOperation(
     3, // max retries
     1000 // initial delay (will increase exponentially)
   );
-      // const print = await printAntrianFarmasi(printPayload);
       await new Promise(resolve => setTimeout(resolve, 2000)); // 1-second delay
 
       

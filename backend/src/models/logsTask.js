@@ -18,6 +18,8 @@ class logsTask {
     da.sep_no,
     da.medical_record_no,
     da.status_medicine,
+    da.total_medicine,
+
     
 
     pa.waiting_pickup_medicine_stamp,
@@ -82,6 +84,8 @@ ORDER BY vt.waiting_verification_stamp;  `;
     da.sep_no,
     da.medical_record_no,
     da.status_medicine,
+        da.total_medicine,
+
     pa.waiting_pickup_medicine_stamp,
     pa.called_pickup_medicine_stamp,
     pa.recalled_pickup_medicine_stamp,
@@ -158,6 +162,8 @@ static async getByTimePeriod(location,period) {
             da.sep_no,
             da.medical_record_no,
             da.status_medicine,
+                da.total_medicine,
+
             pa.waiting_pickup_medicine_stamp,
             pa.called_pickup_medicine_stamp,
             pa.recalled_pickup_medicine_stamp,
@@ -220,6 +226,7 @@ static async getByDate(location,date) {
     da.sep_no,
     da.medical_record_no,
     da.status_medicine,
+    da.total_medicine,
     pa.waiting_pickup_medicine_stamp,
     pa.called_pickup_medicine_stamp,
     pa.recalled_pickup_medicine_stamp,

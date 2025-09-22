@@ -16,9 +16,9 @@ class VerificationTask {
    *          - completed_verification_stamp (opsional)
    * @returns {Promise<Object>} - Hasil query.
    */
-  static async create(data) {
+  static async create(data, conn = null) {
   const pool = await getDb();
-  const conn = await pool.getConnection(); // ? Explicit connection
+  const connection =conn || await pool.getConnection(); // ? Explicit connection
 
     try {
       const query = `
@@ -31,7 +31,7 @@ class VerificationTask {
         )
         VALUES (?, ?, ?, ?,? , ?, ?, ?, ?, ?,?)
       `;
-      const [loket] = await conn.execute(`
+      const [loket] = await connection.execute(`
         SELECT loket_name 
         FROM Loket 
         WHERE status = "active" 
@@ -54,12 +54,12 @@ class VerificationTask {
         activeLoket || null,
         data.lokasi || null
       ];
-      const [result] = await conn.execute(query, values);
+      const [result] = await connection.execute(query, values);
       return result;
     } catch (error) {
       throw error;
     }finally {
-    conn.release(); // ?? Critical cleanup
+    if (!conn) connection.release(); // only release if we created it
   }
   }
 

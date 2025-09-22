@@ -264,6 +264,7 @@ const handleFilterChange = (value) => {
             <TableCell align="center"><strong>Called Pickup Medicine</strong></TableCell> 
             <TableCell align="center"><strong>Completed Pickup Medicine</strong></TableCell> 
             <TableCell align="center"><strong>Duration</strong></TableCell> 
+            <TableCell align="center"><strong>Total Medicine</strong></TableCell>
 
           </TableRow>
         </TableHead>
@@ -334,6 +335,16 @@ const handleFilterChange = (value) => {
                                   Menit
 
                   </div>
+              </div>
+                
+            </TableCell>
+            <TableCell align="center">
+              <div className="d-flex flex-row gap-2">
+                <div>
+                {item.total_medicine} 
+
+                </div>
+                
               </div>
                 
             </TableCell>

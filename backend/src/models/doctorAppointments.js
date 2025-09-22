@@ -6,9 +6,9 @@ class DoctorAppointment {
    * Membuat record appointment baru.
    * @param {Object} appointmentData - Data appointment yang akan disimpan.
    */
-  static async create(appointmentData) {
+  static async create(appointmentData,conn = null) {
   const pool = await getDb();
-  const conn = await pool.getConnection(); // ? Explicit connection
+  const connection = conn || await pool.getConnection(); // ? Explicit connection
 
     try {
       const query = `
@@ -27,8 +27,9 @@ class DoctorAppointment {
           nik,
           farmasi_queue_number,
           NOP,
-          PRB
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?)
+          PRB,
+          total_medicine
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?,?)
       `;
       const values = [
         appointmentData.sep_no,
@@ -45,15 +46,16 @@ class DoctorAppointment {
         appointmentData.nik,
         appointmentData.farmasi_queue_number,
         appointmentData.NOP,
-        appointmentData.PRB
+        appointmentData.PRB,
+        appointmentData.total_medicine
 
       ];
-      const [result] = await conn.execute(query, values);
+      const [result] = await connection.execute(query, values);
       return result;
     } catch (error) {
       throw error;
     }finally {
-    conn.release(); // ?? Critical cleanup
+    if (!conn) connection.release(); // only release if we created it
   }
   }
 

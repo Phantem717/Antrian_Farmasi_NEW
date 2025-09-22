@@ -31,6 +31,7 @@ import CreateAntrianAPI from "@/app/utils/api/createAntrian";
 import VerificationAPI from "@/app/utils/api/Verification";
 import CheckRegistrationInfo from "@/app/utils/api/checkRegistrationInfo";
 export default function BarcodeScanner({location, visible, onClose }) {
+  const[totalMedicine,setTotalMedicine]= useState(0);
   const [inputValue, setInputValue] = useState("");
   const [name, setName] = useState("");
   const [type, setType] = useState("");
@@ -150,7 +151,8 @@ const barcode = inputValue.replace(/\s+/g, ""); // Removes ALL whitespace
       nik: payload.nik,
       farmasi_queue_number: payload.farmasi_queue_number,
       NOP: payload.NOP,
-      PRB: payload.PRB
+      PRB: payload.PRB,
+      total_medicine:  payload.total_medicine
     };
 
     const pharmacyPayload = {
@@ -192,6 +194,7 @@ taskData);
       setDOB(checkRegistrationResponse.DateOfBirth);
       setNOP(checkRegistrationResponse.RegistrationNo);
       setPRB(checkRegistrationResponse.ProlanisPRB);
+      setTotalMedicine(0);
 
 
     return checkRegistrationResponse;
@@ -233,7 +236,8 @@ taskData);
         nik: NIK||"-",
         farmasi_queue_number: queueNumberData.data.queue_number,
         NOP: inputValue,
-        PRB: PRB || null
+        PRB: PRB || null,
+        total_medicine: totalMedicine
       };
 
       console.log("NEW PAYLOAD",payload);
@@ -256,7 +260,6 @@ taskData);
             patient_name: name ?? "-",
             farmasi_queue_number: queueNumberData.data.queue_number ?? "-",
             medicine_type: medType ?? "-",
-            
             rm: medical_record_no??"-",
             tanggal_lahir:  new Date(DOB).toISOString().split('T')[0]??"-",
             queue_number: queueNumberData.data.queue_number ?? null,
