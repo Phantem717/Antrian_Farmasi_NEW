@@ -7,13 +7,13 @@ class Status{
     try {
  // ? Explicit connection
       const query = `SELECT 
-    pa.waiting_pickup_medicine_stamp,
-    pa.called_pickup_medicine_stamp,
-    pa.completed_pickup_medicine_stamp,
-    mt.waiting_medicine_stamp,
-    mt.completed_medicine_stamp,
-    vt.waiting_verification_stamp,
-    vt.completed_verification_stamp
+    pa.waiting_pickup_medicine_stamp as "Obat Siap Diambil",
+    pa.called_pickup_medicine_stamp as "Obat Telah Dipanggil",
+    pa.completed_pickup_medicine_stamp as "Obat Telah Selesai",
+    mt.waiting_medicine_stamp as "Menunggu Obat",
+    mt.completed_medicine_stamp as "Obat Selesai Dikemas",
+    vt.waiting_verification_stamp as "Obat Sedang Verifikasi",
+    vt.completed_verification_stamp as "Obat Selesai Verifikasi"
 FROM Doctor_Appointments da
 LEFT JOIN Verification_Task vt ON da.NOP = vt.NOP
 LEFT JOIN Pharmacy_Task pt ON da.NOP = pt.NOP
@@ -37,13 +37,13 @@ ORDER BY da.queue_number`;
     try {
  // ? Explicit connection
       const query = `SELECT 
-    pa.waiting_pickup_medicine_stamp,
-    pa.called_pickup_medicine_stamp,
-    pa.completed_pickup_medicine_stamp,
-    mt.waiting_medicine_stamp,
-    mt.completed_medicine_stamp,
-    vt.waiting_verification_stamp,
-    vt.completed_verification_stamp
+    pa.waiting_pickup_medicine_stamp as "Obat Siap Diambil",
+    pa.called_pickup_medicine_stamp as "Obat Telah Dipanggil",
+    pa.completed_pickup_medicine_stamp as "Obat Telah Selesai",
+    mt.waiting_medicine_stamp as "Menunggu Obat",
+    mt.completed_medicine_stamp as "Obat Selesai Dikemas",
+    vt.waiting_verification_stamp as "Obat Sedang Verifikasi",
+    vt.completed_verification_stamp as "Obat Selesai Verifikasi"
 FROM Doctor_Appointments da
 LEFT JOIN Verification_Task vt ON da.NOP = vt.NOP
 LEFT JOIN Pharmacy_Task pt ON da.NOP = pt.NOP
@@ -68,13 +68,13 @@ ORDER BY da.queue_number`;
     try {
 // ? Explicit connection
       const query = `SELECT 
-    pa.waiting_pickup_medicine_stamp,
-    pa.called_pickup_medicine_stamp,
-    pa.completed_pickup_medicine_stamp,
-    mt.waiting_medicine_stamp,
-    mt.completed_medicine_stamp,
-    vt.waiting_verification_stamp,
-    vt.completed_verification_stamp
+     pa.waiting_pickup_medicine_stamp as "Obat Siap Diambil",
+    pa.called_pickup_medicine_stamp as "Obat Telah Dipanggil",
+    pa.completed_pickup_medicine_stamp as "Obat Telah Selesai",
+    mt.waiting_medicine_stamp as "Menunggu Obat",
+    mt.completed_medicine_stamp as "Obat Selesai Dikemas",
+    vt.waiting_verification_stamp as "Obat Sedang Verifikasi",
+    vt.completed_verification_stamp as "Obat Selesai Verifikasi"
 FROM Doctor_Appointments da
 LEFT JOIN Verification_Task vt ON da.NOP = vt.NOP
 LEFT JOIN Pharmacy_Task pt ON da.NOP = pt.NOP
