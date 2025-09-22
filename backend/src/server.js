@@ -36,6 +36,7 @@ const retrieveRoutes = require('../src/routes/getFarmasiListRoute');
 const pharmacyStatusRoutes = require('../src/routes/getPharmacyStatusRoutes')
 const createFarmasiRoute = require('./routes/createAntrianRoute');
 const checkRegistrationRoute = require('./routes/checkRegistrationInfoRoute');
+const statusRoute = require('./routes/statusRoutes');
 (async function startServer() {
   try {
     await initDb();
@@ -69,9 +70,10 @@ app.use('/api/retrieve',retrieveRoutes);
 app.use('/api/create-farmasi',createFarmasiRoute);
 app.use('/api/pharmacy-status',pharmacyStatusRoutes);
 app.use('/api/check',checkRegistrationRoute);
+app.use('/adpi/status',statusRoute);
   // Menjalankan server pada semua network interfaces
   const PORT = process.env.PORT || 5000;
-  const HOST = process.env.HOST|| '0.0.0.0'
+  const HOST =  '0.0.0.0'
   server.listen(PORT,HOST, () => {
     console.log(`✅ Server berjalan pada ${PORT}`,loginRoutes);
   });

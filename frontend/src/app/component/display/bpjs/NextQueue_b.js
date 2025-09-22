@@ -32,11 +32,11 @@ const [times, setTimes] = useState({
 });    
   function calculateTime(verifLength, processLengthNon, processLengthRacik, pickupLengthNon, pickupLengthRacik) {
   // Divide all multipliers by 2 for faster speed
-  const verifTime = verifLength < 3 ? 5 : Math.floor(verifLength * 1);
-  const processTimeNon = processLengthNon < 3 ? 5 : (Math.floor(processLengthNon * 1));
-  const processTimeRacik = processLengthRacik < 3 ? 5 : (Math.floor(processLengthRacik * 1));
-  const pickupTimeNon = pickupLengthNon < 3 ? 5 : (Math.floor(pickupLengthNon * 1));
-  const pickupTimeRacik = pickupLengthRacik < 3 ? 5 : (Math.floor(pickupLengthRacik * 1));
+  const verifTime = verifLength < 3 ? 5 : Math.floor(verifLength * 0.5);
+  const processTimeNon = processLengthNon < 3 ? 5 : (Math.floor(processLengthNon * 0.5));
+  const processTimeRacik = processLengthRacik < 3 ? 5 : (Math.floor(processLengthRacik * 0.5));
+  const pickupTimeNon = pickupLengthNon < 3 ? 5 : (Math.floor(pickupLengthNon * 0.5));
+  const pickupTimeRacik = pickupLengthRacik < 3 ? 5 : (Math.floor(pickupLengthRacik * 0.5));
   return { verifTime, processTimeNon, processTimeRacik, pickupTimeNon, pickupTimeRacik };
 }
 
@@ -154,18 +154,17 @@ socket.on('send_nameToggle', (payload) => {
   };
 
   
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (new Date().toDateString() !== currentDate) {
-        setCurrentDate(new Date().toDateString());
-        window.location.reload();
-      }
-    }, 300000);
-    return () => clearInterval(interval);
-  }, [currentDate]);
-  
-  
+useEffect(() => {
+  const interval = setInterval(() => {
+    const today = new Date().toDateString();
+    if (new Date().toDateString() !== today) {
+      window.location.reload();
+    }
+  }, 300000); // check every 5 mins
 
+  return () => clearInterval(interval);
+}, []);
+  
   // Queue section components
  const QueueSection = ({ title, queuesRacik, queuesNonRacik, bgColor }) => {
   const renderQueueItems = (queues, isRacikan = true) => {
