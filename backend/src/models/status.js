@@ -2,9 +2,10 @@ const { getDb } = require('../config/db');
 
 class Status{
  static async getPharmacyStatusByNoTelpon(phone_number,date_of_birth,location){
+   const pool = await getDb();
+  const conn = await pool.getConnection();
     try {
- const pool = await getDb();
-  const conn = await pool.getConnection(); // ? Explicit connection
+ // ? Explicit connection
       const query = `SELECT 
     pa.waiting_pickup_medicine_stamp,
     pa.called_pickup_medicine_stamp,
@@ -12,7 +13,7 @@ class Status{
     mt.waiting_medicine_stamp,
     mt.completed_medicine_stamp,
     vt.waiting_verification_stamp,
-    vt.completed_verification_stamp,
+    vt.completed_verification_stamp
 FROM Doctor_Appointments da
 LEFT JOIN Verification_Task vt ON da.NOP = vt.NOP
 LEFT JOIN Pharmacy_Task pt ON da.NOP = pt.NOP
@@ -31,9 +32,10 @@ ORDER BY da.queue_number`;
  }
 
   static async getPharmacyStatusByNIK(nik,date_of_birth,location){
+     const pool = await getDb();
+  const conn = await pool.getConnection();
     try {
- const pool = await getDb();
-  const conn = await pool.getConnection(); // ? Explicit connection
+ // ? Explicit connection
       const query = `SELECT 
     pa.waiting_pickup_medicine_stamp,
     pa.called_pickup_medicine_stamp,
@@ -41,7 +43,7 @@ ORDER BY da.queue_number`;
     mt.waiting_medicine_stamp,
     mt.completed_medicine_stamp,
     vt.waiting_verification_stamp,
-    vt.completed_verification_stamp,
+    vt.completed_verification_stamp
 FROM Doctor_Appointments da
 LEFT JOIN Verification_Task vt ON da.NOP = vt.NOP
 LEFT JOIN Pharmacy_Task pt ON da.NOP = pt.NOP
@@ -60,9 +62,11 @@ ORDER BY da.queue_number`;
  }
 
   static async getPharmacyStatusByName(full_name,date_of_birth,location){
+    console.log("VARS",full_name,date_of_birth,location);
+     const pool = await getDb();
+  const conn = await pool.getConnection();
     try {
- const pool = await getDb();
-  const conn = await pool.getConnection(); // ? Explicit connection
+// ? Explicit connection
       const query = `SELECT 
     pa.waiting_pickup_medicine_stamp,
     pa.called_pickup_medicine_stamp,
@@ -70,7 +74,7 @@ ORDER BY da.queue_number`;
     mt.waiting_medicine_stamp,
     mt.completed_medicine_stamp,
     vt.waiting_verification_stamp,
-    vt.completed_verification_stamp,
+    vt.completed_verification_stamp
 FROM Doctor_Appointments da
 LEFT JOIN Verification_Task vt ON da.NOP = vt.NOP
 LEFT JOIN Pharmacy_Task pt ON da.NOP = pt.NOP
@@ -79,7 +83,7 @@ LEFT JOIN Pickup_Task pa ON da.NOP = pa.NOP
 WHERE da.patient_name = ?
 AND da.lokasi = ? AND da.patient_date_of_birth = ?
 ORDER BY da.queue_number`;
-      const [rows] = await conn.execute(query, [full_name,date_of_birth,location]);
+      const [rows] = await conn.execute(query, [full_name,location,date_of_birth]);
       return rows;
     } catch (error) {
       throw error;

@@ -8,7 +8,7 @@ const {
 getStatus
 } = require('../controllers/statusController');
 
-router.get('/', getAllResponses);
+router.get('/', getStatus);
 
 
 module.exports = router;

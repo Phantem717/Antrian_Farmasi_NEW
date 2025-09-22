@@ -9,7 +9,7 @@ const StatusAPI = {
     getStatus: async (requestBody) => {
         try {
             const response = await axios.post(
-                `${BASE_URL}/api/pharmacy-status`, // Your endpoint URL
+                `${BASE_URL}/api/status`, // Your endpoint URL
                 requestBody,                       // The request body
                 {
                     headers: {
