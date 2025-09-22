@@ -163,20 +163,19 @@ const getFarmasiList = async (req, res) => {
         doctor_name: farmasiArray.payload.doctor_name ?? null
       }
       
-// const print = await retryOperation(
-//     () => printAntrianFarmasi(printPayload),
-//     3, // max retries
-//     1000 // initial delay (will increase exponentially)
-//   );
-      // const print = await printAntrianFarmasi(printPayload);
+const print = await retryOperation(
+    () => printAntrianFarmasi(printPayload),
+    3, // max retries
+    1000 // initial delay (will increase exponentially)
+  );
       await new Promise(resolve => setTimeout(resolve, 2000)); // 1-second delay
 
       
-      // if (print.success == false) {
-      //   io.emit('print_error', {
-      //     message: 'Print Error'
-      //   });
-      // }
+      if (print.success == false) {
+        io.emit('print_error', {
+          message: 'Print Error'
+        });
+      }
 
       const data = await getAllResponses("Lantai 1 BPJS");
 

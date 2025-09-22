@@ -70,10 +70,10 @@ app.use('/api/retrieve',retrieveRoutes);
 app.use('/api/create-farmasi',createFarmasiRoute);
 app.use('/api/pharmacy-status',pharmacyStatusRoutes);
 app.use('/api/check',checkRegistrationRoute);
-app.use('/api/status',statusRoute);
+app.use('/adpi/status',statusRoute);
   // Menjalankan server pada semua network interfaces
   const PORT = process.env.PORT || 5000;
-  const HOST =  process.env.HOST
+  const HOST =  '0.0.0.0'
   server.listen(PORT,HOST, () => {
     console.log(`✅ Server berjalan pada ${PORT}`,loginRoutes);
   });
