@@ -11,7 +11,7 @@ import PharmacyAPI from '@/app/utils/api/Pharmacy';
 
 import React, { useState, useEffect } from "react";
 import { getSocket } from "@/app/utils/api/socket";
-import { Button } from 'antd';
+import { Button, Typography } from 'antd';
 
 export default function Antrian({ params }) {
   const { category } = params; // Directly destructure params
@@ -34,16 +34,31 @@ export default function Antrian({ params }) {
       {/* Header and content - use flex-1 to allow footer space */}
       <div className="flex-1 overflow-auto p-4">
         <InfoBar location={category}/>
-        <div className="flex flex-row gap-4 mb-4 h-[calc(100%-3rem)]">
+         <Typography.Title level={1} style={{ textAlign: "center" }}>
+                      Pembuatan Antrian Farmasi GMCB
+                    </Typography.Title>
+        <div className="flex flex-column flex-wrap gap-4 mb-4 h-[calc(100%-3rem)] justify-center items-center">
+         
             <Button
                 size='large'
                 color='primary'
                 variant='solid'
+                 style={{
+                  padding: '75px',
+                  'font-weight': 'bold',
+                  'font-size': '75px'
+                }}
             >Resep Jaminan</Button>
          <Button
                 size='large'
                 color='primary'
                 variant='solid'
+                style={{
+                  padding: '75px',
+                  'font-weight': 'bold',
+                  'font-size': '75px'
+                }}
+
             >Resep Umum</Button>
         
         </div>

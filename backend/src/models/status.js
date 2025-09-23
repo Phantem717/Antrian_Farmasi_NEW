@@ -13,7 +13,8 @@ class Status{
     mt.waiting_medicine_stamp as "Menunggu Obat",
     mt.completed_medicine_stamp as "Obat Selesai Dikemas",
     vt.waiting_verification_stamp as "Obat Sedang Verifikasi",
-    vt.completed_verification_stamp as "Obat Selesai Verifikasi"
+    vt.completed_verification_stamp as "Obat Selesai Verifikasi",
+    da.queue_number as "Nomor Antrian"
 FROM Doctor_Appointments da
 LEFT JOIN Verification_Task vt ON da.NOP = vt.NOP
 LEFT JOIN Pharmacy_Task pt ON da.NOP = pt.NOP
@@ -43,7 +44,8 @@ ORDER BY da.queue_number`;
     mt.waiting_medicine_stamp as "Menunggu Obat",
     mt.completed_medicine_stamp as "Obat Selesai Dikemas",
     vt.waiting_verification_stamp as "Obat Sedang Verifikasi",
-    vt.completed_verification_stamp as "Obat Selesai Verifikasi"
+    vt.completed_verification_stamp as "Obat Selesai Verifikasi",
+    da.queue_number as "Nomor Antrian"
 FROM Doctor_Appointments da
 LEFT JOIN Verification_Task vt ON da.NOP = vt.NOP
 LEFT JOIN Pharmacy_Task pt ON da.NOP = pt.NOP
@@ -74,7 +76,8 @@ ORDER BY da.queue_number`;
     mt.waiting_medicine_stamp as "Menunggu Obat",
     mt.completed_medicine_stamp as "Obat Selesai Dikemas",
     vt.waiting_verification_stamp as "Obat Sedang Verifikasi",
-    vt.completed_verification_stamp as "Obat Selesai Verifikasi"
+    vt.completed_verification_stamp as "Obat Selesai Verifikasi",
+    da.queue_number as "Nomor Antrian"
 FROM Doctor_Appointments da
 LEFT JOIN Verification_Task vt ON da.NOP = vt.NOP
 LEFT JOIN Pharmacy_Task pt ON da.NOP = pt.NOP
