@@ -218,7 +218,17 @@ taskData);
 
      
       const medType = type === "racikan" ? "Racikan" : "Non - Racikan";
-      const queueNumber = await CreateAntrianAPI.createAntrian(medType);
+      let newLocation="";
+      if(location == "bpjs"){
+              newLocation = "farmasi-bpjs";
+            }
+            else if (location == "gmcb"){
+              newLocation = "farmasi-gmcb";
+            }
+            else if (location == "lt3"){
+              newLocation = "farmasi-gmcb-lt3";
+            }
+      const queueNumber = await CreateAntrianAPI.createAntrian(medType,newLocation);
       const queueNumberData = queueNumber.data;
       console.log("PREV PAYLOAD",queueNumberData.data.queue_number,medType,name);
       const payload = {
@@ -263,7 +273,8 @@ taskData);
             rm: medical_record_no??"-",
             tanggal_lahir:  new Date(DOB).toISOString().split('T')[0]??"-",
             queue_number: queueNumberData.data.queue_number ?? null,
-            prev_queue_number: "-"
+            prev_queue_number: "-",
+            location: location
         };
 
            const printPayload = {

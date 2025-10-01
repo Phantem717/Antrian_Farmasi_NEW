@@ -2,24 +2,25 @@ const {createAntrianFarmasi} = require('../services/createFarmasiQueueService')
 
 const createAntrian = async (req,res) =>{
 try {
-    let medicine_type = req.params.medicineType;
-    if(!medicine_type){
-        return res.status(400).json({ message: "medicine type not found" });
+    let {medicineType,lokasi} = req.params;
+    console.log("PARAMS",medicineType,lokasi);
+    if(!medicineType || !lokasi){
+        return res.status(400).json({ message: "medicine type + location not found" });
 
     }
-    console.log("MEDICINE TP+YPE PREV:",medicine_type);
+    console.log("MEDICINE TP+YPE PREV:",medicineType, lokasi);
 
     let newMedicineType= "";
-    if(medicine_type == 'Non - Racikan'){
+    if(medicineType == 'Non - Racikan'){
         newMedicineType = "nonracikan";
     }
-    if(medicine_type=='Racikan'){
+    if(medicineType=='Racikan'){
         newMedicineType = "racikan";
     }
     console.log("MED TYPE CONTROLLER",newMedicineType);
 
     // const payload = {medicine_type};
-    const data = await createAntrianFarmasi(newMedicineType);
+    const data = await createAntrianFarmasi(newMedicineType,lokasi);
     res.status(200).json({ data });
 
 

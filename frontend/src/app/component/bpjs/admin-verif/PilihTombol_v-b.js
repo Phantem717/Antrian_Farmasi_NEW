@@ -196,8 +196,18 @@ const PilihAksi = ({location, selectedQueueIds = [], setSelectedQueueIds, select
         selectedQueue2.map(async (queue) => {
           
           if((queue.status_medicine == "Racikan" && medicineType == "Non - Racikan") || (queue.status_medicine == "Non - Racikan" && medicineType == "Racikan") ||   queue.queue_number.startsWith("TR-")   // force refresh for TR queues
-){
-            const antrianResp = await CreateAntrianAPI.createAntrian(medicineType);
+){          
+            let newLocation="";
+            if(location == "bpjs"){
+                newLocation = "farmasi-bpjs";
+            }
+            else if (location == "gmcb"){
+                newLocation = "farmasi-gmcb";
+            }
+            else if (location == "lt3"){
+                newLocation = "farmasi-gmcb-lt3";
+            }
+            const antrianResp = await CreateAntrianAPI.createAntrian(medicineType,newLocation);
             console.log("MEDTYPE",medicineType);
             console.log("ANTRIAN RESP",antrianResp);
 
@@ -252,7 +262,8 @@ const PilihAksi = ({location, selectedQueueIds = [], setSelectedQueueIds, select
                 docter: doctorResponse.data.doctor_name,
                 nik: doctorResponse.data.nik,
                 prev_queue_number: queue.queue_number || "-",
-                switch_WA: localStorage.getItem('waToggleState') || "true"
+                switch_WA: localStorage.getItem('waToggleState') || "true",
+                location: location
 
     
     
@@ -271,7 +282,8 @@ const PilihAksi = ({location, selectedQueueIds = [], setSelectedQueueIds, select
               SEP:doctorResponse.data.sep_no,
               tanggal_lahir: new Date(queue.patient_date_of_birth).toISOString().split('T')[0],
               queue_number: doctorResponse.data.queue_number,
-              doctor_name: queue.doctor_name
+              doctor_name: queue.doctor_name,
+              lokasi: location
             }
             const printResp = await PrintAntrian.printAntrian(printPayload);
             console.log("PRINT AFTER CHANGE",printResp,printPayload);

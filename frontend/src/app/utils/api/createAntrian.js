@@ -6,10 +6,10 @@ const PORT = process.env.NEXT_PUBLIC_API_PORT
 console.log(HOST,PORT)
 const BASE_URL = `http://${HOST}:${PORT}`; // Base URL API
 const CreateAntrian = {
-    createAntrian: async(medicineType) => {
+    createAntrian: async(medicineType,lokasi) => {
         try {
 
-            const response = await axios.post(`${BASE_URL}/api/create-farmasi/${medicineType}` );
+            const response = await axios.post(`${BASE_URL}/api/create-farmasi/${medicineType}/${lokasi}` );
             return response.data;
 
             

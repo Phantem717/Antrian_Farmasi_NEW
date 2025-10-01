@@ -11,8 +11,8 @@ const CheckRegistrationInfo = {
         console.log("NOP CHECK",registrationNo);
     
         try {
-const response = await axios.get(`${BASE_URL}/api/check/${encodeURIComponent(registrationNo)}`)         
- return response.data ;
+        const response = await axios.get(`${BASE_URL}/api/check/${encodeURIComponent(registrationNo)}`)         
+        return response.data ;
         } catch (error) {
             console.error(`❌ Error checking queue for Booking ID ${registrationNo}:`, error.response?.data || error.message);
             throw error;
@@ -26,7 +26,20 @@ const response = await axios.get(`${BASE_URL}/api/check/${encodeURIComponent(sep
             console.error(`❌ Error checking queue for Booking ID ${sepNo}:`, error.response?.data || error.message);
             throw error;
         }
+    },
+
+ checkQueueERM: async (name, mr_no) => {
+    try {
+        // ✅ CORRECTION 2: Use axios.get and params for query parameters
+        const response = await axios.get(`${BASE_URL}/api/check`, {
+            params: { name, mr_no } // Data is correctly sent as query parameters
+        });
+        return response.data;
+    } catch (error) {
+        console.error(`❌ Error checking queue for Booking ID ${name} ${mr_no}:`, error.response?.data || error.message);
+        throw error;
     }
+}
 
  
     

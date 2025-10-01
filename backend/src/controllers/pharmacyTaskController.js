@@ -9,6 +9,7 @@ const { generateFourDigitNumber } = require('../handler/generate'); // Import fu
 const createPharmacyTask = async (req, res) => {
   try {
     let { NOP, status, medicine_type,lokasi } = req.body;
+    console.log("PHAR PARAM: ",NOP,status,medicine_type,lokasi);
     let location = lokasi;
  if(location.toLowerCase() == "bpjs"){
       location = "Lantai 1 BPJS" 

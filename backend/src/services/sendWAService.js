@@ -12,7 +12,20 @@ async function sendWAVerif(payload){
     try {
       const { timestamp, signature } = generateSignature(consID2, password);
       let duration = "";
-      
+      let location = "";
+
+      if(payload.location == "Lantai 1 BPJS"){
+        location= "Kami dari Farmasi Rawat Jalan BPJS";
+      }
+      else if(payload.location == "Lantai 1 GMCB"){
+        location= "Kami dari Farmasi GMCB Lantai 1";
+
+      }
+      else if(payload.location == "Lantai 3 GMCB"){
+        location= "Kami dari Farmasi GMCB Lantai 3";
+
+      }
+
       if (payload?.medicine_type?.trim() === "Racikan") {
         duration = "60 Menit"
       }
@@ -45,7 +58,7 @@ phone: payload.phone_number,        // phone: payload.phone_number,
         message : `*Notifikasi Sistem Otomatis*
 
 ${messageNext}
-Kami dari Farmasi Rawat Jalan BPJS RS St. Carolus menginformasikan bahwa:    
+${location} RS St. Carolus menginformasikan bahwa:    
 
 Nama Pasien : *${payload.patient_name}*
 No Registrasi : *${payload.NOP}*        
@@ -83,7 +96,19 @@ Terima kasih.
 async function sendWAProses(payload){
     try {
         const { timestamp, signature } = generateSignature(consID2, password);
+          let location = "";
 
+      if(payload.location == "Lantai 1 BPJS"){
+        location= "Kami dari Farmasi Rawat Jalan BPJS";
+      }
+      else if(payload.location == "Lantai 1 GMCB"){
+        location= "Kami dari Farmasi GMCB Lantai 1";
+
+      }
+      else if(payload.location == "Lantai 3 GMCB"){
+        location= "Kami dari Farmasi GMCB Lantai 3";
+
+      }
     const url = path;
     const url_local = `http:/192.168.6.85/api/v1/integration/whatsappweb/hello/send-text`;
 console.log("PHONE_NUMBER_PROSES",payload.phone_number,payload.switch_WA,"SWITCH TEST: ", payload.switch_WA ? payload.phone_number : "test");
@@ -95,7 +120,7 @@ phone: payload.phone_number,        // phone: payload.phone_number,
       message: `Notifikasi Sistem Otomatis
 
 Terimakasih telah memilih RS St. Carolus sebagai Rumah Sakit pilihan anda.
-Kami dari Farmasi Rawat Jalan BPJS RS St. Carolus menginformasikan bahwa : 
+${location} RS St. Carolus menginformasikan bahwa : 
     
 Nama Pasien : *${payload.patient_name}*
 No Registrasi : *${payload.NOP}*        
@@ -137,7 +162,19 @@ async function sendWAAntrian(payload){
     try {
         const { timestamp, signature } = generateSignature(consID2, password);
         let duration = "";
+        let location = "";
 
+      if(payload.location == "Lantai 1 BPJS"){
+        location= "Kami dari Farmasi Rawat Jalan BPJS";
+      }
+      else if(payload.location == "Lantai 1 GMCB"){
+        location= "Kami dari Farmasi GMCB Lantai 1";
+
+      }
+      else if(payload.location == "Lantai 3 GMCB"){
+        location= "Kami dari Farmasi GMCB Lantai 3";
+
+      }
         if (payload?.medicine_type?.trim() === "Racikan") {
           duration = "Obat anda akan siap dalam 60 menit"
         }
@@ -155,7 +192,7 @@ phone:payload.phone_number,        // phone: payload.phone_number,
         message : `
 Notifikasi Sistem Otomatis
 
-Kami dari Farmasi Rawat Jalan BPJS RS St. Carolus menginformasikan bahwa :        
+${location} RS St. Carolus menginformasikan bahwa :        
 
 Nama Pasien : *${payload.patient_name}*
 No Registrasi : *${payload.NOP}*        
@@ -197,6 +234,19 @@ async function sendWAPickup(payload){
         const { timestamp, signature } = generateSignature(consID2, password);
         const currentTime = getCurrentTimestamp().split(' ')[1].substring(0, 2);
         let messageNext;
+          let location = "";
+
+      if(payload.location == "Lantai 1 BPJS"){
+        location= "Kami dari Farmasi Rawat Jalan BPJS";
+      }
+      else if(payload.location == "Lantai 1 GMCB"){
+        location= "Kami dari Farmasi GMCB Lantai 1";
+
+      }
+      else if(payload.location == "Lantai 3 GMCB"){
+        location= "Kami dari Farmasi GMCB Lantai 3";
+
+      }
         console.log("TIMESTAMP",currentTime >= 20 ? true : false);
         console.log("PHONE_NUMBER_PICKUP",payload.phone_number);
         if(currentTime >= 20 == true ){
@@ -215,7 +265,7 @@ phone: payload.phone_number,        // phone: payload.phone_number,
         message : `*Notifikasi Sistem Otomatis*
 
 ${messageNext}
-Kami dari Farmasi Rawat Jalan BPJS RS St. Carolus menginformasikan bahwa :        
+${location} RS St. Carolus menginformasikan bahwa :        
 
 Nama Pasien : *${payload.patient_name}*
 No Registrasi : *${payload.NOP}*        

@@ -9,10 +9,11 @@ async function printAntrianFarmasi(payload){
     
 try {
     const { timestamp, signature } = generateSignature(consID2, password);
- const url = `https://rscarolus.com/api/v1/visit/queue/pharmacy/cetak`;
+ const url = `http://192.168.6.86/api/v1/visit/queue/pharmacy/cetak`;
 let message = "";
 let urlprinter = "";
- if(payload.medicine_type == "Racikan" || payload.queue_number.startsWith("RC")){
+if(payload.lokasi == "Lantai 1 BPJS"){
+if(payload.medicine_type == "Racikan" || payload.queue_number.startsWith("RC")){
  message = "Mohon Menunggu 30 menit sampai 1 jam Karena Obat Anda Adalah Racikan";
  urlprinter="172.16.31.4";
  }
@@ -28,6 +29,8 @@ let urlprinter = "";
         urlprinter="172.16.26.78";
 
  }
+}
+ 
  let PRB= "";
  if(payload.PRB != null && !payload.PRB.includes("Potensi")){
   PRB = "PRB";
