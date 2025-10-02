@@ -11,7 +11,7 @@ try {
  
     const { timestamp, signature } = generateSignature(consID2, password);
  const url = `http://192.168.6.86/api/v1/visit/queue/pharmacy/create-queue`;
- console.log("medicine_type",medicine_type)
+ console.log("medicine_type",medicine_type,lokasi)
 // console.log("PHONE_NUMBER",phone_number);
     const response = await axios.post(
       url,

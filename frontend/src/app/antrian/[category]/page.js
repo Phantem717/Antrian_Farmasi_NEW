@@ -8,13 +8,14 @@ import WA_API from '@/app/utils/api/WA';
 import VerificationAPI from '@/app/utils/api/Verification';
 import DoctorAppointmentAPI from '@/app/utils/api/Doctor_Appoinment';
 import PharmacyAPI from '@/app/utils/api/Pharmacy';
-
+import createQueuePatientAPI from '@/app/utils/api/createQueuePatient';
 import React, { useState, useEffect } from "react";
 import { getSocket } from "@/app/utils/api/socket";
 import { Button, Typography } from 'antd';
+import { use } from 'react'; // Next.js 14+
 
 export default function Antrian({ params }) {
-  const { category } = params; // Directly destructure params
+  const { category } = use(params); // Directly destructure params
   const socket = getSocket();
   console.log(category);
   
@@ -23,11 +24,16 @@ export default function Antrian({ params }) {
   }
 
   async function handleButtonJaminan(){
+    const resp = await createQueuePatientAPI.createAntrian('jaminan');  
+    const respData = resp.data;
+    console.log("RESP",resp);
 
   }
 
    async function handleButtonUmum(){
-    
+     const resp = await createQueuePatientAPI.createAntrian('umum');  
+    const respData = resp.data;
+    console.log("RESP",resp);
   }
   return (
     <div className="bg-slate-200 h-screen min-w-screen flex flex-col ">
@@ -43,6 +49,8 @@ export default function Antrian({ params }) {
                 size='large'
                 color='primary'
                 variant='solid'
+                         onClick={() => handleButtonJaminan()}
+
                  style={{
                   padding: '75px',
                   'font-weight': 'bold',
@@ -52,6 +60,7 @@ export default function Antrian({ params }) {
                 className="uppercase w-full"
             >Resep Jaminan</Button>
          <Button
+         onClick={() => handleButtonUmum()}
                 size='large'
                 color='primary'
                 variant='solid'

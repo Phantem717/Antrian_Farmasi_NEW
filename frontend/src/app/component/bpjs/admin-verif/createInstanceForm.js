@@ -223,7 +223,7 @@ taskData);
               newLocation = "farmasi-bpjs";
             }
             else if (location == "gmcb"){
-              newLocation = "farmasi-gmcb";
+              newLocation = "farmasi-gmcb-lt1";
             }
             else if (location == "lt3"){
               newLocation = "farmasi-gmcb-lt3";

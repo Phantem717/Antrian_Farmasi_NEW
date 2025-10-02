@@ -196,10 +196,9 @@ static async updateMedicineType(NOP,status_medicine,farmasi_queue_number){
   const conn = await pool.getConnection(); // ? Explicit connection
 
     try {
-      const query = `SELECT queue_number 
+      const query = `SELECT queue_number,NOP 
 FROM Doctor_Appointments
-WHERE queue_number LIKE 'FA%' 
-ORDER BY queue_number DESC LIMIT 1
+ORDER BY NOP DESC LIMIT 1
 `;
 
       
