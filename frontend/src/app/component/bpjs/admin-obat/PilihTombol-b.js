@@ -106,7 +106,8 @@ const socket = getSocket();
               NOP : doctorResponse.data.NOP,
               waiting_pickup_medicine_stamp: queue.waiting_pickup_medicine_stamp,
               switch_WA: localStorage.getItem('waToggleState') || "true",
-              loket: selectedLoket
+              loket: selectedLoket,
+              location:location
 
           }
 

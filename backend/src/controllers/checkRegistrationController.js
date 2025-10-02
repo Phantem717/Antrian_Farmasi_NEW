@@ -1,5 +1,5 @@
 // backend_farmasi\src\controllers\barcodeController.js
-const {checkRegistrationInfo} = require('../services/checkRegistrationInfo');
+const {checkRegistrationInfo,checkRegistrationERM} = require('../services/checkRegistrationInfo');
 const {create} = require('../models/apiResponses')
 const DoctorAppointments = require('../models/doctorAppointments');
 const PharmacyTask = require('../models/pharmacyTask');
@@ -52,7 +52,29 @@ const checkRegistrationSEP= async (req, res) => {
 };
 
 
+const checkRegistrationERMController = async (req, res) => {
+    // ✅ CORRECTION 1: Read data from req.query for GET requests
+    console.log("req query", req.query); // It will log req.query now
+    const { name, mr_no } = req.query; 
+
+    if (!name || !mr_no) {
+        return res.status(400).json({ error: 'NAMA + ERM harus disediakan' });
+    }
+
+    try {
+        // Assuming checkRegistrationERM calls the external API
+        const data = await checkRegistrationERM(name, mr_no);
+        res.status(200).json(data);
+    } catch (error) {
+        console.error('Error fetching registration data:', error);
+        // Ensure the error status is 500 if it's a server issue
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
 
 
-module.exports = { checkRegistration,checkRegistrationSEP};
+
+
+
+module.exports = { checkRegistration,checkRegistrationSEP,checkRegistrationERMController};
 
