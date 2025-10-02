@@ -57,16 +57,16 @@ const Sidebar = ({lokasi, collapsed, setCollapsed, isLocation }) => {
   };
 
   
+
+  
   // Mapping URL ke key Menu
  
   const menuKeyMapping = {
     [`/login/${lokasi}/admin-verif-b`]: "1",
     [`/login/${lokasi}/admin-proses-b`]: "2",
     [`/login/${lokasi}/admin-obat-b`]: "3",
-    "/manajemen-akun": "4",
-    "/kinerja-pelayanan": "5",
-    "/login/bpjs/edit-marquee-b": "6",
-    [`/login/${lokasi}/logs`]: "8"
+    [`/login/${lokasi}/logs`]: "8",
+    [`/login/add-obat`]: "5",
   };
   // Tentukan menu yang aktif berdasarkan pathname
   const currentSelectedKey = menuKeyMapping[pathname] || "1"; // Default ke Admin Verifikasi jika tidak cocok
@@ -115,6 +115,14 @@ const Sidebar = ({lokasi, collapsed, setCollapsed, isLocation }) => {
   icon: <EditOutlined />,
   label: "Send WA",
   onClick: () => setShowWAForm(true),
+},
+ {
+  key: "5",
+  icon: <EditOutlined />,
+  label: "Add Obat GMCB",
+  disabled: lokasi == 'bpjs' ? true : false,
+  onClick: () =>         router.push(`/login/add-obat`)
+,
 },
   
     {

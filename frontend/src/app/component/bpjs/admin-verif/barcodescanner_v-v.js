@@ -109,7 +109,8 @@ export default function BarcodeScanner({location, onScanResult, handleBulkPharma
             docter: doctorResponse.data.doctor_name,
             nik: doctorResponse.data.nik || "-",
             prev_queue_number: "-",
-            switch_WA: localStorage.getItem('waToggleState') || "true"
+            switch_WA: localStorage.getItem('waToggleState') || "true",
+            location: location
 
         };
 

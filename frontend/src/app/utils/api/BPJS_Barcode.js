@@ -7,7 +7,16 @@ console.log(HOST,PORT)
 const BASE_URL = `http://${HOST}:${PORT}`; // Base URL API
 const BPJSBarcodeAPI = {
     // 1. Check Queue by Booking ID
-    
+    fetchRegistrationInfo: async (NOP) => {
+        try {
+            const payload = { registrationNo: NOP };
+            const response = await axios.post(`${BASE_URL}/api/bpjs/registration`, payload);
+            return response.data;
+        } catch (error) {
+            console.error(`❌ Error fetching registration info for Booking ID ${NOP}:`, error.response?.data || error.message);
+            throw error;
+        }
+    },
     checkQueue: async (NOP) => {
         try {
             const response = await axios.get(`${BASE_URL}/api/bpjs/barcode/check`, {
@@ -16,6 +25,7 @@ const BPJSBarcodeAPI = {
 
             // ✅ Ambil registration_no_client dari response API
             const registrationNo = response.data?.data?.detail?.registration_no_client || null;
+            console.log("REGISTRATION NO", registrationNo); 
             return { ...response.data, registrationNo };
         } catch (error) {
             console.error(`❌ Error checking queue for Booking ID ${NOP}:`, error.response?.data || error.message);

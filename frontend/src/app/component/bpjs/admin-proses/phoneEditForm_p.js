@@ -108,7 +108,8 @@ export default function BarcodeScanner({location, visible, onClose,selectedQueue
             rm: selectedQueue.medical_record_no??"-",
             tanggal_lahir:  selectedQueue.patient_date_of_birth??"-",
             queue_number: selectedQueue.queue_number ?? null,
-            switch_WA: localStorage.getItem('waToggleState')
+            switch_WA: localStorage.getItem('waToggleState'),
+            location: location
         };
 
               socket.emit('update_proses',{location});

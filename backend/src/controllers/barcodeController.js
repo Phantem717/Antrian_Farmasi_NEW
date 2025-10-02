@@ -294,7 +294,7 @@ const updateBarcodeTask = async (req, res) => {
 
 // Fungsi untuk mendapatkan registration data
 const getRegistrationData = async (req, res) => {
-  const registrationNo = req.body.registrationNo; // Karena endpoint POST, ambil dari body
+  const {registrationNo} = req.body; // Karena endpoint POST, ambil dari body
 
   if (!registrationNo) {
     return res.status(400).json({ error: 'registrationNo harus disediakan' });

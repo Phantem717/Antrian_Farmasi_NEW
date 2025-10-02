@@ -5,12 +5,12 @@ const generateSignature = require('../utils/signature');
 const password = process.env.PASSWORD ;
 const consID2 = process.env.CONS_ID_FARMASI;
 
-async function createAntrianFarmasi(medicine_type){
+async function createAntrianFarmasi(medicine_type,lokasi){
     
 try {
  
     const { timestamp, signature } = generateSignature(consID2, password);
- const url = `https://rscarolus.com/api/v1/visit/queue/pharmacy/create-queue`;
+ const url = `http://192.168.6.86/api/v1/visit/queue/pharmacy/create-queue`;
  console.log("medicine_type",medicine_type)
 // console.log("PHONE_NUMBER",phone_number);
     const response = await axios.post(
@@ -18,7 +18,7 @@ try {
       {
         queue: {
             sub_facility: medicine_type, 
-            location_id: "farmasi-bpjs"
+            location_id: lokasi
         }
       },
       {

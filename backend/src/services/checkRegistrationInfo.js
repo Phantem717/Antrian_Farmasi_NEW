@@ -94,4 +94,29 @@ async function checkRegistrationSEP(SEP) {
   }
 }
 
-module.exports = { checkRegistrationInfo,checkRegistrationSEP };
+
+
+async function checkRegistrationERM(name,mr_no) {
+  const { timestamp, signature } = generateSignature(consID2, password);
+  // regisNo = SEP.trim();
+  try {
+    const response = await axios({
+      method: 'get',
+      url: process.env.MEDIN_URL_GMCB,
+      params: { name: name, mr_no: mr_no },
+      headers: {
+        'X-cons-id': process.env.CONS_ID_FARMASI,
+        'X-Timestamp': timestamp,
+        'X-Signature': signature,
+        'Content-Type': 'application/json'
+      }
+    });
+ 
+    return response.data;
+  } catch (error) {
+    console.error('Error dalam pemanggilan API:', error);
+    throw error;
+  }
+}
+
+module.exports = { checkRegistrationInfo,checkRegistrationSEP,checkRegistrationERM };

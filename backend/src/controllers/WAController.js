@@ -2,14 +2,23 @@ const {sendWAVerif,sendWAAntrian,sendWAProses,sendWAPickup,sendWACustom} = requi
 
 const sendWAVerifController  = async (req,res) => {
     try {
-        const { phone_number, NOP, queue_number, patient_name,docter,nik,rm,sep,medicine_type,prev_queue_number, switch_WA } = req.body;
+        let { phone_number, NOP, queue_number, patient_name,docter,nik,rm,sep,medicine_type,prev_queue_number, switch_WA, location } = req.body;
       console.log("PHONE BODY",req.body);
         // Check if required fields exist
-        if (!phone_number || !NOP || !queue_number|| !patient_name || !docter || !medicine_type) {
-          return res.status(400).json({ message: "Payload incomplete. Required: phone_number, NOP, queue_number, patient_name." });
+        if(location == "bpjs"){
+          location = "Lantai 1 BPJS"
+        }
+        else if(location == "gmcb"){
+          location = "Lantai 1 GMCB"
+        }
+        else if(location == "lt3"){
+          location = "Lantai 3 GMCB"
+        }
+        if (!phone_number || !NOP || !queue_number|| !patient_name || !docter || !medicine_type || !location) {
+          return res.status(400).json({ message: "Payload incomplete. Required: phone_number, NOP, queue_number, patient_name, location." });
         }
   
-        const payload = { phone_number, NOP, queue_number, patient_name,docter,nik,rm,sep,medicine_type,prev_queue_number, switch_WA  };
+        const payload = { phone_number, NOP, queue_number, patient_name,docter,nik,rm,sep,medicine_type,prev_queue_number, switch_WA, location  };
         const data = await sendWAVerif(payload);
     
         res.status(200).json({ data });
@@ -21,14 +30,22 @@ const sendWAVerifController  = async (req,res) => {
 
 const sendWAAntrianController  = async (req,res) => {
     try {
-        const { phone_number, NOP, queue_number, patient_name,docter,nik,rm,sep,medicine_type,switch_WA } = req.body;
+        let { phone_number, NOP, queue_number, patient_name,docter,nik,rm,sep,medicine_type,switch_WA, location } = req.body;
         console.log("CHECK ANTRIAN PAYLOAD",phone_number, NOP, queue_number, patient_name,docter,nik,rm,sep,medicine_type );
         // Check if required fields exist
-        if (!phone_number || !NOP || !queue_number|| !patient_name || !docter ) {
+        if (!phone_number || !NOP || !queue_number|| !patient_name || !docter|| !location ) {
             return res.status(400).json({ message: "Payload incomplete. Required: phone_number, NOP, queue_number, patient_name." });
           }
-      
-          const payload = { phone_number, NOP, queue_number, patient_name,docter,nik,rm,sep,medicine_type ,switch_WA };
+       if(location == "bpjs"){
+          location = "Lantai 1 BPJS"
+        }
+        else if(location == "gmcb"){
+          location = "Lantai 1 GMCB"
+        }
+        else if(location == "lt3"){
+          location = "Lantai 3 GMCB"
+        }
+          const payload = { phone_number, NOP, queue_number, patient_name,docter,nik,rm,sep,medicine_type ,switch_WA,location };
         const data = await sendWAAntrian(payload);
     
         res.status(200).json({ data });
@@ -40,14 +57,22 @@ const sendWAAntrianController  = async (req,res) => {
 
     const sendWAPickupController  = async (req,res) => {
         try {
-            const { phone_number, NOP, queue_number, patient_name,docter,nik,rm,sep,medicine_type,switch_WA,loket } = req.body;
+            let { phone_number, NOP, queue_number, patient_name,docter,nik,rm,sep,medicine_type,switch_WA,loket,location } = req.body;
     
             // Check if required fields exist
-            if (!phone_number || !NOP || !queue_number|| !patient_name || !docter ||!medicine_type) {
+            if (!phone_number || !NOP || !queue_number|| !patient_name || !docter ||!medicine_type || !location) {
                 return res.status(400).json({ message: "Payload incomplete. Required: phone_number, NOP, queue_number, patient_name." });
               }
-          
-              const payload = { phone_number, NOP, queue_number, patient_name,docter,nik,rm,sep,medicine_type,switch_WA,loket  };
+           if(location == "bpjs"){
+          location = "Lantai 1 BPJS"
+        }
+        else if(location == "gmcb"){
+          location = "Lantai 1 GMCB"
+        }
+        else if(location == "lt3"){
+          location = "Lantai 3 GMCB"
+        }
+              const payload = { phone_number, NOP, queue_number, patient_name,docter,nik,rm,sep,medicine_type,switch_WA,loket,location  };
             const data = await sendWAPickup(payload);
         
             res.status(200).json({ data });
@@ -58,15 +83,23 @@ const sendWAAntrianController  = async (req,res) => {
         }
         const sendWAProsesController = async (req, res) => {
             try {
-                const { phone_number, NOP, queue_number, patient_name,docter,nik,rm,sep,medicine_type,switch_WA } = req.body;
+                let { phone_number, NOP, queue_number, patient_name,docter,nik,rm,sep,medicine_type,switch_WA,location } = req.body;
           console.log("PHONE BODY",req.body);
 
                 // Check if required fields exist
-                if (!phone_number || !NOP || !queue_number|| !patient_name || !docter || !medicine_type) {
+                if (!phone_number || !NOP || !queue_number|| !patient_name || !docter || !medicine_type || !location) {
                     return res.status(400).json({ message: "Payload incomplete. Required: phone_number, NOP, queue_number, patient_name." });
                   }
-              
-                  const payload = { phone_number, NOP, queue_number, patient_name,docter,nik,rm,sep,medicine_type,switch_WA  };
+               if(location == "bpjs"){
+          location = "Lantai 1 BPJS"
+        }
+        else if(location == "gmcb"){
+          location = "Lantai 1 GMCB"
+        }
+        else if(location == "lt3"){
+          location = "Lantai 3 GMCB"
+        }
+                  const payload = { phone_number, NOP, queue_number, patient_name,docter,nik,rm,sep,medicine_type,switch_WA,location  };
               const data = await sendWAProses(payload);
           
               res.status(200).json({ data });

@@ -188,16 +188,23 @@ const PilihAksi = ({location, selectedQueueIds = [], setSelectedQueueIds, select
     // ✅ don't drop the result with a comma
     await handleBulkStatusUpdate("completed_verification");
 
-    await Promise.all(
-      selectedQueue2.map(async (queue) => {
-        // === 1. If switching type or special TR queue, create new antrian + update type
-        if (
-          (queue.status_medicine === "Racikan" && medicineType === "Non - Racikan") ||
-          (queue.status_medicine === "Non - Racikan" && medicineType === "Racikan") ||
-          queue.queue_number.startsWith("TR-")
-        ) {
-          const antrianResp = await CreateAntrianAPI.createAntrian(medicineType);
-          const antrianNumber = antrianResp.data?.data?.queue_number;
+        selectedQueue2.map(async (queue) => {
+          
+          if((queue.status_medicine == "Racikan" && medicineType == "Non - Racikan") || (queue.status_medicine == "Non - Racikan" && medicineType == "Racikan") ||   queue.queue_number.startsWith("TR-")   // force refresh for TR queues
+){          
+            let newLocation="";
+            if(location == "bpjs"){
+                newLocation = "farmasi-bpjs";
+            }
+            else if (location == "gmcb"){
+                newLocation = "farmasi-gmcb";
+            }
+            else if (location == "lt3"){
+                newLocation = "farmasi-gmcb-lt3";
+            }
+            const antrianResp = await CreateAntrianAPI.createAntrian(medicineType,newLocation);
+            console.log("MEDTYPE",medicineType);
+            console.log("ANTRIAN RESP",antrianResp);
 
           console.log("➡️ New antrian:", antrianNumber);
 
@@ -219,6 +226,21 @@ const PilihAksi = ({location, selectedQueueIds = [], setSelectedQueueIds, select
         // === 3. Get latest doctor data after updates
         const doctorResponse = await DoctorAppointmentAPI.getAppointmentByNOP(queue.NOP);
         console.log("DOC RESP", doctorResponse);
+     
+              const payload = {
+                phone_number: doctorResponse.data.phone_number,
+                patient_name: doctorResponse.data.patient_name,
+                NOP: doctorResponse.data.NOP,
+                queue_number: doctorResponse.data.queue_number,
+                medicine_type : doctorResponse.data.status_medicine,
+                sep: doctorResponse.data.sep_no,
+                rm: doctorResponse.data.medical_record_no,
+                docter: doctorResponse.data.doctor_name,
+                nik: doctorResponse.data.nik,
+                prev_queue_number: queue.queue_number || "-",
+                switch_WA: localStorage.getItem('waToggleState') || "true",
+                location: location
+              }
 
         // === 4. Ensure medicine task exists
         await MedicineAPI.createMedicineTask({
@@ -230,19 +252,23 @@ const PilihAksi = ({location, selectedQueueIds = [], setSelectedQueueIds, select
         });
 
         // === 5. Send WA notif with the NEW medicineType
-        const payload = {
-          phone_number: doctorResponse.data.phone_number,
-          patient_name: doctorResponse.data.patient_name,
-          NOP: doctorResponse.data.NOP,
-          queue_number: doctorResponse.data.queue_number,
-          medicine_type: medicineType, // ✅ use param, not possibly stale DB value
-          sep: doctorResponse.data.sep_no,
-          rm: doctorResponse.data.medical_record_no,
-          docter: doctorResponse.data.doctor_name,
-          nik: doctorResponse.data.nik,
-          prev_queue_number: queue.queue_number || "-",
-          switch_WA: localStorage.getItem("waToggleState") || "true",
-        };
+   
+  const printPayload = {
+              
+              phone_number: doctorResponse.data.phone_number,
+              barcode: doctorResponse.data.NOP,
+              patient_name: doctorResponse.data.patient_name,
+              farmasi_queue_number: doctorResponse.data.queue_number,
+              medicine_type: doctorResponse.data.status_medicine,
+              SEP:doctorResponse.data.sep_no,
+              tanggal_lahir: new Date(queue.patient_date_of_birth).toISOString().split('T')[0],
+              queue_number: doctorResponse.data.queue_number,
+              doctor_name: queue.doctor_name,
+              lokasi: location
+            }
+            const printResp = await PrintAntrian.printAntrian(printPayload);
+            console.log("PRINT AFTER CHANGE",printResp,printPayload);
+              console.log("WA SENT",sendResponse);    
 
         console.log("WA_PAYLOAD2", payload);
         const sendResponse = await WA_API.sendWAVerif(payload);
@@ -251,19 +277,8 @@ const PilihAksi = ({location, selectedQueueIds = [], setSelectedQueueIds, select
         await new Promise((resolve) => setTimeout(resolve, 1000)); // 1s delay
 
         // === 6. Print slip with NEW medicineType
-        const printPayload = {
-          phone_number: doctorResponse.data.phone_number,
-          barcode: doctorResponse.data.NOP,
-          patient_name: doctorResponse.data.patient_name,
-          farmasi_queue_number: doctorResponse.data.queue_number,
-          medicine_type: medicineType, // ✅ enforce consistency
-          SEP: doctorResponse.data.sep_no,
-          tanggal_lahir: new Date(queue.patient_date_of_birth).toISOString().split("T")[0],
-          queue_number: doctorResponse.data.queue_number,
-          doctor_name: queue.doctor_name,
-        };
+      
 
-        const printResp = await PrintAntrian.printAntrian(printPayload);
         console.log("PRINT AFTER CHANGE", printResp, printPayload);
       })
     );
@@ -300,6 +315,7 @@ const PilihAksi = ({location, selectedQueueIds = [], setSelectedQueueIds, select
     });
   }
 };
+}
 
   const handleScanResult = (data) => {
     console.log("📡 Hasil Scan diterima:", data);
