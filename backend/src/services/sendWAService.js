@@ -248,7 +248,7 @@ async function sendWAPickup(payload){
 
       }
         console.log("TIMESTAMP",currentTime >= 20 ? true : false);
-        console.log("PHONE_NUMBER_PICKUP",payload.phone_number);
+        console.log("PHONE_NUMBER_PICKUP",payload.phone_number, location);
         if(currentTime >= 20 == true ){
           messageNext= "Terima kasih telah menunggu, Karena sudah diluar jam kerja farmasi, obat anda dapat diambil di hari berikutnya pada jam 08.00-10.00."
         }
