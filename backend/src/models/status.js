@@ -134,7 +134,7 @@ WHERE da.patient_name like ?
 AND da.lokasi = ? 
 AND da.patient_date_of_birth = ?
 ORDER BY vt.waiting_verification_stamp ASC;`;
-      const [rows] = await conn.execute(query, [`%${full_name}`,location,date_of_birth]);
+      const [rows] = await conn.execute(query, [full_name,location,date_of_birth]);
       return rows;
     } catch (error) {
       throw error;
@@ -243,7 +243,7 @@ WHERE da.patient_name like ?
   AND vt.waiting_verification_stamp IS NOT NULL
   AND da.lokasi = ?
 ORDER BY vt.waiting_verification_stamp DESC;`;
-      const [rows] = await conn.execute(query, [`%${full_name}%`,location,date_of_birth]);
+      const [rows] = await conn.execute(query, [`%${full_name}%`,date_of_birth,location]);
       return rows;
     } catch (error) {
       throw error;
