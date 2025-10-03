@@ -175,7 +175,7 @@ const getFarmasiList = async (req, res) => {
             docter:  farmasiArray.payload?.patient_date_of_birth,
             nik:  farmasiArray.payload.nik || "-",
             prev_queue_number: "-",
-            switch_WA: localStorage.getItem('waToggleState') || "true",
+            switch_WA: "true",
             location: "Lantai 1 BPJS"
 
         };
