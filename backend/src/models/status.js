@@ -70,7 +70,7 @@ ORDER BY vt.waiting_verification_stamp ASC;  -- Order by creation time for queue
      AND vt2.waiting_verification_stamp < vt.waiting_verification_stamp  -- ⬅️ Created earlier today
     ) + 1 AS current_position,
     DATE(vt.waiting_verification_stamp) as "Tanggal Antrian",
-    da.NOP ,
+    da.NOP,
     da.status_medicine
 FROM Doctor_Appointments da
 LEFT JOIN Verification_Task vt ON da.NOP = vt.NOP
@@ -160,7 +160,7 @@ ORDER BY vt.waiting_verification_stamp ASC;`;
      AND vt2.waiting_verification_stamp < vt.waiting_verification_stamp  -- ⬅️ Created earlier today
     ) + 1 AS current_position,
     DATE(vt.waiting_verification_stamp) as "Tanggal Antrian",
-    da.NOP ,
+    da.NOP,
     da.status_medicine
 FROM Doctor_Appointments da
 LEFT JOIN Verification_Task vt ON da.NOP = vt.NOP
@@ -196,7 +196,7 @@ ORDER BY vt.waiting_verification_stamp DESC;
      AND vt2.waiting_verification_stamp < vt.waiting_verification_stamp  -- ⬅️ Created earlier today
     ) + 1 AS current_position,
     DATE(vt.waiting_verification_stamp) as "Tanggal Antrian",
-    da.NOP ,
+    da.NOP,
     da.status_medicine
 FROM Doctor_Appointments da
 LEFT JOIN Verification_Task vt ON da.NOP = vt.NOP
@@ -241,7 +241,7 @@ ORDER BY da.queue_number`;
      AND vt2.waiting_verification_stamp < vt.waiting_verification_stamp
     ) + 1 AS current_position,
     DATE(vt.waiting_verification_stamp) as "Tanggal Antrian",
-    da.NOP ,
+    da.NOP,
     da.status_medicine
 FROM Doctor_Appointments da
 LEFT JOIN Verification_Task vt ON da.NOP = vt.NOP
@@ -286,7 +286,7 @@ ORDER BY vt.waiting_verification_stamp DESC;`;
      AND vt2.waiting_verification_stamp < vt.waiting_verification_stamp
     ) + 1 AS current_position,
     DATE(vt.waiting_verification_stamp) as "Tanggal Antrian",
-    da.NOP ,
+    da.NOP,
     da.status_medicine
 FROM Doctor_Appointments da
 LEFT JOIN Verification_Task vt ON da.NOP = vt.NOP
