@@ -10,7 +10,7 @@ getStatus,getPharmacyNOP,getTimestamp
 } = require('../controllers/statusController');
 
 router.post('/',authCheck, getStatus);
-router.get('/nop', authCheck, getPharmacyNOP);
-router.get('/timestamp',authCheck, getTimestamp);
+router.post('/nop', authCheck, getPharmacyNOP);
+router.post('/timestamp',authCheck, getTimestamp);
 
 module.exports = router;
