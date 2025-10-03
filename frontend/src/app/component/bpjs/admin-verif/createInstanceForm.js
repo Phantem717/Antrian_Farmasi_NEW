@@ -375,7 +375,7 @@ return (
            onChange={(e) => setInputValue(e.target.value.replace(/\s+/g, ""))}
     onKeyDown={handleBarcodeEnter} 
           />
-          <TextField
+          <TextField 
             label="Nama"
             variant="outlined"
             size="small"
