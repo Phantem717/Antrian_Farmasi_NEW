@@ -238,12 +238,12 @@ LEFT JOIN Verification_Task vt ON da.NOP = vt.NOP
 LEFT JOIN Pharmacy_Task pt ON da.NOP = pt.NOP
 LEFT JOIN Medicine_Task mt ON da.NOP = mt.NOP
 LEFT JOIN Pickup_Task pa ON da.NOP = pa.NOP
-WHERE da.patient_name = ?
+WHERE da.patient_name like ?
   AND da.patient_date_of_birth = ?
   AND vt.waiting_verification_stamp IS NOT NULL
   AND da.lokasi = ?
 ORDER BY vt.waiting_verification_stamp DESC;`;
-      const [rows] = await conn.execute(query, [full_name,location,date_of_birth]);
+      const [rows] = await conn.execute(query, [`${full_name}`,date_of_birth,location]);
       return rows;
     } catch (error) {
       throw error;
