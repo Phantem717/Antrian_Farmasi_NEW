@@ -195,13 +195,14 @@ const print = await retryOperation(
       }
 
     
-      const waResp = await sendWAAntrian()
+      const waResp = await sendWAAntrian(wa_payload);
       const data = await getAllResponses("Lantai 1 BPJS");
 
        io.emit('insert_appointment', {
 
     message: 'Doctor Created Successfully',
-    data: data
+    data: data,
+    wa: waResp
   });
     }
   
