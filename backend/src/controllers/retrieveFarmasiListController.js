@@ -179,7 +179,8 @@ const getFarmasiList = async (req, res) => {
             location: "Lantai 1 BPJS"
 
         };
-      
+            const waResp = await sendWAAntrian(wa_payload);
+            console.log("WA RESPONSE:", waResp,wa_payload);
 const print = await retryOperation(
     () => printAntrianFarmasi(printPayload),
     3, // max retries
@@ -195,7 +196,6 @@ const print = await retryOperation(
       }
 
     
-      const waResp = await sendWAAntrian(wa_payload);
       const data = await getAllResponses("Lantai 1 BPJS");
 
        io.emit('insert_appointment', {
