@@ -10,7 +10,7 @@ const { createAntrianFarmasi } = require('../services/createFarmasiQueueService'
 const { createVerificationTaskInternal } = require('./verificationTaskController');
 const { printAntrianFarmasi } = require('../services/printAntrianService');
 const { getDb } = require('../config/db');
-
+const {sendWAAntrian} = require('../services/sendWAService');
 let io;
 let shouldEmit;
 
@@ -162,6 +162,23 @@ const getFarmasiList = async (req, res) => {
         PRB: farmasiArray.payload.PRB ?? null,
         doctor_name: farmasiArray.payload.doctor_name ?? null
       }
+
+       const wa_payload = {
+
+            phone_number: farmasiArray.payload.phone_number,
+            patient_name: farmasiArray.payload.patient_name ,
+            NOP: farmasiArray.payload.NOP,
+            queue_number: farmasiArray.payload.farmasi_queue_number,
+            medicine_type: statusMedicine,
+            sep: farmasiArray.payload.sep_no,
+            rm: farmasiArray.payload.medical_record_no ,
+            docter:  farmasiArray.payload?.patient_date_of_birth,
+            nik:  farmasiArray.payload.nik || "-",
+            prev_queue_number: "-",
+            switch_WA: localStorage.getItem('waToggleState') || "true",
+            location: "Lantai 1 BPJS"
+
+        };
       
 const print = await retryOperation(
     () => printAntrianFarmasi(printPayload),
@@ -177,6 +194,8 @@ const print = await retryOperation(
         });
       }
 
+    
+      const waResp = await sendWAAntrian()
       const data = await getAllResponses("Lantai 1 BPJS");
 
        io.emit('insert_appointment', {
