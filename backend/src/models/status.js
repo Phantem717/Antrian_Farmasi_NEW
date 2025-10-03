@@ -243,7 +243,7 @@ WHERE da.patient_name like ?
   AND vt.waiting_verification_stamp IS NOT NULL
   AND da.lokasi = ?
 ORDER BY vt.waiting_verification_stamp DESC;`;
-      const [rows] = await conn.execute(query, [`${full_name}`,date_of_birth,location]);
+      const [rows] = await conn.execute(query, [`%${full_name}%`,date_of_birth,location]);
       return rows;
     } catch (error) {
       throw error;
