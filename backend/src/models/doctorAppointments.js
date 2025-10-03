@@ -210,6 +210,34 @@ ORDER BY NOP DESC LIMIT 1
     conn.release(); // ?? Critical cleanup
   }
   }
+static async getLatestAntrianJaminan(type) {
+  const pool = await getDb();
+  const conn = await pool.getConnection();
+
+  let select;
+  if (type.toLowerCase() === "jaminan") {
+    select = "queue_number LIKE 'C-%'";
+  } else {
+    select = "queue_number LIKE 'D-%'";
+  }
+
+  try {
+    const query = `
+      SELECT queue_number, NOP 
+      FROM Doctor_Appointments
+      WHERE status_medicine = ? AND ${select}
+      ORDER BY NOP DESC 
+      LIMIT 1
+    `;
+
+    const [rows] = await conn.execute(query, [type]);
+    return rows[0] || null; // safer in case no rows
+  } catch (error) {
+    throw error;
+  } finally {
+    conn.release();
+  }
+}
 
   /**
    * Menghapus record appointment berdasarkan booking_id.
