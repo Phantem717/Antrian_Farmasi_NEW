@@ -149,17 +149,15 @@ ORDER BY vt.waiting_verification_stamp ASC;`;
     try {
  // ? Explicit connection
       const query = `SELECT 
-    
-    -- ✅ Simple daily queue position
     (SELECT COUNT(*) 
      FROM Doctor_Appointments da2 
      LEFT JOIN Verification_Task vt2 ON da2.NOP = vt2.NOP
      WHERE vt2.completed_verification_stamp IS NULL
-     AND da2.lokasi = da.lokasi
-     AND DATE(vt2.waiting_verification_stamp) = DATE(vt.waiting_verification_stamp)  -- ⬅️ SAME DAY
-     AND vt2.waiting_verification_stamp < vt.waiting_verification_stamp  -- ⬅️ Created earlier today
+       AND da2.lokasi = da.lokasi
+       AND DATE(vt2.waiting_verification_stamp) = DATE(vt.waiting_verification_stamp)  -- same day
+       AND vt2.waiting_verification_stamp < vt.waiting_verification_stamp              -- earlier today
     ) + 1 AS current_position,
-    DATE(vt.waiting_verification_stamp) as "Tanggal Antrian",
+    DATE(vt.waiting_verification_stamp) AS Tanggal_Antrian,
     da.NOP,
     da.status_medicine
 FROM Doctor_Appointments da
@@ -167,10 +165,11 @@ LEFT JOIN Verification_Task vt ON da.NOP = vt.NOP
 LEFT JOIN Pharmacy_Task pt ON da.NOP = pt.NOP
 LEFT JOIN Medicine_Task mt ON da.NOP = mt.NOP
 LEFT JOIN Pickup_Task pa ON da.NOP = pa.NOP
-WHERE da.phone_number = ? AND da.patient_date_of_birth = ? AND vt.waiting_verification_stamp IS NOT NULL
-AND da.lokasi = ?
-ORDER BY vt.waiting_verification_stamp DESC;
-  -- Order by creation time for queue sequence`;
+WHERE da.phone_number = ?
+  AND da.patient_date_of_birth = ?
+  AND vt.waiting_verification_stamp IS NOT NULL
+  AND da.lokasi = ?
+ORDER BY vt.waiting_verification_stamp DESC;`;
       const [rows] = await conn.execute(query, [phone_number,date_of_birth,location]);
       return rows;
     } catch (error) {
@@ -186,16 +185,15 @@ ORDER BY vt.waiting_verification_stamp DESC;
     try {
  // ? Explicit connection
       const query = `SELECT 
-   
     (SELECT COUNT(*) 
      FROM Doctor_Appointments da2 
      LEFT JOIN Verification_Task vt2 ON da2.NOP = vt2.NOP
      WHERE vt2.completed_verification_stamp IS NULL
-     AND da2.lokasi = da.lokasi
-     AND DATE(vt2.waiting_verification_stamp) = DATE(vt.waiting_verification_stamp)  -- ⬅️ SAME DAY
-     AND vt2.waiting_verification_stamp < vt.waiting_verification_stamp  -- ⬅️ Created earlier today
+       AND da2.lokasi = da.lokasi
+       AND DATE(vt2.waiting_verification_stamp) = DATE(vt.waiting_verification_stamp)  -- same day
+       AND vt2.waiting_verification_stamp < vt.waiting_verification_stamp              -- earlier today
     ) + 1 AS current_position,
-    DATE(vt.waiting_verification_stamp) as "Tanggal Antrian",
+    DATE(vt.waiting_verification_stamp) AS Tanggal_Antrian,
     da.NOP,
     da.status_medicine
 FROM Doctor_Appointments da
@@ -203,18 +201,11 @@ LEFT JOIN Verification_Task vt ON da.NOP = vt.NOP
 LEFT JOIN Pharmacy_Task pt ON da.NOP = pt.NOP
 LEFT JOIN Medicine_Task mt ON da.NOP = mt.NOP
 LEFT JOIN Pickup_Task pa ON da.NOP = pa.NOP
-WHERE da.phone_number = ? AND da.patient_date_of_birth = ? AND vt.waiting_verification_stamp IS NOT NULL
-AND da.lokasi = ?
-ORDER BY vt.waiting_verification_stamp DESC;
-
-FROM Doctor_Appointments da
-LEFT JOIN Verification_Task vt ON da.NOP = vt.NOP
-LEFT JOIN Pharmacy_Task pt ON da.NOP = pt.NOP
-LEFT JOIN Medicine_Task mt ON da.NOP = mt.NOP
-LEFT JOIN Pickup_Task pa ON da.NOP = pa.NOP
-WHERE da.NIK = ? AND da.patient_date_of_birth = ?
-AND da.lokasi = ?
-ORDER BY da.queue_number`;
+WHERE da.nik = ?
+  AND da.patient_date_of_birth = ?
+  AND vt.waiting_verification_stamp IS NOT NULL
+  AND da.lokasi = ?
+ORDER BY vt.waiting_verification_stamp DESC;`;
       const [rows] = await conn.execute(query, [nik,date_of_birth,location]);
       return rows;
     } catch (error) {
@@ -231,16 +222,15 @@ ORDER BY da.queue_number`;
     try {
 // ? Explicit connection
       const query = `SELECT 
-  
     (SELECT COUNT(*) 
      FROM Doctor_Appointments da2 
      LEFT JOIN Verification_Task vt2 ON da2.NOP = vt2.NOP
      WHERE vt2.completed_verification_stamp IS NULL
-     AND da2.lokasi = da.lokasi
-     AND DATE(vt2.waiting_verification_stamp) = DATE(vt.waiting_verification_stamp)
-     AND vt2.waiting_verification_stamp < vt.waiting_verification_stamp
+       AND da2.lokasi = da.lokasi
+       AND DATE(vt2.waiting_verification_stamp) = DATE(vt.waiting_verification_stamp)  -- same day
+       AND vt2.waiting_verification_stamp < vt.waiting_verification_stamp              -- earlier today
     ) + 1 AS current_position,
-    DATE(vt.waiting_verification_stamp) as "Tanggal Antrian",
+    DATE(vt.waiting_verification_stamp) AS Tanggal_Antrian,
     da.NOP,
     da.status_medicine
 FROM Doctor_Appointments da
@@ -249,8 +239,9 @@ LEFT JOIN Pharmacy_Task pt ON da.NOP = pt.NOP
 LEFT JOIN Medicine_Task mt ON da.NOP = mt.NOP
 LEFT JOIN Pickup_Task pa ON da.NOP = pa.NOP
 WHERE da.patient_name like ?
-AND da.lokasi = ? 
-AND da.patient_date_of_birth = ? AND vt.waiting_verification_stamp IS NOT NULL
+  AND da.patient_date_of_birth = ?
+  AND vt.waiting_verification_stamp IS NOT NULL
+  AND da.lokasi = ?
 ORDER BY vt.waiting_verification_stamp DESC;`;
       const [rows] = await conn.execute(query, [full_name,location,date_of_birth]);
       return rows;
