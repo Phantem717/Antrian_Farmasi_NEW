@@ -26,7 +26,7 @@ const StatusAPI = {
 
     getStatusByNOP: async ( requestBody)=> {
         try {
-            const response = await axios.get(
+            const response = await axios.post(
                 `${BASE_URL}/api/status/nop`, // Your endpoint URL
                 requestBody,                       // The request body
                 {
