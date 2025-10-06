@@ -200,7 +200,7 @@ const PilihAksi = ({location, selectedQueueIds = [], setSelectedQueueIds, select
         const needsNewQueue = 
           (queue.status_medicine === "Racikan" && medicineType === "Non - Racikan") ||
           (queue.status_medicine === "Non - Racikan" && medicineType === "Racikan") ||
-          queue.queue_number?.startsWith("TR-");
+          queue.queue_number?.startsWith("TR-") || queue.queue_number.startsWith("C-") || queue.queue_number.startsWith("D-");
 
         let newQueueNumber = queue.queue_number;
 
@@ -217,12 +217,13 @@ const PilihAksi = ({location, selectedQueueIds = [], setSelectedQueueIds, select
           console.log("TEST",newLocation,medicineType);
           // Create new queue number
           const antrianResp = await CreateAntrianAPI.createAntrian(medicineType, newLocation);
-          console.log("Antrian RESP",antrianResp);
-          if (!antrianResp?.data?.data.data.queue_number) {
+          const antrianData = antrianResp.data;
+          console.log("Antrian RESP",antrianData);
+          if (!antrianData?.data?.queue_number) {
             throw new Error("Failed to create new queue number");
           }
 
-          newQueueNumber = antrianResp.data.data.data.queue_number;
+          newQueueNumber = antrianData.data.queue_number;
           console.log(`✅ New queue created: ${newQueueNumber}`);
 
           // Update with new queue number
@@ -249,14 +250,23 @@ const PilihAksi = ({location, selectedQueueIds = [], setSelectedQueueIds, select
 
         // Third: Update doctor appointment medicine status
         await DoctorAppointmentAPI.updateStatusMedicine(queue.NOP, medicineType);
-
+        let lokasi;
+        if(location == "bpjs"){
+          lokasi = "Lantai 1 BPJS"
+        }
+        else if ( location = "gmcb"){
+          lokasi = "Lantai 1 GMCB"
+        }
+        else{
+          lokasi = "Lantai 3 GMCB"
+        }
         // === 3. Create/ensure medicine task exists
         await MedicineAPI.createMedicineTask({
           NOP: queue.NOP,
           Executor: null,
           Executor_Names: null,
           status: "waiting_medicine",
-          lokasi: "Lantai 1 BPJS",
+          lokasi: lokasi,
         });
 
         // === 4. Get fresh data after all updates
@@ -272,37 +282,37 @@ const PilihAksi = ({location, selectedQueueIds = [], setSelectedQueueIds, select
 
         // === 5. Prepare payloads
         const waPayload = {
-          phone_number: doctorResponse.data.phone_number,
+          phone_number: doctorResponse.data.phone_number || "-",
           patient_name: doctorResponse.data.patient_name,
           NOP: doctorResponse.data.NOP,
           queue_number: doctorResponse.data.queue_number || newQueueNumber,
           medicine_type: medicineType, // Use the new medicine type
-          sep: doctorResponse.data.sep_no,
-          rm: doctorResponse.data.medical_record_no,
-          docter: doctorResponse.data.doctor_name,
-          nik: doctorResponse.data.nik,
+          sep: doctorResponse.data.sep_no || "-",
+          rm: doctorResponse.data.medical_record_no || "-",
+          docter: doctorResponse.data.doctor_name || "-",
+          nik: doctorResponse.data.nik || "-",
           prev_queue_number: queue.queue_number || "-",
           switch_WA: localStorage.getItem('waToggleState') || "true",
           location: location
         };
 
         const printPayload = {
-          phone_number: doctorResponse.data.phone_number,
+          phone_number: doctorResponse.data.phone_number || "-",
           barcode: doctorResponse.data.NOP,
-          patient_name: doctorResponse.data.patient_name,
+          patient_name: doctorResponse.data.patient_name ||"-",
           farmasi_queue_number: doctorResponse.data.queue_number || newQueueNumber,
           medicine_type: medicineType, // Use the new medicine type
-          SEP: doctorResponse.data.sep_no,
+          SEP: doctorResponse.data.sep_no || "-",
           tanggal_lahir: queue.patient_date_of_birth 
             ? new Date(queue.patient_date_of_birth).toISOString().split('T')[0]
-            : "",
+            : null,
           queue_number: doctorResponse.data.queue_number || newQueueNumber,
-          doctor_name: doctorResponse.data.doctor_name || queue.doctor_name,
+          doctor_name: doctorResponse.data.doctor_name || "-",
           lokasi: location
         };
 
         // === 6. Send WA notification
-        console.log("Sending WA notification:", waPayload);
+        console.log("Sending WA notification:", waPayload, printPayload);
         const sendResponse = await WA_API.sendWAVerif(waPayload);
         console.log("WA sent:", sendResponse);
 

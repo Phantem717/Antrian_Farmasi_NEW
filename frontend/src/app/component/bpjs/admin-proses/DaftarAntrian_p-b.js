@@ -66,7 +66,7 @@ useEffect(() => {
                 response = await MedicineAPI.getMedicineToday(location);
 
             }
-            console.log("RESP",response, response.data[0].isPaid, typeof response.data[0].isPaid,Number(response.data[0].isPaid) === 1 );
+            console.log("RESP",response);
             processQueue(response);
         } catch (error) {
             console.error("Gagal mengambil data antrian:", error);

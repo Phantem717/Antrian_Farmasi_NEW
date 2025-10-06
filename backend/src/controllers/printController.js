@@ -6,7 +6,7 @@ try {
     console.log("PRINT DATA",data);
     let dataPrint;
     if(data.queue_number.startsWith("RC") || data.queue_number.startsWith("NR")){
- if(!data.phone_number|| !data.barcode || !data.patient_name  || !data.medicine_type || !data.SEP || !data.tanggal_lahir || !data.queue_number || !data.lokasi){
+ if(!data.phone_number|| !data.barcode || !data.patient_name  || !data.medicine_type || !data.queue_number || !data.lokasi){
         return res.status(400).json({ message: "Payload incomplete. Required: phone_number, booking_id, queue_number, patient_name." });
 
     }
