@@ -12,7 +12,8 @@ const {
   getLatestAntrian,
   updateMedicineType,
   getAllAppointmentsByLocation,
-  updatePhoneNumber
+  updatePhoneNumber,
+  updateTotalMedicineController
 } = require('../controllers/doctorAppointmentsController');
     
 // Endpoint untuk membuat appointment baru
@@ -30,6 +31,7 @@ router.get('/', getAllAppointments);
 // Endpoint untuk memperbarui appointment berdasarkan NOP
 router.put('/:NOP', updateAppointment);
 router.put('/:NOP/phone_number', updatePhoneNumber);
+router.put('/:NOP/total_medicine', updateTotalMedicineController);
 
 router.put('/type/:NOP',updateMedicineType);
 router.patch('/:NOP/status_medicine', updateStatusMedicine);

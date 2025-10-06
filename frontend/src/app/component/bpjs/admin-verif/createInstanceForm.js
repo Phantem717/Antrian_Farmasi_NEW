@@ -170,13 +170,27 @@ const barcode = inputValue.replace(/\s+/g, ""); // Removes ALL whitespace
       location: location,
     };
 
-  const [doctorAppointment, pharmacyData] = await Promise.all([
-  DoctorAppointmentAPI.createAppointment(appointmentData),
-  PharmacyAPI.createPharmacyTask(pharmacyPayload)
-]);
-// then verification, since it depends on pharmacy
-const verificationData = await VerificationAPI.createVerificationTask(
-taskData);
+    let doctorAppointment;
+    let pharmacyData;
+    let verificationData;
+
+    const [checkDoctorAppointment,checkPharmacyData,checkVerifData] = await Promise.all([
+      DoctorAppointmentAPI.getAppointmentByNOP(appointmentData.NOP),
+      PharmacyAPI.getPharmacyTaskByNOP(pharmacyPayload.NOP),
+      VerificationAPI.getVerificationTaskByNOP(taskData.NOP)
+    ]);
+
+    if(checkDoctorAppointment.length < 0 ){
+       doctorAppointment = await DoctorAppointmentAPI.createAppointment(appointmentData)
+    }
+
+    if(checkPharmacyData.length < 0){
+      pharmacyData = await PharmacyAPI.createPharmacyTask(pharmacyPayload)
+  }
+    if(checkVerifData.length < 0){
+      verificationData = await VerificationAPI.createVerificationTask(taskData)
+  }
+
     return { doctorAppointment, pharmacyData, verificationData };
   }
   async function checkRegistration(inputValue){

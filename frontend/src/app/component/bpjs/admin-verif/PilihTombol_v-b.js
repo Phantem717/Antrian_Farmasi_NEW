@@ -168,7 +168,7 @@ const PilihAksi = ({location, selectedQueueIds = [], setSelectedQueueIds, select
 
   };
 
- const handleBulkPharmacyUpdate = async (medicineType) => {
+  const handleBulkPharmacyUpdate = async (medicineType) => {
   if (selectedQueue2.length === 0) {
     Swal.fire({
       icon: "warning",
@@ -185,59 +185,98 @@ const PilihAksi = ({location, selectedQueueIds = [], setSelectedQueueIds, select
   try {
     console.log("📡 Bulk update:", selectedQueue2, "->", medicineType);
 
-    // ✅ Complete status first
-    await handleBulkStatusUpdate("completed_verification");
+    // ✅ Track success/failure
+    const results = {
+      success: [],
+      failed: []
+    };
 
-    // ✅ Process each queue item
-    await Promise.all(
-      selectedQueue2.map(async (queue) => {
-        // === 1. Check if medicine type changed or is TR queue
-        if (
-          (queue.status_medicine == "Racikan" && medicineType == "Non - Racikan") ||
-          (queue.status_medicine == "Non - Racikan" && medicineType == "Racikan") ||
-          queue.queue_number.startsWith("TR-") // force refresh for TR queues
-        ) {
-          let newLocation = "";
-          if (location == "bpjs") {
-            newLocation = "farmasi-bpjs";
-          } else if (location == "gmcb") {
-            newLocation = "farmasi-gmcb";
-          } else if (location == "lt3") {
-            newLocation = "farmasi-gmcb-lt3";
-          }
+    // ✅ Process each queue item sequentially to avoid race conditions
+    for (const queue of selectedQueue2) {
+      try {
+        console.log(`Processing queue: ${queue.NOP} (${queue.queue_number})`);
+
+        // === 1. Determine if we need a new queue number
+        const needsNewQueue = 
+          (queue.status_medicine === "Racikan" && medicineType === "Non - Racikan") ||
+          (queue.status_medicine === "Non - Racikan" && medicineType === "Racikan") ||
+          queue.queue_number?.startsWith("TR-");
+
+        let newQueueNumber = queue.queue_number;
+
+        if (needsNewQueue) {
+          // Map location correctly
+          const locationMap = {
+            "bpjs": "farmasi-bpjs",
+            "gmcb": "farmasi-gmcb",
+            "lt3": "farmasi-gmcb-lt3"
+          };
           
+          const newLocation = locationMap[location] || "farmasi-bpjs";
+          console.log(`Creating new queue for location: ${newLocation}`);
+
+          // Create new queue number
           const antrianResp = await CreateAntrianAPI.createAntrian(medicineType, newLocation);
-          console.log("MEDTYPE", medicineType);
-          console.log("ANTRIAN RESP", antrianResp);
+          
+          if (!antrianResp?.data?.queue_number) {
+            throw new Error("Failed to create new queue number");
+          }
 
-          const antrianNumber = antrianResp.data.queue_number; // ✅ Fixed: define variable
-          console.log("➡️ New antrian:", antrianNumber);
+          newQueueNumber = antrianResp.data.queue_number;
+          console.log(`✅ New queue created: ${newQueueNumber}`);
 
+          // Update with new queue number
           await DoctorAppointmentAPI.updateMedicineType(
             queue.NOP,
             medicineType,
-            antrianNumber
+            newQueueNumber
           );
         }
 
-        // === 2. Always update pharmacy + doctor tables
+        // === 2. Update all statuses (order matters!)
+        
+        // First: Update verification status
+        await updateButtonStatus(queue.NOP, "completed_verification");
+        
+        // Wait a bit to ensure DB update completes
+        await new Promise(resolve => setTimeout(resolve, 300));
+
+        // Second: Update pharmacy status
         await PharmacyAPI.updatePharmacyTask(queue.NOP, {
           status: "waiting_medicine",
           medicine_type: medicineType,
         });
 
+        // Third: Update doctor appointment medicine status
         await DoctorAppointmentAPI.updateStatusMedicine(queue.NOP, medicineType);
 
-        // === 3. Get latest doctor data after updates
-        const doctorResponse = await DoctorAppointmentAPI.getAppointmentByNOP(queue.NOP);
-        console.log("DOC RESP", doctorResponse);
+        // === 3. Create/ensure medicine task exists
+        await MedicineAPI.createMedicineTask({
+          NOP: queue.NOP,
+          Executor: null,
+          Executor_Names: null,
+          status: "waiting_medicine",
+          lokasi: "Lantai 1 BPJS",
+        });
 
-        const payload = {
+        // === 4. Get fresh data after all updates
+        await new Promise(resolve => setTimeout(resolve, 300));
+        
+        const doctorResponse = await DoctorAppointmentAPI.getAppointmentByNOP(queue.NOP);
+        
+        if (!doctorResponse?.data) {
+          throw new Error("Failed to fetch updated appointment data");
+        }
+
+        console.log("Updated doctor data:", doctorResponse.data);
+
+        // === 5. Prepare payloads
+        const waPayload = {
           phone_number: doctorResponse.data.phone_number,
           patient_name: doctorResponse.data.patient_name,
           NOP: doctorResponse.data.NOP,
-          queue_number: doctorResponse.data.queue_number,
-          medicine_type: doctorResponse.data.status_medicine,
+          queue_number: doctorResponse.data.queue_number || newQueueNumber,
+          medicine_type: medicineType, // Use the new medicine type
           sep: doctorResponse.data.sep_no,
           rm: doctorResponse.data.medical_record_no,
           docter: doctorResponse.data.doctor_name,
@@ -247,61 +286,86 @@ const PilihAksi = ({location, selectedQueueIds = [], setSelectedQueueIds, select
           location: location
         };
 
-        // === 4. Ensure medicine task exists
-        await MedicineAPI.createMedicineTask({
-          NOP: queue.NOP,
-          Executor: null,
-          Executor_Names: null,
-          status: "waiting_medicine",
-          lokasi: "Lantai 1 BPJS",
-        });
-
-        // === 5. Send WA notification
         const printPayload = {
           phone_number: doctorResponse.data.phone_number,
           barcode: doctorResponse.data.NOP,
           patient_name: doctorResponse.data.patient_name,
-          farmasi_queue_number: doctorResponse.data.queue_number,
-          medicine_type: doctorResponse.data.status_medicine,
+          farmasi_queue_number: doctorResponse.data.queue_number || newQueueNumber,
+          medicine_type: medicineType, // Use the new medicine type
           SEP: doctorResponse.data.sep_no,
-          tanggal_lahir: new Date(queue.patient_date_of_birth).toISOString().split('T')[0],
-          queue_number: doctorResponse.data.queue_number,
-          doctor_name: queue.doctor_name,
+          tanggal_lahir: queue.patient_date_of_birth 
+            ? new Date(queue.patient_date_of_birth).toISOString().split('T')[0]
+            : "",
+          queue_number: doctorResponse.data.queue_number || newQueueNumber,
+          doctor_name: doctorResponse.data.doctor_name || queue.doctor_name,
           lokasi: location
         };
 
-        console.log("WA_PAYLOAD2", payload);
-        const sendResponse = await WA_API.sendWAVerif(payload);
-        console.log("WA SENT", sendResponse);
+        // === 6. Send WA notification
+        console.log("Sending WA notification:", waPayload);
+        const sendResponse = await WA_API.sendWAVerif(waPayload);
+        console.log("WA sent:", sendResponse);
 
-        await new Promise((resolve) => setTimeout(resolve, 1000)); // 1s delay
+        // Delay before printing
+        await new Promise(resolve => setTimeout(resolve, 1000));
 
-        // === 6. Print slip with NEW medicineType
+        // === 7. Print slip
+        console.log("Printing slip:", printPayload);
         const printResp = await PrintAntrian.printAntrian(printPayload);
-        console.log("PRINT AFTER CHANGE", printResp, printPayload);
-      })
-    ); // ✅ Fixed: properly close Promise.all
+        console.log("Print response:", printResp);
 
-    // === 7. Reset selections
-    setSelectedQueue2([]);
-    setSelectedQueueIds([]);
+        results.success.push(queue.NOP);
+        
+      } catch (error) {
+        console.error(`❌ Error processing ${queue.NOP}:`, error);
+        results.failed.push({
+          NOP: queue.NOP,
+          queue_number: queue.queue_number,
+          error: error.message
+        });
+      }
+    }
 
-    // === 8. Refresh displays
-    socket.emit("update_proses", { location });
-    socket.emit("update_verif", { location });
-    socket.emit("update_display", { location });
+    // === 8. Reset selections only if at least one succeeded
+    if (results.success.length > 0) {
+      setSelectedQueue2([]);
+      setSelectedQueueIds([]);
 
-    Swal.fire({
-      icon: "success",
-      title: `Berhasil memperbarui ${selectedQueue2.length} antrian ke status ${medicineType}`,
-      toast: true,
-      position: "top-end",
-      showConfirmButton: false,
-      timer: 2500,
-      timerProgressBar: true,
-    });
+      // === 9. Emit socket events with delay to ensure updates propagate
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      socket.emit("update_proses", { location });
+      socket.emit("update_verif", { location });
+      socket.emit("update_display", { location });
+    }
+
+    // === 10. Show results
+    if (results.failed.length === 0) {
+      Swal.fire({
+        icon: "success",
+        title: `Berhasil memperbarui ${results.success.length} antrian ke ${medicineType}`,
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 2500,
+        timerProgressBar: true,
+      });
+    } else {
+      Swal.fire({
+        icon: "warning",
+        title: `Berhasil: ${results.success.length}, Gagal: ${results.failed.length}`,
+        html: `
+          <div style="text-align: left; max-height: 200px; overflow-y: auto;">
+            <strong>Gagal:</strong><br/>
+            ${results.failed.map(f => `${f.queue_number} (${f.NOP}): ${f.error}`).join('<br/>')}
+          </div>
+        `,
+        confirmButtonText: "OK"
+      });
+    }
+
   } catch (error) {
-    console.error("❌ Error saat memperbarui status RACIKAN/NON-RACIKAN:", error);
+    console.error("❌ Critical error in bulk pharmacy update:", error);
     Swal.fire({
       icon: "error",
       title: "Gagal memperbarui data!",
