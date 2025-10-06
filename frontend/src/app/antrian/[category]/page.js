@@ -20,20 +20,81 @@ export default function Antrian({ params }) {
   console.log(category);
   
   async function insertAll(payload){
-    
+    console.log("PAYLOAD",payload);
+     const appointmentData = {
+      queue_number: payload.queue_number,
+      patient_name: payload.patient_name,
+      status_medicine: payload.statusMedicine,
+      lokasi: payload.lokasi,
+      farmasi_queue_number: payload.farmasi_queue_number,
+      NOP: payload.NOP,
+        sep_no: "-",
+      queue_number: "-",
+      queue_status: "-",
+      queue_type: "-",
+      patient_name: "-",
+      medical_record_no: "-",
+      patient_date_of_birth: "-",
+      phone_number: "-",
+      doctor_name: "-",
+      nik: "-",
+      PRB: "-",
+      total_medicine:  "-"
+    };
+
+    const pharmacyPayload = {
+      NOP: payload.NOP,
+      status: "waiting_verification",
+      medicine_type: payload.statusMedicine,
+      lokasi: payload.lokasi,
+    };
+
+    const taskData = {
+      NOP: payload.NOP,
+      Executor: "-",
+      Executor_Names: "-",
+      status: null,
+      location: payload.lokasi,
+    };
+
+  const [doctorAppointment, pharmacyData] = await Promise.all([
+  DoctorAppointmentAPI.createAppointment(appointmentData),
+  PharmacyAPI.createPharmacyTask(pharmacyPayload)
+]);
+// then verification, since it depends on pharmacy
+const verificationData = await VerificationAPI.createVerificationTask(
+taskData);
+    return { doctorAppointment, pharmacyData, verificationData };
   }
 
   async function handleButtonJaminan(){
     const resp = await createQueuePatientAPI.createAntrian('jaminan');  
-    const respData = resp.data;
     console.log("RESP",resp);
-
+const payload = {
+      NOP: resp.queue_number,
+      queue_number: resp.queue_number,
+      farmasi_queue_number: resp.farmasi_queue_number,
+      statusMedicine: "Jaminan",
+      lokasi: category
+    }
+    const insertResp = await insertAll(payload);
+    console.log("RESP",resp, insertResp);
+   
   }
 
    async function handleButtonUmum(){
      const resp = await createQueuePatientAPI.createAntrian('umum');  
+
     const respData = resp.data;
-    console.log("RESP",resp);
+    const payload = {
+      NOP: resp.queue_number,
+      queue_number: resp.queue_number,
+      farmasi_queue_number: resp.farmasi_queue_number,
+      statusMedicine: "Umum",
+      lokasi: category
+    }
+    const insertResp = await insertAll(payload);
+    console.log("RESP",resp, insertResp);
   }
   return (
     <div className="bg-slate-200 h-screen min-w-screen flex flex-col ">
