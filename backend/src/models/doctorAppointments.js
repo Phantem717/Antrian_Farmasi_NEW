@@ -257,6 +257,26 @@ static async getLatestAntrianJaminan(type) {
     conn.release(); // ?? Critical cleanup
   }
   }
+  static async updateTotalMedicine(NOP, total_medicine) {
+    const pool = await getDb();
+    const conn = await pool.getConnection(); // ? Explicit connection
+  
+      try {
+        const query = `
+          UPDATE Doctor_Appointments 
+          SET total_medicine = ?
+          WHERE NOP = ?
+        `;
+        const values = [total_medicine, NOP];
+  
+        const [result] = await conn.execute(query, values);
+        return result;
+      } catch (error) {
+        throw error;
+      }finally {
+      conn.release(); // ?? Critical cleanup
+    }
+  }
 
   
 

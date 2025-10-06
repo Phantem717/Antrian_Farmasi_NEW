@@ -278,6 +278,37 @@ const updatePhoneNumber = async (req,res)=>{
     });
   }
 }
+
+const updateTotalMedicineController = async (req,res)=>{
+  try {
+    const NOP = req.params.NOP;
+    const { total_medicine } = req.body;
+
+    // console.log("DATA UPDATE TYPE", status_medicine,NOP,farmasi_queue_number);
+    if (!total_medicine) {
+      return res.status(400).json({ message: "status_medicine is required" });
+    }
+
+    const result = await DoctorAppointment.updateTotalMedicine(NOP,total_medicine);
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: 'Appointment not found or no changes made' });
+    }
+
+    // const io = require('socketio');
+    
+
+    res.status(200).json({
+      message: 'Status medicine updated successfully',
+      data: result
+    });
+  } catch (error) {
+    console.error('Error updating status medicine:', error);
+    res.status(500).json({ 
+      message: 'Failed to update status medicine', 
+      error: error.message 
+    });
+  }
+}
 module.exports = {
   createAppointment,
   getAllAppointments,
@@ -288,5 +319,6 @@ module.exports = {
   getLatestAntrian,
   updateMedicineType,
   updatePhoneNumber,
-  getAllAppointmentsByLocation
+  getAllAppointmentsByLocation,
+  updateTotalMedicineController
 };

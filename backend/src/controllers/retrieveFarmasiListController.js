@@ -10,7 +10,7 @@ const { createAntrianFarmasi } = require('../services/createFarmasiQueueService'
 const { createVerificationTaskInternal } = require('./verificationTaskController');
 const { printAntrianFarmasi } = require('../services/printAntrianService');
 const { getDb } = require('../config/db');
-
+const {sendWAAntrian} = require('../services/sendWAService');
 let io;
 let shouldEmit;
 
@@ -162,28 +162,47 @@ const getFarmasiList = async (req, res) => {
         PRB: farmasiArray.payload.PRB ?? null,
         doctor_name: farmasiArray.payload.doctor_name ?? null
       }
-      
-// const print = await retryOperation(
-//     () => printAntrianFarmasi(printPayload),
-//     3, // max retries
-//     1000 // initial delay (will increase exponentially)
-//   );
-      // const print = await printAntrianFarmasi(printPayload);
+
+       const wa_payload = {
+
+            phone_number: farmasiArray.payload.phone_number,
+            patient_name: farmasiArray.payload.patient_name ,
+            NOP: farmasiArray.payload.NOP,
+            queue_number: farmasiArray.payload.farmasi_queue_number,
+            medicine_type: statusMedicine,
+            sep: farmasiArray.payload.sep_no,
+            rm: farmasiArray.payload.medical_record_no ,
+            docter:  farmasiArray.payload?.patient_date_of_birth,
+            nik:  farmasiArray.payload.nik || "-",
+            prev_queue_number: "-",
+            switch_WA: "true",
+            location: "Lantai 1 BPJS"
+
+        };
+            const waResp = await sendWAAntrian(wa_payload);
+            console.log("WA RESPONSE:", waResp,wa_payload);
+const print = await retryOperation(
+    () => printAntrianFarmasi(printPayload),
+    3, // max retries
+    1000 // initial delay (will increase exponentially)
+  );
       await new Promise(resolve => setTimeout(resolve, 2000)); // 1-second delay
 
       
-      // if (print.success == false) {
-      //   io.emit('print_error', {
-      //     message: 'Print Error'
-      //   });
-      // }
+      if (print.success == false) {
+        io.emit('print_error', {
+          message: 'Print Error'
+        });
+      }
 
+    
       const data = await getAllResponses("Lantai 1 BPJS");
 
        io.emit('insert_appointment', {
 
     message: 'Doctor Created Successfully',
-    data: data
+    data: data,
+    wa: waResp
   });
     }
   
