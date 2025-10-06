@@ -8,6 +8,7 @@ console.log("TYPEBE",type);
 let number;
 let queue_number;
 let nop_date;
+let queue_symbol;
 
 if(!type){
     return res.status(400).json({ message: "type not found" });
@@ -18,10 +19,10 @@ if(type != "jaminan" && type != "umum"){
 }
 
 if(type == "jaminan"){
-    type = "C";
+    queue_symbol = "C";
 }
 else if(type == "umum"){
-    type = "D";
+    queue_symbol = "D";
 }
 
 const formatted = date.getFullYear().toString() +
@@ -29,24 +30,24 @@ const formatted = date.getFullYear().toString() +
   String(date.getDate()).padStart(2, '0');
 
 console.log("DATE", formatted); // e.g. 20251002
-
+const NOPQueue = await Doctor_Appoinment.getLatestAntrian();
 const latestQueue = await Doctor_Appoinment.getLatestAntrianJaminan(type);
 console.log("latestQueue", latestQueue);
 
-if(!latestQueue){
-    queue_number = `${type}-001`;
+if(!latestQueue || latestQueue.queue_number == "-"){
+    queue_number = `${queue_symbol}-001`;
 
 }
 else{
-nop_date = latestQueue.NOP.split("/")[1];
-
+nop_date = NOPQueue.NOP.split("/")[1];
+console.log("NOP DATE",nop_date,formatted);
 if (nop_date == formatted) {
 number = parseInt(latestQueue.queue_number.split("-")[1],10)+ 1 ;
 console.log("NUM",number);
-queue_number = `${type}-${String(number).padStart(3, '0')}`;
+queue_number = `${queue_symbol}-${String(number).padStart(3, '0')}`;
 }
 else{
-        queue_number = `${type}-001`;
+        queue_number = `${queue_symbol}-001`;
 
 }
 }

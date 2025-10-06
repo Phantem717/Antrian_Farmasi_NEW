@@ -26,21 +26,22 @@ export default function Antrian({ params }) {
       patient_name: payload.patient_name,
       status_medicine: payload.statusMedicine,
       lokasi: payload.lokasi,
-      farmasi_queue_number: payload.farmasi_queue_number,
+      farmasi_queue_number: payload.queue_number,
       NOP: payload.NOP,
         sep_no: "-",
-      queue_number: "-",
       queue_status: "-",
       queue_type: "-",
       patient_name: "-",
       medical_record_no: "-",
-      patient_date_of_birth: "-",
+      patient_date_of_birth: null,
       phone_number: "-",
       doctor_name: "-",
       nik: "-",
       PRB: "-",
-      total_medicine:  "-"
+      total_medicine:  0
     };
+
+    console.log("APP_DATA",appointmentData);
 
     const pharmacyPayload = {
       NOP: payload.NOP,
@@ -70,10 +71,16 @@ taskData);
   async function handleButtonJaminan(){
     const resp = await createQueuePatientAPI.createAntrian('jaminan');  
     console.log("RESP",resp);
-const payload = {
-      NOP: resp.queue_number,
+    const date = new Date();
+    const date_today =  date.getFullYear().toString() +
+  String(date.getMonth() + 1).padStart(2, '0') +
+  String(date.getDate()).padStart(2, '0');
+  
+    let new_NOP = `NOP/${date_today}/${resp.queue_number}`;
+    const payload = {
+      NOP: new_NOP,
       queue_number: resp.queue_number,
-      farmasi_queue_number: resp.farmasi_queue_number,
+      farmasi_queue_number: resp.queue_number,
       statusMedicine: "Jaminan",
       lokasi: category
     }
@@ -84,12 +91,17 @@ const payload = {
 
    async function handleButtonUmum(){
      const resp = await createQueuePatientAPI.createAntrian('umum');  
+    console.log("RESP",resp);
+    const date = new Date();
+    const date_today =  date.getFullYear().toString() +
+  String(date.getMonth() + 1).padStart(2, '0') +
+  String(date.getDate()).padStart(2, '0');
 
-    const respData = resp.data;
+    let new_NOP = `NOP/${date_today}/${resp.queue_number}`;
     const payload = {
-      NOP: resp.queue_number,
+      NOP: new_NOP,
       queue_number: resp.queue_number,
-      farmasi_queue_number: resp.farmasi_queue_number,
+      farmasi_queue_number: resp.queue_number,
       statusMedicine: "Umum",
       lokasi: category
     }

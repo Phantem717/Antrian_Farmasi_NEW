@@ -213,19 +213,14 @@ ORDER BY NOP DESC LIMIT 1
 static async getLatestAntrianJaminan(type) {
   const pool = await getDb();
   const conn = await pool.getConnection();
-
+  console.log("TYPE MODEL",type);
   let select;
-  if (type.toLowerCase() === "jaminan") {
-    select = "queue_number LIKE 'C-%'";
-  } else {
-    select = "queue_number LIKE 'D-%'";
-  }
-
+  
   try {
     const query = `
-      SELECT queue_number, NOP 
+      SELECT queue_number
       FROM Doctor_Appointments
-      WHERE status_medicine = ? AND ${select}
+      WHERE LOWER(status_medicine) = LOWER(?)
       ORDER BY NOP DESC 
       LIMIT 1
     `;

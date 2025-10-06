@@ -34,7 +34,7 @@ try {
     console.log("ANRIAN RESPONSE:", response.data);
     return response.data;
 } catch (error) {
-    console.error('Error Printing:', error.message);
+    console.error('Error QUEUE:', error.message);
     throw error;
 }
 }

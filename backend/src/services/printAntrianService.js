@@ -6,7 +6,84 @@ const password = process.env.PASSWORD ;
 const consID2 = process.env.CONS_ID_FARMASI;
 
 async function printAntrianFarmasi(payload){
+   let PRB= "";
+ if(payload.PRB != null && !payload.PRB.includes("Potensi")){
+  PRB = "PRB";
+ }
+ 
+    const templates = {
+  umum: (payload) => ({
+    judul: {
+      judultext: `Farmasi ${payload.lokasi}`,
+      queuenumber: payload.queue_number
+    },
+    content: {
+      "Tanggal lahir": payload.tanggal_lahir,
+      "Tipe Obat": payload.medicine_type,
+      Nama: payload.patient_name,
+      "Doctor Name": payload.doctor_name,
+      "Kode Reservasi": payload.barcode,
+      qrcodedata: payload.barcode
+    },
     
+    footer: {
+      footer_info: "Melayani dari Hati membangkitkan harapan"
+    }
+  }),
+
+  bpjs: (payload) => ({
+    judul: {
+      judultext: `Farmasi ${payload.lokasi}`,
+      queuenumber: payload.queue_number
+    },
+    content: {
+      "Tanggal lahir": payload.tanggal_lahir,
+      "No SEP": payload.SEP,
+      "Tipe Obat": payload.medicine_type,
+      Nama: payload.patient_name,
+      "Doctor Name": payload.doctor_name,
+      "Kode Reservasi": payload.barcode,
+      qrcodedata: payload.barcode
+    },
+    Note: {
+      remarks_info: PRB
+    },
+    footer: {
+      footer_info: "Melayani dari Hati membangkitkan harapan"
+    }
+  }),
+
+  manual: (payload) => ({
+    judul: {
+      judultext: `Farmasi ${payload.lokasi}`,
+      queuenumber: payload.queue_number
+    },
+    content: {
+      "Kode Reservasi": payload.barcode,
+      qrcodedata: payload.barcode
+    },
+   
+    footer: {
+      footer_info: "Melayani dari Hati membangkitkan harapan"
+    }
+  })
+};
+
+let htmlContent;
+
+if(payload.lokasi == "Lantai 1 BPJS"){
+  htmlContent = templates.bpjs(payload);
+}
+
+else{
+  if(payload.queue_number.startsWith("RC") || payload.queue_number.startsWith("NR")){ 
+  htmlContent = templates.umum(payload);
+}
+
+else{
+  htmlContent = templates.manual(payload);
+}
+}
 try {
     const { timestamp, signature } = generateSignature(consID2, password);
  const url = `http://192.168.6.86/api/v1/visit/queue/pharmacy/cetak`;
@@ -31,11 +108,7 @@ if(payload.medicine_type == "Racikan" || payload.queue_number.startsWith("RC")){
  }
 }
  
- let PRB= "";
- if(payload.PRB != null && !payload.PRB.includes("Potensi")){
-  PRB = "PRB";
- }
- 
+
 // console.log("PHONE_NUMBER",phone_number);
     const response = await axios.post(
       url,
@@ -44,35 +117,29 @@ if(payload.medicine_type == "Racikan" || payload.queue_number.startsWith("RC")){
           printerIp: urlprinter,
           printerPort: 9100
         },
-        htmlContent: {
-          judul: {
-            judultext: `Farmasi ${payload.lokasi}`,
-            queuenumber: payload.queue_number
-          },
-          content: {
-            // nama: payload.patient_name,
-            // no_telp: payload.phone_number,
-            // id: payload.farmasi_queue_number,
-            // qrcodedata:payload.barcode
-            // "Antrian Farmasi": payload.farmasi_queue_number,
-            "Tanggal lahir": payload.tanggal_lahir,
-            "No SEP": payload.SEP,
-            "Tipe Obat" : payload.medicine_type,
-            Nama : payload.patient_name,
-            "Doctor Name": payload.doctor_name,
-            // "No Antrian" : payload.queue_number,
-            "Kode Reservasi" : payload.barcode,
-            qrcodedata:payload.barcode,
-
-    //   base64Barcode: payload.barcode
-          },
-          Note: {
-            remarks_info: PRB
-          },
-          footer: {
-            footer_info: "Melayani dari Hati membangkitkan harapan"
-          }
-        }
+        htmlContent
+        // htmlContent: {
+        //   judul: {
+        //     judultext: `Farmasi ${payload.lokasi}`,
+        //     queuenumber: payload.queue_number
+        //   },
+        //   content: {
+       
+        //     "Tanggal lahir": payload.tanggal_lahir,
+        //     "No SEP": payload.SEP,
+        //     "Tipe Obat" : payload.medicine_type,
+        //     Nama : payload.patient_name,
+        //     "Doctor Name": payload.doctor_name,
+        //     "Kode Reservasi" : payload.barcode,
+        //     qrcodedata:payload.barcode,
+        //   },
+        //   Note: {
+        //     remarks_info: PRB
+        //   },
+        //   footer: {
+        //     footer_info: "Melayani dari Hati membangkitkan harapan"
+        //   }
+        // }
       },
       {
         headers: {

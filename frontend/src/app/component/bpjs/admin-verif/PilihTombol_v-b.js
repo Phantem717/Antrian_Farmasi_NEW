@@ -208,21 +208,21 @@ const PilihAksi = ({location, selectedQueueIds = [], setSelectedQueueIds, select
           // Map location correctly
           const locationMap = {
             "bpjs": "farmasi-bpjs",
-            "gmcb": "farmasi-gmcb",
+            "gmcb": "farmasi-gmcb-lt1",
             "lt3": "farmasi-gmcb-lt3"
           };
           
           const newLocation = locationMap[location] || "farmasi-bpjs";
           console.log(`Creating new queue for location: ${newLocation}`);
-
+          console.log("TEST",newLocation,medicineType);
           // Create new queue number
           const antrianResp = await CreateAntrianAPI.createAntrian(medicineType, newLocation);
-          
-          if (!antrianResp?.data?.queue_number) {
+          console.log("Antrian RESP",antrianResp);
+          if (!antrianResp?.data?.data.data.queue_number) {
             throw new Error("Failed to create new queue number");
           }
 
-          newQueueNumber = antrianResp.data.queue_number;
+          newQueueNumber = antrianResp.data.data.data.queue_number;
           console.log(`✅ New queue created: ${newQueueNumber}`);
 
           // Update with new queue number
