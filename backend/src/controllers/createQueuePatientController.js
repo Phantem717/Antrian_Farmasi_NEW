@@ -31,7 +31,7 @@ const formatted = date.getFullYear().toString() +
 
 console.log("DATE", formatted); // e.g. 20251002
 const NOPQueue = await Doctor_Appoinment.getLatestAntrian();
-const latestQueue = await Doctor_Appoinment.getLatestAntrianJaminan(type);
+const latestQueue = await Doctor_Appoinment.getLatestAntrianJaminan(queue_symbol);
 console.log("latestQueue", latestQueue);
 
 if(!latestQueue || latestQueue.queue_number == "-"){

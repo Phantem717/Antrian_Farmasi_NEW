@@ -218,9 +218,9 @@ static async getLatestAntrianJaminan(type) {
   
   try {
     const query = `
-      SELECT queue_number
+     SELECT queue_number,NOP
       FROM Doctor_Appointments
-      WHERE LOWER(status_medicine) = LOWER(?)
+      WHERE NOP REGEXP 'NOP/[0-9]{8}/[CD]-[0-9]+$'
       ORDER BY NOP DESC 
       LIMIT 1
     `;
