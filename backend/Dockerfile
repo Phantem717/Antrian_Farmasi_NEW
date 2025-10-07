@@ -14,7 +14,7 @@ RUN npm install
 COPY . .
 
 # Ekspos port aplikasi
-EXPOSE 5000
+EXPOSE 5001
 
 # Jalankan aplikasi
 CMD ["npm", "start"]
