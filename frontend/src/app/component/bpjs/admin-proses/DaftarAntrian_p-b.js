@@ -1,4 +1,5 @@
 "use client";
+import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
 
 import React, { useState, useEffect } from "react";
 import Swal from "sweetalert2";
@@ -90,7 +91,8 @@ useEffect(() => {
                         timestamp: item.waiting_medicine_stamp,
                         phone_number: item.phone_number,
                         doctor_name: item.doctor_name,
-                        queue_number: item.queue_number
+                        queue_number: item.queue_number,
+                        isPaid: item.isPaid
                     }))
                     .sort((a, b) => {
                         const getTimestamp = (item) => {
@@ -256,11 +258,15 @@ useEffect(() => {
                     <Table stickyHeader>
                         <TableHead>
                             <TableRow>
+                            {
+                                location !== "bpjs" && (
+                                    <TableCell align="center"><strong>Bayar?</strong></TableCell>
+                                )
+                            }
                                 <TableCell align="center"><strong>NOP</strong></TableCell>
                                 <TableCell align="center"><strong>Nomor Antrian</strong></TableCell>
                                 <TableCell align="center"><strong>Nama Pasien</strong></TableCell>
                                 <TableCell align="center"><strong>No. Rekam Medis</strong></TableCell>
-                                {/* <TableCell align="center"><strong>Status</strong></TableCell> */}
                                 <TableCell align="center"><strong>Jenis Obat</strong></TableCell>
                                 <TableCell align="center"><strong>Nomor Telepon</strong></TableCell>
                                 <TableCell align="center"><strong>Timestamp</strong></TableCell>
@@ -273,7 +279,23 @@ useEffect(() => {
                                 </TableRow>
                             ) : queueList.length > 0 ? (
                                 queueList.map((item, index) => (
+                                                                                console.log("isPaid raw:", item.isPaid, "→ Number:", Number(item.isPaid)),
+
                                     <TableRow key={index}>
+                                   {
+                                    location !== "bpjs" && (
+                                        <TableCell align="center">
+                                            {/* Conditional rendering based on item.isPaid */}
+                                           {Number(item.isPaid) === 1 ? (
+
+  <CheckCircleOutlined style={{ color: '#52c41a', fontSize: '20px' }} />
+) : (
+  <CloseCircleOutlined style={{ color: '#f5222d', fontSize: '20px' }} />
+)}
+
+                                        </TableCell>
+                                    )
+                                    }
                                         <TableCell style={{ fontWeight: 'bold' }} align="center" className='font-bold'>{item.NOP}</TableCell>
                                         <TableCell style={{ fontWeight: 'bold' }} align="center" className='font-bold'>{item.queue_number}</TableCell>
                                         <TableCell style={{ fontWeight: 'bold' }} align="center" className='font-bold'>{item.patient_name}</TableCell>

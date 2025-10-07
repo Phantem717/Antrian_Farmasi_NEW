@@ -196,10 +196,9 @@ static async updateMedicineType(NOP,status_medicine,farmasi_queue_number){
   const conn = await pool.getConnection(); // ? Explicit connection
 
     try {
-      const query = `SELECT queue_number 
+      const query = `SELECT queue_number,NOP 
 FROM Doctor_Appointments
-WHERE queue_number LIKE 'FA%' 
-ORDER BY queue_number DESC LIMIT 1
+ORDER BY NOP DESC LIMIT 1
 `;
 
       
@@ -211,6 +210,29 @@ ORDER BY queue_number DESC LIMIT 1
     conn.release(); // ?? Critical cleanup
   }
   }
+static async getLatestAntrianJaminan(type) {
+  const pool = await getDb();
+  const conn = await pool.getConnection();
+  console.log("TYPE MODEL",type);
+  let select;
+  
+  try {
+    const query = `
+     SELECT queue_number,NOP
+      FROM Doctor_Appointments
+      WHERE NOP REGEXP 'NOP/[0-9]{8}/[CD]-[0-9]+$'
+      ORDER BY NOP DESC 
+      LIMIT 1
+    `;
+
+    const [rows] = await conn.execute(query, [type]);
+    return rows[0] || null; // safer in case no rows
+  } catch (error) {
+    throw error;
+  } finally {
+    conn.release();
+  }
+}
 
   /**
    * Menghapus record appointment berdasarkan booking_id.
@@ -229,6 +251,26 @@ ORDER BY queue_number DESC LIMIT 1
     }finally {
     conn.release(); // ?? Critical cleanup
   }
+  }
+  static async updateTotalMedicine(NOP, total_medicine) {
+    const pool = await getDb();
+    const conn = await pool.getConnection(); // ? Explicit connection
+  
+      try {
+        const query = `
+          UPDATE Doctor_Appointments 
+          SET total_medicine = ?
+          WHERE NOP = ?
+        `;
+        const values = [total_medicine, NOP];
+  
+        const [result] = await conn.execute(query, values);
+        return result;
+      } catch (error) {
+        throw error;
+      }finally {
+      conn.release(); // ?? Critical cleanup
+    }
   }
 
   

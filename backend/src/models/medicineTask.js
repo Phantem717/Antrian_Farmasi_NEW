@@ -73,7 +73,8 @@ class MedicineTask {
           da.queue_number,
           da.status_medicine,
           pt.status,
-          pt.medicine_type
+          pt.medicine_type,
+          da.isPaid
         FROM Medicine_Task mt
         LEFT JOIN Doctor_Appointments da ON mt.NOP = da.NOP
         LEFT JOIN Pharmacy_Task pt ON mt.NOP = pt.NOP
@@ -105,7 +106,8 @@ class MedicineTask {
           da.queue_number,
           da.status_medicine,
           pt.status,
-          pt.medicine_type
+          pt.medicine_type,
+          da.isPaid
         FROM Medicine_Task mt
         LEFT JOIN Doctor_Appointments da ON mt.NOP = da.NOP
          LEFT JOIN Pharmacy_Task pt ON mt.NOP = pt.NOP
@@ -138,7 +140,8 @@ class MedicineTask {
 
           da.status_medicine,
           pt.status,
-          pt.medicine_type
+          pt.medicine_type,
+          da.isPaid
         FROM Medicine_Task mt
         LEFT JOIN Doctor_Appointments da ON mt.NOP = da.NOP
         LEFT JOIN Pharmacy_Task pt ON mt.NOP = pt.NOP
@@ -176,7 +179,8 @@ AND (pt.status IS NULL OR
           da.phone_number,
           da.doctor_name,
           pt.status,
-          pt.medicine_type
+          pt.medicine_type,
+          da.isPaid
         FROM Medicine_Task mt
         LEFT JOIN Doctor_Appointments da ON mt.NOP = da.NOP
          LEFT JOIN Pharmacy_Task pt ON mt.NOP = pt.NOP
