@@ -136,49 +136,93 @@ const barcode = inputValue.replace(/\s+/g, ""); // Removes ALL whitespace
     }
   }
   async function insertAll(payload) {
-    const appointmentData = {
-      sep_no: payload.sep_no,
-      queue_number: payload.queue_number,
-      queue_status: payload.queue_status,
-      queue_type: payload.queue_type,
-      patient_name: payload.patient_name,
-      medical_record_no: payload.medical_record_no,
-      patient_date_of_birth: payload.patient_date_of_birth,
-      status_medicine: payload.statusMedicine,
-      lokasi: payload.location,
-      phone_number: payload.phone_number,
-      doctor_name: payload.doctor_name,
-      nik: payload.nik,
-      farmasi_queue_number: payload.farmasi_queue_number,
-      NOP: payload.NOP,
-      PRB: payload.PRB,
-      total_medicine:  payload.total_medicine
-    };
+  const appointmentData = {
+    sep_no: payload.sep_no,
+    queue_number: payload.queue_number,
+    queue_status: payload.queue_status,
+    queue_type: payload.queue_type,
+    patient_name: payload.patient_name,
+    medical_record_no: payload.medical_record_no,
+    patient_date_of_birth: payload.patient_date_of_birth,
+    status_medicine: payload.statusMedicine,
+    lokasi: payload.location,
+    phone_number: payload.phone_number,
+    doctor_name: payload.doctor_name,
+    nik: payload.nik,
+    farmasi_queue_number: payload.farmasi_queue_number,
+    NOP: payload.NOP,
+    PRB: payload.PRB,
+    total_medicine: payload.total_medicine
+  };
 
-    const pharmacyPayload = {
-      NOP: payload.NOP,
-      status: "waiting_verification",
-      medicine_type: payload.statusMedicine,
-      lokasi: payload.location,
-    };
+  const pharmacyPayload = {
+    NOP: payload.NOP,
+    status: "waiting_verification",
+    medicine_type: payload.statusMedicine,
+    lokasi: payload.location,
+  };
 
-    const taskData = {
-      NOP: payload.NOP,
-      Executor: "-",
-      Executor_Names: "-",
-      status: null,
-      location: location,
-    };
+  const taskData = {
+    NOP: payload.NOP,
+    Executor: "-",
+    Executor_Names: "-",
+    status: null,
+    location: location,
+  };
 
-  const [doctorAppointment, pharmacyData] = await Promise.all([
-  DoctorAppointmentAPI.createAppointment(appointmentData),
-  PharmacyAPI.createPharmacyTask(pharmacyPayload)
-]);
-// then verification, since it depends on pharmacy
-const verificationData = await VerificationAPI.createVerificationTask(
-taskData);
+  // SOLUTION 1: Check for existing records BEFORE inserting
+  try {
+    // Check if records already exist
+    const [existingAppointment, existingPharmacy, existingVerification] = await Promise.allSettled([
+      DoctorAppointmentAPI.getAppointmentByNOP(payload.NOP), // You need this endpoint
+      PharmacyAPI.getPharmacyTaskByNOP(payload.NOP), // You need this endpoint
+      VerificationAPI.getVerificationTaskByNOP(payload.NOP) // You need this endpoint
+    ]);
+
+    // Delete existing records if found (cleanup before re-insert)
+    const deletionPromises = [];
+    
+    if (existingAppointment.status === 'fulfilled' && existingAppointment.value) {
+      deletionPromises.push(DoctorAppointmentAPI.deleteAppointment(payload.NOP));
+    }
+    
+    if (existingPharmacy.status === 'fulfilled' && existingPharmacy.value) {
+      deletionPromises.push(PharmacyAPI.deletePharmacyTask(payload.NOP));
+    }
+    
+    if (existingVerification.status === 'fulfilled' && existingVerification.value) {
+      deletionPromises.push(VerificationAPI.deleteVerificationTask(payload.NOP));
+    }
+
+    // Wait for all deletions to complete
+    if (deletionPromises.length > 0) {
+      await Promise.all(deletionPromises);
+      console.log('Cleaned up existing records');
+    }
+
+    // Now insert all records
+    const [doctorAppointment, pharmacyData, verificationData] = await Promise.all([
+      DoctorAppointmentAPI.createAppointment(appointmentData),
+      PharmacyAPI.createPharmacyTask(pharmacyPayload),
+      VerificationAPI.createVerificationTask(taskData)
+    ]);
+
     return { doctorAppointment, pharmacyData, verificationData };
+
+  } catch (error) {
+    // If ANY insertion fails, rollback all
+    console.error('Error during insertion, attempting rollback:', error);
+    
+    // Attempt to delete any successfully created records
+    await Promise.allSettled([
+      DoctorAppointmentAPI.deleteAppointment(payload.NOP).catch(() => {}),
+      PharmacyAPI.deletePharmacyTask(payload.NOP).catch(() => {}),
+      VerificationAPI.deleteVerificationTask(payload.NOP).catch(() => {})
+    ]);
+
+    throw new Error('Failed to create records, Silakan coba lagi');
   }
+}
   async function checkRegistration(inputValue){
     console.log(inputValue);
    

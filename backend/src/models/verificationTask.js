@@ -87,7 +87,8 @@ class VerificationTask {
           da.patient_date_of_birth,
           pt.status,
           pt.medicine_type,
-          mt.loket as 'loket2'
+          mt.loket as 'loket2',
+          da.isPaid
         FROM Verification_Task vt
         LEFT JOIN Doctor_Appointments da ON vt.NOP = da.NOP
         LEFT JOIN Pharmacy_Task pt ON vt.NOP = pt.NOP
@@ -124,7 +125,8 @@ class VerificationTask {
   da.status_medicine,
   da.phone_number,
   pt.status,
-  pt.medicine_type
+  pt.medicine_type,
+          da.isPaid
 FROM Verification_Task vt
 LEFT JOIN Doctor_Appointments da ON vt.NOP = da.NOP
 LEFT JOIN Pharmacy_Task pt ON vt.NOP = pt.NOP
@@ -160,7 +162,8 @@ ORDER BY vt.waiting_verification_stamp ASC;
   da.doctor_name,
   da.phone_number,
   pt.status,
-  pt.medicine_type
+  pt.medicine_type,
+          da.isPaid
 FROM Verification_Task vt
 LEFT JOIN Doctor_Appointments da ON vt.NOP = da.NOP
 LEFT JOIN Pharmacy_Task pt ON vt.NOP = pt.NOP
@@ -199,7 +202,8 @@ ORDER BY vt.waiting_verification_stamp ASC;
   da.phone_number,
   da.doctor_name,
   pt.status,
-  pt.medicine_type
+  pt.medicine_type,
+          da.isPaid
 FROM Verification_Task vt
 LEFT JOIN Doctor_Appointments da ON vt.NOP = da.NOP
 LEFT JOIN Pharmacy_Task pt ON vt.NOP = pt.NOP

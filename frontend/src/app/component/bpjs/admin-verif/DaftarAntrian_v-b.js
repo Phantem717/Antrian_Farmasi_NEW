@@ -1,5 +1,6 @@
 //src\app\component\admin-verif\DaftarAntrian_v.js
 "use client";
+import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
 
 import React, { useState, useEffect,useRef } from "react";
 import {
@@ -523,11 +524,19 @@ Swal.fire({
           <TableHead>
             <TableRow>
               <TableCell align="center"><strong>Pilih</strong></TableCell>
-      
+              {
+                location !== 'bpjs' && (
+                <TableCell align="center"><strong>Bayar?</strong></TableCell>
+
+              )}
               <TableCell align="center"><strong>No. Antrian</strong></TableCell>
               <TableCell align="center"><strong>ID Booking</strong></TableCell>
               <TableCell align="center"><strong>Nama Pasien</strong></TableCell>
+              {
+                location === 'bpjs' && (
               <TableCell align="center"><strong>Nomor SEP</strong></TableCell>
+                )
+              }
               <TableCell align="center"><strong>Nama Dokter</strong></TableCell>
               <TableCell align="center"><strong>No. Rekam Medis</strong></TableCell>
               {/* <TableCell align="center"><strong>Status</strong></TableCell> */}
@@ -550,13 +559,26 @@ return (
         <Button onClick={()=>handlePrintFunction(item)}>      <PrintIcon className="flex items-middle" ></PrintIcon>
 </Button>
     </TableCell>
-   
-    <TableCell align="center" style={{ fontWeight: 'bold' }} className='font-bold'>{item.queue_number}</TableCell>
-    <TableCell align="center" style={{ fontWeight: 'bold' }} className='font-bold'>{item.NOP}</TableCell>
-    <TableCell align="center" style={{ fontWeight: 'bold' }} className='font-bold'>{item.patient_name}</TableCell>
-    <TableCell align="center" style={{ fontWeight: 'bold' }} className='font-bold'>{item.sep_no}</TableCell>
-    <TableCell align="center" style={{ fontWeight: 'bold' }} className='font-bold'>{item.doctor_name}</TableCell>
-    <TableCell align="center" style={{ fontWeight: 'bold' }} className='font-bold'>{item.medical_record_no || "-"}</TableCell>
+    {  location !== "bpjs" && (
+                                        <TableCell align="center">
+                                            {/* Conditional rendering based on item.isPaid */}
+                                           {Number(item.isPaid) === 1 ? (
+
+  <CheckCircleOutlined style={{ color: '#52c41a', fontSize: '20px' }} />
+) : (
+  <CloseCircleOutlined style={{ color: '#f5222d', fontSize: '20px' }} />
+)}
+
+                                        </TableCell>
+                                    )}
+  <TableCell align="center" className="font-bold">{item?.queue_number || "-"}</TableCell>
+<TableCell align="center" className="font-bold">{item?.NOP || "-"}</TableCell>
+<TableCell align="center" className="font-bold">{item?.patient_name || "-"}</TableCell>
+{location === "bpjs" && (
+  <TableCell align="center" className="font-bold">{item?.sep_no || "-"}</TableCell>
+)}
+<TableCell align="center" className="font-bold">{item?.doctor_name || "-"}</TableCell>
+<TableCell align="center" className="font-bold">{item?.medical_record_no || "-"}</TableCell>
     {/* <TableCell align="center" style={{ fontWeight: 'bold' }} className='font-bold'>
       {item.status.replace("_verification", "")}
     </TableCell> */}
