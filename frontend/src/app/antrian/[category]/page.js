@@ -1,6 +1,5 @@
 'use client' // Keep this if using hooks/state/browser APIs
 
-
 import InfoBar from '@/app/component/display/bpjs/InfoBar_b';
 import MarqueeFooter from '@/app/component/display/bpjs/MarqueeFooter_b';
 import PrintAntrian from '@/app/utils/api/printAntrian';
@@ -86,7 +85,8 @@ taskData);
     }
     const insertResp = await insertAll(payload);
     console.log("RESP",resp, insertResp);
-   
+   socket.emit('update_verif',{location});
+      socket.emit('update_display',{location});
   }
 
    async function handleButtonUmum(){
@@ -107,6 +107,8 @@ taskData);
     }
     const insertResp = await insertAll(payload);
     console.log("RESP",resp, insertResp);
+    socket.emit('update_verif',{location});
+      socket.emit('update_display',{location});
   }
   return (
     <div className="bg-slate-200 h-screen min-w-screen flex flex-col ">

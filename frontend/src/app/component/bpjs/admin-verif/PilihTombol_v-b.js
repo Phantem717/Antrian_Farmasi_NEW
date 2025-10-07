@@ -47,7 +47,17 @@ const PilihAksi = ({location, selectedQueueIds = [], setSelectedQueueIds, select
 
     try {
       console.log("📡 Memanggil nomor:", selectedQueueIds, selectedQueue2);
-      socket.emit('call_queues_verif',{data: selectedQueue2, lokasi: "Lantai 1 BPJS"});
+      let lokasi;
+      if(location = "bpjs"){
+                  lokasi = "Lantai 1 BPJS";
+                }
+                else if(location = "gmcb"){
+                  lokasi = "Lantai 1 GMCB";
+                }
+                else if(location = "lt3"){
+                  lokasi = "Lantai 3 GMCB";
+                }
+      socket.emit('call_queues_verif',{data: selectedQueue2, lokasi: lokasi});
       await Promise.all(
         selectedQueue2.map(async (queue) => {
           await updateButtonStatus(queue.NOP, "called_verification");
@@ -124,7 +134,17 @@ const PilihAksi = ({location, selectedQueueIds = [], setSelectedQueueIds, select
               console.log("STATUS TYPE",statusType);
               if(statusType == "recalled_verification"){
                 console.log("CHANGED STATUS");
-                socket.emit('call_queues_verif',{data: selectedQueue2, lokasi: "Lantai 1 BPJS"});
+                let lokasi;
+                if(location = "bpjs"){
+                  lokasi = "Lantai 1 BPJS";
+                }
+                else if(location = "gmcb"){
+                  lokasi = "Lantai 1 GMCB";
+                }
+                else if(location = "lt3"){
+                  lokasi = "Lantai 3 GMCB";
+                }
+                socket.emit('call_queues_verif',{data: selectedQueue2, lokasi: lokasi});
 
              
                 console.log("SCOKET EMITTED",queue);
