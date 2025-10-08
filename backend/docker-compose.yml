@@ -8,18 +8,18 @@ services:
     container_name: backend_container_farmasi
     dns: 8.8.8.8 
     ports:
-      - "5001:5001"
+      - "5001:5000"
     environment:
-      - X_API_KEY= ${X_API_KEY}
-      - BASE_URL= ${BASE_URL}
-      - HOST= ${HOST}
-      - PORT= ${PORT}
-      - FE_HOST= ${FE_HOST}
-      - FE_PORT= ${FE_PORT}
-      - MEDIN_URL= ${MEDIN_URL}
-      - MEDIN_URL2= ${MEDIN_URL2}
-      - MEDIN_URL_GMCB= ${MEDIN_URL_GMCB}
-      - X_API_KEY_MEDIN= ${X_API_KEY_MEDIN}
+      - X_API_KEY=${X_API_KEY}
+      - BASE_URL=${BASE_URL}
+      - HOST=${HOST}
+      - PORT=${PORT}
+      - FE_HOST=${FE_HOST}
+      - FE_PORT=${FE_PORT}
+      - MEDIN_URL=${MEDIN_URL}
+      - MEDIN_URL2=${MEDIN_URL2}
+      - MEDIN_URL_GMCB=${MEDIN_URL_GMCB}
+      - X_API_KEY_MEDIN=${X_API_KEY_MEDIN}
       - CONS_ID=${CONS_ID}
       - PASSWORD=${PASSWORD}
       - CONS_ID_FARMASI=${CONS_ID_FARMASI}
@@ -43,7 +43,7 @@ services:
     image: mysql:8.0
     container_name: mysql_container_farmasi
     ports:
-      - "3307:3306"
+      - "3308:3306"
     environment:
       MYSQL_ROOT_PASSWORD: secret
       MYSQL_DATABASE: farmasi_queue_db
@@ -61,7 +61,7 @@ services:
   redis:
     image: redis:7-alpine
     ports:
-      - "6379:6379"
+      - "6380:6379"
     volumes:
       - redis_data:/data
     restart: unless-stopped
@@ -70,7 +70,7 @@ services:
     image: phpmyadmin/phpmyadmin
     container_name: phpmyadmin_container_farmasi
     ports:
-      - "3300:80"
+      - "3301:80"
     environment:
       PMA_HOST: db
       MYSQL_ROOT_PASSWORD: secret
