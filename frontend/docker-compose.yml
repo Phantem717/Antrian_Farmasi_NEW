@@ -11,14 +11,14 @@ services:
     environment:
       - HOST=0.0.0.0 # Pastikan container mendengarkan di semua alamat
       - NODE_ENV=production
-      - NEXT_PUBLIC_API_HOST=${NEXT_PUBLIC_API_HOST}
-      - NEXT_PUBLIC_API_PORT=${NEXT_PUBLIC_API_PORT}
-      - X_API_KEY=${X_API_KEY}
-      - BASE_URL=${BASE_URL}
-      - MEDIN_URL=${MEDIN_URL}
-      - X_API_KEY_MEDIN=${X_API_KEY_MEDIN}
-      - CONS_ID=${CONS_ID}
-      - SECRETKEY=${SECRETKEY}
+      - NEXT_PUBLIC_API_HOST=${{secrets.NEXT_PUBLIC_API_HOST}}
+      - NEXT_PUBLIC_API_PORT=${{secrets.NEXT_PUBLIC_API_PORT}}
+      - X_API_KEY=${{secrets.X_API_KEY}}
+      - BASE_URL=${{secrets.BASE_URL}}
+      - MEDIN_URL=${{secrets.MEDIN_URL}}
+      - X_API_KEY_MEDIN=${{secrets.X_API_KEY_MEDIN}}
+      - CONS_ID=${{secrets.CONS_ID}}
+      - SECRETKEY=${{secrets.SECRETKEY}}
 
     networks:
       - app_network
