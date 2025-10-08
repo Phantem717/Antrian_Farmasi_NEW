@@ -231,6 +231,7 @@ Terima kasih.
 
 async function sendWAPickup(payload){
     try {
+
         const { timestamp, signature } = generateSignature(consID2, password);
         const currentTime = getCurrentTimestamp().split(' ')[1].substring(0, 2);
         let messageNext;
@@ -247,7 +248,7 @@ async function sendWAPickup(payload){
         location= "Kami dari Farmasi GMCB Lantai 3";
 
       }
-        console.log("TIMESTAMP",currentTime >= 20 ? true : false);
+        console.log("TIMESTAMP",currentTime >= 20 ? true : false, currentTime);
         console.log("PHONE_NUMBER_PICKUP",payload.phone_number,location);
 
         if(currentTime >= 20 == true ){

@@ -310,10 +310,19 @@ const changeDate = (date,dateString) => {
     
   };
 
-  const handleSelectAll = () => {
+ const handleSelectAll = () => {
   const allIds = queueList.map((item) => item.NOP);
   setSelectedQueueIds(allIds);
   setSelectedQueue2([...queueList]);
+  
+  // Set selectedQueue to the first item in the list (or last, or null)
+  if (queueList.length > 0) {
+    setSelectedQueue(queueList[0]); // First item
+    // OR
+    // setSelectedQueue(queueList[queueList.length - 1]); // Last item
+  } else {
+    setSelectedQueue(null);
+  }
 };
   
 
