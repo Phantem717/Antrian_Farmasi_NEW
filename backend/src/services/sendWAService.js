@@ -41,7 +41,7 @@ async function sendWAVerif(payload){
       const currentTime = getCurrentTimestamp().split(' ')[1].substring(0, 2);
         let messageNext;
         console.log("TIMESTAMP",currentTime >= 20 ? true : false);
-        console.log("PHONE_NUMBER_PICKUP",payload.phone_number);
+        console.log("PHONE_NUMBER_PICKUP",payload.phone_number,location);
         if(currentTime >= 20 == true ){
           messageNext= "Terima kasih telah menunggu, Karena sudah diluar jam kerja farmasi, obat anda dapat diambil di hari berikutnya pada jam 08.00-10.00."
         }
@@ -111,7 +111,7 @@ async function sendWAProses(payload){
       }
     const url = path;
     const url_local = `http:/192.168.6.85/api/v1/integration/whatsappweb/hello/send-text`;
-console.log("PHONE_NUMBER_PROSES",payload.phone_number,payload.switch_WA,"SWITCH TEST: ", payload.switch_WA ? payload.phone_number : "test");
+console.log("PHONE_NUMBER_PROSES",payload.phone_number,payload.switch_WA,"SWITCH TEST: ", payload.switch_WA ? payload.phone_number : "test",location);
     const response = await axios.post(
       url,
       {
@@ -183,7 +183,7 @@ async function sendWAAntrian(payload){
 
         }
     const url = path;
-console.log("PHONE_NUMBER_ANTRIAN",payload.phone_number,payload.switch_WA,"SWITCH TEST: ", payload.switch_WA ? payload.phone_number : "test");
+console.log("PHONE_NUMBER_ANTRIAN",payload.phone_number,payload.switch_WA,"SWITCH TEST: ", payload.switch_WA ? payload.phone_number : "test",location);
     const response = await axios.post(
       url,
       {
@@ -248,7 +248,8 @@ async function sendWAPickup(payload){
 
       }
         console.log("TIMESTAMP",currentTime >= 20 ? true : false);
-        console.log("PHONE_NUMBER_PICKUP",payload.phone_number, location);
+        console.log("PHONE_NUMBER_PICKUP",payload.phone_number,location);
+
         if(currentTime >= 20 == true ){
           messageNext= "Terima kasih telah menunggu, Karena sudah diluar jam kerja farmasi, obat anda dapat diambil di hari berikutnya pada jam 08.00-10.00."
         }
