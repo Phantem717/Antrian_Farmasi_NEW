@@ -11,6 +11,27 @@ jobs:
     steps:
     - name: Deploy to server
       uses: appleboy/ssh-action@v1.0.3
+      env:
+           X_API_KEY:'${{ secrets.X_API_KEY }}'
+           BASE_URL:'${{ secrets.BASE_URL }}'
+           HOST:'${{ secrets.HOST }}'
+           PORT:'${{ secrets.PORT }}'
+           FE_HOST:'${{ secrets.FE_HOST }}'
+           FE_PORT:'${{ secrets.FE_PORT }}'
+           MEDIN_URL:'${{ secrets.MEDIN_URL }}'
+           MEDIN_URL2:'${{ secrets.MEDIN_URL2 }}'
+           MEDIN_URL_GMCB:'${{ secrets.MEDIN_URL_GMCB }}'
+           X_API_KEY_MEDIN:'${{ secrets.X_API_KEY_MEDIN }}'
+           CONS_ID:'${{ secrets.CONS_ID }}'
+           PASSWORD:'${{ secrets.PASSWORD }}'
+           CONS_ID_FARMASI:'${{ secrets.CONS_ID_FARMASI }}'
+           SECRETKEY:'${{ secrets.SECRETKEY }}'
+           API_URL:'${{ secrets.API_URL }}'
+           API_WA:'${{ secrets.API_WA }}'
+           CONS_ID_WA:'${{ secrets.CONS_ID_WA }}'
+           PASSWORD_WA:'${{ secrets.PASSWORD_WA }}'
+           NEXT_PUBLIC_API_HOST:'${{ secrets.NEXT_PUBLIC_API_HOST }}'
+           NEXT_PUBLIC_API_PORT:'${{ secrets.NEXT_PUBLIC_API_PORT }}'
       with:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USERNAME }}
@@ -22,27 +43,7 @@ jobs:
           git stash
           git pull
 
-          echo "🔐 Exporting environment secrets..."
-          export X_API_KEY='${{ secrets.X_API_KEY }}'
-          export BASE_URL='${{ secrets.BASE_URL }}'
-          export HOST='${{ secrets.HOST }}'
-          export PORT='${{ secrets.PORT }}'
-          export FE_HOST='${{ secrets.FE_HOST }}'
-          export FE_PORT='${{ secrets.FE_PORT }}'
-          export MEDIN_URL='${{ secrets.MEDIN_URL }}'
-          export MEDIN_URL2='${{ secrets.MEDIN_URL2 }}'
-          export MEDIN_URL_GMCB='${{ secrets.MEDIN_URL_GMCB }}'
-          export X_API_KEY_MEDIN='${{ secrets.X_API_KEY_MEDIN }}'
-          export CONS_ID='${{ secrets.CONS_ID }}'
-          export PASSWORD='${{ secrets.PASSWORD }}'
-          export CONS_ID_FARMASI='${{ secrets.CONS_ID_FARMASI }}'
-          export SECRETKEY='${{ secrets.SECRETKEY }}'
-          export API_URL='${{ secrets.API_URL }}'
-          export API_WA='${{ secrets.API_WA }}'
-          export CONS_ID_WA='${{ secrets.CONS_ID_WA }}'
-          export PASSWORD_WA='${{ secrets.PASSWORD_WA }}'
-          export NEXT_PUBLIC_API_HOST='${{ secrets.NEXT_PUBLIC_API_HOST }}'
-          export NEXT_PUBLIC_API_PORT='${{ secrets.NEXT_PUBLIC_API_PORT }}'
+          
 
           echo "🧱 Rebuilding backend..."
           cd backend
