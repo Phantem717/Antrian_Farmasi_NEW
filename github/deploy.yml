@@ -2,12 +2,12 @@ name: Auto Deploy to Server
 
 on:
   push:
-    branches: [ main ]  # Change this to your default branch if different
+    branches: [ test_secret ]  # Change to 'prod' later for production
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: Deploy to server
       uses: appleboy/ssh-action@v1.0.3
@@ -16,21 +16,46 @@ jobs:
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.SSH_KEY }}
         script: |
-          # Navigate to your project directory
           cd /home/sirs/Antrian_Farmasi_NEW || exit 1
-          
-          # Stash any local changes (in case of conflicts)
+
+          echo "📦 Pulling latest changes..."
           git stash
-          
-          # Pull latest changes
           git pull
-          
-          # Restart services with docker-compose
+
+          echo "🔐 Exporting environment secrets..."
+          export X_API_KEY='${{ secrets.X_API_KEY }}'
+          export BASE_URL='${{ secrets.BASE_URL }}'
+          export HOST='${{ secrets.HOST }}'
+          export PORT='${{ secrets.PORT }}'
+          export FE_HOST='${{ secrets.FE_HOST }}'
+          export FE_PORT='${{ secrets.FE_PORT }}'
+          export MEDIN_URL='${{ secrets.MEDIN_URL }}'
+          export MEDIN_URL2='${{ secrets.MEDIN_URL2 }}'
+          export MEDIN_URL_GMCB='${{ secrets.MEDIN_URL_GMCB }}'
+          export X_API_KEY_MEDIN='${{ secrets.X_API_KEY_MEDIN }}'
+          export CONS_ID='${{ secrets.CONS_ID }}'
+          export PASSWORD='${{ secrets.PASSWORD }}'
+          export CONS_ID_FARMASI='${{ secrets.CONS_ID_FARMASI }}'
+          export SECRETKEY='${{ secrets.SECRETKEY }}'
+          export API_URL='${{ secrets.API_URL }}'
+          export API_WA='${{ secrets.API_WA }}'
+          export CONS_ID_WA='${{ secrets.CONS_ID_WA }}'
+          export PASSWORD_WA='${{ secrets.PASSWORD_WA }}'
+          export NEXT_PUBLIC_API_HOST='${{ secrets.NEXT_PUBLIC_API_HOST }}'
+          export NEXT_PUBLIC_API_PORT='${{ secrets.NEXT_PUBLIC_API_PORT }}'
+
+          echo "🧱 Rebuilding backend..."
+          cd backend
           docker-compose down
           docker-compose up -d --build
-          
-          # Check if containers are running
-          docker-compose ps
-          
-          # Optional: Clean up unused images
+
+          echo "🧱 Rebuilding frontend..."
+          cd ../frontend
+          docker-compose down
+          docker-compose up -d --build
+
+          echo "✅ Checking container status..."
+          docker ps
+
+          echo "🧹 Cleaning up unused images..."
           docker image prune -f

@@ -10,24 +10,24 @@ services:
     ports:
       - "5002:5001"
     environment:
-      - X_API_KEY=${{secrets.X_API_KEY}}
-      - BASE_URL=${{secrets.BASE_URL}}
-      - HOST=${{secrets.HOST}}
-      - PORT=${{secrets.PORT}}
-      - FE_HOST=${{secrets.FE_HOST}}
-      - FE_PORT=${{secrets.FE_PORT}}
-      - MEDIN_URL=${{secrets.MEDIN_URL}}
-      - MEDIN_URL2=${{secrets.MEDIN_URL2}}
-      - MEDIN_URL_GMCB=${{secrets.MEDIN_URL_GMCB}}
-      - X_API_KEY_MEDIN=${{secrets.X_API_KEY_MEDIN}}
-      - CONS_ID=${{secrets.CONS_ID}}
-      - PASSWORD=${{secrets.PASSWORD}}
-      - CONS_ID_FARMASI=${{secrets.CONS_ID_FARMASI}}
-      - SECRETKEY=${{secrets.SECRETKEY}}
-      - API_URL=${{secrets.API_URL}}
-      - API_WA=${{secrets.API_WA}}
-      - CONS_ID_WA=${{secrets.CONS_ID_WA}}
-      - PASSWORD_WA=${{secrets.PASSWORD_WA}} 
+      - X_API_KEY=${X_API_KEY}
+      - BASE_URL=${BASE_URL}
+      - HOST=${HOST}
+      - PORT=${PORT}
+      - FE_HOST=${FE_HOST}
+      - FE_PORT=${FE_PORT}
+      - MEDIN_URL=${MEDIN_URL}
+      - MEDIN_URL2=${MEDIN_URL2}
+      - MEDIN_URL_GMCB=${MEDIN_URL_GMCB}
+      - X_API_KEY_MEDIN=${X_API_KEY_MEDIN}
+      - CONS_ID=${CONS_ID}
+      - PASSWORD=${PASSWORD}
+      - CONS_ID_FARMASI=${CONS_ID_FARMASI}
+      - SECRETKEY=${SECRETKEY}
+      - API_URL=${API_URL}
+      - API_WA=${API_WA}
+      - CONS_ID_WA=${CONS_ID_WA}
+      - PASSWORD_WA=${PASSWORD_WA} 
       - DB_HOST=db
       - DB_USER=root
       - DB_PASSWORD=
