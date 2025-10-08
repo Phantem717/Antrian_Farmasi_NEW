@@ -308,21 +308,6 @@ const QueuePickup = ({ title, queuesRacik, queuesNonRacik, bgColor }) => {
     );
   };
 
-  const renderMarqueeSection = (queues, duration, isRacikan = true) => (
-    <Marquee
-      direction="up"
-      pauseOnHover
-      style={{
-        width: '100%',
-        marginTop: 20,
-        marginBottom: 10,
-        '--duration': `${duration}s`,
-        height: '1030px'
-      }}
-    >
-      {renderQueueList(queues, isRacikan)}
-    </Marquee>
-  );
 
   return (
     <div className={`p-4 flex-1 min-w-0 ${bgColor} rounded-lg shadow-md overflow-hidden`} style={{ minHeight: "1200px" }}>
@@ -359,9 +344,7 @@ const chunkedNonRacik = useMemo(() => chunkArray(queuesNonRacik, 5), [queuesNonR
       style={{ minHeight: "140px" }}
     >
       <div className="flex flex-col font-extrabold">
-        {queue.isYesterday && (
-          <div className={`text-2xl ${getStatusColor(queue.status)}`}>KEMARIN</div>
-        )}
+       
         <div className={`text-6xl ${getStatusColor(queue.status)}`}>
           {queue.queueNumber}
         </div>
@@ -389,20 +372,6 @@ const chunkedNonRacik = useMemo(() => chunkArray(queuesNonRacik, 5), [queuesNonR
     );
   };
 
-  // const renderMarqueeSection = (queues, duration, isRacikan = true) => (
-  //   <Marquee
-  //     fade={true}
-  //     direction="up"
-  //     className="gap-[3rem]"
-  //     innerClassName="gap-[3rem] [--gap:3rem]"
-  //     style={{
-  //       '--duration': `${duration}s`,
-  //       height: '1060px'
-  //     }}
-  //   >
-  //     {renderQueueList(queues, isRacikan)}
-  //   </Marquee>
-  // );
 const renderMarqueeSection = (chunkedQueues, duration, isRacikan = true) => (
   <Carousel
     autoplay
@@ -432,7 +401,8 @@ const renderMarqueeSection = (chunkedQueues, duration, isRacikan = true) => (
   const renderQueueSection = (queues, chunked, duration, label, isRacikan = true) => (
     <div
       className="flex-1 min-w-[300px] bg-gray-100 p-2 rounded-md shadow-md"
-      style={{ height: "1120px" }}
+      style={{ height: "1120px" }}  
+      
     >
       <p className="text-2xl font-extrabold text-center text-green-700 uppercase">
         {label}
