@@ -14,11 +14,12 @@ import WA_API from "@/app/utils/api/WA";
 import CreateAntrianAPI from "@/app/utils/api/createAntrian";
 import PrintAntrian from "@/app/utils/api/printAntrian";
 import BPJSBarcodeAPI from "@/app/utils/api/BPJS_Barcode";
+import { getSocket } from "@/app/utils/api/socket";
 const AddObat = () => {
   const { Content } = Layout;
   const [collapsed, setCollapsed] = useState(false);
   const siderWidth = collapsed ? 80 : 300;
-
+  const socket = getSocket();
   const [name, setName] = useState("");
   const [inputValue, setInputValue] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -108,8 +109,8 @@ const AddObat = () => {
       setPhoneNumber(data.MobilePhoneNo1);
       setDocter(data.ParamedicName);
       setPRB(data.ProlanisPRB);
-      setNOP(data.RegistrationNo)
-      
+      setNOP(data.RegistrationNo);
+
       Swal.fire({
         title: "Konfirmasi Data Pasien",
         html: `
@@ -202,7 +203,6 @@ const AddObat = () => {
           try {
             const resultData = result.value;
             console.log("DATA", resultData, result.value);
-
             const WAPayload = {
             phone_number: resultData.phone_number ?? "-",
             NOP: resultData.NOP ?? "-",
@@ -241,7 +241,8 @@ const AddObat = () => {
             console.log("PRINT_WA",print_wa);
             Swal.fire("Success!", "Data berhasil disimpan", "success");
 
-
+            socket.emit('update_verif',{location});
+            socket.emit('update_display',{location});
 
           } catch (error) {
             console.error("Error:", error);
