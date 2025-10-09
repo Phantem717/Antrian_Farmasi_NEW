@@ -36,28 +36,57 @@ jobs:
       with:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USERNAME }}
+        envs: X_API_KEY,BASE_URL,HOST,PORT,FE_HOST,FE_PORT,MEDIN_URL,MEDIN_URL2,MEDIN_URL_GMCB,X_API_KEY_MEDIN,CONS_ID,PASSWORD,CONS_ID_FARMASI,SECRETKEY,API_URL,API_WA,CONS_ID_WA,PASSWORD_WA,NEXT_PUBLIC_API_HOST,NEXT_PUBLIC_API_PORT
         key: ${{ secrets.SSH_KEY }}
         script: |
           cd /home/sirs/Antrian_Farmasi_NEW || exit 1
-
+          
           echo "📦 Pulling latest changes..."
           git stash
-          git pull
-
+          git pull origin test_secret
           
-
+          echo "🔧 Creating backend .env file..."
+          cat > backend/.env << EOF
+          X_API_KEY=${X_API_KEY}
+          BASE_URL=${BASE_URL}
+          HOST=${HOST}
+          PORT=${PORT}
+          FE_HOST=${FE_HOST}
+          FE_PORT=${FE_PORT}
+          MEDIN_URL=${MEDIN_URL}
+          MEDIN_URL2=${MEDIN_URL2}
+          MEDIN_URL_GMCB=${MEDIN_URL_GMCB}
+          X_API_KEY_MEDIN=${X_API_KEY_MEDIN}
+          CONS_ID=${CONS_ID}
+          PASSWORD=${PASSWORD}
+          CONS_ID_FARMASI=${CONS_ID_FARMASI}
+          SECRETKEY=${SECRETKEY}
+          API_URL=${API_URL}
+          API_WA=${API_WA}
+          CONS_ID_WA=${CONS_ID_WA}
+          PASSWORD_WA=${PASSWORD_WA}
+          EOF
+          
+          echo "🔧 Creating frontend .env file..."
+          cat > frontend/.env << EOF
+          NEXT_PUBLIC_API_HOST=${NEXT_PUBLIC_API_HOST}
+          NEXT_PUBLIC_API_PORT=${NEXT_PUBLIC_API_PORT}
+          EOF
+          
           echo "🧱 Rebuilding backend..."
           cd backend
           docker-compose down
           docker-compose up -d --build
-
+          
           echo "🧱 Rebuilding frontend..."
           cd ../frontend
           docker-compose down
           docker-compose up -d --build
-
+          
           echo "✅ Checking container status..."
           docker ps
-
+          
           echo "🧹 Cleaning up unused images..."
           docker image prune -f
+          
+          echo "✅ Deployment complete!"
