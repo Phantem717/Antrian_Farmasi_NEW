@@ -172,7 +172,6 @@ useEffect(() => {
 
   // Queue section components
  const QueueSection = ({ title, queuesRacik, queuesNonRacik, bgColor }) => {
-  
   const chunkArray = (arr, size) => {
     return arr.reduce((chunks, item, i) => {
       if (i % size === 0) {
@@ -184,36 +183,109 @@ useEffect(() => {
     }, []);
   };
   
-  // ✅ Memoize so chunks are stable and don't reset carousel
   const chunkedRacik = useMemo(() => chunkArray(queuesRacik, 5), [queuesRacik]);
   const chunkedNonRacik = useMemo(() => chunkArray(queuesNonRacik, 5), [queuesNonRacik]);
   
-  const renderMarqueeSectionMedicine = (chunkedQueues, duration, isRacikan = true) => (
-    <Carousel
-      autoplay
-      autoplaySpeed={5000}
-      dots
-      infinite={true}
-      slidesToShow={1}
-      draggable={false}
-      adaptiveHeight={false}
-      className="gap-[3rem]"
-      style={{ "--duration": `${duration}s`, height: "1060px", width: "100%" }}
-    >
-      {chunkedQueues.map((group, groupIndex) => (
-        <div key={`group-${groupIndex}-${group.map(q => q.queueNumber).join("_")}`}>
-          <div style={{ height: "1060px", textAlign: "center" }}>
-            <div className="flex flex-col gap-2">
-              {/* ✅ Pass the entire group (array), not individual queue */}
-              {renderQueueItems(group, isRacikan)}
+  // ✅ Custom Seamless Carousel Component
+  const SeamlessCarousel = ({ chunks, duration, renderItem }) => {
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const [isTransitioning, setIsTransitioning] = useState(true);
+    
+    // Duplicate first slide at end for seamless loop
+    const loopedChunks = chunks.length > 0 ? [...chunks, chunks[0]] : chunks;
+    
+    useEffect(() => {
+      if (chunks.length <= 1) return;
+
+      const interval = setInterval(() => {
+        setCurrentIndex((prev) => {
+          const next = prev + 1;
+          
+          // If we reach the duplicated last slide
+          if (next === loopedChunks.length - 1) {
+            // Move to it with transition
+            return next;
+          }
+          
+          return next;
+        });
+      }, duration * 1000);
+
+      return () => clearInterval(interval);
+    }, [chunks.length, duration, loopedChunks.length]);
+    
+    useEffect(() => {
+      // When we reach the duplicate (last position), instantly jump to first
+      if (currentIndex === loopedChunks.length - 1) {
+        setTimeout(() => {
+          setIsTransitioning(false); // Disable transition
+          setCurrentIndex(0); // Jump to first instantly
+          
+          // Re-enable transition after a brief moment
+          setTimeout(() => {
+            setIsTransitioning(true);
+          }, 50);
+        }, duration * 1000);
+      }
+    }, [currentIndex, loopedChunks.length, duration]);
+
+    if (chunks.length === 0) return null;
+
+    return (
+      <div style={{ height: "1060px", position: "relative", overflow: "hidden" }}>
+        <div
+          style={{
+            display: "flex",
+            transform: `translateX(-${currentIndex * 100}%)`,
+            transition: isTransitioning ? "transform 0.5s ease-in-out" : "none",
+            height: "100%"
+          }}
+        >
+          {loopedChunks.map((group, idx) => (
+            <div
+              key={`slide-${idx}`}
+              style={{
+                minWidth: "100%",
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
+                gap: "0.5rem"
+              }}
+            >
+              {renderItem(group)}
             </div>
-          </div>
+          ))}
         </div>
-      ))}
-    </Carousel>
-  );
-  
-  // ✅ Renamed parameter to queueList for clarity
+        
+        {/* Dots indicator - only show for actual slides */}
+        {chunks.length > 1 && (
+          <div style={{
+            position: "absolute",
+            bottom: "10px",
+            left: "50%",
+            transform: "translateX(-50%)",
+            display: "flex",
+            gap: "8px",
+            zIndex: 10
+          }}>
+            {chunks.map((_, idx) => (
+              <div
+                key={idx}
+                style={{
+                  width: "10px",
+                  height: "10px",
+                  borderRadius: "50%",
+                  backgroundColor: (currentIndex % chunks.length) === idx ? "#22c55e" : "#d1d5db",
+                  transition: "background-color 0.3s"
+                }}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   const renderQueueItems = (queueList, isRacikan = true) => {
     if (!queueList || queueList.length === 0) {
       return (
@@ -241,7 +313,6 @@ useEffect(() => {
           {queue.queueNumber}
         </div>
         <div className="mt-2 w-full bg-green-400 px-4 py-2 text-black text-center text-3xl truncate whitespace-nowrap overflow-hidden leading-tight">
-          {/* ✅ Fixed hideName check */}
           {hideName ? hideNameAction(queue.patient_name) : queue.patient_name}
         </div>
       </div>
@@ -257,7 +328,11 @@ useEffect(() => {
         <div className="flex-1 min-w-[300px] bg-gray-100 p-2 rounded-md shadow-md overflow-hidden">
           <p className="text-2xl font-extrabold text-center text-green-700 uppercase">Racikan</p>
           {queuesRacik.length > 5 ? 
-            renderMarqueeSectionMedicine(chunkedRacik, times.processTimeRacik, true) :
+            <SeamlessCarousel
+              chunks={chunkedRacik}
+              duration={times.processTimeRacik}
+              renderItem={(group) => renderQueueItems(group, true)}
+            /> :
             <div className="w-full flex flex-col items-center" style={{ height: '1030px', overflowY: 'auto' }}>
               {renderQueueItems(queuesRacik, true)}
             </div>
@@ -268,7 +343,11 @@ useEffect(() => {
         <div className="flex-1 min-w-[300px] bg-gray-100 p-2 rounded-md shadow-md overflow-hidden">
           <p className="text-2xl font-extrabold text-center text-green-700 uppercase">Non-Racikan</p>
           {queuesNonRacik.length > 5 ? 
-            renderMarqueeSectionMedicine(chunkedNonRacik, times.processTimeNon, false) :
+            <SeamlessCarousel
+              chunks={chunkedNonRacik}
+              duration={times.processTimeNon}
+              renderItem={(group) => renderQueueItems(group, false)}
+            /> :
             <div className="w-full flex flex-col items-center" style={{ height: '1030px', overflowY: 'auto' }}>
               {renderQueueItems(queuesNonRacik, false)}
             </div>
@@ -291,8 +370,7 @@ function hideNameAction(name){
 }
 
 
-
- const QueueSectionVerification = ({ title, queues, bgColor }) => {
+const QueueSectionVerification = ({ title, queues, bgColor }) => {
   const chunkArray = (arr, size) => {
     return arr.reduce((chunks, item, i) => {
       if (i % size === 0) {
@@ -306,32 +384,96 @@ function hideNameAction(name){
   
   const chunkedQueue = useMemo(() => chunkArray(queues, 5), [queues]);
   
-  const renderMarqueeSection = (chunkedQueues, duration) => (
-    <Carousel
-      autoplay
-      autoplaySpeed={5000}
-      dots
-      infinite={true}
-      slidesToShow={1}
-      draggable={false}
-      adaptiveHeight={false}
-      className="gap-[3rem]"
-      style={{ "--duration": `${duration}s`, height: "1060px", width: "100%" }}
-    >
-      {chunkedQueues.map((group, groupIndex) => (
-        <div key={`group-${groupIndex}-${group.map(q => q.queueNumber).join("_")}`}>
-          <div style={{ height: "1060px", textAlign: "center" }}>
-            <div className="flex flex-col gap-2">
-              {/* ✅ Pass the group to renderQueueItems */}
+  // ✅ Custom Seamless Carousel Component
+  const SeamlessCarousel = ({ chunks, duration }) => {
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const [isTransitioning, setIsTransitioning] = useState(true);
+    
+    // Duplicate first slide at end for seamless loop
+    const loopedChunks = chunks.length > 0 ? [...chunks, chunks[0]] : chunks;
+    
+    useEffect(() => {
+      if (chunks.length <= 1) return;
+
+      const interval = setInterval(() => {
+        setCurrentIndex((prev) => prev + 1);
+      }, duration * 1000);
+
+      return () => clearInterval(interval);
+    }, [chunks.length, duration]);
+    
+    useEffect(() => {
+      // When we reach the duplicate (last position), instantly jump to first
+      if (currentIndex === loopedChunks.length - 1) {
+        setTimeout(() => {
+          setIsTransitioning(false); // Disable transition
+          setCurrentIndex(0); // Jump to first instantly
+          
+          // Re-enable transition after a brief moment
+          setTimeout(() => {
+            setIsTransitioning(true);
+          }, 50);
+        }, duration * 1000);
+      }
+    }, [currentIndex, loopedChunks.length, duration]);
+
+    if (chunks.length === 0) return null;
+
+    return (
+      <div style={{ height: "1060px", position: "relative", overflow: "hidden" }}>
+        <div
+          style={{
+            display: "flex",
+            transform: `translateX(-${currentIndex * 100}%)`,
+            transition: isTransitioning ? "transform 0.5s ease-in-out" : "none",
+            height: "100%"
+          }}
+        >
+          {loopedChunks.map((group, idx) => (
+            <div
+              key={`slide-${idx}`}
+              style={{
+                minWidth: "100%",
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
+                gap: "0.5rem"
+              }}
+            >
               {renderQueueItems(group)}
             </div>
-          </div>
+          ))}
         </div>
-      ))}
-    </Carousel>
-  );
+        
+        {/* Dots indicator - only show for actual slides, not duplicate */}
+        {chunks.length > 1 && (
+          <div style={{
+            position: "absolute",
+            bottom: "10px",
+            left: "50%",
+            transform: "translateX(-50%)",
+            display: "flex",
+            gap: "8px",
+            zIndex: 10
+          }}>
+            {chunks.map((_, idx) => (
+              <div
+                key={idx}
+                style={{
+                  width: "10px",
+                  height: "10px",
+                  borderRadius: "50%",
+                  backgroundColor: (currentIndex % chunks.length) === idx ? "#22c55e" : "#d1d5db",
+                  transition: "background-color 0.3s"
+                }}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
   
-  // ✅ Accept queueList parameter
   const renderQueueItems = (queueList = queues) => {
     if (!queueList || queueList.length === 0) {
       return (
@@ -344,10 +486,10 @@ function hideNameAction(name){
     return queueList.map((queue, index) => (
       <div 
         key={`${queue.queueNumber}-${index}`}
-        className="flex items-center flex-col justify-between bg-gray-100 text-green-700 text-6xl font-extrabold p-4 shadow text-center border-2 border-black rounded w-full"
+        className="flex items-center flex-col justify-between bg-gray-100 text-green-700 text-6xl font-extrabold p-4 shadow text-center border-2 border-black rounded w-full mb-2"
       >
-        <div className="flex flex-row gap-5 justify-around w-full h-1/6">
-          <div className={`flex-1 text-4xl text-left items-middle ${getStatusColor(queue.status)}`}>
+        <div className="flex flex-row gap-5 justify-around w-full">
+          <div className={`flex-1 text-4xl text-left ${getStatusColor(queue.status)}`}>
             {queue.queueNumber}
           </div>
           <div className={`flex-1 text-3xl text-center ${getStatusColor(queue.status)}`}>
@@ -357,8 +499,7 @@ function hideNameAction(name){
             {queue.status}
           </div>
         </div>
-        <div className={`flex-1 text-4xl text-center bg-green-400 mt-2 w-full p-1 text-black`}>
-          {/* ✅ Fixed hideName check */}
+        <div className={`text-4xl text-center bg-green-400 mt-2 w-full p-1 text-black truncate`}>
           {hideName ? hideNameAction(queue.patient_name) : queue.patient_name}
         </div>
       </div>
@@ -371,7 +512,10 @@ function hideNameAction(name){
       <div className="flex gap-2 mt-2">
         <div className="bg-gray-100 p-2 rounded-md shadow-md w-full h-full">
           {queues.length > 5 ? (
-            renderMarqueeSection(chunkedQueue, times.verifTime)
+            <SeamlessCarousel
+              chunks={chunkedQueue}
+              duration={times.verifTime}
+            />
           ) : (
             <div className="w-full" style={{ height: '1100px', overflowY: 'auto' }}>
               {renderQueueItems()}

@@ -65,6 +65,7 @@ export default function BarcodeScanner({location, visible, onClose }) {
     setSEP("");
     setType("");
     setPRB("");
+    setTotalMedicine(0);
   if (inputRef.current) {
     inputRef.current.focus();
   }  
@@ -227,7 +228,8 @@ const barcode = inputValue.replace(/\s+/g, ""); // Removes ALL whitespace
     console.log(inputValue);
    
      const checkRegistrationResponse = await CheckRegistrationInfo.checkQueue(inputValue);
-   
+    const regisData = await BPJSBarcodeAPI.fetchRegistrationInfo(inputValue);
+    console.log("REG DATA",regisData.data.length);
       console.log("CHECKRES",checkRegistrationResponse);
       setDocter(checkRegistrationResponse.ParamedicName);
       setNIK(checkRegistrationResponse.SSN);
@@ -238,7 +240,7 @@ const barcode = inputValue.replace(/\s+/g, ""); // Removes ALL whitespace
       setDOB(checkRegistrationResponse.DateOfBirth);
       setNOP(checkRegistrationResponse.RegistrationNo);
       setPRB(checkRegistrationResponse.ProlanisPRB);
-      setTotalMedicine(0);
+      setTotalMedicine(regisData.data.length);
 
 
     return checkRegistrationResponse;
@@ -340,10 +342,10 @@ const barcode = inputValue.replace(/\s+/g, ""); // Removes ALL whitespace
       socket.emit('update_verif',{location});
       socket.emit('update_display',{location});
       const WARESP =await WA_API.sendWAAntrian(WAPayload);
-      const PRINTRESP= await PrintAntrian.printAntrian(printPayload);
-                  await new Promise(resolve => setTimeout(resolve, 1000)); // 1-second delay
+      // const PRINTRESP= await PrintAntrian.printAntrian(printPayload);
+      //             await new Promise(resolve => setTimeout(resolve, 1000)); // 1-second delay
 
-      console.log("RESP ERROR",WARESP.data,PRINTRESP.data)
+      // console.log("RESP ERROR",WARESP.data,PRINTRESP.data)
      
 
 
