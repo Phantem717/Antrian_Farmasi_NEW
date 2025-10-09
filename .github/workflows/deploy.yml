@@ -2,7 +2,7 @@ name: Auto Deploy to Server
 
 on:
   push:
-    branches: [ test_secret ]  # Change to 'prod' later for production
+    branches: [ test_secrets ]  # Change to 'prod' later for production
 
 jobs:
   deploy:
