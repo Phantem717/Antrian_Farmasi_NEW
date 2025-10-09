@@ -2,14 +2,15 @@ name: Auto Deploy to Server
 
 on:
   push:
-    branches: [ test-secrets ]  # Change to 'prod' later for production
+    branches: [ test_secret ]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
+    
     steps:
     - name: Deploy to server
+      uses: appleboy/ssh-action@v1.0.3
       env:
         X_API_KEY: ${{ secrets.X_API_KEY }}
         BASE_URL: ${{ secrets.BASE_URL }}
@@ -18,7 +19,7 @@ jobs:
         FE_HOST: ${{ secrets.FE_HOST }}
         FE_PORT: ${{ secrets.FE_PORT }}
         MEDIN_URL: ${{ secrets.MEDIN_URL }}
-        MEDIN_URL2: ${{ secrets.MEDIN_URL2 }}
+        MEDIN_URL2: ${{ secrets.ME_URL2 }}
         MEDIN_URL_GMCB: ${{ secrets.MEDIN_URL_GMCB }}
         X_API_KEY_MEDIN: ${{ secrets.X_API_KEY_MEDIN }}
         CONS_ID: ${{ secrets.CONS_ID }}
@@ -31,13 +32,11 @@ jobs:
         PASSWORD_WA: ${{ secrets.PASSWORD_WA }}
         NEXT_PUBLIC_API_HOST: ${{ secrets.NEXT_PUBLIC_API_HOST }}
         NEXT_PUBLIC_API_PORT: ${{ secrets.NEXT_PUBLIC_API_PORT }}
-      uses: appleboy/ssh-action@v1.0.3
-
       with:
-        host: ${{ secrets.HOST }}
+        host: ${{ secrets.DEPLOY_HOST }}
         username: ${{ secrets.USERNAME }}
-        envs: X_API_KEY,BASE_URL,HOST,PORT,FE_HOST,FE_PORT,MEDIN_URL,MEDIN_URL2,MEDIN_URL_GMCB,X_API_KEY_MEDIN,CONS_ID,PASSWORD,CONS_ID_FARMASI,SECRETKEY,API_URL,API_WA,CONS_ID_WA,PASSWORD_WA,NEXT_PUBLIC_API_HOST,NEXT_PUBLIC_API_PORT
         key: ${{ secrets.SSH_KEY }}
+        envs: X_API_KEY,BASE_URL,HOST,PORT,FE_HOST,FE_PORT,MEDIN_URL,MEDIN_URL2,MEDIN_URL_GMCB,X_API_KEY_MEDIN,CONS_ID,PASSWORD,CONS_ID_FARMASI,SECRETKEY,API_URL,API_WA,CONS_ID_WA,PASSWORD_WA,NEXT_PUBLIC_API_HOST,NEXT_PUBLIC_API_PORT
         script: |
           cd /home/sirs/Antrian_Farmasi_NEW || exit 1
           
