@@ -12,3 +12,4 @@ export default function Home() {
 
   return null; // Tidak perlu menampilkan apapun karena langsung redirect
 }
+                                                             
