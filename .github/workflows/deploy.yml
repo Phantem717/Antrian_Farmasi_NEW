@@ -1,3 +1,8 @@
+name: Auto Deploy to Server
+
+on:
+  push:
+    branches: [ test_secret ]
 jobs:
   deploy:
     runs-on: ubuntu-latest
