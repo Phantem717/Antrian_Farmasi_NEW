@@ -69,7 +69,7 @@ const ExportToExcel = ({ data, fileName }) => {
 
   // Create worksheet and workbook
   const ws = XLSX.utils.json_to_sheet(exportData);
-  ws['!rows'] = [{ hpx: 500 }]; 
+  ws['!rows'] = [{ hpx: 50 }]; 
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Data Antrian");
 
