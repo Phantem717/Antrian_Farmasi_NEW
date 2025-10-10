@@ -1,6 +1,7 @@
 // src/routes/doctorAppointments.js
 const express = require('express');
 const router = express.Router();
+const authCheck = require('../middleware/authMiddleware.js');
 
 const {
   createAppointment,
@@ -31,7 +32,7 @@ router.get('/', getAllAppointments);
 // Endpoint untuk memperbarui appointment berdasarkan NOP
 router.put('/:NOP', updateAppointment);
 router.put('/:NOP/phone_number', updatePhoneNumber);
-router.put('/:NOP/total_medicine', updateTotalMedicineController);
+router.put('/:NOP/total_medicine', authCheck, updateTotalMedicineController);
 
 router.put('/type/:NOP',updateMedicineType);
 router.patch('/:NOP/status_medicine', updateStatusMedicine);
