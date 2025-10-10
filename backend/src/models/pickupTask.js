@@ -120,6 +120,9 @@ class PickupTask {
   }
   }
 
+
+//   WHERE (date(pt.waiting_pickup_medicine_stamp) = CURRENT_DATE OR (date(pt.waiting_pickup_medicine_stamp) = CURRENT_DATE - INTERVAL 1 DAY) AND ph.status = 'pending_pickup_medicine')
+//  AND (ph.status IS NULL OR 
   static async getPickupToday(location){
   const pool = await getDb();
   const conn = await pool.getConnection(); // ? Explicit connection
@@ -140,8 +143,8 @@ class PickupTask {
         FROM Pickup_Task pt
           LEFT JOIN Doctor_Appointments da ON pt.NOP = da.NOP
           LEFT JOIN Pharmacy_Task ph ON pt.NOP = ph.NOP
-          WHERE (date(pt.waiting_pickup_medicine_stamp) = CURRENT_DATE OR (date(pt.waiting_pickup_medicine_stamp) = CURRENT_DATE - INTERVAL 1 DAY) AND ph.status = 'pending_pickup_medicine')
- AND (ph.status IS NULL OR 
+           WHERE date(pt.waiting_pickup_medicine_stamp) = CURRENT_DATE
+           AND (ph.status IS NULL OR 
        (ph.status != 'completed_pickup_medicine' AND ph.status LIKE '%pickup%'))
        AND pt.lokasi = ?
           ORDER BY 
@@ -176,8 +179,8 @@ class PickupTask {
         FROM Pickup_Task pt
           LEFT JOIN Doctor_Appointments da ON pt.NOP = da.NOP
           LEFT JOIN Pharmacy_Task ph ON pt.NOP = ph.NOP
-          WHERE (date(pt.waiting_pickup_medicine_stamp) = CURRENT_DATE )
- AND (ph.status IS NULL OR 
+           WHERE date(pt.waiting_pickup_medicine_stamp) = CURRENT_DATE
+           AND (ph.status IS NULL OR 
        (ph.status != 'completed_pickup_medicine' AND ph.status LIKE '%pickup%'))
        AND pt.lokasi = ?
           ORDER BY 
