@@ -124,7 +124,7 @@ const DoctorAppointmentAPI = {
       getUpdateTotalMedicine: async (requestBody) => {
         try {
             console.log("requestBody",requestBody);
-            const response = await axios.put(
+            const response = await axios.patch(
                 `${BASE_URL}/api/doctor-appointments/total_medicine`, // Your endpoint URL
                 requestBody,                       // The request body
                 {
