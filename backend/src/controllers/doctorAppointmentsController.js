@@ -281,8 +281,8 @@ const updatePhoneNumber = async (req,res)=>{
 
 const updateTotalMedicineController = async (req,res)=>{
   try {
-    const NOP = req.params.NOP;
-    const { total_medicine } = req.body;
+    // const NOP = req.params.NOP;
+    const { NOP,total_medicine } = req.body;
 
     // console.log("DATA UPDATE TYPE", status_medicine,NOP,farmasi_queue_number);
     if (!total_medicine) {
