@@ -106,6 +106,7 @@ const Sidebar = ({lokasi, collapsed, setCollapsed, isLocation }) => {
       icon: <SettingOutlined />,
       label: "Admin Obat",
       onClick: () =>{
+        
         console.log("URL",`${lokasi}`,`/login/${lokasi}/admin-obat-b`);
         router.push(`/login/${lokasi}/admin-obat-b`)
       } ,

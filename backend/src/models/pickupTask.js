@@ -72,7 +72,8 @@ class PickupTask {
           da.queue_number,
           da.status_medicine,
           ph.status,
-          ph.medicine_type
+          ph.medicine_type,
+          da.farmasi_queue_number
         FROM Pickup_Task pt
           LEFT JOIN Doctor_Appointments da ON pt.NOP = da.NOP
           LEFT JOIN Pharmacy_Task ph ON pt.NOP = ph.NOP
@@ -104,12 +105,13 @@ class PickupTask {
           da.queue_number,
           da.status_medicine,
           ph.status,
-          ph.medicine_type
+          ph.medicine_type,
+          da.farmasi_queue_number
         FROM Pickup_Task pt
           LEFT JOIN Doctor_Appointments da ON pt.NOP = da.NOP
           LEFT JOIN Pharmacy_Task ph ON pt.NOP = ph.NOP
           ORDER BY 
-    da.queue_number;
+    pt.waiting_pickup_medicine_stamp DESC;
       `;
       const [rows] = await conn.execute(query);
       return rows;
@@ -139,7 +141,8 @@ class PickupTask {
           da.doctor_name,
           da.status_medicine,
           ph.status,
-          ph.medicine_type
+          ph.medicine_type,
+          da.farmasi_queue_number
         FROM Pickup_Task pt
           LEFT JOIN Doctor_Appointments da ON pt.NOP = da.NOP
           LEFT JOIN Pharmacy_Task ph ON pt.NOP = ph.NOP
@@ -148,7 +151,7 @@ class PickupTask {
        (ph.status != 'completed_pickup_medicine' AND ph.status LIKE '%pickup%'))
        AND pt.lokasi = ?
           ORDER BY 
-    da.queue_number;
+    pt.waiting_pickup_medicine_stamp DESC;
       `;
       const [rows] = await conn.execute(query,[location]);
       return rows;
@@ -175,7 +178,8 @@ class PickupTask {
           da.doctor_name,
           da.status_medicine,
           ph.status,
-          ph.medicine_type
+          ph.medicine_type,
+          da.farmasi_queue_number
         FROM Pickup_Task pt
           LEFT JOIN Doctor_Appointments da ON pt.NOP = da.NOP
           LEFT JOIN Pharmacy_Task ph ON pt.NOP = ph.NOP
@@ -184,7 +188,7 @@ class PickupTask {
        (ph.status != 'completed_pickup_medicine' AND ph.status LIKE '%pickup%'))
        AND pt.lokasi = ?
           ORDER BY 
-    da.queue_number;
+    pt.waiting_pickup_medicine_stamp DESC;
       `;
       const [rows] = await conn.execute(query,[location]);
       return rows;
@@ -211,7 +215,8 @@ class PickupTask {
            da.phone_number,
           da.doctor_name,
           ph.status,
-          ph.medicine_type
+          ph.medicine_type,
+          da.farmasi_queue_number
         FROM Pickup_Task pt
           LEFT JOIN Doctor_Appointments da ON pt.NOP = da.NOP
           LEFT JOIN Pharmacy_Task ph ON pt.NOP = ph.NOP
@@ -221,7 +226,7 @@ class PickupTask {
               AND pt.lokasi = ?
 
           ORDER BY 
-    da.queue_number;
+    pt.waiting_pickup_medicine_stamp DESC;
       `;
       const values = [
         date,

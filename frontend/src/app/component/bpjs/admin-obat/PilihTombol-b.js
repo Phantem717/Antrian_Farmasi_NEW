@@ -48,12 +48,6 @@ const socket = getSocket();
     try {
       const status = validStatus[statusType];
 
-      
-
-      // await Promise.all([
-      //   PickupAPI.updatePickupTask(selectedQueue.NOP, requestBody),
-      //   PharmacyAPI.updatePharmacyTask(selectedQueue.NOP, requestBody),
-      // ]);
       if(statusType == "call" || statusType === "recall"){
           const respLoket = await LoketAPI.getAllLokets();
           const respData = respLoket.data;

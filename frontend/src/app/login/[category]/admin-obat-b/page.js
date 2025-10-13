@@ -7,11 +7,12 @@ import Footer from "@/app/component/Footer";
 import DisplayAntrian from "@/app/component/bpjs/admin-obat/DisplayAntrian-b";
 import PilihAksi from "@/app/component/bpjs/admin-obat/PilihTombol-b";
 import DaftarAntrian from "@/app/component/bpjs/admin-obat/DaftarAntrian-b";
+import DaftarAntrianG from "@/app/component/bpjs/admin-obat/DaftarAntrian-g";
 import MovingText from "@/app/component/bpjs/admin-obat/Movingtext";
 import Sidebar from "@/app/component/Sidebar-b";
 import { useRouter, usePathname } from "next/navigation";
 import { use } from 'react'; // Next.js 14+
-
+import PilihAksiG from "@/app/component/bpjs/admin-obat/PilihTombol-g";
 const { Content } = Layout;
 function useTokenCheck() {
   const [token, setToken] = useState("");
@@ -92,7 +93,17 @@ export default function Admin({params}) {
                 loketNumber={selectedLoket || "Pilih Loket"} // ? Gunakan loket yang dipilih
               />
 
-              <PilihAksi
+              {
+                category == "bpjs" ? <PilihAksi
+                selectedQueue={selectedQueue} // ? Kirim antrian yang dipilih
+                selectedQueueIds={selectedQueueIds} // ? Kirim banyak antrian yang dipilih
+                setSelectedQueueIds={setSelectedQueueIds} // ? Memungkinkan perubahan dari PilihAksi
+                onStatusUpdate={() => {}}
+                setSelectedQueue2={setSelectedQueue2}
+                selectedQueue2={selectedQueue2}
+                selectedLoket={selectedLoket}
+                location={category}
+              />: <PilihAksiG
                 selectedQueue={selectedQueue} // ? Kirim antrian yang dipilih
                 selectedQueueIds={selectedQueueIds} // ? Kirim banyak antrian yang dipilih
                 setSelectedQueueIds={setSelectedQueueIds} // ? Memungkinkan perubahan dari PilihAksi
@@ -102,11 +113,13 @@ export default function Admin({params}) {
                 selectedLoket={selectedLoket}
                 location={category}
               />
+              }
+             
             </div>
 
             {/* Bagian Kanan - Daftar Antrian */}
             <div style={{ flex: "2", overflowY: "auto", maxHeight: "100%", marginBottom:"100px"}}>
-            <DaftarAntrian 
+              {category == "bpjs" ?  <DaftarAntrian 
               selectedQueueIds={selectedQueueIds} 
               setSelectedQueueIds={setSelectedQueueIds} 
               setSelectedQueue={setSelectedQueue} 
@@ -114,7 +127,16 @@ export default function Admin({params}) {
               setSelectedQueue2={setSelectedQueue2}
               selectedQueue2={selectedQueue2}
               location={category}
-              />
+              />: <DaftarAntrianG 
+              selectedQueueIds={selectedQueueIds} 
+              setSelectedQueueIds={setSelectedQueueIds} 
+              setSelectedQueue={setSelectedQueue} 
+              setSelectedLoket={setSelectedLoket} // ? FIXED: Prop Name Corrected
+              setSelectedQueue2={setSelectedQueue2}
+              selectedQueue2={selectedQueue2}
+              location={category}
+              />}
+           
 
             </div>
           </div>
