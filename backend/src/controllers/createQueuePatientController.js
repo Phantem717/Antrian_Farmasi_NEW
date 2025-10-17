@@ -1,61 +1,58 @@
 const Doctor_Appoinment = require('../models/doctorAppointments');
 
 const createQueuePatient = async (req, res) => {
-const date = new Date();
-let type = req.params.type.toLowerCase();
-console.log("TYPEBE",type);
+    const date = new Date();
+    let type = req.params.type.toLowerCase();
+    
+    // --- Input Validation ---
+    if(!type || (type !== "jaminan" && type !== "umum")){
+        return res.status(400).json({ message: "Tipe Antrian TIdak Sesuai" });
+    }
+    console.log("TYPE",type);
+    // Determine the unique queue symbol
+    let queue_symbol = (type === "jaminan") ? "C" : "D";
 
-let number;
-let queue_number;
-let nop_date;
-let queue_symbol;
+    // --- 1. Get Today's Date String (YYYYMMDD) ---
+    const formattedToday = date.getFullYear().toString() +
+        String(date.getMonth() + 1).padStart(2, '0') +
+        String(date.getDate()).padStart(2, '0');
 
-if(!type){
-    return res.status(400).json({ message: "type not found" });
-}
+    // --- 2. Fetch Latest Queue for the SPECIFIC TYPE ('C' or 'D') ---
+    const latestQueueRecord = await Doctor_Appoinment.getLatestAntrianJaminan(queue_symbol);
+    console.log("LATEST QUEUE RECORD", latestQueueRecord);
+    let queue_number;
+    let number;
 
-if(type != "jaminan" && type != "umum"){
-    return res.status(400).json({ message: "Tipe Antrian TIdak Sesuai" });
-}
-
-if(type == "jaminan"){
-    queue_symbol = "C";
-}
-else if(type == "umum"){
-    queue_symbol = "D";
-}
-
-const formatted = date.getFullYear().toString() +
-  String(date.getMonth() + 1).padStart(2, '0') +
-  String(date.getDate()).padStart(2, '0');
-
-console.log("DATE", formatted); // e.g. 20251002
-const NOPQueue = await Doctor_Appoinment.getLatestAntrian();
-const latestQueue = await Doctor_Appoinment.getLatestAntrianJaminan(queue_symbol);
-console.log("latestQueue", latestQueue);
-
-if(!latestQueue || latestQueue.queue_number == "-"){
-    queue_number = `${queue_symbol}-001`;
-
-}
-else{
-nop_date = NOPQueue.NOP.split("/")[1];
-console.log("NOP DATE",nop_date,formatted);
-if (nop_date == formatted) {
-number = parseInt(latestQueue.queue_number.split("-")[1],10)+ 1 ;
-console.log("NUM",number);
-queue_number = `${queue_symbol}-${String(number).padStart(3, '0')}`;
-}
-else{
+    if (!latestQueueRecord || !latestQueueRecord.NOP || latestQueueRecord.queue_number === "-") {
+        // CASE 1: First queue of the day/system.
         queue_number = `${queue_symbol}-001`;
 
-}
-}
-
-return res.status(200).json({ message: "Success", queue_number: queue_number });
-
-
-
+    } else {
+        // --- 3. Date Check and Increment ---
+        const latestNOPParts = latestQueueRecord.NOP.split("/");
+        // Assuming NOP format is [SYMBOL]/[YYYYMMDD]/[NUMBER]
+        const nopDatePart = latestNOPParts.length > 1 ? latestNOPParts[1] : null; 
+        
+        if (nopDatePart === formattedToday) {
+            // CASE 2: Same day. Increment the sequence number.
+            
+            // Extract number from the queue_number field (e.g., gets '005' from 'C-005')
+            number = parseInt(latestQueueRecord.queue_number.split("-")[1], 10) + 1;
+            
+            queue_number = `${queue_symbol}-${String(number).padStart(3, '0')}`;
+        } else {
+            // CASE 3: New day. Reset the number.
+            queue_number = `${queue_symbol}-001`;
+        }
+    }
+    
+    // --- 4. Calculate Final NOP ---
+    // NOP is constructed as: SYMBOL/YYYYMMDD/NNN (e.g., C/20251016/001)
+    const sequenceNumber = queue_number.split("-")[1];
+    const NOP = `${queue_symbol}/${formattedToday}/${sequenceNumber}`;
+    
+    // Return the calculated values to the frontend for insertion
+    return res.status(200).json({ message: "Success", queue_number: queue_number, NOP: NOP });
 }
 
 module.exports = {

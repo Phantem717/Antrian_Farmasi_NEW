@@ -172,7 +172,7 @@ const getFarmasiList = async (req, res) => {
             medicine_type: statusMedicine,
             sep: farmasiArray.payload.sep_no,
             rm: farmasiArray.payload.medical_record_no ,
-            docter:  farmasiArray.payload?.patient_date_of_birth,
+            docter:  farmasiArray.payload?.doctor_name,
             nik:  farmasiArray.payload.nik || "-",
             prev_queue_number: "-",
             switch_WA: "true",

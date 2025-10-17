@@ -1,7 +1,7 @@
 'use client'
 import QueueCall from '@/app/component/display/bpjs/QueueCall_b';
 import ServingQueue from '@/app/component/display/bpjs/ServingQueue_b';
-import MissQueue from '@/app/component/display/bpjs/MissQueue_b';
+import NextQueueG from '@/app/component/display/bpjs/NextQueue_miss_g';
 import NextQueue from '@/app/component/display/bpjs/NextQueue_miss';
 import InfoBar from '@/app/component/display/bpjs/InfoBar_b';
 import MarqueeFooter from '@/app/component/display/bpjs/MarqueeFooter_b';
@@ -22,7 +22,8 @@ export default function BPJS_Pickup_Miss({params}) {
         <div className="flex-1 overflow-auto p-4">
           <InfoBar location={category}/>
           <div className="flex flex-row gap-4 mb-4 h-[calc(100%-3rem)]">
-            <NextQueue location={category} />
+            {category == "bpjs" ? <NextQueue location={category} />: <NextQueueG location={category} /> }
+            
             <QueueCall location={category} />
           </div>
         </div>

@@ -175,7 +175,7 @@ async function getInitalData(){
     processQueue(response);
 }
  const processQueue = async (response) => {
-    if (!selectedStatus) return;
+    // if (!selectedStatus) return;
 
     try {
         // Calculate yesterday's date at midnight
@@ -196,35 +196,19 @@ async function getInitalData(){
 
       
 
-        if(selectedStatus == "waiting_pickup_medicine" || selectedStatus == "called_pickup_medicine"){
-            filteredQueues = filteredQueues.filter(item => item.status == "waiting_pickup_medicine" || item.status == "called_pickup_medicine");
-        }
-        else{
-            filteredQueues = filteredQueues.filter(item => item.status === selectedStatus);
+        // if(selectedStatus == "waiting_pickup_medicine" || selectedStatus == "called_pickup_medicine"){
+        //     filteredQueues = filteredQueues.filter(item => item.status == "waiting_pickup_medicine" || item.status == "called_pickup_medicine");
+        // }
+        // else{
+        //     filteredQueues = filteredQueues.filter(item => item.status === selectedStatus);
 
-        }
-        const getEarliestTimestamp = (item) => {
-            const timestamps = [
-                item.waiting_pickup_medicine_stamp,
-                item.called_pickup_medicine_stamp,
-                item.recalled_pickup_medicine_stamp,
-                item.pending_pickup_medicine_stamp,
-                item.completed_pickup_medicine_stamp,
-            ]
-            .filter(Boolean)
-            .map((ts) => new Date(ts).getTime());
-
-            return timestamps.length > 0 ? Math.min(...timestamps) : Infinity;
-        };
-
-        filteredQueues = filteredQueues.sort(
-            (a, b) => getEarliestTimestamp(a) - getEarliestTimestamp(b)
-        );
-
+        // }
+       
         console.log("QUEUELIST with yesterday flag:", filteredQueues);
         setRawQueueList(filteredQueues);
         
         if (!searchText) {
+          console.log("QUEUE",filteredQueues);
             setQueueList(filteredQueues);
         } else {
             const filtered = filteredQueues.filter(item =>
@@ -237,11 +221,10 @@ async function getInitalData(){
         console.error("Error processing queue:", error);
     }
 };
-useEffect(() => {
-  
 
-   getInitalData();
-  socket.on('get_responses_pickup',(payload)=>{
+useEffect(() => {
+    getInitalData();
+    socket.on('get_responses_pickup',(payload)=>{
     console.log("PROCESSUS",payload);
     processQueue(payload);
     console.log("QUEUELIST2",queueList);
@@ -250,7 +233,7 @@ useEffect(() => {
     return () => {
             socket.off('get_responses_pickup');
         };
-}, [selectedStatus, selectedLoketLocal, date]); // Add date to dependencies
+}, [ selectedLoketLocal, date]); // Add date to dependencies
 
 // Add a clear date function
 const handleClearDate = () => {
@@ -362,6 +345,25 @@ const handleSearchClear = () => {
     }
   }
 
+  const handleColourChange = (status) => {
+    if(status.includes("called") || status.includes("recalled")){
+      return 'text-green-600';
+    }
+    
+    if(status.includes("pending")){
+      return 'text-red-600'
+    }
+
+    if(status.includes("waiting")){
+      return 'text-yellow-600'
+    }
+
+
+
+
+  }
+
+
 const hasYesterdayItems = queueList.some(item => item.isYesterday);
   return (
     <Box sx={{ padding: "10px" }}>
@@ -397,18 +399,7 @@ const hasYesterdayItems = queueList.some(item => item.isYesterday);
       </Select>
 
 
-        <Select
-          value={selectedStatus}
-          onChange={(e) => setSelectedStatus(e.target.value)}
-          displayEmpty
-          sx={{ width: "200px", marginRight: "10px" }}
-          disabled={!selectedLoketLocal}
-        >
-          <MenuItem value="waiting_pickup_medicine">Menunggu + Panggil Panggilan</MenuItem>
-          <MenuItem value="recalled_pickup_medicine">Panggil Ulang Pengambilan</MenuItem>
-          <MenuItem value="pending_pickup_medicine">Tunda Pengambilan</MenuItem>
-          {/* <MenuItem value="processed_pickup_medicine">Processed Pickup</MenuItem> */}
-        </Select>
+
 
   <Box sx={{ display: "flex", alignItems: "center", gap: "10px" }}>
   <div className="w-[200px] z-10">
@@ -416,7 +407,7 @@ const hasYesterdayItems = queueList.some(item => item.isYesterday);
               size="large"
 
             onChange={changeDate} 
-            disabled={!selectedStatus}
+            // disabled={!selectedStatus}
                 maxDate={dayjs(new Date().toISOString(), dateFormat)}
                 defaultValue={dayjs(new Date().toISOString(), dateFormat)}
 
@@ -522,6 +513,9 @@ const hasYesterdayItems = queueList.some(item => item.isYesterday);
         <strong>Kemarin?</strong>
       </TableCell>
     )}
+    <TableCell align="center">
+                <strong>STATUS</strong>
+              </TableCell>
               <TableCell align="center">
                 <strong>No. Antrian</strong>
               </TableCell>
@@ -531,9 +525,9 @@ const hasYesterdayItems = queueList.some(item => item.isYesterday);
               <TableCell align="center">
                 <strong>Nama Pasien</strong>
               </TableCell>
-              <TableCell align="center">
+              {/* <TableCell align="center">
                 <strong>Nomor SEP</strong>
-              </TableCell>
+              </TableCell> */}
               <TableCell align="center">
                 <strong>No. Rekam Medis</strong>
               </TableCell>
@@ -549,6 +543,9 @@ const hasYesterdayItems = queueList.some(item => item.isYesterday);
                 <TableCell align="center">
                 <strong>Timestamp</strong>
               </TableCell>
+                {/* <TableCell align="center">
+                <strong>Called Timestamp</strong>
+              </TableCell> */}
             </TableRow>
           </TableHead>
 
@@ -572,11 +569,21 @@ const hasYesterdayItems = queueList.some(item => item.isYesterday);
           ) : null}
         </TableCell>
       )}
+<TableCell  align="center" className={`font-extrabold uppercase text-lg ${handleColourChange(item.status)}`}>
+  {/* Correct comparison (===) and grouping for OR condition */}
+  {item.status == "called_pickup_medicine" || item.status == "recalled_pickup_medicine" 
+    ? "Dipanggil" 
+    : item.status == "waiting_pickup_medicine" 
+      ? "Menunggu" 
+      : item.status == "pending_pickup_medicine" 
+        ? "Ditunda" 
+        : "-"}
+</TableCell>
                 <TableCell style={{ fontWeight: 'bold' }} align="center" className='font-bold'>{item.queue_number}</TableCell>
                 
                 <TableCell style={{ fontWeight: 'bold' }} align="center" className='font-bold'>{item.NOP}</TableCell>
                 <TableCell style={{ fontWeight: 'bold' }} align="center" className='font-bold'>{item.patient_name}</TableCell>
-                <TableCell style={{ fontWeight: 'bold' }} align="center" className='font-bold'>{item.sep_no}</TableCell>
+                {/* <TableCell style={{ fontWeight: 'bold' }} align="center" className='font-bold'>{item.sep_no}</TableCell> */}
                 <TableCell style={{ fontWeight: 'bold' }} align="center" className='font-bold'>
                   {item.medical_record_no || "-"}
                 </TableCell>
@@ -601,11 +608,15 @@ const hasYesterdayItems = queueList.some(item => item.isYesterday);
                     : item.status_medicine === "Non - Racikan" ? "Non - Racikan" : "Tidak Ada Resep"}
                 </TableCell>
                  <TableCell style={{ fontWeight: 'bold' }} align="center" className='font-bold'>
-                                                          {item.waiting_pickup_medicine_stamp 
-                                                                               ? dayjs(item.waiting_pickup_medicine_stamp , "YYYY-MM-DD HH:mm:ss").format("DD MMM YYYY HH:mm")
-                                                             
-                                                                             : "-"}
-                                                        </TableCell>
+                  {item.called_pickup_medicine_stamp 
+                    ? dayjs(item.called_pickup_medicine_stamp , "YYYY-MM-DD HH:mm:ss").format("DD MMM YYYY HH:mm")                                     
+                      : dayjs(item.waiting_pickup_medicine_stamp , "YYYY-MM-DD HH:mm:ss").format("DD MMM YYYY HH:mm")   }
+                 </TableCell>
+                  {/* <TableCell style={{ fontWeight: 'bold' }} align="center" className='font-bold'>
+                  {item.called_pickup_medicine_stamp 
+                    ? dayjs(item.called_pickup_medicine_stamp , "YYYY-MM-DD HH:mm:ss").format("DD MMM YYYY HH:mm")                                     
+                      : "-"}
+                 </TableCell> */}
               </TableRow>
             ))}
           </TableBody>

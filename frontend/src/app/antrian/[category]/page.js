@@ -85,6 +85,7 @@ taskData);
     }
     const insertResp = await insertAll(payload);
     console.log("RESP",resp, insertResp);
+    const location = category
    socket.emit('update_verif',{location});
       socket.emit('update_display',{location});
   }
@@ -107,7 +108,8 @@ taskData);
     }
     const insertResp = await insertAll(payload);
     console.log("RESP",resp, insertResp);
-    socket.emit('update_verif',{location});
+    const location = category
+   socket.emit('update_verif',{location});
       socket.emit('update_display',{location});
   }
   return (

@@ -16,7 +16,6 @@ const socketConfig = require('./config/socket'); // ? Import socket setup
 const io = socketConfig.init(server);
 app.set('socketio',io);
 
-const emailRoutes = require('./routes/emailRoutes');
 const doctorAppointmentsRoutes = require('./routes/doctorAppointments');
 const BarcodeRoutes = require('./routes/BarcodeRoutes');
 const loketRoutes = require('./routes/loketRoutes');
@@ -53,7 +52,6 @@ app.use(express.json({ limit: '500mb' }));
 app.use(express.urlencoded({ limit: '500mb', extended: true }));
 
   // Daftarkan route
-  app.use('/api/email/', emailRoutes);
   app.use('/api/doctor-appointments', doctorAppointmentsRoutes);
   app.use('/api/bpjs', BarcodeRoutes);
   app.use('/api/loket', loketRoutes);

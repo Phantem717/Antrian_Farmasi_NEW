@@ -210,28 +210,38 @@ ORDER BY NOP DESC LIMIT 1
     conn.release(); // ?? Critical cleanup
   }
   }
-static async getLatestAntrianJaminan(type) {
-  const pool = await getDb();
-  const conn = await pool.getConnection();
-  console.log("TYPE MODEL",type);
-  let select;
-  
-  try {
-    const query = `
-     SELECT queue_number,NOP
-      FROM Doctor_Appointments
-      WHERE NOP REGEXP 'NOP/[0-9]{8}/[CD]-[0-9]+$'
-      ORDER BY NOP DESC 
-      LIMIT 1
-    `;
+// Inside ../models/doctorAppointments.js
 
-    const [rows] = await conn.execute(query, [type]);
-    return rows[0] || null; // safer in case no rows
-  } catch (error) {
-    throw error;
-  } finally {
-    conn.release();
-  }
+static async getLatestAntrianJaminan(type) {
+    const pool = await getDb();
+    const conn = await pool.getConnection();
+    
+    // 1. CRITICAL: Define the pattern to search for (e.g., 'C-%' or 'D-%')
+    const queuePattern = `${type}-%`; 
+
+    try {
+        const query = `
+            SELECT queue_number, NOP
+            FROM Doctor_Appointments
+            
+            -- FIX: Use the LIKE clause to filter by the start of the queue_number
+            WHERE queue_number LIKE ? 
+            
+            ORDER BY NOP DESC 
+            LIMIT 1
+        `;
+
+        // 2. Execute the query using the pattern
+        const [rows] = await conn.execute(query, [queuePattern]); // Pass [queuePattern] here
+        
+        // If no rows match (e.g., first 'D' entry ever), rows[0] will be null,
+        // which correctly triggers the 'D-001' logic in the controller.
+        return rows[0] || null; 
+    } catch (error) {
+        throw error;
+    } finally {
+        conn.release();
+    }
 }
 
   /**

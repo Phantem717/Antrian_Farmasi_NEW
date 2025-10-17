@@ -1,196 +1,226 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Box, Button } from "@mui/material";
 import PickupAPI from "@/app/utils/api/Pickup";
 import PharmacyAPI from "@/app/utils/api/Pharmacy";
 import LoketAPI from "@/app/utils/api/Loket";
 import Swal from "sweetalert2";
-import {getSocket} from "@/app/utils/api/socket";
+import { getSocket } from "@/app/utils/api/socket";
 import DoctorAppointmentAPI from "@/app/utils/api/Doctor_Appoinment";
 import WA_API from "@/app/utils/api/WA";
-import { queue } from "jquery";
-const PilihAksiG = ({location, selectedQueue,selectedQueueIds = [], setSelectedQueueIds, onStatusUpdate, setSelectedQueue2,selectedQueue2, selectedLoket }) => {
-  console.log("QUEUS",selectedQueue2, selectedLoket);
-const socket = getSocket();
+
+const validStatus = {
+  call: "called_pickup_medicine",
+  pending: "pending_pickup_medicine",
+  complete: "completed_pickup_medicine",
+  recall: "recalled_pickup_medicine",
+};
+
+const PilihAksiG = ({ location, selectedQueue, selectedQueueIds = [], setSelectedQueueIds, onStatusUpdate, setSelectedQueue2, selectedQueue2, selectedLoket }) => {
+  const socket = getSocket();
   const [isCompleteServiceEnabled, setIsCompleteServiceEnabled] = useState(false);
+  
+  // Define 5 minutes in milliseconds for the stale check
+  const CHECK_DURATION_MS = 5 * 60 * 1000; 
 
-  // ✅ Status yang sesuai untuk PickupAPI & PharmacyAPI
-  const validStatus = {
-    call: "called_pickup_medicine",
-    pending: "pending_pickup_medicine",
-    complete: "completed_pickup_medicine",
-    recall: "recalled_pickup_medicine",
-  };
-
- useEffect(() => {
-    const shouldEnable = selectedQueue2.some(queue => 
-      queue.status === "pending_pickup_medicine" || 
+  useEffect(() => {
+    // Enable 'Complete' button if any selected queue is currently being processed/called/recalled
+    const shouldEnable = selectedQueue2.some(queue =>
+      queue.status === "pending_pickup_medicine" ||
       queue.status === "called_pickup_medicine" ||
       queue.status === "recalled_pickup_medicine"
     );
     setIsCompleteServiceEnabled(shouldEnable);
-  }, [selectedQueue2]); // Re-run whenever selectedQueue2 changes
+  }, [selectedQueue2]);
 
-  
-const reorderQueueAfterCall = async (calledQueues, allQueues) => {
-  try {
-    console.log("TEST",calledQueues,allQueues);
-    // Separate queues by medicine type
-    const racikanQueues = allQueues.filter(q => q.status_medicine === "Racikan");
-    const nonRacikanQueues = allQueues.filter(q => q.status_medicine === "Non - Racikan");
-    
-    // Process each called queue
-    for (const calledQueue of calledQueues) {
-      const isRacikan = calledQueue.status_medicine === "Racikan";
-      const relevantQueues = isRacikan ? racikanQueues : nonRacikanQueues;
-      
-      // Find current position
-      const currentIndex = relevantQueues.findIndex(q => q.NOP === calledQueue.NOP);
-      
-      if (currentIndex === -1) continue;
-      
-      // Calculate new position (3 positions down)
-      const newIndex = Math.min(currentIndex + 3, relevantQueues.length - 1);
-      
-      // Get the queue that will be at the new position
-      const targetQueue = relevantQueues[newIndex];
-      
-      if (!targetQueue) continue;
-      
-      // Get timestamp slightly after the target queue
-      const targetTimestamp = new Date(targetQueue.waiting_pickup_medicine_stamp);
-      const newTimestamp = new Date(targetTimestamp.getTime() + 900000); // 1 second after
-      
-      // Update the called queue's timestamp
-      const update = await PickupAPI.updatePickupTask(calledQueue.NOP, {
-        called_pickup_medicine_stamp: newTimestamp,
-      });
-      console.log("UPDATE",update);
-      console.log(`✅ Moved ${calledQueue.queue_number} down 3 positions`);
+  // --- NEW: FUNCTION TO CHECK AND FLAG STALE CALLS ---
+  const checkAndFlagStaleCalls = async (currentLocation) => {
+    try {
+        const response = await PickupAPI.getPickupToday(currentLocation);
+        const allQueues = response.data;
+        const now = new Date().getTime();
+        
+        const staleCalledQueues = allQueues.filter(item => {
+            // Check only items that were called and have a timestamp
+            if (item.status === 'called_pickup_medicine' && item.called_pickup_medicine_stamp) {
+                const calledTime = new Date(item.called_pickup_medicine_stamp).getTime();
+                const timeElapsed = now - calledTime;
+                
+                // Return true if time elapsed is GREATER than 5 minutes
+                return timeElapsed > CHECK_DURATION_MS;
+            }
+            return false;
+        });
+
+        if (staleCalledQueues.length > 0) {
+            console.warn(`⚠️ Found ${staleCalledQueues.length} stale called items.`);
+            
+            const statusToFlag = 'pending_pickup_medicine';
+
+            // Update all stale items to 'pending_pickup_medicine' status
+            await Promise.all(
+                staleCalledQueues.map(async (queue) => {
+                    const updateBody = { status: statusToFlag,  medicine_type: queue.status_medicine,
+                };
+                    
+                    await PharmacyAPI.updatePharmacyTask(queue.NOP, updateBody);
+                    await PickupAPI.updatePickupTask(queue.NOP, updateBody);
+                })
+            );
+            
+            return { count: staleCalledQueues.length, action: statusToFlag };
+        }
+        return { count: 0 };
+
+    } catch (error) {
+        console.error("Error checking stale calls:", error);
+        return { count: -1, error: error.message };
     }
-  } catch (error) {
-    console.error("Error reordering queue:", error);
-  }
-};
+  };
+  // ----------------------------------------------------
 
   // ✅ Fungsi untuk Update Status ke API Pickup & Pharmacy
   const handleStatusUpdate = async (statusType) => {
-  if (!selectedQueue) {
-    Swal.fire({
-      icon: "warning",
-      title: "Pilih antrian terlebih dahulu!",
-      toast: true,
-      position: "top-end",
-      showConfirmButton: false,
-      timer: 2000,
-      timerProgressBar: true,
-    });
-    return;
-  }
-
-  try {
-    const status = validStatus[statusType];
-
-    // ✅ First, update status for all selected queues
-    await Promise.all(
-      selectedQueue2.map(async (queue) => {
-        const requestBody = {
-          status: status,
-          medicine_type: queue.status_medicine,
-        };
-
-        await Promise.all([
-          PickupAPI.updatePickupTask(queue.NOP, requestBody),
-          PharmacyAPI.updatePharmacyTask(queue.NOP, requestBody),
-        ]);
-      })
-    );
-
-    // ✅ If calling queues, handle reordering and notifications
-    if (statusType == "call" || statusType === "recall") {
-      const respLoket = await LoketAPI.getAllLokets();
-      const updatedQueues = selectedQueue2.map(queue => ({
-        ...queue,
-        loket: selectedLoket
-      }));
-      
-      // Emit socket for display
-      socket.emit('call_queues_pickup', {
-        data: updatedQueues,
-        lokasi: "Lantai 1 BPJS"
-      });
-
-      // ✅ Reorder queue - push down 3 positions
-      // Get all current queues from the list
-      const allCurrentQueues = await PickupAPI.getPickupToday(location);
-      await reorderQueueAfterCall(selectedQueue2, allCurrentQueues.data);
-
-      // Send WhatsApp notifications
-      for (const queue of selectedQueue2) {
-        const doctorResponse = await DoctorAppointmentAPI.getAppointmentByNOP(queue.NOP);
+    
+    // 🛑 INTEGRATION: RUN STALE CHECK FIRST
+    const staleResult = await checkAndFlagStaleCalls(location);
+    
+    if (staleResult.count > 0) {
+        Swal.fire({
+            icon: "info",
+            title: "Antrian Diperbarui Otomatis",
+            text: `${staleResult.count} antrian yang melewati batas 5 menit telah ditandai sebagai 'Ditunda'.`,
+            toast: true,
+            position: "top-end",
+            showConfirmButton: false,
+            timer: 4000,
+            timerProgressBar: true,
+        });
+        // Force refresh the list to show the pending items before processing the user's new action
+        socket.emit('update_pickup', { location }); 
         
-        const payload = {
-          phone_number: doctorResponse.data.phone_number,
-          patient_name: doctorResponse.data.patient_name,
-          medicine_type: doctorResponse.data.status_medicine,
-          sep: doctorResponse.data.sep_no,
-          rm: doctorResponse.data.medical_record_no,
-          docter: doctorResponse.data.doctor_name,
-          nik: doctorResponse.data.nik,
-          queue_number: doctorResponse.data.queue_number,
-          NOP: doctorResponse.data.NOP,
-          waiting_pickup_medicine_stamp: queue.waiting_pickup_medicine_stamp,
-          switch_WA: localStorage.getItem('waToggleState') || "true",
-          loket: selectedLoket,
-          location: location
-        };
+        // This is a design choice: either return here, or continue with the user's action
+        // For simplicity, we continue, assuming the user's new call is more important.
+    }
+    // ------------------------------------------
 
-        if (queue === selectedQueue2[0]) {
-          socket.emit('update_latest_pickup', {
-            message: "Update Pickup",
-            data: payload
-          });
-        }
-
-        // await WA_API.sendWAPickup(payload);
-        await new Promise(resolve => setTimeout(resolve, 1000));
-      }
+    if (!selectedQueue) {
+      Swal.fire({
+        icon: "warning",
+        title: "Pilih antrian terlebih dahulu!",
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true,
+      });
+      return;
     }
 
-    Swal.fire({
-      icon: "success",
-      title: `Status berhasil diperbarui menjadi ${status.replace("_", " ")}`,
-      toast: true,
-      position: "top-end",
-      showConfirmButton: false,
-      timer: 2000,
-      timerProgressBar: true,
-    });
+    try {
+      const status = validStatus[statusType];
+      const newDate = new Date().toISOString(); // Current timestamp
 
-    setIsCompleteServiceEnabled(statusType === "call" || statusType === "recall");
-    
-    socket.emit('update_pickup', { location });
-    socket.emit('update_display', { location });
+      // Determine the timestamp field to update based on the statusType
+      const timestampField = `${statusType}_pickup_medicine_stamp`;
+      
+      // 1. Update status and timestamp for all selected queues
+      await Promise.all(
+        selectedQueue2.map(async (queue) => {
+          const pharmacyRequestBody = {
+            status: status,
+            medicine_type: queue.status_medicine,
+          };
+          
+          // Pickup task requires the status AND the timestamp update
+          const pickupRequestBody = {
+            status: status,
+            
+            // Dynamically set the timestamp field to the current time
+            [timestampField]: newDate, 
+          };
 
-    setSelectedQueue2([]);
-    setSelectedQueueIds([]);
-    onStatusUpdate();
+          await Promise.all([
+            PharmacyAPI.updatePharmacyTask(queue.NOP, pharmacyRequestBody), 
+            // Send the timestamp to Pickup Task
+            PickupAPI.updatePickupTask(queue.NOP, pickupRequestBody), 
+          ]);
+        })
+      );
 
-  } catch (error) {
-    console.error("❌ Error detail:", error);
-    Swal.fire({
-      icon: "error",
-      title: "Gagal memperbarui status!",
-      text: error.message || "Terjadi kesalahan saat menghubungi server.",
-      toast: true,
-      position: "top-end",
-      showConfirmButton: false,
-      timer: 3000,
-      timerProgressBar: true,
-    });
-  }
-};
+      // 2. Handle notifications (only for calling actions)
+      if (statusType === "call" || statusType === "recall") {
+        
+        // Emit socket for display
+        const updatedQueues = selectedQueue2.map(queue => ({
+          ...queue,
+          loket: selectedLoket,
+          status: status, // Reflect new status for socket emit
+        }));
+        
+        socket.emit('call_queues_pickup', {
+          data: updatedQueues,
+          lokasi: "Lantai 1 BPJS" // Use correct location for display
+        });
+        
+        // 3. Send WhatsApp notifications (simplified)
+        for (const queue of selectedQueue2) {
+          const doctorResponse = await DoctorAppointmentAPI.getAppointmentByNOP(queue.NOP);
+          
+          const payload = {
+            phone_number: doctorResponse.data.phone_number,
+            patient_name: doctorResponse.data.patient_name,
+            loket: selectedLoket,
+            location: location,
+            // ... other payload data ...
+          };
 
-  // Add this function in PilihAksiG component or in a utils file
+          // Update latest for display (first queue in selection)
+          if (queue === selectedQueue2[0]) {
+            socket.emit('update_latest_pickup', {
+              message: "Update Pickup",
+              data: payload
+            });
+          }
+
+          // await WA_API.sendWAPickup(payload);
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+      }
+
+      Swal.fire({
+        icon: "success",
+        title: `Status berhasil diperbarui menjadi ${status.replace("_", " ")}`,
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true,
+      });
+
+      setIsCompleteServiceEnabled(statusType === "call" || statusType === "recall");
+
+      // 4. Force global updates to refresh queue list
+      socket.emit('update_pickup', { location });
+      socket.emit('update_display', { location });
+
+      setSelectedQueue2([]);
+      setSelectedQueueIds([]);
+      onStatusUpdate();
+
+    } catch (error) {
+      console.error("❌ Error detail:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Gagal memperbarui status!",
+        text: error.message || "Terjadi kesalahan saat menghubungi server.",
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+      });
+    }
+  };
 
   return (
     <Box
@@ -237,7 +267,7 @@ const reorderQueueAfterCall = async (calledQueues, allQueues) => {
         PENDING
       </Button>
 
-      {/* ✅ SELESAIKAN LAYANAN (Sekarang bisa langsung aktif setelah "PANGGIL NOMOR") */}
+      {/* ✅ SELESAIKAN LAYANAN */}
       <Button
         variant="contained"
         sx={{

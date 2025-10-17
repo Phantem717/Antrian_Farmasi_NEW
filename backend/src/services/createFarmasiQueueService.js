@@ -10,7 +10,7 @@ async function createAntrianFarmasi(medicine_type,lokasi){
 try {
  
     const { timestamp, signature } = generateSignature(consID2, password);
- const url = `http://192.168.6.86/api/v1/visit/queue/pharmacy/create-queue`;
+ const url = `http://192.168.6.86/api/v1/visit/queue/pharmacy/create-queue2`;
  console.log("medicine_type",medicine_type,lokasi)
 // console.log("PHONE_NUMBER",phone_number);
     const response = await axios.post(
