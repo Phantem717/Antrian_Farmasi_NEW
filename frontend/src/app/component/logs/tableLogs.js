@@ -64,7 +64,8 @@ const ExportToExcel = ({ data, fileName }) => {
     'Completed Pickup Medicine': item.completed_pickup_medicine_stamp 
       ? new Date(item.completed_pickup_medicine_stamp).toLocaleString("id-ID")
       : "-",
-    'Duration (Menit)': item.verification_to_pickup_minutes || "-"
+    'Duration (Menit)': item.verification_to_pickup_minutes || "-",
+    'Total Medicine': item.total_medicine || "0",
   }));
 
   // Create worksheet and workbook
