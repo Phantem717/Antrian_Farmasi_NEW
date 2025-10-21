@@ -12,8 +12,13 @@ const NextQueue = ({location, verificationData, medicineData, pickupData }) => {
     const socket = getSocket(); // Ensure this returns a singleton socket instance
     console.log("LOCATION",location);
     const [currentDate, setCurrentDate] = useState(new Date().toDateString()); // [currentDate,setCurrentDate]
-  const [hideName, setHideName] = useState(true);
-  console.log(hideName)
+const [hideName, setHideName] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const storedValue = localStorage.getItem('nameToggleState');
+      return storedValue ? storedValue === 'true' : true;
+    }
+    return true;
+  });  console.log(hideName)
   const [queues, setQueues] = useState({
     nextQueueRacik: [],
     nextQueueNonRacik: [],
