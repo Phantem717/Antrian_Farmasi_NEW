@@ -44,25 +44,25 @@ const ExportToExcel = ({ data, fileName }) => {
     'No. Rekam Medis': item.medical_record_no || "-",
     'Status Medicine': item.status_medicine || "-",
     'Waiting Verification': item.waiting_verification_stamp 
-      ? dayjs(item.waiting_verification_stamp,"YYYY-MM-DD HH:mm:ss").format("DD/MM/YYYY, HH.mm.ss")
+      ? dayjs(item.waiting_verification_stamp, "Asia/Jakarta","YYYY-MM-DD HH:mm:ss").format("DD/MM/YYYY, HH.mm.ss")
       : "-",
     'Completed Verification': item.completed_verification_stamp 
-      ? dayjs(item.completed_verification_stamp,"YYYY-MM-DD HH:mm:ss").format("DD/MM/YYYY, HH.mm.ss")
+      ? dayjs(item.completed_verification_stamp,"Asia/Jakarta","YYYY-MM-DD HH:mm:ss").format("DD/MM/YYYY, HH.mm.ss")
       : "-",
     'Waiting Medicine': item.waiting_medicine_stamp 
-      ? dayjs(item.waiting_medicine_stamp,"YYYY-MM-DD HH:mm:ss").format("DD/MM/YYYY, HH.mm.ss")
+      ? dayjs(item.waiting_medicine_stamp,"Asia/Jakarta","YYYY-MM-DD HH:mm:ss").format("DD/MM/YYYY, HH.mm.ss")
       : "-",
     'Completed Medicine': item.completed_medicine_stamp 
-      ? dayjs(item.completed_medicine_stamp,"YYYY-MM-DD HH:mm:ss").format("DD/MM/YYYY, HH.mm.ss")
+      ? dayjs(item.completed_medicine_stamp,"Asia/Jakarta","YYYY-MM-DD HH:mm:ss").format("DD/MM/YYYY, HH.mm.ss")
       : "-",
     'Waiting Pickup Medicine': item.waiting_pickup_medicine_stamp 
-      ? dayjs(item.waiting_pickup_medicine_stamp ,"YYYY-MM-DD HH:mm:ss").format("DD/MM/YYYY, HH.mm.ss")
+      ? dayjs(item.waiting_pickup_medicine_stamp ,"Asia/Jakarta","YYYY-MM-DD HH:mm:ss").format("DD/MM/YYYY, HH.mm.ss")
       : "-",
     'Called Pickup Medicine': item.called_pickup_medicine_stamp 
-      ? dayjs(item.called_pickup_medicine_stamp  ,"YYYY-MM-DD HH:mm:ss").format("DD/MM/YYYY, HH.mm.ss")
+      ? dayjs(item.called_pickup_medicine_stamp  ,"Asia/Jakarta","YYYY-MM-DD HH:mm:ss").format("DD/MM/YYYY, HH.mm.ss")
       : "-",
     'Completed Pickup Medicine': item.completed_pickup_medicine_stamp 
-      ? dayjs(item.completed_pickup_medicine_stamp   ,"YYYY-MM-DD HH:mm:ss").format("DD/MM/YYYY, HH.mm.ss")
+      ? dayjs(item.completed_pickup_medicine_stamp   ,"Asia/Jakarta","YYYY-MM-DD HH:mm:ss").format("DD/MM/YYYY, HH.mm.ss")
       : "-",
     'Duration (Menit)': item.verification_to_pickup_minutes || "-",
     'Total Medicine': item.total_medicine || "0",
