@@ -22,6 +22,11 @@ import { DatePicker } from "antd";
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import LogsAPI from "@/app/utils/api/Logs";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+dayjs.extend(customParseFormat);
+
 const tableLogs = ({
     selectedQueueIds,// ?? Mengirim daftar nomor yang dipilih
     setSelectedQueueIds,
@@ -43,26 +48,26 @@ const ExportToExcel = ({ data, fileName }) => {
     'Nama Pasien': item.patient_name,
     'No. Rekam Medis': item.medical_record_no || "-",
     'Status Medicine': item.status_medicine || "-",
-    'Waiting Verification': item.waiting_verification_stamp 
-      ? dayjs(item.waiting_verification_stamp, "Asia/Jakarta","YYYY-MM-DD HH:mm:ss").format("DD/MM/YYYY, HH.mm.ss")
+ 'Waiting Verification': item.waiting_verification_stamp 
+      ? dayjs(item.waiting_verification_stamp).tz('Asia/Jakarta').format("DD/MM/YYYY, HH.mm.ss")
       : "-",
     'Completed Verification': item.completed_verification_stamp 
-      ? dayjs(item.completed_verification_stamp,"Asia/Jakarta","YYYY-MM-DD HH:mm:ss").format("DD/MM/YYYY, HH.mm.ss")
+      ? dayjs(item.completed_verification_stamp).tz('Asia/Jakarta').format("DD/MM/YYYY, HH.mm.ss")
       : "-",
     'Waiting Medicine': item.waiting_medicine_stamp 
-      ? dayjs(item.waiting_medicine_stamp,"Asia/Jakarta","YYYY-MM-DD HH:mm:ss").format("DD/MM/YYYY, HH.mm.ss")
+      ? dayjs(item.waiting_medicine_stamp).tz('Asia/Jakarta').format("DD/MM/YYYY, HH.mm.ss")
       : "-",
     'Completed Medicine': item.completed_medicine_stamp 
-      ? dayjs(item.completed_medicine_stamp,"Asia/Jakarta","YYYY-MM-DD HH:mm:ss").format("DD/MM/YYYY, HH.mm.ss")
+      ? dayjs(item.completed_medicine_stamp).tz('Asia/Jakarta').format("DD/MM/YYYY, HH.mm.ss")
       : "-",
     'Waiting Pickup Medicine': item.waiting_pickup_medicine_stamp 
-      ? dayjs(item.waiting_pickup_medicine_stamp ,"Asia/Jakarta","YYYY-MM-DD HH:mm:ss").format("DD/MM/YYYY, HH.mm.ss")
+      ? dayjs(item.waiting_pickup_medicine_stamp).tz('Asia/Jakarta').format("DD/MM/YYYY, HH.mm.ss")
       : "-",
     'Called Pickup Medicine': item.called_pickup_medicine_stamp 
-      ? dayjs(item.called_pickup_medicine_stamp  ,"Asia/Jakarta","YYYY-MM-DD HH:mm:ss").format("DD/MM/YYYY, HH.mm.ss")
+      ? dayjs(item.called_pickup_medicine_stamp).tz('Asia/Jakarta').format("DD/MM/YYYY, HH.mm.ss")
       : "-",
     'Completed Pickup Medicine': item.completed_pickup_medicine_stamp 
-      ? dayjs(item.completed_pickup_medicine_stamp   ,"Asia/Jakarta","YYYY-MM-DD HH:mm:ss").format("DD/MM/YYYY, HH.mm.ss")
+      ? dayjs(item.completed_pickup_medicine_stamp).tz('Asia/Jakarta').format("DD/MM/YYYY, HH.mm.ss")
       : "-",
     'Duration (Menit)': item.verification_to_pickup_minutes || "-",
     'Total Medicine': item.total_medicine || "0",
