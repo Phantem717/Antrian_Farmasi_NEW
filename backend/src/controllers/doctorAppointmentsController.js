@@ -1,7 +1,7 @@
 // src/controllers/doctorAppointmentsController.js
 
 const DoctorAppointment = require('../models/doctorAppointments');
-
+const totalService = require('../services/totalUpdateService')
 /**
  * Controller untuk membuat appointment baru.
  */
@@ -308,7 +308,43 @@ const updateTotalMedicineController = async (req,res)=>{
       error: error.message 
     });
   }
+
+  
 }
+
+
+const getDoctorTotalByDate= async (req,res) => {
+ try {
+    const { date,category } = req.params;
+    let location = category;
+    if(location.toLowerCase() == "bpjs"){
+      location = "Lantai 1 BPJS" 
+    }
+    if(location.toLowerCase() == "gmcb"){
+      location = "Lantai 1 GMCB" 
+
+    }
+     if(location.toLowerCase() == "lt3"){
+      location = "Lantai 3 GMCB" 
+
+    } 
+    const task = await DoctorAppointment.getByDateForTotal(location,date);
+
+    if (!task) {
+      return res.status(404).json({ message: 'Verification Task not found' });
+    }
+
+     for (const element of task) {
+      const total = await totalService.getTotal(element);
+      const response = await DoctorAppointment.updateTotalMedicine(element,total);
+    }
+
+    res.status(200).json({ data: task });
+  } catch (error) {
+    console.error('Error retrieving Verification Task:', error.message);
+    res.status(500).json({ message: 'Failed to retrieve Verification Task', error: error.message });
+  }
+};
 module.exports = {
   createAppointment,
   getAllAppointments,
@@ -320,5 +356,6 @@ module.exports = {
   updateMedicineType,
   updatePhoneNumber,
   getAllAppointmentsByLocation,
-  updateTotalMedicineController
+  updateTotalMedicineController,
+  getDoctorTotalByDate
 };

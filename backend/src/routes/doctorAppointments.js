@@ -7,6 +7,7 @@ const {
   createAppointment,
   getAppointment,
   updateAppointment,
+  getDoctorTotalByDate,
   deleteAppointment,
   updateStatusMedicine,
   getAllAppointments,
@@ -32,11 +33,11 @@ router.get('/', getAllAppointments);
 // Endpoint untuk memperbarui appointment berdasarkan NOP
 // router.put('/:NOP', updateAppointment);
 router.put('/:NOP/phone_number', updatePhoneNumber);
-router.put('/total_medicine', authCheck, updateTotalMedicineController);
+router.patch('/total_medicine', authCheck, updateTotalMedicineController);
 
 router.put('/type/:NOP',updateMedicineType);
 router.patch('/:NOP/status_medicine', updateStatusMedicine);
-
+router.get('/by-date/:date/:category',getDoctorTotalByDate);
 // Endpoint untuk menghapus appointment berdasarkan NOP
 router.delete('/:NOP', deleteAppointment);
 router.get('/:category',getAllAppointmentsByLocation);

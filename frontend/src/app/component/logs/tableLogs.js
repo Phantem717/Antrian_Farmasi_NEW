@@ -22,6 +22,12 @@ import { DatePicker } from "antd";
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import LogsAPI from "@/app/utils/api/Logs";
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+dayjs.extend(utc);
+dayjs.extend(timezone);
+dayjs.extend(customParseFormat);
+
 const tableLogs = ({
     selectedQueueIds,// ?? Mengirim daftar nomor yang dipilih
     setSelectedQueueIds,
@@ -43,33 +49,34 @@ const ExportToExcel = ({ data, fileName }) => {
     'Nama Pasien': item.patient_name,
     'No. Rekam Medis': item.medical_record_no || "-",
     'Status Medicine': item.status_medicine || "-",
-    'Waiting Verification': item.waiting_verification_stamp 
-      ? new Date(item.waiting_verification_stamp).toLocaleString("id-ID")
+ 'Waiting Verification': item.waiting_verification_stamp 
+      ? dayjs(item.waiting_verification_stamp, "YYYY-MM-DD HH:mm:ss").tz('Asia/Jakarta').format("DD/MM/YYYY, HH.mm.ss")
       : "-",
     'Completed Verification': item.completed_verification_stamp 
-      ? new Date(item.completed_verification_stamp).toLocaleString("id-ID")
+      ? dayjs(item.completed_verification_stamp, "YYYY-MM-DD HH:mm:ss").tz('Asia/Jakarta').format("DD/MM/YYYY, HH.mm.ss")
       : "-",
     'Waiting Medicine': item.waiting_medicine_stamp 
-      ? new Date(item.waiting_medicine_stamp).toLocaleString("id-ID")
+      ? dayjs(item.waiting_medicine_stamp, "YYYY-MM-DD HH:mm:ss").tz('Asia/Jakarta').format("DD/MM/YYYY, HH.mm.ss")
       : "-",
     'Completed Medicine': item.completed_medicine_stamp 
-      ? new Date(item.completed_medicine_stamp).toLocaleString("id-ID")
+      ? dayjs(item.completed_medicine_stamp, "YYYY-MM-DD HH:mm:ss").tz('Asia/Jakarta').format("DD/MM/YYYY, HH.mm.ss")
       : "-",
     'Waiting Pickup Medicine': item.waiting_pickup_medicine_stamp 
-      ? new Date(item.waiting_pickup_medicine_stamp).toLocaleString("id-ID")
+      ? dayjs(item.waiting_pickup_medicine_stamp, "YYYY-MM-DD HH:mm:ss").tz('Asia/Jakarta').format("DD/MM/YYYY, HH.mm.ss")
       : "-",
     'Called Pickup Medicine': item.called_pickup_medicine_stamp 
-      ? new Date(item.called_pickup_medicine_stamp).toLocaleString("id-ID")
+      ? dayjs(item.called_pickup_medicine_stamp, "YYYY-MM-DD HH:mm:ss").tz('Asia/Jakarta').format("DD/MM/YYYY, HH.mm.ss")
       : "-",
     'Completed Pickup Medicine': item.completed_pickup_medicine_stamp 
-      ? new Date(item.completed_pickup_medicine_stamp).toLocaleString("id-ID")
+      ? dayjs(item.completed_pickup_medicine_stamp, "YYYY-MM-DD HH:mm:ss").tz('Asia/Jakarta').format("DD/MM/YYYY, HH.mm.ss")
       : "-",
-    'Duration (Menit)': item.verification_to_pickup_minutes || "-"
+    'Duration (Menit)': item.verification_to_pickup_minutes || "-",
+    'Total Medicine': item.total_medicine || "0",
   }));
 
   // Create worksheet and workbook
   const ws = XLSX.utils.json_to_sheet(exportData);
-  ws['!rows'] = [{ hpx: 500 }]; 
+  ws['!rows'] = [{ hpx: 50 }]; 
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Data Antrian");
 
