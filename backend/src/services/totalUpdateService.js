@@ -36,4 +36,4 @@ try {
 }
 }
 
-module.exports ={createAntrianFarmasi}
+module.exports ={getTotal}
