@@ -140,6 +140,16 @@ const DoctorAppointmentAPI = {
         }
     },
 
+getTotalMedicineByDate: async (category,date) => {
+        try {
+             const response = await axios.get(`${BASE_URL}/api/doctor-appointments/by-date/${encodeURIComponent(date)}/${category}`);
+            console.log("VERIF",response.data);
+            return response.data;
+        } catch (error) {
+             console.error('Error fetching all verification tasks:', error);
+            throw error;
+        }
+    },
 
 };
 

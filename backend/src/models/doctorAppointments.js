@@ -274,6 +274,32 @@ static async getLatestAntrianJaminan(type) {
   }
 
   
+  static async getByDateForTotal(location,date){
+  const pool = await getDb();
+  const conn = await pool.getConnection(); // ? Explicit connection
+
+    try {
+      const query = `
+       SELECT 
+  da.NOP
+FROM Doctor_Appointments da
+WHERE (da.queue_number LIKE 'RC%' OR da.queue_number LIKE 'NR%')
+  AND DATE(vt.waiting_verification_stamp) = ?
+  AND vt.lokasi = ?
+ORDER BY vt.waiting_verification_stamp ASC;
+      `;
+      const values = [
+        date,
+        location
+      ]
+      const [rows] = await conn.execute(query, values);
+      return rows;
+    } catch (error) {
+      throw error;
+    }finally {
+    conn.release(); // ?? Critical cleanup
+  }
+  }
 
 
 }
