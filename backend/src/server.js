@@ -47,9 +47,7 @@ const queueRoute = require('./routes/createQueuePatientRoute');
   }
 
   // Middleware untuk parsing JSON dan CORS
-app.use(express.json({ limit: '500mb' })); 
   app.use(cors({ origin: "*" })); // 🔥 Izinkan akses dari mana saja
-app.use(express.urlencoded({ limit: '500mb', extended: true }));
 
   // Daftarkan route
   app.use('/api/doctor-appointments', doctorAppointmentsRoutes);
