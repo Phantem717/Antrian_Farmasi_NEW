@@ -293,6 +293,8 @@ static async getLatestAntrianJaminan(type) {
        SELECT 
   da.NOP
 FROM Doctor_Appointments da
+LEFT JOIN Verification_Task vt ON da.NOP = vt.NOP
+
 WHERE (da.queue_number LIKE 'RC%' OR da.queue_number LIKE 'NR%')
   AND DATE(vt.waiting_verification_stamp) = ?
   AND vt.lokasi = ?

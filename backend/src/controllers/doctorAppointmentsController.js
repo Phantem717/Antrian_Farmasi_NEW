@@ -329,14 +329,17 @@ const getDoctorTotalByDate= async (req,res) => {
 
     } 
     const task = await DoctorAppointment.getByDateForTotal(location,date);
-
+    console.log("TASK",task);
     if (!task) {
       return res.status(404).json({ message: 'Verification Task not found' });
     }
 
      for (const element of task) {
-      const total = await totalService.getTotal(element);
-      const response = await DoctorAppointment.updateTotalMedicine(element,total);
+      console.log("ELEMENT",element.NOP);
+      const total = await totalService.getTotal(element.NOP);
+      console.log("TOTAL",total);
+      const response = await DoctorAppointment.updateTotalMedicine(element.NOP,total);
+      console.log("RESP",response);
     }
 
     res.status(200).json({ data: task });

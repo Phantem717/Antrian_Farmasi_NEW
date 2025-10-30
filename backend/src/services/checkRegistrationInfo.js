@@ -39,10 +39,7 @@ async function checkRegistrationInfo(registrationNo) {
         'Content-Type': 'application/json'
       }
     });
-    const payload = {
-      response: response.data,
-      response_type: "Medicine_Type",
-    }
+
     const headers = {
         consId : consID2,
         timestamp : timestamp
