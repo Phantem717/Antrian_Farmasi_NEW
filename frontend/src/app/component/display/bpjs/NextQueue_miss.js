@@ -297,7 +297,7 @@ const NextQueue = ({ location, verificationData, medicineData, pickupData }) => 
             <div className="text-white text-center mt-2">
               <div className="text-9xl font-extrabold">{item.queue_number}</div>
               <div className="text-6xl font-extrabold truncate mt-2">
-                {hideName ? hideNameAction(item.patient_name) : item.patient_name}
+                {hideNameAction(item.patient_name)}
               </div>
               <div className="text-2xl font-extrabold truncate mt-2">
                 {formatDateTime(item.waiting_pickup_medicine_stamp)}
@@ -348,7 +348,7 @@ const NextQueue = ({ location, verificationData, medicineData, pickupData }) => 
           </div>
         </div>
         <div className="text-center text-bold mt-2 w-[450px] bg-green-400 px-4 py-2 text-black text-3xl truncate whitespace-nowrap overflow-hidden leading-tight">
-          {hideName ? hideNameAction(queue.patient_name) : queue.patient_name}
+          { hideNameAction(queue.patient_name) }
         </div>
       </div>
     );
