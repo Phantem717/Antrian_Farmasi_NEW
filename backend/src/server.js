@@ -16,7 +16,6 @@ const socketConfig = require('./config/socket'); // ? Import socket setup
 const io = socketConfig.init(server);
 app.set('socketio',io);
 
-
 const doctorAppointmentsRoutes = require('./routes/doctorAppointments');
 const BarcodeRoutes = require('./routes/BarcodeRoutes');
 const loketRoutes = require('./routes/loketRoutes');

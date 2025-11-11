@@ -3,13 +3,7 @@ import { getSocket } from "@/app/utils/api/socket";
 
 const NextQueue = ({ location, verificationData, medicineData, pickupData }) => {
   const [currentDate, setCurrentDate] = useState(new Date().toDateString());
-  const [hideName, setHideName] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const storedValue = localStorage.getItem('nameToggleState');
-      return storedValue ? storedValue === 'true' : true;
-    }
-    return true;
-  });
+  const [hideName, setHideName] = useState(true);
 
   const [lastCalled, setLastCalled] = useState({
     racik: null,
