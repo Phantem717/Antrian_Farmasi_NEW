@@ -74,7 +74,7 @@ app.use('/api/status',statusRoute);
 app.use('/api/create-queue',queueRoute);
   // Menjalankan server pada semua network interfaces
   const PORT = process.env.PORT || 5000;
-  const HOST =  process.env.HOST
+  const HOST =  '0.0.0.0'
   server.listen(PORT,HOST, () => {
     console.log(`✅ Server berjalan pada ${PORT}`,loginRoutes);
   });
