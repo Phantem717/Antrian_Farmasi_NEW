@@ -1,4 +1,4 @@
-const {sendWAVerif,sendWAAntrian,sendWAProses,sendWAPickup,sendWACustom} = require('../services/sendWAService')
+const {sendWAVerif,sendWAAntrian,sendWAProses,sendWAPickup,sendWACustom} = require('../services/sendWAService2')
 
 const sendWAVerifController  = async (req,res) => {
     try {
@@ -17,7 +17,10 @@ const sendWAVerifController  = async (req,res) => {
         if (!phone_number || !NOP || !queue_number|| !patient_name || !docter || !medicine_type || !location) {
           return res.status(400).json({ message: "Payload incomplete. Required: phone_number, NOP, queue_number, patient_name, location." });
         }
-  
+        
+            if (phone_number.startsWith("0")) {
+      phone_number = "62" + phone_number.slice(1);
+    }
         const payload = { phone_number, NOP, queue_number, patient_name,docter,nik,rm,sep,medicine_type,prev_queue_number, switch_WA, location  };
         const data = await sendWAVerif(payload);
     
@@ -45,6 +48,9 @@ const sendWAAntrianController  = async (req,res) => {
         else if(location == "lt3"){
           location = "Lantai 3 GMCB"
         }
+                    if (phone_number.startsWith("0")) {
+      phone_number = "62" + phone_number.slice(1);
+    }
           const payload = { phone_number, NOP, queue_number, patient_name,docter,nik,rm,sep,medicine_type ,switch_WA,location };
         const data = await sendWAAntrian(payload);
     
@@ -72,6 +78,9 @@ const sendWAAntrianController  = async (req,res) => {
         else if(location == "lt3"){
           location = "Lantai 3 GMCB"
         }
+                    if (phone_number.startsWith("0")) {
+      phone_number = "62" + phone_number.slice(1);
+    }
               const payload = { phone_number, NOP, queue_number, patient_name,docter,nik,rm,sep,medicine_type,switch_WA,loket,location  };
             const data = await sendWAPickup(payload);
         
@@ -85,7 +94,9 @@ const sendWAAntrianController  = async (req,res) => {
             try {
                 let { phone_number, NOP, queue_number, patient_name,docter,nik,rm,sep,medicine_type,switch_WA,location } = req.body;
           console.log("PHONE BODY",req.body);
-
+            if (phone_number.startsWith("0")) {
+      phone_number = "62" + phone_number.slice(1);
+    }
                 // Check if required fields exist
                 if (!phone_number || !NOP || !queue_number|| !patient_name || !docter || !medicine_type || !location) {
                     return res.status(400).json({ message: "Payload incomplete. Required: phone_number, NOP, queue_number, patient_name." });

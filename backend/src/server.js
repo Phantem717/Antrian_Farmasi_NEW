@@ -10,6 +10,7 @@ require('dotenv').config({ path: './.env' }); // Or just require('dotenv').confi
 const app = express();
 const server = http.createServer(app);
 // console.log("ENV",process.env.CONS_ID_FARMASI); // Works!
+app.use(express.json());
 
 //SOCKET
 const socketConfig = require('./config/socket'); // ? Import socket setup
@@ -73,7 +74,7 @@ app.use('/api/status',statusRoute);
 app.use('/api/create-queue',queueRoute);
   // Menjalankan server pada semua network interfaces
   const PORT = process.env.PORT || 5000;
-  const HOST =  '0.0.0.0'
+  const HOST =  process.env.HOST
   server.listen(PORT,HOST, () => {
     console.log(`✅ Server berjalan pada ${PORT}`,loginRoutes);
   });
