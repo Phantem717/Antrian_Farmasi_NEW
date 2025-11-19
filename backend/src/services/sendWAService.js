@@ -8,6 +8,11 @@ const consID2 = process.env.CONS_ID_WA;
 const HOST = process.env.API_WA
 const path = `http://${HOST}/api/v1/integration/whatsappweb/hello/send-text`
 console.log("ENV",password,consID2,HOST,path);
+function base64encode(NOP){
+  NOP = `"${NOP}"`
+  return Buffer.from(NOP).toString('base64');
+
+}
 async function sendWAVerif(payload){
     try {
       const { timestamp, signature } = generateSignature(consID2, password);
@@ -74,6 +79,8 @@ Obat anda akan siap dalam +/- ${duration}.
 Mohon menunggu informasi selanjutnya. 
 Terima kasih. 
 
+Pantau antrean anda melalui link berikut: https://antrean.rscarolus.or.id/farmasi/${base64encode(payload.NOP)}
+
 *_pesan otomatis dari sistem, mohon tidak membalas_*`    },
     {
       headers: {
@@ -130,6 +137,8 @@ No. Antrian : *${payload.queue_number}*
 
 STATUS :
 *3. OBAT SELESAI DIKEMAS*
+
+Pantau antrean anda melalui link berikut: https://antrean.rscarolus.or.id/farmasi/${base64encode(payload.NOP)}
 
 Informasi Tambahan :
 
@@ -207,6 +216,8 @@ Mohon menunggu informasi selanjutnya.
 *Jika Pasien PRB atau OAT Silakan Menuju Ke Loket 2*
 
 Terima kasih. 
+
+Pantau antrean anda melalui link berikut: https://antrean.rscarolus.or.id/farmasi/${base64encode(payload.NOP)}
 
 *pesan otomatis dari sistem, mohon tidak membalas*
 

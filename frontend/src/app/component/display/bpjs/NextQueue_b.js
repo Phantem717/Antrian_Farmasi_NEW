@@ -12,13 +12,7 @@ const NextQueue = ({location, verificationData, medicineData, pickupData }) => {
     const socket = getSocket(); // Ensure this returns a singleton socket instance
     console.log("LOCATION",location);
     const [currentDate, setCurrentDate] = useState(new Date().toDateString()); // [currentDate,setCurrentDate]
-const [hideName, setHideName] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const storedValue = localStorage.getItem('nameToggleState');
-      return storedValue ? storedValue === 'true' : true;
-    }
-    return true;
-  });  console.log(hideName)
+const [hideName, setHideName] = useState(true);  console.log(hideName)
   const [queues, setQueues] = useState({
     nextQueueRacik: [],
     nextQueueNonRacik: [],
@@ -318,7 +312,7 @@ useEffect(() => {
           {queue.queueNumber}
         </div>
         <div className="mt-2 w-full bg-green-400 px-4 py-2 text-black text-center text-3xl truncate whitespace-nowrap overflow-hidden leading-tight">
-          {hideName ? hideNameAction(queue.patient_name) : queue.patient_name}
+          { hideNameAction(queue.patient_name)}
         </div>
       </div>
     ));
@@ -505,7 +499,7 @@ const QueueSectionVerification = ({ title, queues, bgColor }) => {
           </div>
         </div>
         <div className={`text-4xl text-center bg-green-400 mt-2 w-full p-1 text-black truncate`}>
-          {hideName ? hideNameAction(queue.patient_name) : queue.patient_name}
+          { hideNameAction(queue.patient_name) }
         </div>
       </div>
     ));
