@@ -19,9 +19,9 @@ async function sendWAVerif(payload){
    let templateId;
     try {
     if(payload.medicine_type == "Racikan"){
-            name = "narasi_wa_racikan_setelah_verifikasi"
+            name = "narasi_wa_farmasi_racikan_setelah_verifikasi"
 
-      templateId="4f0dfcd8bf6cc6eedab9556331c7d406UTILITY"
+      templateId="30628dfbcce54f77c7cf51b692fd1a5cUTILITY"
     }
     else{
             name = "narasi_wa_farmasi_resep_non_racikan_setelah_verifikasi"
@@ -82,8 +82,8 @@ async function sendWAAntrian(payload){
   let templateId;
     try {
     if(payload.medicine_type == "Racikan"){
-      name = "narasi_wa_farmasi_racikan_masuk"
-            templateId="c1f57e573a49658234f0bde7b3d5b2c5UTILITY"
+      name = "narasi_wa_farmasi_racikan_masuk_2"
+            templateId="d81ea494576090602152d84b6a56a34fUTILITY"
 
     }
     else{
@@ -141,9 +141,9 @@ async function sendWAPickup(payload){
     let templateId;
     try {
     if(payload.medicine_type == "Racikan"){
-            name = "narasi_wa_non_racikan_selesai"
+            name = "narasi_wa_farmasi_racikan_selesai"
 
-      templateId="53e4f4fe2d8e5fc9b3444ad5406960e6UTILITY"
+      templateId="1d410b2e1a87c5c2127829f8f3fb4090UTILITY"
     }
     else{
             name = "narasi_wa_farmasi_non_racikan_selesai"
