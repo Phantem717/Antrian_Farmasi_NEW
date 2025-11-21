@@ -349,7 +349,7 @@ const updateDoctorAppointmentController = async (req,res)=>{
 
 const RouteUpdateDoubleController = async (req,res)=>{
     // const NOP = req.params.NOP;
-    const datas = DoctorAppointment.getAllDouble();
+    const datas = await DoctorAppointment.getAllDouble();
     console.log("DATA UPDATE TYPE", datas);
       const { timestamp, signature } = generateSignature(consID2, password);
 try {
