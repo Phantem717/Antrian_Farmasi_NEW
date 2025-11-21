@@ -370,21 +370,46 @@ try {
         'X-Signature': signature,
         'Content-Type': 'application/json'
     }
-    datas.forEach(async (nop) => {
+    // datas.forEach(async (nop) => {
       
-      const response = await axios.post(`http://192.168.6.85/api/v1/visit/queue/pharmacy/queue`, headers,{
-        registration_no: nop.NOP
-      })
-      // if(response.data.message == "success"){
-      //   DoctorAppointment.updateDoctorAppointment(nop.NOP,response.data.data.queue_number)
+    //   const response = await axios.post(`http://192.168.6.85/api/v1/visit/queue/pharmacy/queue`, headers,{
+    //     registration_no: nop.NOP
+    //   })
+    //   // if(response.data.message == "success"){
+    //   //   DoctorAppointment.updateDoctorAppointment(nop.NOP,response.data.data.queue_number)
         
-      // }
-      // if(response.data.message != "success"){
-      //     console.log("DATA",nop);
+    //   // }
+    //   // if(response.data.message != "success"){
+    //   //     console.log("DATA",nop);
 
-      // }
+    //   // }
+    //   console.log("RESPONSE",response);
+    // });
+    for (const nop of datas) {
+  console.log("PROCESSING", nop.NOP);
+
+  try {
+    const response = await axios.post(
+      "http://192.168.6.85/api/v1/visit/queue/pharmacy/queue",
+      { registration_no: nop.NOP },
+      { headers }
+    );
       console.log("RESPONSE",response);
-    });
+
+    // if (response.data.message === "success") {
+    //   await DoctorAppointment.updateDoctorAppointment(
+    //     nop.NOP,
+    //     response.data.data.queue_number
+    //   );
+    // } else {
+    //   console.log("FAILED", nop.NOP);
+    // }
+
+  } catch (err) {
+    console.error("ERR FOR", nop.NOP, err);
+  }
+}
+
     res.status(200).json({
       message: 'Status medicine updated successfully',
       data: datas
