@@ -10,6 +10,7 @@ require('dotenv').config({ path: './.env' }); // Or just require('dotenv').confi
 const app = express();
 const server = http.createServer(app);
 // console.log("ENV",process.env.CONS_ID_FARMASI); // Works!
+app.use(express.json());
 
 //SOCKET
 const socketConfig = require('./config/socket'); // ? Import socket setup
@@ -47,7 +48,6 @@ const queueRoute = require('./routes/createQueuePatientRoute');
   }
 
   // Middleware untuk parsing JSON dan CORS
-  app.use(express.json());
   app.use(cors({ origin: "*" })); // 🔥 Izinkan akses dari mana saja
 
   // Daftarkan route

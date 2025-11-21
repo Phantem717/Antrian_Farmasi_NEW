@@ -27,7 +27,7 @@ const LoginPage = () => {
       });
       return;
     }
-
+    
         Swal.fire({
       title: "Memproses...",
       html: "Sedang melakukan autentikasi",

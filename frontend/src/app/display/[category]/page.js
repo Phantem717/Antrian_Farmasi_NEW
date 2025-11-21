@@ -1,7 +1,7 @@
 'use client'
 import QueueCall from '@/app/component/display/bpjs/QueueCall_b';
 import ServingQueue from '@/app/component/display/bpjs/ServingQueue_b';
-import MissQueue from '@/app/component/display/bpjs/MissQueue_b';
+import MissQueue from '@/app/component/display/bpjs/NextQueue_miss_g';
 import NextQueue from '@/app/component/display/bpjs/NextQueue_b';
 import InfoBar from '@/app/component/display/bpjs/InfoBar_b';
 import MarqueeFooter from '@/app/component/display/bpjs/MarqueeFooter_b';

@@ -184,9 +184,8 @@ const updatePickupTask = async (req, res) => {
         }
         break;
       case "called_pickup_medicine":
-        if (!existingData.called_pickup_medicine_stamp) {
           updatedData.called_pickup_medicine_stamp = now;
-        }
+        
         break;
       case "recalled_pickup_medicine":
         if (!existingData.recalled_pickup_medicine_stamp) {

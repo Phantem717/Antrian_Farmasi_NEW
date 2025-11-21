@@ -115,7 +115,7 @@ try {
     }}
     );
 socket.on('update_display', async (payload) => {
-  
+  console.log("PAYLOAD",payload);
 try {
   let location = payload.location;
     if(location == "bpjs"){
@@ -127,7 +127,7 @@ try {
       if(location == "lt3"){
         location = "Lantai 3 GMCB"
       }
-  console.log("ON UPDATE"); // ?? Pastikan handler dipanggil
+  console.log("ON UPDATE",location); // ?? Pastikan handler dipanggil
       const data = await responseControl.getAllResponses(location);
       io.emit('get_responses', {
         message: '? Initial data fetched',
@@ -187,7 +187,7 @@ try {
       if(location == "lt3"){
         location = "Lantai 3 GMCB"
       }
-  console.log("ON UPDATE"); // ?? Pastikan handler dipanggil
+  console.log("ON UPDATE",location); // ?? Pastikan handler dipanggil
       const data = await VerificationTask.getToday(location);
       io.emit('get_responses_verif', {
         message: '? Initial data fetched',

@@ -3,14 +3,14 @@ const MedicineTask = require('../models/medicineTask');
 const DoctorAppointment = require('../models/doctorAppointments');
 const PharmacyTask = require('../models/pharmacyTask');
 const {getAllResponses}= require('../controllers/responsesController')
-const sendWA = require('../services/sendWAService');
+const sendWA = require('../services/sendWAService2');
 const { checkQueue, fetchRegistrationData, sendToWA } = require('../services/BarcodeService');
 const { getCurrentTimestamp, convertToJakartaTime } = require('../handler/timeHandler');
 const { createAntrianFarmasi } = require('../services/createFarmasiQueueService');
 const { createVerificationTaskInternal } = require('./verificationTaskController');
 const { printAntrianFarmasi } = require('../services/printAntrianService');
 const { getDb } = require('../config/db');
-const {sendWAAntrian} = require('../services/sendWAService');
+const {sendWAAntrian} = require('../services/sendWAService2');
 let io;
 let shouldEmit;
 

@@ -225,11 +225,11 @@ const barcode = inputValue.replace(/\s+/g, ""); // Removes ALL whitespace
   }
 }
   async function checkRegistration(inputValue){
-    console.log(inputValue);
+    console.log("INPUTVAL",inputValue);
    
      const checkRegistrationResponse = await CheckRegistrationInfo.checkQueue(inputValue);
     const regisData = await BPJSBarcodeAPI.fetchRegistrationInfo(inputValue);
-    console.log("REG DATA",regisData.data.length);
+    console.log("REG DATA",regisData);
       console.log("CHECKRES",checkRegistrationResponse);
       setDocter(checkRegistrationResponse.ParamedicName);
       setNIK(checkRegistrationResponse.SSN);
@@ -240,7 +240,7 @@ const barcode = inputValue.replace(/\s+/g, ""); // Removes ALL whitespace
       setDOB(checkRegistrationResponse.DateOfBirth);
       setNOP(checkRegistrationResponse.RegistrationNo);
       setPRB(checkRegistrationResponse.ProlanisPRB);
-      setTotalMedicine(regisData.data.length);
+      setTotalMedicine(regisData.data? regisData.data.length : 0);
 
 
     return checkRegistrationResponse;

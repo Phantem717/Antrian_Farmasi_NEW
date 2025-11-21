@@ -12,6 +12,7 @@ const loginAPI = {
                 throw new Error("Username and password are required.");
 
             }
+            
             const response = await axios.post(`${BASE_URL}/api/login`,{
                 
                     username,password
