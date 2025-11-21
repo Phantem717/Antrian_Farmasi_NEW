@@ -394,16 +394,16 @@ try {
       { registration_no: nop.NOP },
       { headers }
     );
-      console.log("RESPONSE",response);
+      console.log("RESPONSE",response.data.success);
 
-    // if (response.data.message === "success") {
-    //   await DoctorAppointment.updateDoctorAppointment(
-    //     nop.NOP,
-    //     response.data.data.queue_number
-    //   );
-    // } else {
-    //   console.log("FAILED", nop.NOP);
-    // }
+    if (response.data.success) {
+      await DoctorAppointment.updateDoctorAppointment(
+        nop.NOP,
+        response.data.data.queue_number
+      );
+    } else {
+      console.log("FAILED", nop.NOP);
+    }
 
   } catch (err) {
     console.error("ERR FOR", nop.NOP, err);
