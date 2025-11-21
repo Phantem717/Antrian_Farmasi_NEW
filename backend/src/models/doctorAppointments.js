@@ -152,7 +152,7 @@ ORDER BY da.queue_number`;
       const query = `SELECT * FROM Doctor_Appointments WHERE queue_number = 'NR-083' AND NOP like '%20251121%`;
       const [rows] = await conn.execute(query);
       return rows;
-  }catch{
+  }catch(error){
     throw error;
   }
   }
