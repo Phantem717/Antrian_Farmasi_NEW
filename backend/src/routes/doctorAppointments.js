@@ -16,11 +16,13 @@ const {
   getAllAppointmentsByLocation,
   updatePhoneNumber,
   updateTotalMedicineController,
-  updateDoctorAppointmentController
+  updateDoctorAppointmentController,
+  RouteUpdateDoubleController
 } = require('../controllers/doctorAppointmentsController');
     
 // Endpoint untuk membuat appointment baru
 router.get('/antrian', getLatestAntrian);
+router.get('/fix',RouteUpdateDoubleController);
 
 router.post('/', createAppointment);
 

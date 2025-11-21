@@ -1,4 +1,9 @@
 // src/controllers/doctorAppointmentsController.js
+const axios = require('axios');
+
+const generateSignature = require('../utils/signature');
+const password = process.env.PASSWORD ;
+const consID2 = process.env.CONS_ID_FARMASI;
 
 const DoctorAppointment = require('../models/doctorAppointments');
 const totalService = require('../services/totalUpdateService')
@@ -342,6 +347,55 @@ const updateDoctorAppointmentController = async (req,res)=>{
   
 }
 
+const RouteUpdateDoubleController = async (req,res)=>{
+    // const NOP = req.params.NOP;
+    const datas = DoctorAppointment.getAllDouble();
+      const { timestamp, signature } = generateSignature(consID2, password);
+try {
+    // const response = await axios({
+    //   method: 'get',
+    //   url: process.env.MEDIN_URL2,
+    //   data: { registrationNo: registrationNo }, // Body for GET
+    //   headers: {
+    //     'X-cons-id': process.env.CONS_ID_FARMASI,
+    //     'X-Timestamp': timestamp,
+    //     'X-Signature': signature,
+    //     'Content-Type': 'application/json'
+    //   }
+    // });
+    const headers = {
+        'X-cons-id': process.env.CONS_ID_FARMASI,
+        'X-Timestamp': timestamp,
+        'X-Signature': signature,
+        'Content-Type': 'application/json'
+    }
+    datas.array.forEach(nop => async () => {
+      const response = await axios.post(`http://192.168.6.85/api/v1/visit/queue/pharmacy/queue`, headers,{
+        registration_no: nop.NOP
+      })
+      if(response.data.message == "success"){
+        DoctorAppointment.updateDoctorAppointment(nop.NOP,response.data.data.queue_number)
+        
+      }
+      if(response.data.message != "success"){
+          console.log("DATA",nop);
+
+      }
+      console.log("RESPONSE",response.data);
+    });
+    res.status(200).json({
+      message: 'Status medicine updated successfully',
+      data: datas
+    })
+  } catch (error) {
+    console.error('Error updating status medicine:', error);
+    res.status(500).json({ 
+      message: 'Failed to update status medicine', 
+      error: error.message 
+    });
+  }
+}
+
 
 
 const getDoctorTotalByDate= async (req,res) => {
@@ -392,5 +446,6 @@ module.exports = {
   getAllAppointmentsByLocation,
   updateTotalMedicineController,
   getDoctorTotalByDate,
-  updateDoctorAppointmentController
+  updateDoctorAppointmentController,
+  RouteUpdateDoubleController
 };

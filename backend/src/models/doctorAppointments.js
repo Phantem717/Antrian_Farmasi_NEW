@@ -144,6 +144,18 @@ ORDER BY da.queue_number`;
   }
 }
 
+  static async getAllDouble(){
+  const pool = await getDb();
+  const conn = await pool.getConnection(); // ? Explicit connection
+
+    try {
+      const query = `SELECT * FROM Doctor_Appointments WHERE queue_number = 'NR-083 AND NOP like '%20251121%`;
+      const [rows] = await conn.execute(query);
+      return rows;
+  }catch{
+    throw error;
+  }
+  }
 
   static async updateDoctorAppointment(NOP, queue_number) {
   const pool = await getDb();
@@ -153,10 +165,10 @@ ORDER BY da.queue_number`;
       const query = `
    UPDATE Doctor_Appointments 
 SET queue_number = ?,
-    farmasi_queue_number = ?
+
 WHERE NOP = ?
       `;
-      const values = [queue_number, queue_number,  NOP];
+      const values = [queue_number,  NOP];
 
       const [result] = await conn.execute(query, values);
       return result;
