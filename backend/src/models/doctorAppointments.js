@@ -163,10 +163,9 @@ ORDER BY da.queue_number`;
 
     try {
       const query = `
-   UPDATE Doctor_Appointments 
-SET queue_number = ?,
-
-WHERE NOP = ?
+      UPDATE Doctor_Appointments 
+      SET queue_number = ?
+      WHERE NOP = ?
       `;
       const values = [queue_number,  NOP];
 
