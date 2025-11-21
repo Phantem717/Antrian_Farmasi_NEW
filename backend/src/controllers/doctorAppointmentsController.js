@@ -370,7 +370,7 @@ try {
         'X-Signature': signature,
         'Content-Type': 'application/json'
     }
-    datas.array.forEach(nop => async () => {
+    datas.forEach(nop => async () => {
       
       const response = await axios.post(`http://192.168.6.85/api/v1/visit/queue/pharmacy/queue`, headers,{
         registration_no: nop.NOP
