@@ -33,6 +33,8 @@ router.get('/', getAllAppointments);
 // Endpoint untuk memperbarui appointment berdasarkan NOP
 // router.put('/:NOP', updateAppointment);
 router.put('/:NOP/phone_number', updatePhoneNumber);
+router.patch('/update/:NOP', updateAppointment);
+
 router.patch('/total_medicine', authCheck, updateTotalMedicineController);
 
 router.put('/type/:NOP',updateMedicineType);

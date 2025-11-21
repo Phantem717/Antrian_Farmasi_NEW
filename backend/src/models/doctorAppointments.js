@@ -144,6 +144,29 @@ ORDER BY da.queue_number`;
   }
 }
 
+
+  static async updateDoctorAppointment(NOP, queue_number) {
+  const pool = await getDb();
+  const conn = await pool.getConnection(); // ? Explicit connection
+
+    try {
+      const query = `
+        UPDATE Doctor_Appointments 
+        SET queue_number = ?,
+        SET farmasi_queue_number = ?
+        WHERE NOP = ?
+      `;
+      const values = [queue_number, queue_number,  NOP];
+
+      const [result] = await conn.execute(query, values);
+      return result;
+    } catch (error) {
+      throw error;
+    }finally {
+    conn.release(); // ?? Critical cleanup
+  }
+}
+
  static async updatePhoneNumber(NOP,phone_number) {
       const pool = await getDb();
   const conn = await pool.getConnection(); // ? Explicit connection
