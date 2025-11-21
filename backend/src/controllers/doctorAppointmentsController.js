@@ -318,7 +318,7 @@ const updateDoctorAppointmentController = async (req,res)=>{
     // const NOP = req.params.NOP;
     const { NOP } = req.params;
     const { queue_number } = req.body;
-
+    console.log("DATA UPDATE TYPE", NOP,queue_number);
     const result = await DoctorAppointment.updateDoctorAppointment(NOP,queue_number);
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: 'Appointment not found or no changes made' });
