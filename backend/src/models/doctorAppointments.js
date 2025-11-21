@@ -149,7 +149,12 @@ ORDER BY da.queue_number`;
   const conn = await pool.getConnection(); // ? Explicit connection
 
     try {
-      const query = `SELECT * FROM Doctor_Appointments WHERE queue_number = 'NR-083' AND NOP like '%20251121%'`;
+const query = `
+  SELECT * 
+  FROM Doctor_Appointments 
+  WHERE (queue_number = 'NR-083' OR queue_number = 'NR-014s')
+  AND NOP LIKE '%20251121%'
+`;
       const [rows] = await conn.execute(query);
       return rows;
   }catch(error){
