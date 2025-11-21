@@ -350,7 +350,7 @@ const updateDoctorAppointmentController = async (req,res)=>{
 const RouteUpdateDoubleController = async (req,res)=>{
     // const NOP = req.params.NOP;
     const datas = await DoctorAppointment.getAllDouble();
-    console.log("DATA UPDATE TYPE", datas);
+    // console.log("DATA UPDATE TYPE", datas);
       const { timestamp, signature } = generateSignature(consID2, password);
 try {
     // const response = await axios({
@@ -375,14 +375,14 @@ try {
       const response = await axios.post(`http://192.168.6.85/api/v1/visit/queue/pharmacy/queue`, headers,{
         registration_no: nop.NOP
       })
-      // if(response.data.message == "success"){
-      //   DoctorAppointment.updateDoctorAppointment(nop.NOP,response.data.data.queue_number)
+      if(response.data.message == "success"){
+        DoctorAppointment.updateDoctorAppointment(nop.NOP,response.data.data.queue_number)
         
-      // }
-      // if(response.data.message != "success"){
-      //     console.log("DATA",nop);
+      }
+      if(response.data.message != "success"){
+          console.log("DATA",nop);
 
-      // }
+      }
       console.log("RESPONSE",response.data);
     });
     res.status(200).json({
