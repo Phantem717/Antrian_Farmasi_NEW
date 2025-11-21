@@ -151,10 +151,10 @@ ORDER BY da.queue_number`;
 
     try {
       const query = `
-        UPDATE Doctor_Appointments 
-        SET queue_number = ?,
-        SET farmasi_queue_number = ?
-        WHERE NOP = ?
+   UPDATE Doctor_Appointments 
+SET queue_number = ?,
+    farmasi_queue_number = ?
+WHERE NOP = ?
       `;
       const values = [queue_number, queue_number,  NOP];
 
