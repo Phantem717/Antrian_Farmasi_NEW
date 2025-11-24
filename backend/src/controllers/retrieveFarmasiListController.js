@@ -167,6 +167,9 @@ const getFarmasiList = async (req, res) => {
       new_phone_number = "62" + farmasiArray.payload.phone_number.slice(1);
       console.log("PH1",new_phone_number)
     }
+    else{
+      new_phone_number = farmasiArray.payload.phone_number
+    }
        const wa_payload = {
 
             phone_number: new_phone_number,
