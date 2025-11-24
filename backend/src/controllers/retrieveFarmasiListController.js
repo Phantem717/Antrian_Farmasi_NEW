@@ -162,10 +162,14 @@ const getFarmasiList = async (req, res) => {
         PRB: farmasiArray.payload.PRB ?? null,
         doctor_name: farmasiArray.payload.doctor_name ?? null
       }
-
+      let new_phone_number;
+        if (farmasiArray.payload.phone_number.startsWith("0")) {
+      new_phone_number = "62" + farmasiArray.payload.phone_number.slice(1);
+      console.log("PH1",new_phone_number)
+    }
        const wa_payload = {
 
-            phone_number: farmasiArray.payload.phone_number,
+            phone_number: new_phone_number,
             patient_name: farmasiArray.payload.patient_name ,
             NOP: farmasiArray.payload.NOP,
             queue_number: farmasiArray.payload.farmasi_queue_number,
