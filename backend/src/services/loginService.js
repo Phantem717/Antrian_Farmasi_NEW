@@ -17,7 +17,7 @@ async function login(username, password) {
 
         const response = await axios({
             method: 'post',
-            url: 'https://rscarolus.com/api/v1/auth/login',
+            url: 'http://192.168.6.86/api/v1/auth/login',
             data: { 
                 username: username,
                 password: password 
