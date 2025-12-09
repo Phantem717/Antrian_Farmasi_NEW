@@ -64,6 +64,7 @@ const checkRegistrationERMController = async (req, res) => {
     try {
         // Assuming checkRegistrationERM calls the external API
         const data = await checkRegistrationERM(name, mr_no);
+        console.log("DATA", data);
         res.status(200).json(data);
     } catch (error) {
         console.error('Error fetching registration data:', error);

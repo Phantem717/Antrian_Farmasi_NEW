@@ -94,7 +94,9 @@ async function checkRegistrationSEP(SEP) {
 
 
 async function checkRegistrationERM(name,mr_no) {
+  console.log("QUERY",name,mr_no);
   const { timestamp, signature } = generateSignature(consID2, password);
+  console.log("HEADERS",timestamp,signature);
   // regisNo = SEP.trim();
   try {
     const response = await axios({
@@ -108,7 +110,7 @@ async function checkRegistrationERM(name,mr_no) {
         'Content-Type': 'application/json'
       }
     });
- 
+    // console.log("RESP",response);
     return response.data;
   } catch (error) {
     console.error('Error dalam pemanggilan API:', error);
