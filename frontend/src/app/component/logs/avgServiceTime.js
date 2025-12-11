@@ -29,7 +29,6 @@ const AvgServiceTime = ({isSubmit, setIsSubmit, fromDate, toDate, location}) => 
       } catch (err) {
         console.error("Error fetching data:", err);
       } finally {
-        setLoading(false);
         setIsSubmit(false);
       }
     };

@@ -30,7 +30,7 @@ import { DatePicker } from "antd";
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 export default function Logs({params}) {
-   const { category } = params;
+  const {category} = use(params);
   const [isSubmit, setIsSubmit] = useState(false);
   const [filters, setFilters] = useState({
     fromDate: null,

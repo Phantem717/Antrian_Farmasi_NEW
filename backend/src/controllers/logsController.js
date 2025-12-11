@@ -31,7 +31,7 @@ const getLogsToday = async (req,res)=>{
     if(location == "gmcb"){location = "Lantai 1 GMCB"}
     if(location == "lt3"){location = "Lantai 3 GMCB"}
         const allLogs = await logs.getToday(location);
-
+    console.log("location",location,allLogs);
     res.status(200).json({ 
       message: "List of all Logs",
       data: allLogs

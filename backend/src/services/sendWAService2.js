@@ -89,7 +89,6 @@ async function sendWAAntrian(payload){
     else{
       name = "narasi_wa_farmasi_resep_non_racikan"
             templateId="882b9bd6c012ce7a8a813faed8eef46bUTILITY"
-
     }
     const url = path;
 console.log("PHONE_NUMBER_ANTRIAN",payload.phone_number,payload.switch_WA,"SWITCH TEST: ", payload.switch_WA ? payload.phone_number : "test");

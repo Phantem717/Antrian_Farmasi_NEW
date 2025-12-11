@@ -87,6 +87,7 @@ const ExportToExcel = ({ data, fileName }) => {
     const fetchInitialData = async () => {
       try {
         const response = await LogsAPI.getAllLogsToday(location);
+        console.log("RESP",response);
         setQueueList(response.data);
         setFilteredData(response.data);
       } catch (err) {

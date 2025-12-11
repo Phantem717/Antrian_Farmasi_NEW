@@ -1,6 +1,6 @@
 const VerificationTask = require('../models/verificationTask');
 const MedicineTask = require('../models/medicineTask');
-const DoctorAppointment = require('../models/doctorAppointments');
+const GMCBAppointments = require('../models/GMCBAppointments');
 const PharmacyTask = require('../models/pharmacyTask');
 const {getAllResponses}= require('../controllers/responsesController')
 const sendWA = require('../services/sendWAService2');
@@ -42,23 +42,42 @@ async function insertAll(payload) {
 
   try {
     await conn.beginTransaction();
-
+//  INSERT INTO gmcb_appointments (
+        //   NOP,x
+        //   sep_nox
+        //   queue_number,x
+        //   queue_status,x
+        //   patient_name,x
+        //   medical_record_no,x
+        //   patient_date_of_birth,x
+        //   medicine_type,x
+        //   lokasi,c
+        //   location_from, x
+        //   phone_number, x
+        //   doctor_name, x
+        //   nik, x
+        //   poliklinik, x
+        //   payment_type, x
+        //   isPaid, x
+        //   total_medicine x
+        // ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?,?,?)
     const doctorAppointmentData = {
       sep_no: payload.sep_no || null,
       queue_number: payload.queue_number || null,
       queue_status: payload.queue_status || null,
-      queue_type: payload.queue_type || null,
       patient_name: payload.patient_name || null,
       medical_record_no: payload.medical_record_no || null,
       patient_date_of_birth: payload.patient_date_of_birth || null,
-      status_medicine: payload.statusMedicine,
+      medicine_type: payload.statusMedicine,
       lokasi: payload.location || null,
       phone_number: payload.phone_number || "-",
       doctor_name: payload.doctor_name || "-",
       nik: payload.nik || "-",
-      farmasi_queue_number: payload.farmasi_queue_number || "-",
-      NOP: payload.NOP || "-",
-      PRB: payload.PRB || null,
+      NOP: payload.NOP || null,
+      payment_type: payload.payment_type || null,
+      isPaid: payload.isPaid || false,
+      location_from: payload.location_from || null,
+      poliklinik: payload.poliklinik || null,
       total_medicine:  payload.total_medicine || 0
     };
 
@@ -74,7 +93,7 @@ async function insertAll(payload) {
       lokasi: payload.location
     }, conn);
 
-    const doctorAppointment = await DoctorAppointment.create(doctorAppointmentData, conn);
+    const doctorAppointment = await GMCBAppointments.create(doctorAppointmentData, conn);
   
     await conn.commit();
 
@@ -113,7 +132,7 @@ const getFarmasiList = async (req, res) => {
     }
 
     let [existingDoctorAppointment, existingPharmacyTask, existingVerificationTask] = await Promise.all([
-      DoctorAppointment.findByNOP(NOP),
+      GMCBAppointments.findByNOP(NOP),
       PharmacyTask.findByNOP(NOP),
       VerificationTask.findByNOP(NOP)
     ]);
@@ -126,21 +145,22 @@ const getFarmasiList = async (req, res) => {
 
       payload = {
         sep_no: farmasiArray.payload.sep_no ?? null,
-        queue_number: farmasiArray.payload.farmasi_queue_number ?? null,
+        queue_number: farmasiArray.payload.queue_number ?? null,
         queue_status: farmasiArray.payload.queue_status ?? "Menunggu",
-        queue_type: farmasiArray.payload.queue_type ?? "Dokter",
+        poliklinik: farmasiArray.payload.poliklinik ?? null,
         patient_name: farmasiArray.payload.patient_name ?? null,
         medical_record_no: farmasiArray.payload.medical_record_no ?? null,
         patient_date_of_birth: farmasiArray.payload?.patient_date_of_birth ?? null,
         statusMedicine: statusMedicine,
-        location: "Lantai 1 BPJS",
+        location: "Lantai 1 GMCB",
         phone_number: farmasiArray.payload.phone_number ?? null,
         doctor_name: farmasiArray.payload.doctor_name ?? null,
         nik: farmasiArray.payload.nik ?? "-",
-        farmasi_queue_number: farmasiArray.payload.farmasi_queue_number ?? "-",
         NOP: farmasiArray.payload.NOP ?? null,
-        PRB: farmasiArray.payload.PRB ?? null,
-        total_medicine: farmasiArray.payload.total_medicine ?? 0
+        total_medicine: farmasiArray.payload.total_medicine ?? 0,
+        payment_type: farmasiArray.payload.payment_type ?? null,
+        isPaid: farmasiArray.payload.isPaid ?? false,
+        location_from: farmasiArray.payload.location_from ?? null
       };
 
       result = await insertAll(payload);
@@ -189,19 +209,19 @@ const getFarmasiList = async (req, res) => {
         console.log("SEND WA RET");
             const waResp = await sendWAAntrian(wa_payload);
             console.log("WA RESPONSE:", waResp,wa_payload);
-const print = await retryOperation(
-    () => printAntrianFarmasi(printPayload),
-    3, // max retries
-    1000 // initial delay (will increase exponentially)
-  );
-      await new Promise(resolve => setTimeout(resolve, 2000)); // 1-second delay
+// const print = await retryOperation(
+//     () => printAntrianFarmasi(printPayload),
+//     3, // max retries
+//     1000 // initial delay (will increase exponentially)
+//   );
+//       await new Promise(resolve => setTimeout(resolve, 2000)); // 1-second delay
 
       
-      if (print.success == false) {
-        io.emit('print_error', {
-          message: 'Print Error'
-        });
-      }
+//       if (print.success == false) {
+//         io.emit('print_error', {
+//           message: 'Print Error'
+//         });
+//       }
 
     
       const data = await getAllResponses("Lantai 1 BPJS");
