@@ -1,75 +1,57 @@
 // src/models/doctorAppointments.js
 const { getDb } = require('../config/db');
-
 class GMCBAppointments {
   /**
    * Membuat record appointment baru.
    * @param {Object} appointmentData - Data appointment yang akan disimpan.
    */
   static async create(appointmentData,conn = null) {
+    console.log("APPOINTMENT DATA",appointmentData);
   const pool = await getDb();
   const connection = conn || await pool.getConnection(); // ? Explicit connection
-
     try {
-      //  sep_no: payload.sep_no || null, x
-      // queue_number: payload.queue_number || null, x
-      // queue_status: payload.queue_status || null, x
-      // patient_name: payload.patient_name || null, x
-      // medical_record_no: payload.medical_record_no || null, x
-      // patient_date_of_birth: payload.patient_date_of_birth || null, x
-      // medicine_type: payload.statusMedicine, x
-      // lokasi: payload.location || null, x
-      // phone_number: payload.phone_number || "-", x
-      // doctor_name: payload.doctor_name || "-", x
-      // nik: payload.nik || "-", x
-      // NOP: payload.NOP || null, x x
-      // payment_type: payload.payment_type || null, x
-      // isPaid: payload.isPaid || false, x
-      // location_from: payload.location_from || null, x
-      // poliklinik: payload.poliklinik || null, x
-      // total_medicine:  payload.total_medicine || 0 x
-      const query = `
-        INSERT INTO gmcb_appointments (
-          NOP,
-          sep_no,
-          queue_number,
-          queue_status,
-          patient_name,
-          medical_record_no,
-          patient_date_of_birth,
-          medicine_type,
-          lokasi,
-          location_from,
-          phone_number,
-          doctor_name,
-          nik,
-          poliklinik,
-          payment_type,
-          isPaid,
-          total_medicine,
-          patient_name
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?,?,?,?)
-      `;
-      const values = [
-        appointmentData.NOP,
-        appointmentData.sep_no,
-        appointmentData.queue_number,
-        appointmentData.queue_status,
-        appointmentData.patient_name,
-        appointmentData.medical_record_no,
-        appointmentData.patient_date_of_birth,
-        appointmentData.status_medicine,
-        appointmentData.lokasi,
-        appointmentData.location_from,
-        appointmentData.phone_number,
-        appointmentData.doctor_name,
-        appointmentData.nik,
-        appointmentData.poliklinik,
-        appointmentData.payment_type,
-        appointmentData.isPaid,
-        appointmentData.patient_name
+     const query = `
+  INSERT INTO gmcb_appointments (
+    NOP,
+    sep_no,
+    queue_number,
+    queue_status,
+    patient_name,
+    medical_record_no,
+    patient_date_of_birth,
+    medicine_type,
+    lokasi,
+    location_from,
+    phone_number,
+    doctor_name,
+    nik,
+    poliklinik,
+    payment_type,
+    isPaid,
+    total_medicine
+  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+`;
+const values = [
+  appointmentData.NOP,
+  appointmentData.sep_no,
+  appointmentData.queue_number,
+  appointmentData.queue_status,
+  appointmentData.patient_name,
+  appointmentData.medical_record_no,
+  appointmentData.patient_date_of_birth,
+  appointmentData.medicine_type,      // ✅ FIXED
+  appointmentData.lokasi,
+  appointmentData.location_from,
+  appointmentData.phone_number,
+  appointmentData.doctor_name,
+  appointmentData.nik,
+  appointmentData.poliklinik,
+  appointmentData.payment_type,
+  appointmentData.isPaid,
+  appointmentData.total_medicine ?? 0 // ✅ safe default
+];
 
-      ];
+
       const [result] = await connection.execute(query, values);
       return result;
     } catch (error) {
@@ -242,7 +224,6 @@ FROM gmcb_appointments
 ORDER BY NOP DESC LIMIT 1
 `;
 
-      
       const [rows] = await conn.execute(query);
       return rows[0]; // Instead of returning the whole array
     } catch (error) {
@@ -258,10 +239,10 @@ static async getLatestAntrianJaminan(type) {
     const conn = await pool.getConnection();
     
     // 1. CRITICAL: Define the pattern to search for (e.g., 'C-%' or 'D-%')
-    const queuePattern = `${type}-%`; 
+    const queuePattern = `%${type}-%`; 
 
     try {
-        const query = `S
+        const query = `
             SELECT queue_number, NOP
             FROM gmcb_appointments
             
@@ -303,6 +284,7 @@ static async getLatestAntrianJaminan(type) {
     conn.release(); // ?? Critical cleanup
   }
   }
+
   static async updateTotalMedicine(NOP, total_medicine) {
     const pool = await getDb();
     const conn = await pool.getConnection(); // ? Explicit connection

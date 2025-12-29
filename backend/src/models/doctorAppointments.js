@@ -102,20 +102,107 @@ ORDER BY da.queue_number`;
    * Mengambil record appointment berdasarkan booking_id.
    * @param {string} NOP - ID booking appointment.
    */
-  static async findByNOP(NOP) {
+static async findByNOP(NOP) {
   const pool = await getDb();
-  const conn = await pool.getConnection(); // ? Explicit connection
+  const conn = await pool.getConnection();
 
-    try {
-      const query = `SELECT * FROM Doctor_Appointments WHERE NOP = ?`;
-      const [rows] = await conn.execute(query, [NOP]);
-      return rows[0];
-    } catch (error) {
-      throw error;
-    }finally {
-    conn.release(); // ?? Critical cleanup
+  try {
+    const query = `
+      /* ================= DOCTOR APPOINTMENTS ================= */
+      SELECT
+        da.NOP,
+        da.sep_no,
+        da.queue_number,
+        da.queue_status,
+        da.queue_type,
+        da.patient_name,
+        da.medical_record_no,
+        da.status_medicine,
+        da.patient_date_of_birth,
+        da.lokasi,
+        da.phone_number,
+        da.nik,
+        da.doctor_name,
+        da.farmasi_queue_number,
+        da.PRB,
+        da.total_medicine,
+        da.isPaid,
+        da.total_queue,
+        da.poliklinik,
+        da.payment,
+        'doctor' AS source
+      FROM Doctor_Appointments da
+      WHERE da.NOP = ?
+
+      UNION ALL
+
+      /* ================= GMCB APPOINTMENTS ================= */
+      SELECT
+        ga.NOP,
+        ga.sep_no,
+        ga.queue_number,
+        ga.queue_status,
+        NULL            AS queue_type,
+        ga.patient_name,
+        ga.medical_record_no,
+        ga.medicine_type AS status_medicine,
+        ga.patient_date_of_birth,
+        ga.lokasi,
+        ga.phone_number,
+        ga.nik,
+        ga.doctor_name,
+        NULL            AS farmasi_queue_number,
+        NULL            AS PRB,
+        ga.total_medicine,
+        ga.isPaid,
+        NULL            AS total_queue,
+        ga.poliklinik,
+        ga.payment_type AS payment,
+        'gmcb_appointment' AS source
+      FROM gmcb_appointments ga
+      WHERE ga.NOP = ?
+
+      UNION ALL
+
+      /* ================= GMCB FARMASI TEMP ================= */
+      SELECT
+        gc.id            AS NOP,
+        NULL             AS sep_no,
+        gc.queue_number,
+        NULL             AS queue_status,
+        NULL             AS queue_type,
+        NULL             AS patient_name,
+        NULL             AS medical_record_no,
+        NULL             AS status_medicine,
+        NULL             AS patient_date_of_birth,
+        'Lantai 1 GMCB'   AS lokasi,
+        NULL             AS phone_number,
+        NULL             AS nik,
+        NULL             AS doctor_name,
+        NULL             AS farmasi_queue_number,
+        NULL             AS PRB,
+        NULL             AS total_medicine,
+        FALSE            AS isPaid,
+        NULL             AS total_queue,
+        NULL             AS poliklinik,
+        NULL             AS payment,
+        'gmcb_temp'      AS source
+      FROM gmcb_farmasi_temp gc
+      WHERE gc.id = ?
+
+      LIMIT 1
+    `;
+
+    const [rows] = await conn.execute(query, [NOP, NOP, NOP]);
+    return rows[0] || null;
+
+  } catch (error) {
+    throw error;
+  } finally {
+    conn.release();
   }
-  }
+}
+
 
   /**
    * Memperbarui record appointment berdasarkan booking_id.

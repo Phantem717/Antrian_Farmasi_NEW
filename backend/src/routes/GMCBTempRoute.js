@@ -3,22 +3,17 @@ const express = require('express');
 const authCheck = require('../middleware/authMiddleware.js');
 const router = express.Router();
 const  {
-    createAppointment,
+    updateAntrian,
     getAppointment,
     getAllAppointments,
-    updateStatusMedicine,
-    updateGMCBAppointmentController,
+    getFarmasiList,
     deleteAppointment,
     getLatestAntrian,
-    updateMedicineType,
     getAllAppointmentsByLocation,
-    updateTotalMedicineController,
-    getDoctorTotalByDate,
-updateAppointment,
-    RouteUpdateDoubleController,
-    updatePhoneNumber,
+    createAppointment
+ 
    
-} = require('../controllers/GMCBController')
+} = require('../controllers/GMCBTempController')
 const authenticate = (req,res,next) => {
     try {
         const consId = req.headers['x-cons-id'];
@@ -37,10 +32,7 @@ const authenticate = (req,res,next) => {
     }
    
 }
-const {
-  getFarmasiList
-} = require('../controllers/retrieveGMCBAntrianListController');
-    
+
 // Endpoint untuk membuat appointment baru
 router.post('/', createAppointment);
 router.get('/', getAllAppointments);
@@ -50,23 +42,16 @@ router.get('/antrian', getLatestAntrian);
 
 
 // Endpoint untuk mengambil appointment berdasarkan NOP
-router.get('/:NOP', getAppointment);
+router.get('/:id', getAppointment);
 
 // Endpoint untuk mengambil appointment 
 
 
 // Endpoint untuk memperbarui appointment berdasarkan NOP
 // router.put('/:NOP', updateAppointment);
-router.put('/:NOP/phone_number', updatePhoneNumber);
-router.patch('/update/:NOP', updateGMCBAppointmentController);
-
-router.patch('/total_medicine', authCheck, updateTotalMedicineController);
-
-router.put('/type/:NOP',updateMedicineType);
-router.patch('/:NOP/status_medicine', updateStatusMedicine);
-router.get('/by-date/:date/:category',getDoctorTotalByDate);
+router.patch('/update', updateAntrian);
 // Endpoint untuk menghapus appointment berdasarkan NOP
-router.delete('/:NOP', deleteAppointment);
+router.delete('/:id', deleteAppointment);
 router.get('/:category',getAllAppointmentsByLocation);
 
 module.exports = router;

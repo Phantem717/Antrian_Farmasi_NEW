@@ -70,39 +70,90 @@ class VerificationTask {
    */
   static async findByNOP(NOP) {
   const pool = await getDb();
-  const conn = await pool.getConnection(); // ? Explicit connection
+  const conn = await pool.getConnection();
 
-    try {
-      const query = `
-        SELECT 
-          vt.*, 
-          da.patient_name,
-          da.sep_no,
-          da.medical_record_no,
-          da.queue_number,
-                    da.farmasi_queue_number,
-          da.phone_number,
+  try {
+    const query = `
+      /* ================= DOCTOR APPOINTMENTS ================= */
+      SELECT 
+        vt.*,
+        da.patient_name,
+        da.sep_no,
+        da.medical_record_no,
+        da.queue_number,
+        da.farmasi_queue_number,
+        da.phone_number,
+        da.status_medicine,
+        da.patient_date_of_birth,
+        pt.status,
+        pt.medicine_type,
+        mt.loket AS loket2,
+        da.isPaid,
+        'doctor' AS source
+      FROM Verification_Task vt
+      JOIN Doctor_Appointments da ON vt.NOP = da.NOP
+      LEFT JOIN Pharmacy_Task pt ON vt.NOP = pt.NOP
+      LEFT JOIN Medicine_Task mt ON vt.NOP = mt.NOP
+      WHERE vt.NOP = ?
 
-          da.status_medicine,
-          da.patient_date_of_birth,
-          pt.status,
-          pt.medicine_type,
-          mt.loket as 'loket2',
-          da.isPaid
-        FROM Verification_Task vt
-        LEFT JOIN Doctor_Appointments da ON vt.NOP = da.NOP
-        LEFT JOIN Pharmacy_Task pt ON vt.NOP = pt.NOP
-        LEFT JOIN Medicine_Task mt ON vt.NOP = mt.NOP
-        WHERE vt.NOP = ?
-      `;
-      const [rows] = await conn.execute(query, [NOP]);
-      return rows[0];
-    } catch (error) {
-      throw error;
-    }finally {
-    conn.release(); // ?? Critical cleanup
+      UNION ALL
+
+      /* ================= GMCB APPOINTMENTS ================= */
+      SELECT 
+        vt.*,
+        ga.patient_name,
+        ga.sep_no,
+        ga.medical_record_no,
+        ga.queue_number,
+        NULL AS farmasi_queue_number,
+        ga.phone_number,
+        ga.medicine_type AS status_medicine,
+        ga.patient_date_of_birth,
+        pt.status,
+        pt.medicine_type,
+        mt.loket AS loket2,
+        ga.isPaid,
+        'gmcb_appointment' AS source
+      FROM Verification_Task vt
+      JOIN gmcb_appointments ga ON vt.NOP = ga.NOP
+      LEFT JOIN Pharmacy_Task pt ON vt.NOP = pt.NOP
+      LEFT JOIN Medicine_Task mt ON vt.NOP = mt.NOP
+      WHERE vt.NOP = ?
+
+      UNION ALL
+
+      /* ================= GMCB FARMASI TEMP ================= */
+      SELECT 
+        vt.*,
+        NULL AS patient_name,
+        NULL AS sep_no,
+        NULL AS medical_record_no,
+        gc.queue_number,
+        NULL AS farmasi_queue_number,
+        NULL AS phone_number,
+        NULL AS status_medicine,
+        NULL AS patient_date_of_birth,
+        pt.status,
+        pt.medicine_type,
+        mt.loket AS loket2,
+        FALSE AS isPaid,
+        'gmcb_temp' AS source
+      FROM Verification_Task vt
+      JOIN gmcb_farmasi_temp gc ON vt.NOP = gc.id
+      LEFT JOIN Pharmacy_Task pt ON vt.NOP = pt.NOP
+      LEFT JOIN Medicine_Task mt ON vt.NOP = mt.NOP
+      WHERE vt.NOP = ?
+    `;
+
+    const [rows] = await conn.execute(query, [NOP, NOP, NOP]);
+
+    return rows[0] || null;
+  } catch (error) {
+    throw error;
+  } finally {
+    conn.release();
   }
-  }
+}
 
   /**
    * Mengambil semua record Verification_Task.
@@ -142,61 +193,191 @@ ORDER BY vt.waiting_verification_stamp ASC;
     conn.release(); // ?? Critical cleanup
   }
   }
-
-  static async getToday(location){
+static async getToday(location) {
   const pool = await getDb();
-  const conn = await pool.getConnection(); // ? Explicit connection
+  const conn = await pool.getConnection();
 
-    try {
+  try {
+    let query;
+    let params = [];
 
-      const query = `
-     SELECT 
-  vt.*, 
-  da.patient_name,
+    if (location === 'Lantai 1 GMCB') {
+      // ✅ GMCB → UNION query
+  query = `
+    SELECT * FROM (
+      /* ==========================
+         GMCB Doctor Appointments
+         ========================== */
+      SELECT
+        vt.*,
+        ga.patient_name,
+  ga.sep_no,
+  ga.medical_record_no,
+  ga.queue_number,
+  ga.patient_date_of_birth,
+  ga.medicine_type as status_medicine,
+  ga.phone_number,
+
+  pt.status,
+  pt.medicine_type,
+  ga.isPaid
+    
+     
+      FROM Verification_Task vt
+      JOIN gmcb_appointments ga ON vt.NOP = ga.NOP
+      LEFT JOIN Pharmacy_Task pt ON vt.NOP = pt.NOP
+      WHERE vt.lokasi = ?
+
+      UNION ALL
+
+      /* ==========================
+         GMCB Independent Queue
+         ========================== */
+      SELECT
+        vt.*,
+        NULL                    AS patient_name,
+        NULL                    AS sep_no,
+        NULL                    AS medical_record_no,
+        gc.queue_number         AS queue_number,
+        NULL                    AS patient_date_of_birth,
+        NULL                    AS status_medicine,
+        NULL                    AS phone_number,
+      
+        pt.status,
+        pt.medicine_type,
+        FALSE                   AS isPaid
+      FROM Verification_Task vt
+      JOIN gmcb_farmasi_temp gc ON vt.NOP = gc.id
+      LEFT JOIN Pharmacy_Task pt ON vt.NOP = pt.NOP
+      WHERE vt.lokasi = ?
+    ) gmcb
+    WHERE DATE(waiting_verification_stamp) = CURRENT_DATE
+      AND (
+        status IS NULL
+        OR (status != 'completed_verification' AND status LIKE '%verification%')
+      )
+    ORDER BY waiting_verification_stamp ASC
+  `;
+
+  params = [location, location];
+
+    } else {
+      // ✅ BPJS / LT3 / others → normal query
+      query = `
+    SELECT
+  vt.*,
+     da.patient_name,
   da.sep_no,
   da.medical_record_no,
   da.queue_number,
   da.farmasi_queue_number,
   da.patient_date_of_birth,
   da.status_medicine,
-  da.doctor_name,
   da.phone_number,
+
   pt.status,
   pt.medicine_type,
-          da.isPaid
+  da.isPaid
+    
 FROM Verification_Task vt
 LEFT JOIN Doctor_Appointments da ON vt.NOP = da.NOP
 LEFT JOIN Pharmacy_Task pt ON vt.NOP = pt.NOP
-WHERE DATE(vt.waiting_verification_stamp) = CURRENT_DATE
-  AND (pt.status IS NULL OR 
-       (pt.status != 'completed_verification' AND pt.status LIKE '%verification%'))
-  AND vt.lokasi = ?
-ORDER BY vt.waiting_verification_stamp ASC;
+WHERE DATE(vt.waiting_verification_stamp) = CURRENT_DATE AND (pt.status IS NULL OR (pt.status != 'completed_verification' AND pt.status LIKE '%verification%'))
+AND vt.lokasi = ?
       `;
+      params = [location];
+    }
 
-      const [rows] = await conn.execute(query,[location]);
-      return rows;
-    } catch (error) {
-      throw error;
-    }finally {
-    conn.release(); // ?? Critical cleanup
+    const [rows] = await conn.execute(query, params);
+    return rows;
+
+  } catch (err) {
+    throw err;
+  } finally {
+    conn.release();
   }
-  }
-  
+}
+
   
   static async getByDate(location,date){
   const pool = await getDb();
   const conn = await pool.getConnection(); // ? Explicit connection
 
     try {
-      const query = `
+      let query;
+      let params = [];
+    if (location === "Lantai 1 GMCB") {
+  query = `
+    SELECT * FROM (
+      /* ==========================
+         GMCB Doctor Appointments
+         ========================== */
+      SELECT
+        vt.*,
+           ga.patient_name,
+  ga.sep_no,
+  ga.medical_record_no,
+  ga.queue_number,
+  ga.patient_date_of_birth,
+  ga.medicine_type as status_medicine,
+  ga.phone_number,
+
+  pt.status,
+  pt.medicine_type,
+  ga.isPaid
+    
+      FROM Verification_Task vt
+      JOIN gmcb_appointments ga ON vt.NOP = ga.NOP
+      LEFT JOIN Pharmacy_Task pt ON vt.NOP = pt.NOP
+      WHERE (ga.queue_number LIKE '%RC%' OR ga.queue_number LIKE '%NR%')
+        AND DATE(vt.waiting_verification_stamp) = ?
+        AND vt.waiting_verification_stamp IS NOT NULL
+        AND vt.lokasi = ?
+
+      UNION ALL
+
+      /* ==========================
+         GMCB Independent Queue
+         ========================== */
+      SELECT
+        vt.*,
+        NULL                    AS patient_name,
+        NULL                    AS sep_no,
+        NULL                    AS medical_record_no,
+        gc.queue_number         AS queue_number,
+        NULL                    AS patient_date_of_birth,
+        NULL                    AS status_medicine,
+        NULL                    AS phone_number,
+        pt.status,
+        pt.medicine_type,
+        FALSE                   AS isPaid
+      FROM Verification_Task vt
+      JOIN gmcb_farmasi_temp gc ON vt.NOP = gc.id
+      LEFT JOIN Pharmacy_Task pt ON vt.NOP = pt.NOP
+      WHERE DATE(vt.waiting_verification_stamp) = ?
+        AND vt.waiting_verification_stamp IS NOT NULL
+        AND vt.lokasi = ?
+    ) gmcb
+    WHERE (
+      status IS NULL
+      OR (status != 'completed_verification' AND status LIKE '%verification%')
+    )
+    ORDER BY waiting_verification_stamp ASC
+  `;
+
+  params = [
+    date, location,   // appointment
+    date, location    // independent
+  ];
+}
+
+      else{  query = `
        SELECT 
   vt.*, 
   da.patient_name,
   da.sep_no,
   da.medical_record_no,
   da.queue_number,
-  da.farmasi_queue_number,
   da.patient_date_of_birth,
   da.status_medicine,
   da.phone_number,
@@ -207,19 +388,20 @@ ORDER BY vt.waiting_verification_stamp ASC;
 FROM Verification_Task vt
 LEFT JOIN Doctor_Appointments da ON vt.NOP = da.NOP
 LEFT JOIN Pharmacy_Task pt ON vt.NOP = pt.NOP
-WHERE (da.queue_number LIKE 'RC%' OR da.queue_number LIKE 'NR%')
-  AND DATE(vt.waiting_verification_stamp) = ?
+WHERE DATE(vt.waiting_verification_stamp) = ?
   AND vt.waiting_verification_stamp IS NOT NULL
   AND (pt.status IS NULL OR 
        (pt.status != 'completed_verification' AND pt.status LIKE '%verification%'))
        AND vt.lokasi = ?
 ORDER BY vt.waiting_verification_stamp ASC;
       `;
-      const values = [
+      params = [
         date,
         location
       ]
-      const [rows] = await conn.execute(query, values);
+      }
+      
+      const [rows] = await conn.execute(query, params);
       return rows;
     } catch (error) {
       throw error;

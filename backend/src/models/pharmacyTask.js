@@ -36,10 +36,10 @@ class PharmacyTask {
    */
   static async findByNOP(NOP) {
   const pool = await getDb();
-  const conn = await pool.getConnection(); // ? Explicit connection
+  const conn = await pool.getConnection();
 
-    try {
-      const query = `
+  try {
+    const query = `
       SELECT 
         da.NOP,
         da.sep_no,
@@ -48,19 +48,54 @@ class PharmacyTask {
         da.queue_number,
         da.status_medicine,
         pt.status,
-        pt.medicine_type
-      FROM Pharmacy_Task pt
-      JOIN Doctor_Appointments da ON pt.NOP = da.NOP
+        pt.medicine_type,
+        'doctor' AS source
+      FROM Doctor_Appointments da
+      LEFT JOIN Pharmacy_Task pt ON pt.NOP = da.NOP
       WHERE da.NOP = ?
-      `;
-      const [rows] = await conn.execute(query, [NOP]);
-      return rows[0];
-    } catch (error) {
-      throw error;
-    }finally {
-    conn.release(); // ?? Critical cleanup
+
+      UNION ALL
+
+      SELECT
+        ga.NOP,
+        ga.sep_no,
+        ga.patient_name,
+        ga.medical_record_no,
+        ga.queue_number,
+        ga.medicine_type AS status_medicine,
+        pt.status,
+        pt.medicine_type,
+        'gmcb_appointment' AS source
+      FROM gmcb_appointments ga
+      LEFT JOIN Pharmacy_Task pt ON pt.NOP = ga.NOP
+      WHERE ga.NOP = ?
+
+      UNION ALL
+
+      SELECT
+        gc.id AS NOP,
+        NULL AS sep_no,
+        NULL AS patient_name,
+        NULL AS medical_record_no,
+        gc.queue_number,
+        NULL AS status_medicine,
+        pt.status,
+        pt.medicine_type,
+        'gmcb_temp' AS source
+      FROM gmcb_farmasi_temp gc
+      LEFT JOIN Pharmacy_Task pt ON pt.NOP = gc.id
+      WHERE gc.id = ?
+    `;
+
+    const [rows] = await conn.execute(query, [NOP, NOP, NOP]);
+
+    return rows[0] || null;
+  } catch (error) {
+    throw error;
+  } finally {
+    conn.release();
   }
-  }
+}
 
   /**
    * Mengambil semua record task farmasi.
@@ -96,9 +131,12 @@ class PharmacyTask {
    static async getAllByStatus(location,status) {
   const pool = await getDb();
   const conn = await pool.getConnection(); // ? Explicit connection
-
+  let values = [];
+  let query;
     try {
-      const query = `
+      if(location == "Lantai 1 BPJS")
+{
+query = `
       SELECT 
         da.NOP,
         da.sep_no,
@@ -114,9 +152,30 @@ class PharmacyTask {
       AND pt.lokasi = ?
       ORDER BY da.NOP DESC;
       `;
-      const values = [
+      values = [
         status,location
       ]
+}     else{
+query = `
+      SELECT 
+        gc.NOP,
+        gc.sep_no,
+        gc.patient_name,
+        gc.medical_record_no,
+        gc.queue_number,
+        gc.medicine_type as status_medicine,
+        pt.status,
+        pt.medicine_type
+      FROM Pharmacy_Task pt
+      JOIN gmcb_Appointments gc ON pt.NOP = gc.NOP
+      WHERE pt.status = ?
+      AND pt.lokasi = ?
+      ORDER BY gc.NOP DESC;
+      `;
+      values = [
+        status,location
+      ]
+}
       const [rows] = await conn.execute(query, values);
       return rows;
     } catch (error) {

@@ -148,7 +148,6 @@ const getFarmasiList = async (req, res) => {
       existingPharmacyTask = result.pharmacyData;
       existingVerificationTask = result.verificationData;
 
-
       const printPayload = {
         phone_number: farmasiArray.payload.phone_number ?? "-",
         barcode: farmasiArray.payload.NOP ?? "-",

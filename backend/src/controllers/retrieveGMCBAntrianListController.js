@@ -34,33 +34,13 @@ async function retryOperation(operation, maxRetries = 3, delayMs = 1000) {
   throw lastError;
 }
 
-
-
 async function insertAll(payload) {
   const pool = await getDb();
   const conn = await pool.getConnection();
 
   try {
     await conn.beginTransaction();
-//  INSERT INTO gmcb_appointments (
-        //   NOP,x
-        //   sep_nox
-        //   queue_number,x
-        //   queue_status,x
-        //   patient_name,x
-        //   medical_record_no,x
-        //   patient_date_of_birth,x
-        //   medicine_type,x
-        //   lokasi,c
-        //   location_from, x
-        //   phone_number, x
-        //   doctor_name, x
-        //   nik, x
-        //   poliklinik, x
-        //   payment_type, x
-        //   isPaid, x
-        //   total_medicine x
-        // ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?,?,?)
+
     const doctorAppointmentData = {
       sep_no: payload.sep_no || null,
       queue_number: payload.queue_number || null,
@@ -94,7 +74,7 @@ async function insertAll(payload) {
     }, conn);
 
     const doctorAppointment = await GMCBAppointments.create(doctorAppointmentData, conn);
-  
+    console.log("GMCB",doctorAppointment);
     await conn.commit();
 
     return { doctorAppointment, pharmacyData, verificationData };
@@ -175,7 +155,7 @@ const getFarmasiList = async (req, res) => {
         patient_name: farmasiArray.payload.patient_name ?? "-",
         farmasi_queue_number: farmasiArray.payload.farmasi_queue_number ?? "-",
         medicine_type: statusMedicine ?? "-",
-        lokasi: "Lantai 1 BPJS",
+        lokasi: "Lantai 1 GMCB",
         SEP: farmasiArray.payload.sep_no ?? "-",
         tanggal_lahir: farmasiArray.payload?.patient_date_of_birth ?? null,
         queue_number: farmasiArray.payload.farmasi_queue_number ?? null,
@@ -203,12 +183,12 @@ const getFarmasiList = async (req, res) => {
             nik:  farmasiArray.payload.nik || "-",
             prev_queue_number: "-",
             switch_WA: "true",
-            location: "Lantai 1 BPJS"
+            location: "Lantai 1 GMCB"
 
         };
         console.log("SEND WA RET");
-            const waResp = await sendWAAntrian(wa_payload);
-            console.log("WA RESPONSE:", waResp,wa_payload);
+            // const waResp = await sendWAAntrian(wa_payload);
+            // console.log("WA RESPONSE:", waResp,wa_payload);
 // const print = await retryOperation(
 //     () => printAntrianFarmasi(printPayload),
 //     3, // max retries
@@ -224,7 +204,7 @@ const getFarmasiList = async (req, res) => {
 //       }
 
     
-      const data = await getAllResponses("Lantai 1 BPJS");
+      const data = await getAllResponses("Lantai 1 GMCB");
 
        io.emit('insert_appointment', {
 

@@ -17,6 +17,7 @@ const socketConfig = require('./config/socket'); // ? Import socket setup
 const io = socketConfig.init(server);
 app.set('socketio',io);
 
+const GMCBTempRoutes = require('./routes/GMCBTempRoute');
 const doctorAppointmentsRoutes = require('./routes/doctorAppointments');
 const BarcodeRoutes = require('./routes/BarcodeRoutes');
 const loketRoutes = require('./routes/loketRoutes');
@@ -73,7 +74,8 @@ app.use('/api/pharmacy-status',pharmacyStatusRoutes);
 app.use('/api/check',checkRegistrationRoute);
 app.use('/api/status',statusRoute);
 app.use('/api/create-queue',queueRoute);
-app.use('/api/GMCBList',GMCBListRoute);
+app.use('/api/GMCB-appointment',GMCBListRoute);
+app.use('/api/GMCB-temp',GMCBTempRoutes);
   // Menjalankan server pada semua network interfaces
   const PORT = process.env.PORT || 5000;
   const HOST =  '0.0.0.0'

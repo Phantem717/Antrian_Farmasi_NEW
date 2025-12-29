@@ -61,33 +61,76 @@ class MedicineTask {
    */
   static async findByNOP(NOP) {
   const pool = await getDb();
-  const conn = await pool.getConnection(); // ? Explicit connection
+  const conn = await pool.getConnection();
 
-    try {
-      const query = `
-        SELECT
-          mt.*, 
-          da.patient_name,
-          da.sep_no,
-          da.medical_record_no,
-          da.queue_number,
-          da.status_medicine,
-          pt.status,
-          pt.medicine_type,
-          da.isPaid
-        FROM Medicine_Task mt
-        LEFT JOIN Doctor_Appointments da ON mt.NOP = da.NOP
-        LEFT JOIN Pharmacy_Task pt ON mt.NOP = pt.NOP
-        WHERE mt.NOP = ?
-      `;
-      const [rows] = await conn.execute(query, [NOP]);
-      return rows[0];
-    } catch (error) {
-      throw error;
-    }finally {
-    conn.release(); // ?? Critical cleanup
+  try {
+    const query = `
+      /* ================= DOCTOR APPOINTMENTS ================= */
+      SELECT
+        mt.*,
+        da.patient_name,
+        da.sep_no,
+        da.medical_record_no,
+        da.queue_number,
+        da.status_medicine,
+        pt.status,
+        pt.medicine_type,
+        da.isPaid,
+        'doctor' AS source
+      FROM Medicine_Task mt
+      JOIN Doctor_Appointments da ON mt.NOP = da.NOP
+      LEFT JOIN Pharmacy_Task pt ON mt.NOP = pt.NOP
+      WHERE mt.NOP = ?
+
+      UNION ALL
+
+      /* ================= GMCB APPOINTMENTS ================= */
+      SELECT
+        mt.*,
+        ga.patient_name,
+        ga.sep_no,
+        ga.medical_record_no,
+        ga.queue_number,
+        ga.medicine_type AS status_medicine,
+        pt.status,
+        pt.medicine_type,
+        ga.isPaid,
+        'gmcb_appointment' AS source
+      FROM Medicine_Task mt
+      JOIN gmcb_appointments ga ON mt.NOP = ga.NOP
+      LEFT JOIN Pharmacy_Task pt ON mt.NOP = pt.NOP
+      WHERE mt.NOP = ?
+
+      UNION ALL
+
+      /* ================= GMCB FARMASI TEMP ================= */
+      SELECT
+        mt.*,
+        NULL AS patient_name,
+        NULL AS sep_no,
+        NULL AS medical_record_no,
+        gc.queue_number,
+        NULL AS status_medicine,
+        pt.status,
+        pt.medicine_type,
+        FALSE AS isPaid,
+        'gmcb_temp' AS source
+      FROM Medicine_Task mt
+      JOIN gmcb_farmasi_temp gc ON mt.NOP = gc.id
+      LEFT JOIN Pharmacy_Task pt ON mt.NOP = pt.NOP
+      WHERE mt.NOP = ?
+    `;
+
+    const [rows] = await conn.execute(query, [NOP, NOP, NOP]);
+    return rows[0] || null;
+
+  } catch (error) {
+    throw error;
+  } finally {
+    conn.release();
   }
-  }
+}
+
 
   /**
    * Mengambil semua record Medicine_Task.
