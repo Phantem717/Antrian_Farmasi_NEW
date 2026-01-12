@@ -188,7 +188,7 @@ static async findByNOP(NOP) {
         NULL             AS payment,
         'gmcb_temp'      AS source
       FROM gmcb_farmasi_temp gc
-      WHERE gc.id = ?
+      WHERE gc.id = ? AND gc.isChanged = 0
 
       LIMIT 1
     `;
@@ -439,7 +439,7 @@ ORDER BY vt.waiting_verification_stamp ASC;
   }
   }
 
-
+  
 }
 
 module.exports = DoctorAppointment;

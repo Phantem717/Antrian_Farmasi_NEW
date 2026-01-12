@@ -152,14 +152,25 @@ const getAllPickupByDate = async (req, res) => {
 const updatePickupTask = async (req, res) => {
   try {
     const { NOP } = req.params;
-    const { Executor, Executor_Names, status, loket } = req.body;
-
+    let { status, Executor, Executor_Names,loket,location } = req.body;
+ if(location == "bpjs"){
+        location = "Lantai 1 BPJS"
+      }
+      
+      if(location == "gmcb"){
+        location = "Lantai 1 GMCB"
+      }
+      if(location == "lt3"){
+        location = "Lantai 3 GMCB"
+      }
+    
+    console.log("TEST",NOP,status);
     // 1. Ambil data lama dari database
-    const existingData = await PickupTask.findByNOP(NOP);
+    const existingData = await PickupTask.findByNOP(NOP,location);
     if (!existingData) {
       return res.status(404).json({ message: "Pickup Task not found" });
     }
-
+    console.log("EXIST",existingData)
     // 2. Buat objek updatedData dengan mewarisi data lama
     const updatedData = {
       Executor: Executor !== undefined ? Executor : existingData.Executor,
@@ -173,6 +184,7 @@ const updatePickupTask = async (req, res) => {
       loket : loket !== undefined ? loket : existingData.loket,
     };
 
+    console.log("UPDATED",updatedData);
     // 3. Dapatkan timestamp saat ini dalam format MySQL "YYYY-MM-DD HH:mm:ss"
     const now = getCurrentTimestamp();
     console.log("NOW DATE",now);
@@ -214,6 +226,7 @@ const updatePickupTask = async (req, res) => {
 
     // 5. Simpan perubahan ke database
     const result = await PickupTask.update(NOP, updatedData);
+    console.log("RES",result)
     const io = req.app.get('socketio');
 
     io.emit('update_pickup',{

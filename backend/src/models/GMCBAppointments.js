@@ -336,7 +336,26 @@ ORDER BY vt.waiting_verification_stamp ASC;
   }
   }
 
-
+static async updatePaymentStatus(NOP, isPaid) {
+    const pool = await getDb();
+    const conn = await pool.getConnection(); // ? Explicit connection
+  
+      try {
+        const query = `
+          UPDATE GMCB_Appointments 
+          SET isPaid = ?
+          WHERE NOP = ?
+        `;
+        const values = [isPaid, NOP];
+  
+        const [result] = await conn.execute(query, values);
+        return result;
+      } catch (error) {
+        throw error;
+      }finally {
+      conn.release(); // ?? Critical cleanup
+    }
+  }
 }
 
 module.exports = GMCBAppointments;

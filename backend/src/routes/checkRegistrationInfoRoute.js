@@ -6,7 +6,7 @@ const { checkRegistration,checkRegistrationSEP,checkRegistrationERMController} =
 
 // Route untuk mengecek queue
 // Endpoint: GET /api/medapp/queue/check?booking_id={id}
-router.get('/:registrationNo', checkRegistration);
+router.get('/reg_no/:registrationNo', checkRegistration);
 router.get('/:sepNo',checkRegistrationSEP)
 router.get('/', checkRegistrationERMController)
 

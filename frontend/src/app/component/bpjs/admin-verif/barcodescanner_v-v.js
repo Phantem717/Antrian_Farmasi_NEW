@@ -39,7 +39,7 @@ export default function BarcodeScanner({location, onScanResult, handleBulkPharma
 
     const fetchQueueList = async () => {
         try {
-            const response = await PharmacyAPI.getAllPharmacyTasksByStatus(location,"waiting_verification");
+            const response = await PharmacyAPI.getAllPharmacyTasksToday(location);
             console.log("Data antrian dari API:", response.data);
             setDaftarAntrian(response.data);
         } catch (error) {
@@ -118,8 +118,8 @@ export default function BarcodeScanner({location, onScanResult, handleBulkPharma
                 setDaftarAntrian(prev => prev.filter(item => item.NOP !== NOP));
             console.log("WA_PAYLOAD1",payload)
 
-        const sendResponse = await retryOperation(() => WA_API.sendWAVerif(payload));
-        console.log("WA response:", sendResponse);
+        // const sendResponse = await retryOperation(() => WA_API.sendWAVerif(payload));
+        // console.log("WA response:", sendResponse);
 
         // Emit socket events
        

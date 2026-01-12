@@ -66,24 +66,45 @@ async function printAntrianFarmasi(payload){
     footer: {
       footer_info: "Melayani dari Hati membangkitkan harapan"
     }
-  })
-};
+  }),
+    gmcb: (payload) => ({
+    judul: {
+      judultext: `Farmasi ${payload.lokasi}`,
+      queuenumber: payload.queue_number
+    },
+    content: {
+      "Tanggal lahir": payload.tanggal_lahir,
+      "No SEP": payload.SEP,
+      "Tipe Obat": payload.medicine_type,
+      Nama: payload.patient_name,
+      "Poliklinik": payload.poliklinik,
+      "Doctor Name": payload.doctor_name,
+      "Kode Reservasi": payload.barcode,
+      qrcodedata: payload.barcode,
+      "Position": payload.position,
+      "Timestamp": payload.timestamp
+    },
+    Note: {
+      remarks_info: PRB
+    },
+    footer: {
+      footer_info: "Melayani dari Hati membangkitkan harapan"
+    }
+  }),
+}
+
+;
 
 let htmlContent;
 
 if(payload.lokasi == "Lantai 1 BPJS"){
   htmlContent = templates.bpjs(payload);
 }
-
 else{
-  if(payload.queue_number.startsWith("RC") || payload.queue_number.startsWith("NR")){ 
-  htmlContent = templates.umum(payload);
+    htmlContent = templates.gmcb(payload);
+
 }
 
-else{
-  htmlContent = templates.manual(payload);
-}
-}
 try {
     const { timestamp, signature } = generateSignature(consID2, password);
  const url = `http://192.168.6.86/api/v1/visit/queue/pharmacy/cetak`;
@@ -118,28 +139,7 @@ if(payload.medicine_type == "Racikan" || payload.queue_number.startsWith("RC")){
           printerPort: 9100
         },
         htmlContent
-        // htmlContent: {
-        //   judul: {
-        //     judultext: `Farmasi ${payload.lokasi}`,
-        //     queuenumber: payload.queue_number
-        //   },
-        //   content: {
-       
-        //     "Tanggal lahir": payload.tanggal_lahir,
-        //     "No SEP": payload.SEP,
-        //     "Tipe Obat" : payload.medicine_type,
-        //     Nama : payload.patient_name,
-        //     "Doctor Name": payload.doctor_name,
-        //     "Kode Reservasi" : payload.barcode,
-        //     qrcodedata:payload.barcode,
-        //   },
-        //   Note: {
-        //     remarks_info: PRB
-        //   },
-        //   footer: {
-        //     footer_info: "Melayani dari Hati membangkitkan harapan"
-        //   }
-        // }
+
       },
       {
         headers: {

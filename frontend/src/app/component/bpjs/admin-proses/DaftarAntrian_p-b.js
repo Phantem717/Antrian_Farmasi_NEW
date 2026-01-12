@@ -286,7 +286,7 @@ useEffect(() => {
                                     location !== "bpjs" && (
                                         <TableCell align="center">
                                             {/* Conditional rendering based on item.isPaid */}
-                                           {Number(item.isPaid) === 1 ? (
+                                           {Number(item.isPaid) == 1 ? (
 
   <CheckCircleOutlined style={{ color: '#52c41a', fontSize: '20px' }} />
 ) : (

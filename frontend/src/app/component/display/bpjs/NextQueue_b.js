@@ -3,8 +3,7 @@ import VerificationAPI from "@/app/utils/api/Verification";
 import MedicineAPI from "@/app/utils/api/Medicine";
 import PickupAPI from "@/app/utils/api/Pickup";
 import { getSocket } from "@/app/utils/api/socket";
-import { Marquee } from "@devnomic/marquee";
-import "@devnomic/marquee/dist/index.css";
+
 import { queue } from "jquery";
 import { Carousel } from "antd";
 

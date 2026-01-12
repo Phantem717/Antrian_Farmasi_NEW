@@ -573,7 +573,6 @@ const hasYesterdayItems = queueList.some(item => item.isYesterday);
         </TableCell>
       )}
                 <TableCell style={{ fontWeight: 'bold' }} align="center" className='font-bold'>{item.queue_number}</TableCell>
-                
                 <TableCell style={{ fontWeight: 'bold' }} align="center" className='font-bold'>{item.NOP}</TableCell>
                 <TableCell style={{ fontWeight: 'bold' }} align="center" className='font-bold'>{item.patient_name}</TableCell>
                 <TableCell style={{ fontWeight: 'bold' }} align="center" className='font-bold'>{item.sep_no}</TableCell>

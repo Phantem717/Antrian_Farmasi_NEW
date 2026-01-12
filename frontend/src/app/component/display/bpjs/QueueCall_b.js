@@ -204,6 +204,7 @@ const fetchActiveLoket = async () => {
       width: "800px"
 
     }}
+
     >
       <h2 className="text-3xl font-bold text-white mb-4">Pemanggilan Obat</h2>
       <p className="text-3xl font-bold text-white">Nomor Obat</p>

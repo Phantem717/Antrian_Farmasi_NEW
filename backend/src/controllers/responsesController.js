@@ -6,6 +6,7 @@ const loket = require('../models/loket');
 const PharmacyTask = require('../models/pharmacyTask');
 const getAllResponses = async (location) => {
   try {
+    console.log("LOC",location);
     if (!location) {
       throw new Error("Location must have a value");
     }
@@ -13,24 +14,23 @@ const getAllResponses = async (location) => {
     let medicineResp = [];
     let pickupResp = [];
     let loketResp = [];
-    if(location.toLowerCase() == "bpjs"){
+    if(location == "bpjs"){
       location = "Lantai 1 BPJS"
 
-    [verificationResp, medicineResp, pickupResp, loketResp, pharmacyResp] = await Promise.all([
+    console.log("DATA RESP",verificationResp,medicineResp,pickupResp,loketResp,pharmacyResp);
+    };
+    if(location == "gmcb"){
+      location = "Lantai 1 GMCB"
+    
+    };
+    if(location == "lt3"){location = "Lantai 3 GMCB"};
+
+      [verificationResp, medicineResp, pickupResp, loketResp, pharmacyResp] = await Promise.all([
       VerificationTask.getToday(location),
       MedicineTask.getMedicineToday(location),
       PickupTask.getPickupDisplay(location),
       loket.getAll(),
     ]);
-
-    };
-    if(location.toLowerCase() == "gmcb"){
-      location = "Lantai 1 GMCB"
-    
-    };
-    if(location.toLowerCase() == "lt3"){location = "Lantai 3 GMCB"};
-
-
 
     return {
       verificationData: verificationResp.sort((a, b) =>
@@ -47,9 +47,9 @@ const getAllResponses = async (location) => {
 
 const getMedicineResponses = async (location) => {
   
-    if(location.toLowerCase() == "bpjs"){location = "Lantai 1 BPJS"};
-    if(location.toLowerCase() == "gmcb"){location = "Lantai 1 GMCB"};
-    if(location.toLowerCase() == "lt3"){location = "Lantai 3 GMCB"};
+    if(location == "bpjs"){location = "Lantai 1 BPJS"};
+    if(location == "gmcb"){location = "Lantai 1 GMCB"};
+    if(location == "lt3"){location = "Lantai 3 GMCB"};
 
   try {
     if (!location) {
@@ -79,11 +79,11 @@ const getVerificationResponses = async (location) => {
     if (!location) {
       throw new Error("Location must have a value");
     }
-    if(location.toLowerCase() == "bpjs"){
+    if(location == "bpjs"){
       location = "Lantai 1 BPJS"
     };
-    if(location.toLowerCase() == "gmcb"){location = "Lantai 1 GMCB"};
-    if(location.toLowerCase() == "lt3"){location = "Lantai 3 GMCB"};
+    if(location == "gmcb"){location = "Lantai 1 GMCB"};
+    if(location == "lt3"){location = "Lantai 3 GMCB"};
 
     const [verificationResp] = await Promise.all([
       VerificationTask.getToday(location),
@@ -107,9 +107,9 @@ const getPickupResponses = async (location) => {
     if (!location) {
       throw new Error("Location must have a value");
     }
-    if(location.toLowerCase() == "bpjs"){location = "Lantai 1 BPJS"};
-    if(location.toLowerCase() == "gmcb"){location = "Lantai 1 GMCB"};
-    if(location.toLowerCase() == "lt3"){location = "Lantai 3 GMCB"};
+    if(location == "bpjs"){location = "Lantai 1 BPJS"};
+    if(location == "gmcb"){location = "Lantai 1 GMCB"};
+    if(location == "lt3"){location = "Lantai 3 GMCB"};
 
     const [pickupResp] = await Promise.all([
      

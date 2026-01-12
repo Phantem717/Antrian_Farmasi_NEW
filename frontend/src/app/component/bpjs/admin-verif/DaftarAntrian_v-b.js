@@ -83,7 +83,7 @@ const DaftarAntrian = ({location, selectedQueueIds, setSelectedQueueIds, onSelec
       if (activeLoket) {
         setSelectedLoketLocal(prev => prev || activeLoket.loket_name);
         setSelectedLoket(prev => prev || activeLoket.loket_name);
-        console.log("activeLoket.loket_name",activeLoket.loket_name);
+        // console.log("activeLoket.loket_name",activeLoket.loket_name);
       }
     } catch (error) {
       console.error("Error fetching lokets:", error);
@@ -112,14 +112,11 @@ const handleLoketUpdate = () => {
     let response;
     if (date) {
       response = await VerificationAPI.getVerificationTasksByDate(location,new Date(date).toISOString().split('T')[0]);
-      console.log("DATE")
     } else {
       response = await VerificationAPI.getVerificationTasksToday(location);
-      console.log("TODAY");
 
     }
 
-    console.log("RESPONSE", response);
     let filteredQueues = response.data;
 
     // Add status filtering here
@@ -542,6 +539,21 @@ Swal.fire({
               {/* <TableCell align="center"><strong>Status</strong></TableCell> */}
               <TableCell align="center"><strong>Status Medicine</strong></TableCell> 
               <TableCell align="center"><strong>Phone Number</strong></TableCell>
+
+              {
+                 location != 'bpjs' && (
+              <TableCell align="center"><strong>Poliklinik</strong></TableCell>
+                )
+              
+              }
+
+              {
+                 location != 'bpjs' && (
+              <TableCell align="center"><strong>Cara Bayar</strong></TableCell>
+                )
+              
+              }
+             
                <TableCell align="center">
                                Timestamp
                               </TableCell>
@@ -599,6 +611,19 @@ return (
       </div>
    
     </TableCell>
+     {
+                 location != 'bpjs' && (
+              <TableCell align="center"><strong>{item.poliklinik}</strong></TableCell>
+                )
+              
+              }
+
+              {
+                 location != 'bpjs' && (
+              <TableCell align="center"><strong>{item.payment_type}</strong></TableCell>
+                )
+              
+              }
      <TableCell align="center" style={{ fontWeight: 'bold' }} className='font-bold'>
      {item.waiting_verification_stamp 
                       ? dayjs(item.waiting_verification_stamp , "YYYY-MM-DD HH:mm:ss").format("DD MMM YYYY HH:mm")

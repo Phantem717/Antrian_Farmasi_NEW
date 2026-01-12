@@ -84,7 +84,7 @@ class PharmacyTask {
         'gmcb_temp' AS source
       FROM gmcb_farmasi_temp gc
       LEFT JOIN Pharmacy_Task pt ON pt.NOP = gc.id
-      WHERE gc.id = ?
+      WHERE gc.id = ? AND gc.isChanged = 0
     `;
 
     const [rows] = await conn.execute(query, [NOP, NOP, NOP]);
@@ -157,23 +157,118 @@ query = `
       ]
 }     else{
 query = `
+SELECT 
+  gc.NOP,
+  gc.sep_no,
+  gc.patient_name,
+  gc.medical_record_no,
+  gc.queue_number,
+  gc.medicine_type as status_medicine,
+  pt.status,
+  pt.medicine_type
+FROM Pharmacy_Task pt
+JOIN gmcb_Appointments gc ON pt.NOP = gc.NOP
+WHERE pt.status = ?
+  AND pt.lokasi = ?
+
+UNION ALL
+
+SELECT 
+  gt.id as NOP,
+        NULL AS sep_no,
+  NULL as patient_name,
+  NULL as medical_record_no,
+  gt.queue_number,
+  NULL as status_medicine,
+  pt.status,
+  NULL as medicine_type
+FROM Pharmacy_Task pt
+JOIN gmcb_farmasi_temp gt ON pt.NOP = gt.id
+WHERE pt.status = ?
+  AND pt.lokasi = ?
+
+ORDER BY NOP DESC;
+      `;
+      values = [
+        status,location,status,location
+      ]
+}
+      const [rows] = await conn.execute(query, values);
+      return rows;
+    } catch (error) {
+      throw error;
+    }finally {
+    conn.release(); // ?? Critical cleanup
+  }
+  }
+
+    static async getToday(location) {
+  const pool = await getDb();
+  const conn = await pool.getConnection(); // ? Explicit connection
+  let values = [];
+  let query;
+    try {
+      if(location == "Lantai 1 BPJS")
+{
+query = `
       SELECT 
-        gc.NOP,
-        gc.sep_no,
-        gc.patient_name,
-        gc.medical_record_no,
-        gc.queue_number,
-        gc.medicine_type as status_medicine,
+        da.NOP,
+        da.sep_no,
+        da.patient_name,
+        da.medical_record_no,
+        da.queue_number,
+        da.status_medicine,
         pt.status,
         pt.medicine_type
       FROM Pharmacy_Task pt
-      JOIN gmcb_Appointments gc ON pt.NOP = gc.NOP
-      WHERE pt.status = ?
+      JOIN Doctor_Appointments da ON pt.NOP = da.NOP
+      JOIN Verification_Task vt ON pt.NOP = vt.NOP
+      WHERE date(vt.waiting_verification_stamp) = CURRENT_DATE
       AND pt.lokasi = ?
-      ORDER BY gc.NOP DESC;
+      ORDER BY da.NOP DESC;
       `;
       values = [
-        status,location
+       location
+      ]
+}     else{
+query = `
+SELECT 
+  gc.NOP,
+  gc.sep_no,
+  gc.patient_name,
+  gc.medical_record_no,
+  gc.queue_number,
+  gc.medicine_type as status_medicine,
+  pt.status,
+  pt.medicine_type
+FROM Pharmacy_Task pt
+JOIN gmcb_Appointments gc ON pt.NOP = gc.NOP
+      JOIN Verification_Task vt ON pt.NOP = vt.NOP
+      WHERE date(vt.waiting_verification_stamp) = CURRENT_DATE
+  AND pt.lokasi = ?
+
+UNION ALL
+
+SELECT 
+  gt.id as NOP,
+        NULL AS sep_no,
+  NULL as patient_name,
+  NULL as medical_record_no,
+  gt.queue_number,
+  NULL as status_medicine,
+  pt.status,
+  NULL as medicine_type
+FROM Pharmacy_Task pt
+JOIN gmcb_farmasi_temp gt ON pt.NOP = gt.id
+      JOIN Verification_Task vt ON pt.NOP = vt.NOP
+      WHERE date(vt.waiting_verification_stamp) = CURRENT_DATE
+  AND pt.lokasi = ?
+
+
+ORDER BY NOP DESC;
+      `;
+      values = [
+        location,location
       ]
 }
       const [rows] = await conn.execute(query, values);
@@ -212,7 +307,7 @@ query = `
     conn.release(); // ?? Critical cleanup
   }
   }
-
+  
   /**
    * Menghapus record task berdasarkan NOP.
    * @param {number|string} NOP - NOP task farmasi.

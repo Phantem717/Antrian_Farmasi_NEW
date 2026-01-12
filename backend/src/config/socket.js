@@ -210,6 +210,7 @@ try {
     socket.on('update_pickup', async (payload) => {
       try {
           let location = payload.location;
+          console.log("LOC",location);
     if(location == "bpjs"){
         location = "Lantai 1 BPJS"
       }
@@ -303,11 +304,6 @@ try {
       });
       const defaultLocation = "Lantai 1 BPJS";
 
-
-         
-     
- 
-      
       socket.on('call_queues_pickup', (payload) => {
         if(payload.lokasi == "Lantai 1 BPJS"){
           queueDataBPJS.push(payload.data);

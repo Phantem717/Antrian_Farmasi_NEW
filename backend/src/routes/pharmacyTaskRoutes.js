@@ -6,7 +6,8 @@ const {
   getAllPharmacyTasks,
   updatePharmacyTask,
   deletePharmacyTask,
-  getAllPharmacyTasksByStatus
+  getAllPharmacyTasksByStatus,
+  getAllPharmacyTasksToday
 } = require("../controllers/pharmacyTaskController");
 
 // 🔹 Endpoint untuk membuat Pharmacy Task
@@ -23,6 +24,7 @@ router.put("/:NOP", updatePharmacyTask);
 
 // 🔹 Endpoint untuk menghapus Pharmacy Task berdasarkan ID
 router.delete("/:NOP", deletePharmacyTask);
+router.get("/today/:category",getAllPharmacyTasksToday)
 
 router.get("/status/:status/:category",getAllPharmacyTasksByStatus)
 

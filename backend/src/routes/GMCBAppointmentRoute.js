@@ -17,6 +17,7 @@ const  {
 updateAppointment,
     RouteUpdateDoubleController,
     updatePhoneNumber,
+    updatePaymentStatus
    
 } = require('../controllers/GMCBController')
 const authenticate = (req,res,next) => {
@@ -58,6 +59,7 @@ router.get('/:NOP', getAppointment);
 // Endpoint untuk memperbarui appointment berdasarkan NOP
 // router.put('/:NOP', updateAppointment);
 router.put('/:NOP/phone_number', updatePhoneNumber);
+router.patch('/update_status/:NOP', updatePaymentStatus);
 router.patch('/update/:NOP', updateGMCBAppointmentController);
 
 router.patch('/total_medicine', authCheck, updateTotalMedicineController);

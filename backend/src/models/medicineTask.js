@@ -118,7 +118,7 @@ class MedicineTask {
       FROM Medicine_Task mt
       JOIN gmcb_farmasi_temp gc ON mt.NOP = gc.id
       LEFT JOIN Pharmacy_Task pt ON mt.NOP = pt.NOP
-      WHERE mt.NOP = ?
+      WHERE mt.NOP = ? AND gc.isChanged = 0
     `;
 
     const [rows] = await conn.execute(query, [NOP, NOP, NOP]);
@@ -171,7 +171,10 @@ class MedicineTask {
   const conn = await pool.getConnection(); // ? Explicit connection
 
     try {
-      const query = `
+      let query;
+      let params = [];
+      if(location == 'Lantai 1 BPJS' ){
+  query = `
         SELECT
           mt.*, 
           da.patient_name,
@@ -195,7 +198,40 @@ AND (pt.status IS NULL OR
          ORDER BY 
     da.queue_number;
       `;
-      const [rows] = await conn.execute(query,[location]);
+
+      params = [location]
+      }
+      else{
+         query = `
+        SELECT
+          mt.*, 
+          gc.patient_name,
+          gc.sep_no,
+          gc.medical_record_no,
+          gc.queue_number,
+          gc.phone_number,
+          gc.doctor_name,
+
+          gc.medicine_type as status_medicine,
+          pt.status,
+          pt.medicine_type,
+          gc.isPaid
+        FROM Medicine_Task mt
+        LEFT JOIN GMCB_Appointments gc ON mt.NOP = gc.NOP
+        LEFT JOIN Pharmacy_Task pt ON mt.NOP = pt.NOP
+        WHERE date(mt.waiting_medicine_stamp) = CURRENT_DATE
+AND (pt.status IS NULL OR 
+       (pt.status != 'completed_medicine' AND pt.status LIKE 'waiting_medicine'))
+       AND mt.lokasi = ?
+         ORDER BY 
+    gc.queue_number;
+      `;
+
+      params = [location]
+      }
+
+     
+      const [rows] = await conn.execute(query,params);
       return rows;
     } catch (error) {
       throw error;
@@ -211,7 +247,11 @@ AND (pt.status IS NULL OR
   const conn = await pool.getConnection(); // ? Explicit connection
 
     try {
-      const query = `
+      let query;
+      let params = [];
+      if(location == 'Lantai 1 BPJS' ){
+
+      query = `
         SELECT
           mt.*, 
           da.patient_name,
@@ -235,8 +275,40 @@ AND (pt.status IS NULL OR
          ORDER BY 
     da.queue_number;
       `;
-      const values = [date,location]
-      const [rows] = await conn.execute(query, values);
+
+            params = [date,location]
+      }
+      else{
+
+      query = `
+        SELECT
+          mt.*, 
+          gc.patient_name,
+          gc.sep_no,
+          gc.medical_record_no,
+          gc.queue_number,
+          gc.medicine_type as status_medicine,
+          gc.phone_number,
+          gc.doctor_name,
+          pt.status,
+          pt.medicine_type,
+          gc.isPaid
+        FROM Medicine_Task mt
+        LEFT JOIN GMCB_Appointments gc ON mt.NOP = gc.NOP
+         LEFT JOIN Pharmacy_Task pt ON mt.NOP = pt.NOP
+
+        WHERE date(mt.waiting_medicine_stamp) = ?
+AND (pt.status IS NULL OR 
+       (pt.status != 'completed_medicine' AND pt.status LIKE 'waiting_medicine'))
+       AND mt.lokasi = ?
+         ORDER BY 
+    gc.queue_number;
+      `;
+
+            params = [date,location]        
+      }
+
+      const [rows] = await conn.execute(query, params);
       console.log("rows",rows,values);
       return rows;
     } catch (error) {

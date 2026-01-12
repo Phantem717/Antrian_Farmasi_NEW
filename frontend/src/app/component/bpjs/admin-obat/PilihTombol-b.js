@@ -66,6 +66,7 @@ const socket = getSocket();
           const requestBody = {
             status: status,
             medicine_type: queue.status_medicine,
+            location: location,
           };
     
           console.log("📡 Mengirim data ke API Pickup & Pharmacy:", {

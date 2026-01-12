@@ -344,25 +344,30 @@ const handleSearchClear = () => {
 
     }
   }
-
-  const handleColourChange = (status) => {
-    if(status.includes("called") || status.includes("recalled")){
-      return 'text-green-600';
-    }
-    
-    if(status.includes("pending")){
-      return 'text-red-600'
-    }
-
-    if(status.includes("waiting")){
-      return 'text-yellow-600'
-    }
-
-
-
-
+const handleColourChange = (status) => {
+  // Called or Recalled - Green
+  if (status === "called_pickup_medicine" || status === "recalled_pickup_medicine") {
+    return { color: '#16a34a' }; // green-600
+  }
+  
+  // Pending - Red
+  if (status === "pending_pickup_medicine") {
+    return { color: '#dc2626' }; // red-600
   }
 
+  // Waiting - Yellow/Orange
+  if (status === "waiting_pickup_medicine") {
+    return { color: '#ea580c' }; // orange-600 (more visible than yellow)
+  }
+
+  // Completed - Blue
+  if (status === "completed_pickup_medicine") {
+    return { color: '#2563eb' }; // blue-600
+  }
+
+  // Default - Gray
+  return { color: '#4b5563' }; // gray-600
+};
 
 const hasYesterdayItems = queueList.some(item => item.isYesterday);
   return (
@@ -569,15 +574,30 @@ const hasYesterdayItems = queueList.some(item => item.isYesterday);
           ) : null}
         </TableCell>
       )}
-<TableCell  align="center" className={`font-extrabold uppercase text-lg ${handleColourChange(item.status)}`}>
-  {/* Correct comparison (===) and grouping for OR condition */}
-  {item.status == "called_pickup_medicine" || item.status == "recalled_pickup_medicine" 
-    ? "Dipanggil" 
-    : item.status == "waiting_pickup_medicine" 
-      ? "Menunggu" 
-      : item.status == "pending_pickup_medicine" 
-        ? "Ditunda" 
-        : "-"}
+<TableCell 
+  align="center" 
+  sx={{
+    fontWeight: 'bold',
+    fontSize: '1.125rem',
+    textTransform: 'uppercase',
+    ...handleColourChange(item.status) // Spread the color object
+  }}
+>
+  {(() => {
+    switch(item.status) {
+      case "called_pickup_medicine":
+      case "recalled_pickup_medicine":
+        return "Dipanggil";
+      case "waiting_pickup_medicine":
+        return "Menunggu";
+      case "pending_pickup_medicine":
+        return "Ditunda";
+      case "completed_pickup_medicine":
+        return "Selesai";
+      default:
+        return "-";
+    }
+  })()}
 </TableCell>
                 <TableCell style={{ fontWeight: 'bold' }} align="center" className='font-bold'>{item.queue_number}</TableCell>
                 

@@ -1,7 +1,8 @@
 // src/models/doctorAppointments.js
 const { getDb } = require('../config/db');
-const {getCurrentTimestamp} = require('../handler/timeHandler')
-
+const {getCurrentTimestamp} = require('../handler/timeHandler');
+const MedicineTask = require('../models/medicineTask');
+const {create} = require('../models/medicineTask')
 class GMCBTemp {
   /**
    * Membuat record appointment baru.
@@ -165,6 +166,117 @@ ORDER BY id DESC LIMIT 1
   }
   }
 
+  /**
+ * Verify and migrate temp queue to gmcb_appointments
+ */
+static async verifyTempQueue(tempId, verificationData) {
+  const pool = await getDb();
+  const connection = await pool.getConnection(); // ? Explicit connection
+  
+  try {
+    console.log("DATA VERIFY",tempId,verificationData);
+    await connection.beginTransaction();
+    
+
+    
+    // 2. Generate new NOP
+    
+    // 3. Insert into gmcb_appointments
+    await connection.query(`
+      INSERT INTO gmcb_appointments (
+        NOP,
+        isPaid,
+        payment_type,
+        poliklinik,
+        doctor_name,
+        queue_number,
+        total_medicine,
+        medicine_type,
+        queue_status,
+        patient_date_of_birth,
+        lokasi,
+        medical_record_no,
+        phone_number,
+        nik,
+        sep_no,
+        location_from,
+        patient_name
+      ) VALUES (?,  ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?)
+    `, [
+      verificationData.NOP,
+      verificationData.isPaid || 0,
+      verificationData.payment_type || null,
+      verificationData.poliklinik || null,
+      verificationData.doctor_name || null,
+      verificationData.queue_number || null,
+      verificationData.total_medicine || 0,
+      verificationData.medicine_type || null,
+      verificationData.queue_status || 'waiting',
+      verificationData.patient_date_of_birth || null,
+      verificationData.location || null,
+      verificationData.medical_record_no || null,
+      verificationData.phone_number || null,
+      verificationData.nik || null,
+      verificationData.sep_no || null,
+      verificationData.location_from || null,
+      verificationData.patient_name || null
+    ]);
+    await connection.query(
+      `
+      UPDATE Pharmacy_Task 
+      SET
+      NOP = ?
+      WHERE NOP = ?
+    `, [verificationData.NOP,tempId]
+    )
+    // 4. Update temp status to 'verified'
+    await connection.query(`
+      UPDATE gmcb_farmasi_temp 
+      SET 
+        isChanged = 1
+      WHERE id = ?
+    `, [tempId]);
+    
+    // 5. Create Verification_Task if needed
+    await connection.query(`
+      UPDATE Verification_Task 
+      SET
+      NOP = ?
+      WHERE NOP = ?
+    `, [verificationData.NOP,tempId]);
+    
+     await connection.query(`
+      UPDATE Medicine_Task 
+      SET
+      NOP = ?
+      WHERE NOP = ?
+    `, [verificationData.NOP,tempId]);
+    
+      
+    await connection.commit();
+    // const medicinePayload = {
+        
+    //     NOP: verificationData.NOP,
+    //     lokasi: verificationData.location
+    //   }
+    //   await MedicineTask.create(medicinePayload);
+    
+    return {
+      success: true,
+      nop: verificationData.NOP,
+      tempId: tempId,
+      message: 'Temp queue successfully verified and migrated'
+    };
+    
+  } catch (error) {
+    await connection.rollback();
+    throw error;
+  } finally {
+    connection.release();
+  }
+}
+
+  
 }
 
 module.exports = GMCBTemp;

@@ -71,7 +71,7 @@ class VerificationTask {
   static async findByNOP(NOP) {
   const pool = await getDb();
   const conn = await pool.getConnection();
-
+  
   try {
     const query = `
       /* ================= DOCTOR APPOINTMENTS ================= */
@@ -142,7 +142,7 @@ class VerificationTask {
       JOIN gmcb_farmasi_temp gc ON vt.NOP = gc.id
       LEFT JOIN Pharmacy_Task pt ON vt.NOP = pt.NOP
       LEFT JOIN Medicine_Task mt ON vt.NOP = mt.NOP
-      WHERE vt.NOP = ?
+      WHERE vt.NOP = ? AND gc.isChanged = 0
     `;
 
     const [rows] = await conn.execute(query, [NOP, NOP, NOP]);
@@ -201,7 +201,7 @@ static async getToday(location) {
     let query;
     let params = [];
 
-    if (location === 'Lantai 1 GMCB') {
+    if (location != 'Lantai 1 BPJS') {
       // ✅ GMCB → UNION query
   query = `
     SELECT * FROM (
@@ -217,6 +217,8 @@ static async getToday(location) {
   ga.patient_date_of_birth,
   ga.medicine_type as status_medicine,
   ga.phone_number,
+  ga.poliklinik,
+  ga.payment_type,
 
   pt.status,
   pt.medicine_type,
@@ -242,14 +244,15 @@ static async getToday(location) {
         NULL                    AS patient_date_of_birth,
         NULL                    AS status_medicine,
         NULL                    AS phone_number,
-      
+        NULL as poliklinik,
+        NULL as payment_type,
         pt.status,
         pt.medicine_type,
         FALSE                   AS isPaid
       FROM Verification_Task vt
       JOIN gmcb_farmasi_temp gc ON vt.NOP = gc.id
       LEFT JOIN Pharmacy_Task pt ON vt.NOP = pt.NOP
-      WHERE vt.lokasi = ?
+      WHERE vt.lokasi = ? AND gc.isChanged = 0
     ) gmcb
     WHERE DATE(waiting_verification_stamp) = CURRENT_DATE
       AND (
@@ -321,7 +324,8 @@ AND vt.lokasi = ?
   ga.patient_date_of_birth,
   ga.medicine_type as status_medicine,
   ga.phone_number,
-
+ga.poliklinik,
+ga.payment_type,
   pt.status,
   pt.medicine_type,
   ga.isPaid
@@ -348,6 +352,8 @@ AND vt.lokasi = ?
         NULL                    AS patient_date_of_birth,
         NULL                    AS status_medicine,
         NULL                    AS phone_number,
+        NULL as poliklinik,
+        null as payment_type,
         pt.status,
         pt.medicine_type,
         FALSE                   AS isPaid
@@ -356,7 +362,7 @@ AND vt.lokasi = ?
       LEFT JOIN Pharmacy_Task pt ON vt.NOP = pt.NOP
       WHERE DATE(vt.waiting_verification_stamp) = ?
         AND vt.waiting_verification_stamp IS NOT NULL
-        AND vt.lokasi = ?
+        AND vt.lokasi = ? AND gc.isChanged = 0
     ) gmcb
     WHERE (
       status IS NULL
@@ -489,6 +495,20 @@ ORDER BY vt.waiting_verification_stamp ASC;
     conn.release(); // ?? Critical cleanup
   }
   }
+static async QueuePosition(stamp) {
+  const pool = await getDb();
+  const conn = await pool.getConnection();
+
+  try {
+    const query = `SELECT COUNT(*) as position FROM Verification_Task WHERE waiting_verification_stamp < ?`;
+    const [result] = await conn.execute(query, [stamp]);
+    return result[0].position; // Returns just the number
+  } catch (error) {
+    throw error;
+  } finally {
+    conn.release();
+  }
+}
 }
 
 module.exports = VerificationTask;
