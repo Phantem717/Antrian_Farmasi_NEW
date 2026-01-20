@@ -59,6 +59,15 @@ const DaftarAntrianG = ({location, selectedQueueIds, setSelectedQueueIds, setSel
   // Run this whenever queueList changes
   // ? Loket yang diizinkan untuk admin obat
   const allowedLokets = ["Loket 1", "Loket 4"];
+
+     const getShortLocation = (loc) => {
+        const locationMap = {
+            "Lantai 1 BPJS": "bpjs",
+            "Lantai 1 GMCB": "gmcb",
+            "Lantai 3 GMCB": "lt3"
+        };
+        return locationMap[loc] || loc;
+    };
   async function deleteAction() {
     if (!selectedQueue2 || !selectedQueueIds || selectedQueueIds.length === 0) {
       console.log("Queues Needed");
@@ -85,8 +94,8 @@ const DaftarAntrianG = ({location, selectedQueueIds, setSelectedQueueIds, setSel
              timer: 2000,
              timerProgressBar: true,
            });
-                 socket.emit('update_display');
-      socket.emit('update_pickup');
+                 socket.emit('update_display', {location: getShortLocation(location)});
+      socket.emit('update_pickup', {location: getShortLocation(location)});
 
      
     } catch (error) {
@@ -221,20 +230,27 @@ async function getInitalData(){
         console.error("Error processing queue:", error);
     }
 };
-
 useEffect(() => {
+      const shortLocation = getShortLocation(location);
+    socket.emit('join_room', { location: shortLocation });
     getInitalData();
-    socket.on('get_responses_pickup',(payload)=>{
-    console.log("PROCESSUS",payload);
-    processQueue(payload);
-    console.log("QUEUELIST2",queueList);
-  })
+    
+    // ✅ Handle the socket update with correct structure
+    socket.on('get_responses_pickup', (payload) => {
+      console.log("📥 Received get_responses_pickup:", payload);
+      
+      // ✅ Wrap payload in expected structure
+      const wrappedPayload = {
+        data: payload.data  // payload.data is already the array
+      };
+      
+      processQueue(wrappedPayload);
+    });
 
     return () => {
-            socket.off('get_responses_pickup');
-        };
-}, [ selectedLoketLocal, date]); // Add date to dependencies
-
+      socket.off('get_responses_pickup');
+    };
+}, [selectedLoketLocal, date]);
 // Add a clear date function
 const handleClearDate = () => {
   setDate(null);

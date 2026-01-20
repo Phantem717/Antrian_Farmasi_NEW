@@ -46,21 +46,46 @@ export default function BarcodeScanner({selectedQueue,location, onScanResult, ha
             console.error("Error fetching queue list:", error);
         }
     };
+useEffect(() => {
+        // ✅ STEP 1: Join location-specific room
+        console.log(`✅ BarcodeScanner joining location: ${location}`);
+        socket.emit('join_location', { location: location });
 
-    useEffect(() => {
-        inputRef.current.focus();
+        // Focus input
+        inputRef.current?.focus();
+
+        // Fetch initial queue list
         fetchQueueList();
 
-        // Set up socket listeners
-        socket.on('update_daftar_verif', fetchQueueList);
-        socket.on('update_display', () => console.log("Display update received"));
+        // ✅ STEP 2: Set up socket listeners
+        socket.on('update_daftar_verif', () => {
+            console.log("🔔 Queue list update received");
+            fetchQueueList();
+        });
 
-        // Clean up socket listeners on unmount
+        socket.on('update_display', () => {
+            console.log("🔔 Display update received");
+            // Optionally refresh queue list here too
+            // fetchQueueList();
+        });
+
+        // ✅ Optional: Listen for direct data updates
+        socket.on('get_responses_verif', (response) => {
+            console.log("📊 Verification data received:", response);
+            if (response.data) {
+                setDaftarAntrian(response.data);
+            }
+        });
+
+        // ✅ STEP 3: Clean up socket listeners on unmount
         return () => {
-            socket.off('update_daftar_verif', fetchQueueList);
+            socket.off('update_daftar_verif');
             socket.off('update_display');
+            socket.off('get_responses_verif');
+            console.log("🧹 BarcodeScanner cleaned up listeners");
         };
-    }, []);
+    }, [location]); // ✅ Re-join if location changes
+
 
     const processScan = async (NOP) => {
         const foundItem = daftarAntrian.find(item => item.NOP === NOP);

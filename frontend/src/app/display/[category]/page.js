@@ -13,7 +13,7 @@ import { use } from 'react'; // Next.js 14+
 
 export default function Display({params}) {
   const {category} = use(params);
-  console.log(category);
+  console.log("DISPALY LOC",category);
     return (
       <div className="bg-gray-200 h-screen min-w-screen flex flex-col">
         {/* Header and content - use flex-1 to allow footer space */}
@@ -21,7 +21,7 @@ export default function Display({params}) {
           <InfoBar location={category}/>
           <div className="flex flex-row gap-4 mb-4 h-[calc(100%-3rem)]">
             <NextQueue location={category} />
-            <QueueCall location={category} />
+            <QueueCall lokasi={category} />
           </div>
         </div>
         

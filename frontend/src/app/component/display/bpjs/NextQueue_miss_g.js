@@ -62,96 +62,150 @@ const NextQueueG = ({ location, verificationData, medicineData, pickupData }) =>
       })
       .join(" ");
   }
+useEffect(() => {
+  const socket = getSocket();
+  
+  console.log(`🎯 [NextQueueG] Mounting with location: "${location}"`);
+  
+  socket.emit('join_room', { location });
 
-  useEffect(() => {
-    const socket = getSocket();
-    
-    const handleNameToggle = (payload) => {
-      const newValue = payload.data.toString() === 'true';
-      if (hideName !== newValue) {
-        setHideName(newValue);
-        localStorage.setItem('nameToggleState', newValue.toString());
-      }
-    };
-
-    socket.on('send_nameToggle', handleNameToggle);
-
-    const handleGetResponses = (payload) => {
-      console.log("? GOT RESP", payload);
-
-      const yesterday = new Date();
-      yesterday.setDate(yesterday.getDate() - 1);
-      yesterday.setHours(0, 0, 0, 0);
-
-      const pickupData = payload.data.pickupData.map(task => {
-        const taskDate = new Date(task.waiting_pickup_medicine_stamp);
-        taskDate.setHours(0, 0, 0, 0);
-        
-        return {
-          queueNumber: task.queue_number,
-          type: task.status_medicine,
-          patient_name: task.patient_name,
-          isYesterday: taskDate.getTime() === yesterday.getTime(),
-          status: task.status === "waiting_pickup_medicine" ? "Menunggu"
-            : task.status === "called_pickup_medicine" ? "Dipanggil"
-            : task.status === "pending_pickup_medicine" ? "Terlewat"
-            : task.status === "recalled_pickup_medicine" ? "Dipanggil"
-            : "-",
-          waiting_pickup_medicine_stamp: new Date(task.waiting_pickup_medicine_stamp)
-        };
-      });
-
-      setQueues({
-        pickupRacik: pickupData.filter(task => task.type == "Racikan" ),
-        pickupNonRacik: pickupData.filter(task => task.type == "Non - Racikan"),
-        pickupTerlewatRacik: pickupData.filter(task => task.type == "Racikan" && task.status == "Terlewat"),
-        pickupTerlewatNonRacik: pickupData.filter(task => task.type == "Non - Racikan" && task.status == "Terlewat"),
-      });
-
-      const newTimes = calculateTime(
-        pickupData.filter(task => task.type == "Non - Racikan" != "Terlewat").length,
-        pickupData.filter(task => task.type == "Racikan" != "Terlewat").length,
-        pickupData.filter(task => task.type == "Racikan" && task.status == "Terlewat").length,
-        pickupData.filter(task => task.type == "Non - Racikan" && task.status == "Terlewat").length,
-      );
-
-      setTimes(newTimes);
-    };
-
-    const handleLatestPickup = (payload) => {
-      const data = payload.data;
-      
-      setLastCalled(prev => {
-        const newState = {
-          racik: data.medicine_type === "Racikan" ? data : prev.racik,
-          nonRacik: data.medicine_type !== "Racikan" ? data : prev.nonRacik
-        };
-        
-        if (data.medicine_type === "Racikan") {
-          localStorage.setItem('lastCalled_racikan', JSON.stringify(data));
-        } else {
-          localStorage.setItem('lastCalled_nonracikan', JSON.stringify(data));
-        }
-        
-        return newState;
-      });
-    };
-
-    if (socket) {
-      socket.emit('get_initial_responses_pickup', { location });
-      socket.on('get_responses', handleGetResponses);
-      socket.on('send_latest_pickup', handleLatestPickup);
+  const handleNameToggle = (payload) => {
+    const newValue = payload.data.toString() === 'true';
+    if (hideName !== newValue) {
+      setHideName(newValue);
+      localStorage.setItem('nameToggleState', newValue.toString());
     }
+  };
 
-    return () => {
-      if (socket) {
-        socket.off('get_responses', handleGetResponses);
-        socket.off('send_latest_pickup', handleLatestPickup);
-        socket.off('send_nameToggle', handleNameToggle);
+  socket.on('send_nameToggle', handleNameToggle);
+
+  // ✅ Handler for general responses (includes all data)
+  const handleGetResponses = (payload) => {
+    console.log(`✅ [NextQueueG-${location}] Received get_responses:`, payload);
+
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    yesterday.setHours(0, 0, 0, 0);
+
+    const pickupData = payload.data.pickupData.map(task => {
+      const taskDate = new Date(task.waiting_pickup_medicine_stamp);
+      taskDate.setHours(0, 0, 0, 0);
+      
+      return {
+        queueNumber: task.queue_number,
+        type: task.status_medicine,
+        patient_name: task.patient_name,
+        isYesterday: taskDate.getTime() === yesterday.getTime(),
+        status: task.status === "waiting_pickup_medicine" ? "Menunggu"
+          : task.status === "called_pickup_medicine" ? "Dipanggil"
+          : task.status === "pending_pickup_medicine" ? "Terlewat"
+          : task.status === "recalled_pickup_medicine" ? "Dipanggil"
+          : "-",
+        waiting_pickup_medicine_stamp: new Date(task.waiting_pickup_medicine_stamp)
+      };
+    });
+
+    setQueues({
+      pickupRacik: pickupData.filter(task => task.type == "Racikan"),
+      pickupNonRacik: pickupData.filter(task => task.type == "Non - Racikan"),
+      pickupTerlewatRacik: pickupData.filter(task => task.type == "Racikan" && task.status == "Terlewat"),
+      pickupTerlewatNonRacik: pickupData.filter(task => task.type == "Non - Racikan" && task.status == "Terlewat"),
+    });
+
+    const newTimes = calculateTime(
+      pickupData.filter(task => task.type == "Non - Racikan" != "Terlewat").length,
+      pickupData.filter(task => task.type == "Racikan" != "Terlewat").length,
+      pickupData.filter(task => task.type == "Racikan" && task.status == "Terlewat").length,
+      pickupData.filter(task => task.type == "Non - Racikan" && task.status == "Terlewat").length,
+    );
+
+    setTimes(newTimes);
+  };
+
+  // ✅ NEW: Handler specifically for pickup updates
+  const handleGetResponsesPickup = (payload) => {
+    console.log(`✅ [NextQueueG-${location}] Received get_responses_pickup:`, payload);
+    
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    yesterday.setHours(0, 0, 0, 0);
+
+    // payload.data is the pickup array directly from pickupControl.getPickupToday
+    const pickupData = payload.data.map(task => {
+      const taskDate = new Date(task.waiting_pickup_medicine_stamp);
+      taskDate.setHours(0, 0, 0, 0);
+      
+      return {
+        queueNumber: task.queue_number,
+        type: task.status_medicine,
+        patient_name: task.patient_name,
+        isYesterday: taskDate.getTime() === yesterday.getTime(),
+        status: task.status === "waiting_pickup_medicine" ? "Menunggu"
+          : task.status === "called_pickup_medicine" ? "Dipanggil"
+          : task.status === "pending_pickup_medicine" ? "Terlewat"
+          : task.status === "recalled_pickup_medicine" ? "Dipanggil"
+          : "-",
+        waiting_pickup_medicine_stamp: new Date(task.waiting_pickup_medicine_stamp)
+      };
+    });
+
+    setQueues(prev => ({
+      ...prev,
+      pickupRacik: pickupData.filter(task => task.type == "Racikan"),
+      pickupNonRacik: pickupData.filter(task => task.type == "Non - Racikan"),
+      pickupTerlewatRacik: pickupData.filter(task => task.type == "Racikan" && task.status == "Terlewat"),
+      pickupTerlewatNonRacik: pickupData.filter(task => task.type == "Non - Racikan" && task.status == "Terlewat"),
+    }));
+
+    const newTimes = calculateTime(
+      pickupData.filter(task => task.type == "Non - Racikan" != "Terlewat").length,
+      pickupData.filter(task => task.type == "Racikan" != "Terlewat").length,
+      pickupData.filter(task => task.type == "Racikan" && task.status == "Terlewat").length,
+      pickupData.filter(task => task.type == "Non - Racikan" && task.status == "Terlewat").length,
+    );
+
+    setTimes(prev => ({...prev, pickupTimeNon: newTimes.pickupTimeNon, pickupTimeRacik: newTimes.pickupTimeRacik}));
+  };
+
+  const handleLatestPickup = (payload) => {
+    console.log(`✅ [NextQueueG-${location}] Received send_latest_pickup:`, payload);
+    
+    const data = payload.data;
+    
+    setLastCalled(prev => {
+      const newState = {
+        racik: data.medicine_type === "Racikan" ? data : prev.racik,
+        nonRacik: data.medicine_type !== "Racikan" ? data : prev.nonRacik
+      };
+      
+      if (data.medicine_type === "Racikan") {
+        localStorage.setItem('lastCalled_racikan', JSON.stringify(data));
+      } else {
+        localStorage.setItem('lastCalled_nonracikan', JSON.stringify(data));
       }
-    };
-  }, [socket, location]);
+      
+      return newState;
+    });
+  };
 
+  if (socket) {
+    socket.emit('get_initial_responses_pickup', { location });
+    
+    // ✅ Listen to BOTH events
+    socket.on('get_responses', handleGetResponses);
+    socket.on('get_responses_pickup', handleGetResponsesPickup); // NEW
+    socket.on('send_latest_pickup', handleLatestPickup);
+  }
+
+  return () => {
+    if (socket) {
+      socket.off('get_responses', handleGetResponses);
+      socket.off('get_responses_pickup', handleGetResponsesPickup); // NEW
+      socket.off('send_latest_pickup', handleLatestPickup);
+      socket.off('send_nameToggle', handleNameToggle);
+    }
+  };
+}, [socket, location]);
   useEffect(() => {
     const interval = setInterval(() => {
       if (new Date().toDateString() !== currentDate) {
@@ -291,125 +345,137 @@ const NextQueueG = ({ location, verificationData, medicineData, pickupData }) =>
     );
   };
 
-  const QueuePickup = ({ title, queuesRacik, queuesNonRacik, bgColor }) => {
-    const chunkArray = (arr, size) => {
-      return arr.reduce((chunks, item, i) => {
-        if (i % size === 0) {
-          chunks.push([item]);
-        } else {
-          chunks[chunks.length - 1].push(item);
-        }
-        return chunks;
-      }, []);
-    };
-
-    const chunkedRacik = useMemo(() => chunkArray(queuesRacik, 4), [queuesRacik]);
-    const chunkedNonRacik = useMemo(() => chunkArray(queuesNonRacik, 4), [queuesNonRacik]);
-
-     const renderQueueItem = (queue, isRacikan = true) => (
-      <div
-        key={`${queue.queueNumber}-${isRacikan ? "racik" : "nonracik"}`}
-        className={`w-full uppercase bg-gray-100  shadow font-extrabold rounded mb-1 flex flex-col items-center justify-center text-center ${getStatusColourBorder(queue.status)}`}
-        style={{ minHeight: "125px" }}
-      >
-        <div className="flex flex-col font-extrabold">
-          <div className={`text-5xl ${getStatusColor(queue.status)}`}>
-            {queue.queueNumber}
-          </div>
-        </div>
-        <div className={`text-xl ${getStatusColor(queue.status)}`}>
-            {queue.status}
-          </div>
-        <div className="text-center text-bold mt-1 w-[450px] bg-green-400 px-4 py-1 text-black text-xl truncate whitespace-nowrap overflow-hidden leading-tight">
-          {hideName ? hideNameAction(queue.patient_name) : queue.patient_name}
-        </div>
-      </div>
-    );
-
-    const renderQueueList = (queues, isRacikan = true) => {
-      if (!queues || queues.length === 0) {
-        return (
-          <div className="bg-gray-100 text-black p-2 shadow text-center font-bold text-2xl h-full flex items-center justify-center">
-            Belum Ada Antrian
-          </div>
-        );
+const QueuePickup = ({ title, queuesRacik, queuesNonRacik, bgColor }) => {
+  const chunkArray = (arr, size) => {
+    return arr.reduce((chunks, item, i) => {
+      if (i % size === 0) {
+        chunks.push([item]);
+      } else {
+        chunks[chunks.length - 1].push(item);
       }
-      return queues.map((queue) => renderQueueItem(queue, isRacikan));
-    };
+      return chunks;
+    }, []);
+  };
+  
+  // ✅ Filter out "Terlewat" (pending) items before chunking
+  const filteredRacik = useMemo(() => 
+    queuesRacik.filter(queue => queue.status !== "Terlewat"),
+    [queuesRacik]
+  );
+  
+  const filteredNonRacik = useMemo(() => 
+    queuesNonRacik.filter(queue => queue.status !== "Terlewat"),
+    [queuesNonRacik]
+  );
+  
+  const chunkedRacik = useMemo(() => chunkArray(filteredRacik, 4), [filteredRacik]);
+  const chunkedNonRacik = useMemo(() => chunkArray(filteredNonRacik, 4), [filteredNonRacik]);
 
-    const renderQueueSection = (queues, chunked, duration, label, isRacikan = true) => (
-      <div
-        className="flex-1 min-w-[300px] bg-gray-100 p-2 rounded-md shadow-md"
-        style={{ height: "1120px" }}
-      >
-        <p className="text-2xl font-extrabold text-center text-green-700 uppercase">
-          {label}
-        </p>
-        <div className="bg-gray-100 rounded-md p-2">
-          {queues.length > 4 ? (
-            <SeamlessCarousel
-              chunks={chunked}
-              duration={duration}
-              renderItem={(group) => renderQueueList(group, isRacikan)}
-            />
-          ) : (
-            <div style={{ height: "1060px", overflowY: "auto" }}>
-              {renderQueueList(queues, isRacikan)}
-            </div>
-          )}
+  const renderQueueItem = (queue, isRacikan = true) => (
+    <div
+      key={`${queue.queueNumber}-${isRacikan ? "racik" : "nonracik"}`}
+      className={`w-full uppercase bg-gray-100 shadow font-extrabold rounded mb-1 flex flex-col items-center justify-center text-center ${getStatusColourBorder(queue.status)}`}
+      style={{ minHeight: "125px" }}
+    >
+      <div className="flex flex-col font-extrabold">
+        <div className={`text-5xl ${getStatusColor(queue.status)}`}>
+          {queue.queueNumber}
         </div>
       </div>
-    );
-    const renderLastCalled = (type) => {
-      const item = type === 'racik' ? lastCalled.racik : lastCalled.nonRacik;
-      const label = type === 'racik' ? 'Racikan' : 'Non-Racikan';
+      <div className={`text-xl ${getStatusColor(queue.status)}`}>
+        {queue.status}
+      </div>
+      <div className="text-center text-bold mt-1 w-[450px] bg-green-400 px-4 py-1 text-black text-xl truncate whitespace-nowrap overflow-hidden leading-tight">
+        {hideName ? hideNameAction(queue.patient_name) : queue.patient_name}
+      </div>
+    </div>
+  );
 
+  const renderQueueList = (queues, isRacikan = true) => {
+    if (!queues || queues.length === 0) {
       return (
-        <div className="flex-1 bg-blue-600 p-4 rounded-lg" style={{ height: '160px', width:'300px' }}>
-          <p className="text-xl font-bold text-white text-center">Terakhir Dipanggil ({label})</p>
-          {item ? (
-            <div className="text-white text-center mt-2">
-              <div className="text-6xl font-extrabold">{item.queue_number}</div>
-              {/* <div className="text-2xl font-extrabold truncate mt-2">
-                {hideName ? hideNameAction(item.patient_name) : item.patient_name}
-              </div> */}
-              <div className="text-2xl font-extrabold truncate mt-2">
-                {formatDateTime(item.waiting_pickup_medicine_stamp)}
-              </div>
-            </div>
-          ) : (
-            <div className="text-white text-center mt-2">-</div>
-          )}
+        <div className="bg-gray-100 text-black p-2 shadow text-center font-bold text-2xl h-full flex items-center justify-center">
+          Belum Ada Antrian
         </div>
       );
-    };
-console.log("QUEUE",queuesNonRacik);
+    }
+    return queues.map((queue) => renderQueueItem(queue, isRacikan));
+  };
+
+  const renderQueueSection = (queues, chunked, duration, label, isRacikan = true) => (
+    <div
+      className="flex-1 min-w-[300px] bg-gray-100 p-2 rounded-md shadow-md"
+      style={{ height: "1120px" }}
+    >
+      <p className="text-2xl font-extrabold text-center text-green-700 uppercase">
+        {label}
+      </p>
+      <div className="bg-gray-100 rounded-md p-2">
+        {queues.length > 4 ? (
+          <SeamlessCarousel
+            chunks={chunked}
+            duration={duration}
+            renderItem={(group) => renderQueueList(group, isRacikan)}
+          />
+        ) : (
+          <div style={{ height: "1060px", overflowY: "auto" }}>
+            {renderQueueList(queues, isRacikan)}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+  
+  const renderLastCalled = (type) => {
+    const item = type === 'racik' ? lastCalled.racik : lastCalled.nonRacik;
+    const label = type === 'racik' ? 'Racikan' : 'Non-Racikan';
+
     return (
-      <div className={`p-4 flex-1 min-w-0 ${bgColor} rounded-lg shadow-md overflow-hidden flex-row`} style={{ minHeight: "1200px" }}>
-        <p className="text-4xl font-extrabold text-white text-center uppercase">{title}</p>
-        <div className="flex flex-row gap-4 mb-4 mt-2">
-          {renderLastCalled('racik')}
-          {renderLastCalled('nonracik')}
-        </div>
-        <div className="flex flex-wrap gap-2 mt-2 overflow-x-hidden">
-          {renderQueueSection(
-            queuesRacik,
-            chunkedRacik,
-            times.pickupTimeRacik,
-            "Racikan",
-            true
-          )}
-          {renderQueueSection(
-            queuesNonRacik,
-            chunkedNonRacik,
-            times.pickupTimeNon,
-            "Non-Racikan",
-            false
-          )}
-        </div>
+      <div className="flex-1 bg-blue-600 p-4 rounded-lg" style={{ height: '160px', width:'300px' }}>
+        <p className="text-xl font-bold text-white text-center">Terakhir Dipanggil ({label})</p>
+        {item ? (
+          <div className="text-white text-center mt-2">
+            <div className="text-6xl font-extrabold">{item.queue_number}</div>
+            <div className="text-2xl font-extrabold truncate mt-2">
+              {formatDateTime(item.waiting_pickup_medicine_stamp)}
+            </div>
+          </div>
+        ) : (
+          <div className="text-white text-center mt-2">-</div>
+        )}
       </div>
     );
   };
+  
+  console.log("QUEUE - Filtered NonRacik:", filteredNonRacik);
+  console.log("QUEUE - Filtered Racik:", filteredRacik);
+  
+  return (
+    <div className={`p-4 flex-1 min-w-0 ${bgColor} rounded-lg shadow-md overflow-hidden flex-row`} style={{ minHeight: "1200px" }}>
+      <p className="text-4xl font-extrabold text-white text-center uppercase">{title}</p>
+      <div className="flex flex-row gap-4 mb-4 mt-2">
+        {renderLastCalled('racik')}
+        {renderLastCalled('nonracik')}
+      </div>
+      <div className="flex flex-wrap gap-2 mt-2 overflow-x-hidden">
+        {renderQueueSection(
+          filteredRacik,  // ✅ Use filtered data
+          chunkedRacik,
+          times.pickupTimeRacik,
+          "Racikan",
+          true
+        )}
+        {renderQueueSection(
+          filteredNonRacik,  // ✅ Use filtered data
+          chunkedNonRacik,
+          times.pickupTimeNon,
+          "Non-Racikan",
+          false
+        )}
+      </div>
+    </div>
+  );
+};
 
   const QueuePickupTerlewat = ({ title, queuesRacik, queuesNonRacik, bgColor }) => {
     const chunkArray = (arr, size) => {

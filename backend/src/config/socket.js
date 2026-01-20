@@ -24,10 +24,24 @@ module.exports = {
     });
 
     console.log('? Socket.IO initialized');
-
+    const mapLocation = (location) => {
+      if (location === "bpjs" || location === "Lantai 1 BPJS") return "Lantai 1 BPJS";
+      if (location === "gmcb" || location === "Lantai 1 GMCB") return "Lantai 1 GMCB";
+      if (location === "lt3" || location === "Lantai 3 GMCB") return "Lantai 3 GMCB";
+      return location;
+    };
     
     // ? Tambahkan listener untuk koneksi baru
     io.on('connection', async (socket) => {
+
+      socket.on('join_room', (payload) => {
+        const { location } = payload;
+        const roomName = `room_${location}`;
+        
+        socket.join(roomName);
+        console.log(`🚪 Client ${socket.id} joined room: ${roomName}`);
+      });
+
      const getData = async (location) => {
     console.log("SOCKET LCOATION",location);
     try {
@@ -57,189 +71,202 @@ module.exports = {
   };
 
   socket.on('get_initial_responses_pickup', async (payload) => {
-    
-try {
-  let location = payload.location;
-    if(location == "bpjs"){
-        location = "Lantai 1 BPJS"
-      }
-      if(location == "gmcb"){
-        location = "Lantai 1 GMCB"
-      }
-      if(location == "lt3"){
-        location = "Lantai 3 GMCB"
-      }
-  console.log("ON UPDATE"); // ?? Pastikan handler dipanggil
-      const data = await responseControl.getAllResponses(location);
-      io.emit('get_responses', {
-        message: '? Initial data fetched',
-        data: data
-      });
-            // console.log("GET RESPONSE");
+        try {
+                  console.log("PAYLOAD INITIAL PICKUP", payload);
 
-    } catch (err) {
-      console.error('? Error fetching responses:', err.message);
-      io.emit('get_responses', {
-        message: '? Failed to fetch data',
-        error: err.message
-      });
-    }
-  });
+            if(payload.location == "Lantai 1 BPJS"){
+            payload.location = "bpjs"
+          }
+          if(payload.location == "Lantai 1 GMCB"){
+            payload.location = "gmcb"
+          }
+          if(payload.location == "Lantai 3 GMCB"){
+            payload.location = "lt3"
+          }
 
-  socket.on('get_initial_responses', async (payload) => {
-    const data =await getData(payload.location);
-try {
-  let location = payload.location;
-    if(location == "bpjs"){
-        location = "Lantai 1 BPJS"
-      }
-      if(location == "gmcb"){
-        location = "Lantai 1 GMCB"
-      }
-      if(location == "lt3"){
-        location = "Lantai 3 GMCB"
-      }
-      const data = await responseControl.getAllResponses(location);
-      io.emit('get_responses', {
-        message: '? Initial data fetched',
-        data: data
+          const location = payload.location;
+          const roomName = `room_${location}`;
+          const mappedLocation = mapLocation(location);
+          
+          socket.join(roomName);
+          
+          const data = await responseControl.getAllResponses(mappedLocation);
+          
+          io.to(roomName).emit('get_responses', {
+            message: '✅ Initial data fetched',
+            data: data
+          });
+        } catch (err) {
+          console.error('❌ Error:', err.message);
+        }
       });
-            // console.log("GET RESPONSE");
 
-    } catch (err) {
-      console.error('? Error fetching responses:', err.message);
-      io.emit('get_responses', {
-        message: '? Failed to fetch data',
-        error: err.message
+ socket.on('get_initial_responses', async (payload) => {
+        try {
+                  console.log("PAYLOAD", payload);
+
+            if(payload.location == "Lantai 1 BPJS"){
+            payload.location = "bpjs"
+          }
+          if(payload.location == "Lantai 1 GMCB"){
+            payload.location = "gmcb"
+          }
+          if(payload.location == "Lantai 3 GMCB"){
+            payload.location = "lt3"
+          }
+          const location = payload.location;
+          const roomName = `room_${location}`;
+          const mappedLocation = mapLocation(location);
+          
+          // Join room
+          socket.join(roomName);
+          
+          const data = await responseControl.getAllResponses(mappedLocation);
+          
+          // ✅ Send only to this room
+          io.to(roomName).emit('get_responses', {
+            message: '✅ Initial data fetched',
+            data: data
+          });
+          
+          console.log(`📤 Sent initial responses to room: ${roomName}`);
+        } catch (err) {
+          console.error('❌ Error fetching responses:', err.message);
+          socket.emit('get_responses', {
+            message: '❌ Failed to fetch data',
+            error: err.message
+          });
+        }
       });
-    }}
-    );
+
 socket.on('update_display', async (payload) => {
-  console.log("PAYLOAD",payload);
-try {
-  let location = payload.location;
-    if(location == "bpjs"){
-        location = "Lantai 1 BPJS"
-      }
-      if(location == "gmcb"){
-        location = "Lantai 1 GMCB"
-      }
-      if(location == "lt3"){
-        location = "Lantai 3 GMCB"
-      }
-  console.log("ON UPDATE",location); // ?? Pastikan handler dipanggil
-      const data = await responseControl.getAllResponses(location);
-      io.emit('get_responses', {
-        message: '? Initial data fetched',
-        data: data
+        console.log("PAYLOAD", payload);
+        try {
+          if(payload.location == "Lantai 1 BPJS"){
+            payload.location = "bpjs"
+          }
+          if(payload.location == "Lantai 1 GMCB"){
+            payload.location = "gmcb"
+          }
+          if(payload.location == "Lantai 3 GMCB"){
+            payload.location = "lt3"
+          }
+          const location = payload.location;
+          const roomName = `room_${location}`;
+          const mappedLocation = mapLocation(location);
+          
+          console.log("ON UPDATE", mappedLocation, "to room", roomName);
+          
+          const data = await responseControl.getAllResponses(mappedLocation);
+          
+          // ✅ Only send to this location's room
+          io.to(roomName).emit('get_responses', {
+            message: '✅ Initial data fetched',
+            data: data
+          });
+        } catch (err) {
+          console.error('❌ Error:', err.message);
+        }
       });
-            // console.log("GET RESPONSE");
-
-    } catch (err) {
-      console.error('? Error fetching responses:', err.message);
-      io.emit('get_responses', {
-        message: '? Failed to fetch data',
-        error: err.message
-      });
-    }});      
     
     socket.on('update_proses', async (payload) => {
-      
-      try {
-          let location = payload.location;
-    if(location == "bpjs"){
-        location = "Lantai 1 BPJS"
-      }
-      if(location == "gmcb"){
-        location = "Lantai 1 GMCB"
-      }
-      if(location == "lt3"){
-        location = "Lantai 3 GMCB"
-      }
-  console.log("ON UPDATE"); // ?? Pastikan handler dipanggil
-      const data = await medControl.getMedicineToday(location);
-      io.emit('get_responses_proses', {
-        message: '? Initial data fetched',
-        data: data
+        try {
+                      console.log("PAYLOAD", payload);
+
+          if(payload.location == "Lantai 1 BPJS"){
+            payload.location = "bpjs"
+          }
+          if(payload.location == "Lantai 1 GMCB"){
+            payload.location = "gmcb"
+          }
+          if(payload.location == "Lantai 3 GMCB"){
+            payload.location = "lt3"
+          }
+          const location = payload.location;
+          const roomName = `room_${location}`;
+          const mappedLocation = mapLocation(location);
+          
+          const data = await medControl.getMedicineToday(mappedLocation);
+          
+          io.to(roomName).emit('get_responses_proses', {
+            message: '✅ Initial data fetched',
+            data: data
+          });
+
+          io.to(roomName).emit('update_daftar_proses');
+          
+          console.log(`📤 Sent proses update to room: ${roomName}`);
+        } catch (err) {
+          console.error('❌ Error:', err.message);
+        }
       });
+socket.on('update_verif', async (payload) => {
+        try {
+                  console.log("PAYLOAD", payload);
 
-      io.emit('update_daftar_proses');
-            console.log("GET RESPONSE");
+              if(payload.location == "Lantai 1 BPJS"){
+            payload.location = "bpjs"
+          }
+          if(payload.location == "Lantai 1 GMCB"){
+            payload.location = "gmcb"
+          }
+          if(payload.location == "Lantai 3 GMCB"){
+            payload.location = "lt3"
+          }
+          const location = payload.location;
+          const roomName = `room_${location}`;
+          const mappedLocation = mapLocation(location);
+          
+          console.log("ON UPDATE", mappedLocation, "to room", roomName);
+          
+          const data = await VerificationTask.getToday(mappedLocation);
+          
+          io.to(roomName).emit('get_responses_verif', {
+            message: '✅ Initial data fetched',
+            data: data
+          });
 
-    } catch (err) {
-      console.error('? Error fetching responses:', err.message);
-      io.emit('get_responses_proses', {
-        message: '? Failed to fetch data',
-        error: err.message
+          io.to(roomName).emit('update_daftar_verif');
+          
+          console.log(`📤 Sent verif update to room: ${roomName}`);
+        } catch (err) {
+          console.error('❌ Error:', err.message);
+        }
       });
-    }
-    });
-
-    socket.on('update_verif', async (payload)=>{
-      try {
-          let location = payload.location;
-    if(location == "bpjs"){
-        location = "Lantai 1 BPJS"
-      }
-      if(location == "gmcb"){
-        location = "Lantai 1 GMCB"
-      }
-      if(location == "lt3"){
-        location = "Lantai 3 GMCB"
-      }
-  console.log("ON UPDATE",location); // ?? Pastikan handler dipanggil
-      const data = await VerificationTask.getToday(location);
-      io.emit('get_responses_verif', {
-        message: '? Initial data fetched',
-        data: data
-      });
-
-      io.emit('update_daftar_verif');
-            console.log("GET RESPONSE");
-
-    } catch (err) {
-      console.error('? Error fetching responses:', err.message);
-      io.emit('get_responses_verif', {
-        message: '? Failed to fetch data',
-        error: err.message
-      });
-    }
-    });
-
     
     socket.on('update_pickup', async (payload) => {
-      try {
-          let location = payload.location;
-          console.log("LOC",location);
-    if(location == "bpjs"){
-        location = "Lantai 1 BPJS"
-      }
-      if(location == "gmcb"){
-        location = "Lantai 1 GMCB"
-      }
-      if(location == "lt3"){
-        location = "Lantai 3 GMCB"
-      }
+        try {
+                  console.log("PAYLOAD", payload);
 
-  console.log("ON UPDATE"); // ?? Pastikan handler dipanggil
-      const data = await pickupControl.getPickupToday(location);
-      io.emit('get_responses_pickup', {
-        message: '? Initial data fetched',
-        data: data
+              if(payload.location == "Lantai 1 BPJS"){
+            payload.location = "bpjs"
+          }
+          if(payload.location == "Lantai 1 GMCB"){
+            payload.location = "gmcb"
+          }
+          if(payload.location == "Lantai 3 GMCB"){
+            payload.location = "lt3"
+          }
+          const location = payload.location;
+          const roomName = `room_${location}`;
+          const mappedLocation = mapLocation(location);
+          
+          console.log("LOC", location, "to room", roomName);
+          
+          const data = await pickupControl.getPickupToday(mappedLocation);
+          
+          io.to(roomName).emit('get_responses_pickup', {
+            message: '✅ Initial data fetched',
+            data: data
+          });
+
+          io.to(roomName).emit('update_daftar_pickup');
+          
+          console.log(`📤 Sent pickup update to room: ${roomName}`);
+        } catch (err) {
+          console.error('❌ Error:', err.message);
+        }
       });
-            console.log("GET RESPONSE");
-      
-            io.emit('update_daftar_pickup');
-
-
-    } catch (err) {
-      console.error('? Error fetching responses:', err.message);
-      io.emit('get_responses_pickup', {
-        message: '? Failed to fetch data',
-        error: err.message
-      });
-    }
-    });
 
     socket.on('toggleName', (payload) => {
       console.log("PAYLOAD",payload.message,payload.data);
@@ -274,63 +301,60 @@ try {
       let queueDataLT3 = [];
 
       socket.on('call_queues_verif', (payload) => {
-        // queueData.push(payload.data);
-        console.log("QUEUES VERIF", payload.data);
-      
-        // Emit updated queue to frontend
-        // io.emit('send_queues_verif_frontend_BPJS', { data: queueData });
-        if(payload.lokasi == "Lantai 1 BPJS"){
+        console.log("QUEUES VERIF", payload);
+        
+        if (payload.lokasi === "Lantai 1 BPJS") {
           console.log("VERIF BPJS");
-          queueDataBPJS.push(payload.data);
-          io.emit('send_queues_verif_frontend_BPJS', { data: queueDataBPJS });
-
+          io.emit('send_queues_verif_frontend_BPJS', { 
+            data: payload.data,
+            message: "Call verification" 
+          });
         }
-        if(payload.lokasi == "Lantai 3 GMCB"){
-          queueDataLT3.push(payload.data);
-
-          io.emit('send_queues_verif_frontend_LT3', { data: queueDataLT3 });
-
+        else if (payload.lokasi === "Lantai 3 GMCB") {
+          io.emit('send_queues_verif_frontend_LT3', { 
+            data: payload.data,
+            message: "Call verification" 
+          });
         }
-        if(payload.lokasi == "Lantai 1 GMCB"){
-          queueDataGMCB.push(payload.data);
-
-          io.emit('send_queues_verif_frontend_GMCB', { data: queueDataGMCB });
-
+        else if (payload.lokasi === "Lantai 1 GMCB") {
+          console.log("GMCB CALL");
+          io.emit('send_queues_verif_frontend_GMCB', { 
+            data: payload.data,
+            message: "Call verification" 
+          });
         }
-        queueDataBPJS = [];
-        queueDataLT3 = [];
-        queueDataGMCB = [];
+      });
 
+  socket.on('call_queues_pickup', (payload) => {
+        console.log("PAYLOAD PICKUP", payload);
+        const data = payload.data;
+        
+        if (payload.lokasi === "Lantai 1 BPJS") {
+          console.log("TEST PICKUP BPJS", payload.lokasi);
+          io.emit('send_queues_pickup_frontend_BPJS', { 
+            data: data,
+            message: "Call pickup" 
+          });
+        }
+        else if (payload.lokasi === "Lantai 3 GMCB") {
+          io.emit('send_queues_pickup_frontend_LT3', { 
+            data: data,
+            message: "Call pickup" 
+          });
+        }
+        else if (payload.lokasi === "Lantai 1 GMCB") {
+          console.log("TEST PICKUP GMCB", payload.lokasi);
+          console.log("DATA", data);
+          io.emit('send_queues_pickup_frontend_GMCB', { 
+            data: data,
+            message: "Call pickup" 
+          });
+          console.log("SEND PICKUP");
+        }
       });
       const defaultLocation = "Lantai 1 BPJS";
 
-      socket.on('call_queues_pickup', (payload) => {
-        if(payload.lokasi == "Lantai 1 BPJS"){
-          queueDataBPJS.push(payload.data);
-          io.emit('send_queues_pickup_frontend_BPJS', { data: queueDataBPJS });
-
-        }
-        if(payload.lokasi == "Lantai 3 GMCB"){
-          queueDataLT3.push(payload.data);
-
-          io.emit('send_queues_pickup_frontend_LT3', { data: queueDataLT3 });
-
-        }
-        
-        if(payload.lokasi == "Lantai 1 GMCB"){
-          queueDataGMCB.push(payload.data);
-
-          io.emit('send_queues_pickup_frontend_GMCB', { data: queueDataGMCB });
-
-        }
-        console.log("QUEUES PICKUP", payload.data);
-      
-        // Emit updated queue to frontend
-        queueDataBPJS = [];
-        queueDataLT3 = [];
-        queueDataGMCB = [];
-
-      });
+    
       // queueData = [];
       // console.log("QUEUEDATA",queueData);
     });

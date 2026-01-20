@@ -15,7 +15,14 @@ const validStatus = {
   complete: "completed_pickup_medicine",
   recall: "recalled_pickup_medicine",
 };
-
+     const getShortLocation = (loc) => {
+        const locationMap = {
+            "Lantai 1 BPJS": "bpjs",
+            "Lantai 1 GMCB": "gmcb",
+            "Lantai 3 GMCB": "lt3"
+        };
+        return locationMap[loc] || loc;
+    };
 const PilihAksiG = ({ location, selectedQueue, selectedQueueIds = [], setSelectedQueueIds, onStatusUpdate, setSelectedQueue2, selectedQueue2, selectedLoket }) => {
   const socket = getSocket();
   const [isCompleteServiceEnabled, setIsCompleteServiceEnabled] = useState(false);
@@ -181,8 +188,8 @@ const PilihAksiG = ({ location, selectedQueue, selectedQueueIds = [], setSelecte
       }
 
       // 4. Force global updates to refresh queue list
-      socket.emit('update_pickup', { location });
-      socket.emit('update_display', { location });
+      socket.emit('update_pickup', {location: getShortLocation(location)});
+      socket.emit('update_display', { location: getShortLocation(location) });
 
       setSelectedQueue2([]);
       setSelectedQueueIds([]);

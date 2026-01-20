@@ -86,9 +86,8 @@ async function insertAll(payload) {
     conn.release();
   }
 }
-
 const getFarmasiList = async (req, res) => {
-        const io = req.app.get('socketio');
+  const io = req.app.get('socketio');
 
   console.log("GETLIST");
   try {
@@ -98,7 +97,7 @@ const getFarmasiList = async (req, res) => {
 
     const farmasiArray = req.body;
     const NOP = farmasiArray.payload.NOP;
-    console.log("FARM",farmasiArray);
+    console.log("FARM", farmasiArray);
     
     if (!NOP) {
       return res.status(400).json({ message: "NOP NOT FOUND" });
@@ -122,7 +121,7 @@ const getFarmasiList = async (req, res) => {
     let payload = {};
 
     if (!existingDoctorAppointment && !existingPharmacyTask && !existingVerificationTask) {
-        shouldEmit = true;
+      shouldEmit = true;
 
       payload = {
         sep_no: farmasiArray.payload.sep_no ?? null,
@@ -160,59 +159,61 @@ const getFarmasiList = async (req, res) => {
         queue_number: farmasiArray.payload.farmasi_queue_number ?? null,
         PRB: farmasiArray.payload.PRB ?? null,
         doctor_name: farmasiArray.payload.doctor_name ?? null
-      }
-      let new_phone_number;
-        if (farmasiArray.payload.phone_number.startsWith("0")) {
-      new_phone_number = "62" + farmasiArray.payload.phone_number.slice(1);
-      console.log("PH1",new_phone_number)
-    }
-    else{
-      new_phone_number = farmasiArray.payload.phone_number
-    }
-       const wa_payload = {
-
-            phone_number: new_phone_number,
-            patient_name: farmasiArray.payload.patient_name ,
-            NOP: farmasiArray.payload.NOP,
-            queue_number: farmasiArray.payload.farmasi_queue_number,
-            medicine_type: statusMedicine,
-            sep: farmasiArray.payload.sep_no,
-            rm: farmasiArray.payload.medical_record_no ,
-            docter:  farmasiArray.payload?.doctor_name,
-            nik:  farmasiArray.payload.nik || "-",
-            prev_queue_number: "-",
-            switch_WA: "true",
-            location: "Lantai 1 BPJS"
-
-        };
-        console.log("SEND WA RET");
-            const waResp = await sendWAAntrian(wa_payload);
-            console.log("WA RESPONSE:", waResp,wa_payload);
-const print = await retryOperation(
-    () => printAntrianFarmasi(printPayload),
-    3, // max retries
-    1000 // initial delay (will increase exponentially)
-  );
-      await new Promise(resolve => setTimeout(resolve, 2000)); // 1-second delay
-
+      };
       
+      let new_phone_number;
+      if (farmasiArray.payload.phone_number.startsWith("0")) {
+        new_phone_number = "62" + farmasiArray.payload.phone_number.slice(1);
+        console.log("PH1", new_phone_number);
+      } else {
+        new_phone_number = farmasiArray.payload.phone_number;
+      }
+      
+      const wa_payload = {
+        phone_number: new_phone_number,
+        patient_name: farmasiArray.payload.patient_name,
+        NOP: farmasiArray.payload.NOP,
+        queue_number: farmasiArray.payload.farmasi_queue_number,
+        medicine_type: statusMedicine,
+        sep: farmasiArray.payload.sep_no,
+        rm: farmasiArray.payload.medical_record_no,
+        docter: farmasiArray.payload?.doctor_name,
+        nik: farmasiArray.payload.nik || "-",
+        prev_queue_number: "-",
+        switch_WA: "true",
+        location: "Lantai 1 BPJS"
+      };
+      
+      console.log("SEND WA RET");
+      const waResp = await sendWAAntrian(wa_payload);
+      console.log("WA RESPONSE:", waResp, wa_payload);
+      
+      const print = await retryOperation(
+        () => printAntrianFarmasi(printPayload),
+        3,
+        1000
+      );
+      
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
       if (print.success == false) {
         io.emit('print_error', {
           message: 'Print Error'
         });
       }
 
-    
       const data = await getAllResponses("Lantai 1 BPJS");
 
-       io.emit('insert_appointment', {
-
-    message: 'Doctor Created Successfully',
-    data: data
-  });
+      // ✅ FIXED: Only emit to BPJS room instead of all clients
+      const roomName = 'room_bpjs'; // Since location is "Lantai 1 BPJS"
+      
+      io.to(roomName).emit('insert_appointment', {
+        message: 'Doctor Created Successfully',
+        data: data
+      });
+      
+      console.log(`📤 Sent insert_appointment to room: ${roomName}`);
     }
-  
-
 
     return res.status(201).json({
       message: "Data berhasil diproses",
@@ -222,13 +223,13 @@ const print = await retryOperation(
       result: payload
     });
 
-    
-
   } catch (error) {
     console.error("GET FARMASI LIST ERROR", error);
     return res.status(500).json({ message: 'Internal server error', error: error.message });
   }
-}
+};
+
+
 
 module.exports = {
   getFarmasiList

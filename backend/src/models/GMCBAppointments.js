@@ -39,7 +39,7 @@ const values = [
   appointmentData.patient_name,
   appointmentData.medical_record_no,
   appointmentData.patient_date_of_birth,
-  appointmentData.medicine_type,      // ✅ FIXED
+  appointmentData.medicine_type?? appointmentData.status_medicine,      // ✅ FIXED
   appointmentData.lokasi,
   appointmentData.location_from,
   appointmentData.phone_number,

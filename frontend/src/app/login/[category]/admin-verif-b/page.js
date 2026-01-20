@@ -41,6 +41,8 @@ function useTokenCheck() {
 }
 export default function Admin({params}) {
   const {category} = use(params);
+
+  console.log("CATEGORY",category)
       const [isLoading, setIsLoading] = useState(false);
   const checkResponse = useTokenCheck();
   const router = useRouter();

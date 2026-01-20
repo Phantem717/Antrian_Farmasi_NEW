@@ -35,7 +35,14 @@ export default function DaftarAntrian({location, scanResult, setIsDeleted }) {
         setSelectedDate(datestring || dayjs());
     };
 
-    
+      const getShortLocation = (loc) => {
+    const locationMap = {
+      "Lantai 1 BPJS": "bpjs",
+      "Lantai 1 GMCB": "gmcb",
+      "Lantai 3 GMCB": "lt3"
+    };
+    return locationMap[loc] || loc;
+  };
 useEffect(() => {
   const interval = setInterval(() => {
     if (new Date().toDateString() !== currentDate) {
@@ -129,6 +136,10 @@ useEffect(() => {
     };
 
     useEffect(() => {
+            const shortLocation = getShortLocation(location);
+    socket.emit('join_room', { location: shortLocation });
+    console.log(`🚪 [DaftarAntrian-Proses] Joined room_${shortLocation}`);
+    
         fetchInitialQueue();
         socket.on('get_responses_proses', (payload) => {
             console.log("PAYLOAD", payload);

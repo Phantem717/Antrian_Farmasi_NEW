@@ -20,7 +20,14 @@ const socket = getSocket();
     complete: "completed_pickup_medicine",
     recall: "recalled_pickup_medicine",
   };
-
+     const getShortLocation = (loc) => {
+        const locationMap = {
+            "Lantai 1 BPJS": "bpjs",
+            "Lantai 1 GMCB": "gmcb",
+            "Lantai 3 GMCB": "lt3"
+        };
+        return locationMap[loc] || loc;
+    };
  useEffect(() => {
     const shouldEnable = selectedQueue2.some(queue => 
       queue.status === "pending_pickup_medicine" || 
@@ -140,8 +147,8 @@ const socket = getSocket();
 
       // ✅ Jika "PANGGIL NOMOR" ditekan, aktifkan "SELESAIKAN LAYANAN"
     
-       socket.emit('update_pickup', {location});
-        socket.emit('update_display', {location},console.log("EMIT UPDATE"));
+       socket.emit('update_pickup', {location: getShortLocation(location)});
+        socket.emit('update_display', {location: getShortLocation(location)},console.log("EMIT UPDATE"));
 
       setSelectedQueue2([]); // ✅ Reset pilihan setelah pemanggilan
       

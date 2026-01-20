@@ -20,6 +20,14 @@ const PilihAksi = ({location, selectedQueueIds = [], setSelectedQueueIds, select
   const [isDeleted, setIsDeleted] = useState(false); // ✅ Untuk menghapus input scanner
    const [scanResult, setScanResult] = useState(""); // ✅ Simpan hasil scan
   const [visible,setVisible] = useState(false);
+       const getShortLocation = (loc) => {
+        const locationMap = {
+            "Lantai 1 BPJS": "bpjs",
+            "Lantai 1 GMCB": "gmcb",
+            "Lantai 3 GMCB": "lt3"
+        };
+        return locationMap[loc] || loc;
+    };
   // ✅ Fungsi untuk memanggil banyak nomor antrian sekaligus
  console.log("QUEUE4",selectedQueue2);
   const socket = getSocket();
@@ -50,15 +58,16 @@ const PilihAksi = ({location, selectedQueueIds = [], setSelectedQueueIds, select
     try {
       console.log("📡 Memanggil nomor:", selectedQueueIds, selectedQueue2);
       let lokasi;
-      if(location = "bpjs"){
+      if(location == "bpjs"){
                   lokasi = "Lantai 1 BPJS";
                 }
-                else if(location = "gmcb"){
+                if(location == "gmcb"){
                   lokasi = "Lantai 1 GMCB";
                 }
-                else if(location = "lt3"){
+                if(location == "lt3"){
                   lokasi = "Lantai 3 GMCB";
                 }
+      console.log("LOCATION",lokasi,location);
       socket.emit('call_queues_verif',{data: selectedQueue2, lokasi: lokasi});
       await Promise.all(
         selectedQueue2.map(async (queue) => {
@@ -87,6 +96,8 @@ const PilihAksi = ({location, selectedQueueIds = [], setSelectedQueueIds, select
         timer: 2000,
         timerProgressBar: true,
       });
+        socket.emit('update_verif', {location: getShortLocation(location)});
+        socket.emit('update_display', {location: getShortLocation(location)},console.log("EMIT UPDATE"));
 
       setSelectedQueueIds([]);
       setSelectedQueue2([]); // ✅ Reset pilihan setelah pemanggilan
@@ -137,13 +148,13 @@ const PilihAksi = ({location, selectedQueueIds = [], setSelectedQueueIds, select
               if(statusType == "recalled_verification"){
                 console.log("CHANGED STATUS");
                 let lokasi;
-                if(location = "bpjs"){
+                if(location == "bpjs"){
                   lokasi = "Lantai 1 BPJS";
                 }
-                else if(location = "gmcb"){
+                else if(location == "gmcb"){
                   lokasi = "Lantai 1 GMCB";
                 }
-                else if(location = "lt3"){
+                else if(location == "lt3"){
                   lokasi = "Lantai 3 GMCB";
                 }
                 socket.emit('call_queues_verif',{data: selectedQueue2, lokasi: lokasi});
@@ -170,7 +181,7 @@ const PilihAksi = ({location, selectedQueueIds = [], setSelectedQueueIds, select
       setSelectedQueue2([]); // ✅ Reset pilihan setelah pemanggilan
 
       setSelectedQueueIds([]); // ✅ Reset setelah update
-                socket.emit('update_verif', {location});
+                socket.emit('update_verif', {location: getShortLocation(location)});
 
     } catch (error) {
       console.error("❌ Error saat memperbarui status:", error);
@@ -276,7 +287,7 @@ const PilihAksi = ({location, selectedQueueIds = [], setSelectedQueueIds, select
         if(location == "bpjs"){
           lokasi = "Lantai 1 BPJS"
         }
-        else if ( location = "gmcb"){
+        if ( location == "gmcb"){
           lokasi = "Lantai 1 GMCB"
         }
         else{
@@ -366,9 +377,9 @@ const PilihAksi = ({location, selectedQueueIds = [], setSelectedQueueIds, select
       // === 9. Emit socket events with delay to ensure updates propagate
       await new Promise(resolve => setTimeout(resolve, 500));
       
-      socket.emit("update_proses", { location });
-      socket.emit("update_verif", { location });
-      socket.emit("update_display", { location });
+      socket.emit("update_proses", { location: getShortLocation(location) });
+      socket.emit("update_verif", { location: getShortLocation(location) });
+      socket.emit("update_display", { location: getShortLocation(location) });
     }
 
     // === 10. Show results
@@ -454,7 +465,7 @@ const PilihAksi = ({location, selectedQueueIds = [], setSelectedQueueIds, select
           });
           setSelectedQueueIds([]);
      
-          socket.emit("update_verif", { location });
+          socket.emit("update_verif", { location: getShortLocation(location) });
 
     console.log("RESP",resp);
     } catch (error) {

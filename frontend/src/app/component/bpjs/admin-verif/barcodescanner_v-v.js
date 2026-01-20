@@ -18,6 +18,16 @@ export default function BarcodeScanner({location, onScanResult, handleBulkPharma
     const inputRef = useRef(null);
     const socket = getSocket();
 
+    // ✅ Add location mapper
+    const getShortLocation = (loc) => {
+        const locationMap = {
+            "Lantai 1 BPJS": "bpjs",
+            "Lantai 1 GMCB": "gmcb",
+            "Lantai 3 GMCB": "lt3"
+        };
+        return locationMap[loc] || loc;
+    };
+
     // Retry mechanism with exponential backoff
     const retryOperation = async (operation, maxRetries = 3, initialDelay = 1000) => {
         let attempt = 0;
@@ -32,7 +42,7 @@ export default function BarcodeScanner({location, onScanResult, handleBulkPharma
                 
                 console.warn(`Attempt ${attempt} failed, retrying in ${delay}ms...`);
                 await new Promise(resolve => setTimeout(resolve, delay));
-                delay *= 2; // Exponential backoff
+                delay *= 2;
             }
         }
     };
@@ -40,27 +50,39 @@ export default function BarcodeScanner({location, onScanResult, handleBulkPharma
     const fetchQueueList = async () => {
         try {
             const response = await PharmacyAPI.getAllPharmacyTasksToday(location);
-            console.log("Data antrian dari API:", response.data);
+            console.log("📊 [BarcodeScanner] Data antrian dari API:", response.data);
             setDaftarAntrian(response.data);
         } catch (error) {
-            console.error("Error fetching queue list:", error);
+            console.error("❌ [BarcodeScanner] Error fetching queue list:", error);
         }
     };
+useEffect(() => {
+    // ✅ Join room first
+    const shortLocation = getShortLocation(location);
+    socket.emit('join_room', { location: shortLocation });
+    console.log(`🚪 [BarcodeScanner] Joined room_${shortLocation}`);
+    
+    inputRef.current.focus();
+    fetchQueueList();
 
-    useEffect(() => {
-        inputRef.current.focus();
-        fetchQueueList();
+    // ✅ Listen to the correct socket event
+    const handleVerifUpdate = (payload) => {
+        console.log("📥 [BarcodeScanner] Received get_responses_verif:", payload);
+        fetchQueueList(); // Re-fetch the list
+    };
 
-        // Set up socket listeners
-        socket.on('update_daftar_verif', fetchQueueList);
-        socket.on('update_display', () => console.log("Display update received"));
+    socket.on('get_responses_verif', handleVerifUpdate);
+    socket.on('update_daftar_verif', fetchQueueList);
+    
+    console.log("✅ [BarcodeScanner] Listeners registered");
 
-        // Clean up socket listeners on unmount
-        return () => {
-            socket.off('update_daftar_verif', fetchQueueList);
-            socket.off('update_display');
-        };
-    }, []);
+    // Clean up socket listeners on unmount
+    return () => {
+        console.log("🧹 [BarcodeScanner] Cleaning up listeners");
+        socket.off('get_responses_verif', handleVerifUpdate);
+        socket.off('update_daftar_verif', fetchQueueList);
+    };
+}, [location]); // ✅ Keep location in dependencies - this is correct
 
     const processScan = async (NOP) => {
         const foundItem = daftarAntrian.find(item => item.NOP === NOP);
@@ -80,7 +102,7 @@ export default function BarcodeScanner({location, onScanResult, handleBulkPharma
             status: "waiting_medicine",
             medicine_type: foundItem.status_medicine,
         });
-        console.log("Pharmacy response:", pharResp);
+        console.log("✅ Pharmacy response:", pharResp);
 
         // Create medicine task
         const medResp = await MedicineAPI.createMedicineTask({
@@ -90,15 +112,17 @@ export default function BarcodeScanner({location, onScanResult, handleBulkPharma
             status: "waiting_medicine",
             lokasi: location
         });
-        console.log("Medicine response:", medResp);
+        console.log("✅ Medicine response:", medResp);
 
         // Get doctor appointment details
         const doctorResponse = await DoctorAppointmentAPI.getAppointmentByNOP(NOP);
-        console.log("Doctor response:", doctorResponse);
+        console.log("✅ Doctor response:", doctorResponse);
+
+        // Update local state FIRST (optimistic update)
+        setDaftarAntrian(prev => prev.filter(item => item.NOP !== NOP));
 
         // Prepare WA payload
         const payload = {
-
             phone_number: doctorResponse.data.phone_number,
             patient_name: doctorResponse.data.patient_name,
             NOP: doctorResponse.data.NOP,
@@ -111,23 +135,19 @@ export default function BarcodeScanner({location, onScanResult, handleBulkPharma
             prev_queue_number: "-",
             switch_WA: localStorage.getItem('waToggleState') || "true",
             location: location
-
         };
 
-        // Send WA notification with retry
-                setDaftarAntrian(prev => prev.filter(item => item.NOP !== NOP));
-            console.log("WA_PAYLOAD1",payload)
+        console.log("📱 WA_PAYLOAD:", payload);
 
-        // const sendResponse = await retryOperation(() => WA_API.sendWAVerif(payload));
-        // console.log("WA response:", sendResponse);
+        // ✅ Emit socket events with SHORT location code
+        const shortLocation = getShortLocation(location);
+        console.log(`📤 [BarcodeScanner] Emitting updates for: ${location} => ${shortLocation}`);
+        
+        socket.emit('update_display', {location: shortLocation});
+        socket.emit('update_proses', {location: shortLocation});
+        socket.emit('update_pickup', {location: shortLocation});
+        socket.emit('update_verif', {location: shortLocation});
 
-        // Emit socket events
-       
-        // Update local state by removing processed item
-        socket.emit('update_display',{location});
-        socket.emit('update_proses', {location} );
-        socket.emit('update_pickup', {location} );
-        socket.emit('update_verif', {location} );
         return { success: true };
     };
 
@@ -146,7 +166,7 @@ export default function BarcodeScanner({location, onScanResult, handleBulkPharma
             return;
         }
 
-        console.log("Booking ID yang di-scan:", NOP);
+        console.log("🔍 [BarcodeScanner] Booking ID yang di-scan:", NOP);
 
         try {
             await processScan(NOP.replace(/\t/g, "").trim());
@@ -163,7 +183,7 @@ export default function BarcodeScanner({location, onScanResult, handleBulkPharma
             setInputValue("");
             inputRef.current.focus();
         } catch (error) {
-            console.error("Error saat memproses scan:", error);
+            console.error("❌ [BarcodeScanner] Error saat memproses scan:", error);
             
             Swal.fire({
                 icon: "error",

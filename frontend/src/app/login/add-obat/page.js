@@ -49,11 +49,12 @@ const AddObat = () => {
       isPaid: payload.isPaid  || "-",
       payment_type: payload.payment_type  || "-",
       location_from: payload.location_from  || "-",
-      total_medicine: payload.total_medicine  || "-",
+      total_medicine: payload.total_medicine  || "0",
       poliklinik: payload.poliklinik  || "-",
     };
 
-    console.log("APPOINTMENT DATA",appointmentData);
+    try {
+        console.log("APPOINTMENT DATA",appointmentData);
 
     const pharmacyPayload = {
       NOP: payload.NOP,
@@ -76,10 +77,34 @@ const AddObat = () => {
       GMCBAppointmentAPI.createAppointment(appointmentData),
       PharmacyAPI.createPharmacyTask(pharmacyPayload),
     ]);
-
+    
     const verificationData = await VerificationAPI.createVerificationTask(taskData);
-
+    
+    // ✅ Map location to short code before emitting
+    const locationMap = {
+        "Lantai 1 BPJS": "bpjs",
+        "Lantai 1 GMCB": "gmcb",
+        "Lantai 3 GMCB": "lt3"
+    };
+    const shortLocation = locationMap[payload.location] || payload.location;
+    
+    console.log(`📤 [add-obat] Emitting for: ${payload.location} => ${shortLocation}`);
+    
+    socket.emit('update_verif', {location: shortLocation});
+    socket.emit('update_display', {location: shortLocation});
+    
     return { doctorAppointment, pharmacyData, verificationData };
+    } catch (error) {
+          console.error('Error during insertion, attempting rollback:', error);
+      await Promise.allSettled([
+      GMCBAppointmentAPI.deleteAppointment(payload.NOP).catch(() => {}),
+      PharmacyAPI.deletePharmacyTask(payload.NOP).catch(() => {}),
+      VerificationAPI.deleteVerificationTask(payload.NOP).catch(() => {})
+    ]);
+
+    throw new Error('Failed to create records, Silakan coba lagi');
+    }
+  
   }
 
   async function handleSubmit() {
@@ -145,7 +170,7 @@ const AddObat = () => {
                 
                 // 2. Determine med_type locally
                 let med_type_local = (med_type_resp.message == "Tidak ada racikan") ? "Non - Racikan" : "Racikan";
-                let total_medicine = med_type_resp.data.length;
+                let total_medicine = med_type_resp.data?.length ?? 0 ;
                 const origin = data.ServiceUnitName;
                 // 3. Create Queue and get queue number
                 const create_antrian_resp = await CreateAntrianAPI.createAntrianGMCB(med_type_local, apiLokasi,origin);
@@ -223,9 +248,7 @@ const AddObat = () => {
             // const print_wa = await Promise.all([WA_API.sendWAAntrian(WAPayload),PrintAntrian.printAntrian(printPayload)]);
             // console.log("PRINT_WA",print_wa);
             Swal.fire("Success!", "Data berhasil disimpan", "success");
-
-            socket.emit('update_verif',{location});
-            socket.emit('update_display',{location});
+     
 
           } catch (error) {
             console.error("Error:", error);
