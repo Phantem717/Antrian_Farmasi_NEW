@@ -1,0 +1,12 @@
+# backend ignores
+backend/.env merge=ours
+backend/config/db.js merge=ours
+backend/config/socket.js merge=ours
+backend/server.js merge=ours
+
+#frontend ignored
+frontend/.env merge=ours
+frontend/package.json merge=ours
+frontend/.env.local merge=ours
+frontend/src/app/page.js merge=ours
+frontend/src/app/utils/socket.js merge=ours
