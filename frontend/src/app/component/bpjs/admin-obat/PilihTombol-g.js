@@ -182,7 +182,7 @@ const PilihAksiG = ({ location, selectedQueue, selectedQueueIds = [], setSelecte
             });
           }
 
-          // await WA_API.sendWAPickup(payload);
+          await WA_API.sendWAPickup(payload);
           await new Promise(resolve => setTimeout(resolve, 1000));
         }
       }
