@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: backend_container_farmasi
+    dns: 8.8.8.8
+    ports:
+      - "5000:5000"
+    environment:
+      - X_API_KEY=3af91c651c18b69f37413798ec0f3eee
+      - BASE_URL=https://app-medapp.eksad.com
+      - HOST=192.168.6.106
+      - PORT=5000
+      - FE_HOST=192.168.6.106
+      - FE_PORT=3000
+      - MEDIN_URL=http://192.168.6.86/api/v1/visit/queue/pharmacy/compound-info
+      - MEDIN_URL2=http://192.168.6.86/api/v1/visit/queue/pharmacy/registration-info
+      - X_API_KEY_MEDIN=AMqey0yAVrqmhR82RMlWB3zqMpvRP0zaaOheEeq2tmmcEtRYNj2
+      - CONS_ID=21011919
+      - PASSWORD=98a6afc736128debea23ee23f365993c
+      - CONS_ID_FARMASI=58381288
+      - SECRETKEY=BeatoCarloAcutis
+      - API_URL=https://rscarolus.com/api
+      - API_WA=192.168.6.86
+      - CONS_ID_WA=39205596
+      - PASSWORD_WA=77b4ea6be45c057071feff350dbd4163
+      - DB_HOST=db
+      - DB_USER=root
+      - DB_PASSWORD=secret
+      - DB_NAME=farmasi_queue_db
+      - API_URL_WA=https://carolus.3dolphins.ai:9443/dolphin/apiv1/graph/broadcast/whatsapp
+      - WA_TOKEN=Basic YXBpQGlubW90aW9uLmNvLmlkOmFkbWluQERvbHBoaW4xMjM=
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - farmasi_network
+    restart: always
+
+  db:
+    image: mysql:8.0
+    container_name: mysql_container_farmasi
