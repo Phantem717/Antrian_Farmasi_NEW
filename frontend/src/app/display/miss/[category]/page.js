@@ -24,7 +24,7 @@ export default function BPJS_Pickup_Miss({params}) {
           <div className="flex flex-row gap-4 mb-4 h-[calc(100%-3rem)]">
             {category == "bpjs" ? <NextQueue location={category} />: <NextQueueG location={category} /> }
             
-            <QueueCall location={category} />
+            <QueueCall lokasi={category} />
           </div>
         </div>
         

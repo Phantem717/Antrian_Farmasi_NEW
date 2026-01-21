@@ -126,6 +126,32 @@ const getAllPharmacyTasksByStatus = async (req, res) => {
 };
 
 
+const getAllPharmacyTasksToday = async (req, res) => {
+  try {
+    let {category} = req.params;
+    let location = category;
+    if(location.toLowerCase() == "bpjs"){
+      location = "Lantai 1 BPJS" 
+    }
+    if(location.toLowerCase() == "gmcb"){
+      location = "Lantai 1 GMCB" 
+
+    }
+     if(location.toLowerCase() == "lt3"){
+      location = "Lantai 3 GMCB" 
+
+    } 
+    console.log("TEST2",location);
+    const tasks = await PharmacyTask.getToday(location);
+    res.status(200).json({ data: tasks });
+  } catch (error) {
+    console.error('Error retrieving all pharmacy tasks:', error);
+    res.status(500).json({
+      message: 'Failed to retrieve pharmacy tasks',
+      error: error.message,
+    });
+  }
+};
 /**
  * Controller untuk memperbarui Pharmacy Task berdasarkan Booking ID.
  */
@@ -206,5 +232,6 @@ module.exports = {
   getAllPharmacyTasks,
   updatePharmacyTask,
   deletePharmacyTask,
-  getAllPharmacyTasksByStatus
+  getAllPharmacyTasksByStatus,
+  getAllPharmacyTasksToday
 };

@@ -11,7 +11,7 @@ const CheckRegistrationInfo = {
         console.log("NOP CHECK",registrationNo);
     
         try {
-        const response = await axios.get(`${BASE_URL}/api/check/${encodeURIComponent(registrationNo)}`)         
+        const response = await axios.get(`${BASE_URL}/api/check/reg_no/${encodeURIComponent(registrationNo)}`)         
         return response.data ;
         } catch (error) {
             console.error(`❌ Error checking queue for Booking ID ${registrationNo}:`, error.response?.data || error.message);

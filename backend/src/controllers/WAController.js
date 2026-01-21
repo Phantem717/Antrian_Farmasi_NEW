@@ -110,7 +110,7 @@ const sendWAAntrianController  = async (req,res) => {
         else if(location == "lt3"){
           location = "Lantai 3 GMCB"
         }
-                  const payload = { phone_number, NOP, queue_number, patient_name,docter,nik,rm,sep,medicine_type,switch_WA,location  };
+              const payload = { phone_number, NOP, queue_number, patient_name,docter,nik,rm,sep,medicine_type,switch_WA,location  };
               const data = await sendWAProses(payload);
           
               res.status(200).json({ data });
@@ -129,7 +129,6 @@ const sendWAAntrianController  = async (req,res) => {
                 if (!phone_number || !patient_name || !message) {
                     return res.status(400).json({ message: "Payload incomplete. Required: phone_number, NOP, queue_number, patient_name." });
                   }
-              
                   const payload = { phone_number,  patient_name, message};
               const data = await sendWACustom(payload);
           

@@ -30,6 +30,7 @@ import WA_API from "@/app/utils/api/WA";
 import CreateAntrianAPI from "@/app/utils/api/createAntrian";
 import VerificationAPI from "@/app/utils/api/Verification";
 import CheckRegistrationInfo from "@/app/utils/api/checkRegistrationInfo";
+import GMCBAppointmentAPI from "@/app/utils/api/GMCB_Appointment";
 export default function BarcodeScanner({location, visible, onClose }) {
   const[totalMedicine,setTotalMedicine]= useState(0);
   const [inputValue, setInputValue] = useState("");
@@ -43,6 +44,10 @@ export default function BarcodeScanner({location, visible, onClose }) {
   const [DOB,setDOB] = useState("");
   const [docter,setDocter] = useState("");
   const [PRB,setPRB] = useState("");
+  const [LastPayment,setLastPayment] = useState("");
+  const [location_from,setLocation_from] = useState("");
+  const [ payment_type, setPayment_type] = useState("");
+
   const isBarcoded = useRef(false);
   const inputRef = useRef(null);
   const isTyped = useRef(false);
@@ -65,6 +70,9 @@ export default function BarcodeScanner({location, visible, onClose }) {
     setSEP("");
     setType("");
     setPRB("");
+    setLastPayment("");
+    setLocation_from("");
+    setPayment_type("");
     setTotalMedicine(0);
   if (inputRef.current) {
     inputRef.current.focus();
@@ -153,7 +161,11 @@ const barcode = inputValue.replace(/\s+/g, ""); // Removes ALL whitespace
     farmasi_queue_number: payload.farmasi_queue_number,
     NOP: payload.NOP,
     PRB: payload.PRB,
-    total_medicine: payload.total_medicine
+    total_medicine: payload.total_medicine,
+    payment_type: payload.payment_type,
+    location_from: payload.location_from,
+    isPaid: payload.isPaid,
+    poliklinik: payload.location_from
   };
 
   const pharmacyPayload = {
@@ -174,8 +186,9 @@ const barcode = inputValue.replace(/\s+/g, ""); // Removes ALL whitespace
   // SOLUTION 1: Check for existing records BEFORE inserting
   try {
     // Check if records already exist
-    const [existingAppointment, existingPharmacy, existingVerification] = await Promise.allSettled([
-      DoctorAppointmentAPI.getAppointmentByNOP(payload.NOP), // You need this endpoint
+    const [existingAppointment, existingPharmacy, existingVerification] = await 
+    Promise.allSettled([
+       location == "bpjs" ? DoctorAppointmentAPI.getAppointmentByNOP(payload.NOP) : GMCBAppointmentAPI.getAppointmentByNOP(payload.NOP), // You need this endpoint
       PharmacyAPI.getPharmacyTaskByNOP(payload.NOP), // You need this endpoint
       VerificationAPI.getVerificationTaskByNOP(payload.NOP) // You need this endpoint
     ]);
@@ -184,7 +197,7 @@ const barcode = inputValue.replace(/\s+/g, ""); // Removes ALL whitespace
     const deletionPromises = [];
     
     if (existingAppointment.status === 'fulfilled' && existingAppointment.value) {
-      deletionPromises.push(DoctorAppointmentAPI.deleteAppointment(payload.NOP));
+      deletionPromises.push(location == "bpjs" ? DoctorAppointmentAPI.deleteAppointment(payload.NOP) : GMCBAppointmentAPI.deleteAppointment(payload.NOP));
     }
     
     if (existingPharmacy.status === 'fulfilled' && existingPharmacy.value) {
@@ -203,7 +216,7 @@ const barcode = inputValue.replace(/\s+/g, ""); // Removes ALL whitespace
 
     // Now insert all records
     const [doctorAppointment, pharmacyData, verificationData] = await Promise.all([
-      DoctorAppointmentAPI.createAppointment(appointmentData),
+      location == "bpjs" ? DoctorAppointmentAPI.createAppointment(appointmentData) : GMCBAppointmentAPI.createAppointment(appointmentData),
       PharmacyAPI.createPharmacyTask(pharmacyPayload),
       VerificationAPI.createVerificationTask(taskData)
     ]);
@@ -216,7 +229,7 @@ const barcode = inputValue.replace(/\s+/g, ""); // Removes ALL whitespace
     
     // Attempt to delete any successfully created records
     await Promise.allSettled([
-      DoctorAppointmentAPI.deleteAppointment(payload.NOP).catch(() => {}),
+      location == "bpjs" ? DoctorAppointmentAPI.deleteAppointment(payload.NOP) : GMCBAppointmentAPI.deleteAppointment(payload.NOP).catch(() => {}),
       PharmacyAPI.deletePharmacyTask(payload.NOP).catch(() => {}),
       VerificationAPI.deleteVerificationTask(payload.NOP).catch(() => {})
     ]);
@@ -241,7 +254,9 @@ const barcode = inputValue.replace(/\s+/g, ""); // Removes ALL whitespace
       setNOP(checkRegistrationResponse.RegistrationNo);
       setPRB(checkRegistrationResponse.ProlanisPRB);
       setTotalMedicine(regisData.data? regisData.data.length : 0);
-
+      setLastPayment(checkRegistrationResponse.LastPaymentDate);
+      setPayment_type(checkRegistrationResponse.BusinessPartnerName);
+      setLocation_from(checkRegistrationResponse.ServiceUnitName);
 
     return checkRegistrationResponse;
   }
@@ -274,9 +289,10 @@ const barcode = inputValue.replace(/\s+/g, ""); // Removes ALL whitespace
             else if (location == "lt3"){
               newLocation = "farmasi-gmcb-lt3";
             }
-      const queueNumber = await CreateAntrianAPI.createAntrian(medType,newLocation);
+      const queueNumber = location == "bpjs" ? await CreateAntrianAPI.createAntrian(medType,newLocation) : await CreateAntrianAPI.createAntrianGMCB(medType,newLocation,location_from);
       const queueNumberData = queueNumber.data;
       console.log("PREV PAYLOAD",queueNumberData.data.queue_number,medType,name);
+
       const payload = {
         sep_no: SEP??"-",
         queue_number:queueNumberData.data.queue_number,
@@ -293,7 +309,11 @@ const barcode = inputValue.replace(/\s+/g, ""); // Removes ALL whitespace
         farmasi_queue_number: queueNumberData.data.queue_number,
         NOP: inputValue,
         PRB: PRB || null,
-        total_medicine: totalMedicine
+        total_medicine: totalMedicine,
+        payment_type: payment_type,
+        location_from: location_from,
+        isPaid: LastPayment,
+        poliklinik: location_from
       };
 
       console.log("NEW PAYLOAD",payload);
@@ -320,7 +340,11 @@ const barcode = inputValue.replace(/\s+/g, ""); // Removes ALL whitespace
             tanggal_lahir:  new Date(DOB).toISOString().split('T')[0]??"-",
             queue_number: queueNumberData.data.queue_number ?? null,
             prev_queue_number: "-",
-            location: location
+            location: location,
+                   payment_type: payment_type,
+            location_from: location_from,
+            isPaid: LastPayment,
+            poliklinik: location_from
         };
 
            const printPayload = {
@@ -337,17 +361,21 @@ const barcode = inputValue.replace(/\s+/g, ""); // Removes ALL whitespace
             queue_number: queueNumberData.data.queue_number ?? null,
             PRB: PRB,
             switch_WA: localStorage.getItem('waToggleState') || "true",
-            lokasi: location
+            lokasi: location,
+                   payment_type: payment_type,
+        location_from: location_from,
+        isPaid: LastPayment,
+        poliklinik: location_from
         }
       socket.emit('update_verif',{location});
       socket.emit('update_display',{location});
 
-      console.log("SEND WA_ANTRIAN", new Date().toISOString().split('T')[0]);
-      const WARESP =await WA_API.sendWAAntrian(WAPayload);
-      const PRINTRESP= await PrintAntrian.printAntrian(printPayload);
-                  await new Promise(resolve => setTimeout(resolve, 1000)); // 1-second delay
+      // console.log("SEND WA_ANTRIAN", new Date().toISOString().split('T')[0]);
+      // const WARESP =await WA_API.sendWAAntrian(WAPayload);
+      // const PRINTRESP= await PrintAntrian.printAntrian(printPayload);
+      //             await new Promise(resolve => setTimeout(resolve, 1000)); // 1-second delay
 
-      console.log("RESP ERROR",WARESP.data,PRINTRESP.data)
+      // console.log("RESP ERROR",WARESP.data,PRINTRESP.data)
      
 
 

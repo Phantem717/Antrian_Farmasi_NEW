@@ -71,61 +71,152 @@ ORDER BY vt.waiting_verification_stamp;  `;
   }
   }
 
-  static async getToday(location) {
-   const pool = await getDb();
-  const conn = await pool.getConnection(); // ? Explicit connection
+static async getToday(location) {
+  const pool = await getDb();
+  const conn = await pool.getConnection();
 
-    try {
-      const query = `
-      SELECT 
-    da.NOP,
-    da.patient_name,
-    da.queue_number,
-    da.sep_no,
-    da.medical_record_no,
-    da.status_medicine,
-        da.total_medicine,
+  try {
+    let query;
+    let params = [];
+    
+    if (location === 'Lantai 1 GMCB') {
+      query = `
+        SELECT 
+          gc.NOP,
+          gc.patient_name,
+          gc.queue_number,
+          gc.sep_no,
+          gc.medical_record_no,
+          gc.medicine_type as status_medicine,
+          gc.total_medicine,
+          pa.waiting_pickup_medicine_stamp,
+          pa.called_pickup_medicine_stamp,
+          pa.recalled_pickup_medicine_stamp,
+          pa.pending_pickup_medicine_stamp,
+          pa.completed_pickup_medicine_stamp,
+          pt.status,
+          mt.waiting_medicine_stamp,
+          mt.completed_medicine_stamp,
+          vt.waiting_verification_stamp,
+          vt.called_verification_stamp,
+          vt.recalled_verification_stamp,
+          vt.pending_verification_stamp,
+          vt.processed_verification_stamp,
+          vt.completed_verification_stamp,
+          ROUND(
+            TIMESTAMPDIFF(SECOND, vt.completed_verification_stamp,
+              CASE
+                WHEN pa.called_pickup_medicine_stamp IS NOT NULL
+                THEN pa.called_pickup_medicine_stamp
+                ELSE pa.completed_pickup_medicine_stamp
+              END
+            ) / 60.0, 1
+          ) AS verification_to_pickup_minutes
+        FROM GMCB_Appointments gc
+        LEFT JOIN Verification_Task vt ON gc.NOP = vt.NOP
+        LEFT JOIN Pharmacy_Task pt ON gc.NOP = pt.NOP
+        LEFT JOIN Medicine_Task mt ON gc.NOP = mt.NOP
+        LEFT JOIN Pickup_Task pa ON gc.NOP = pa.NOP
+        WHERE DATE(vt.waiting_verification_stamp) = CURRENT_DATE
+          AND pt.lokasi = ?
 
-    pa.waiting_pickup_medicine_stamp,
-    pa.called_pickup_medicine_stamp,
-    pa.recalled_pickup_medicine_stamp,
-    pa.pending_pickup_medicine_stamp,
-    pa.completed_pickup_medicine_stamp,
-    pt.status,
-    mt.waiting_medicine_stamp,
-    mt.completed_medicine_stamp,
-    vt.waiting_verification_stamp,
-    vt.called_verification_stamp,
-    vt.recalled_verification_stamp,
-    vt.pending_verification_stamp,
-    vt.processed_verification_stamp,
-    vt.completed_verification_stamp,
-   ROUND(
-  TIMESTAMPDIFF(SECOND, vt.completed_verification_stamp,
-    CASE
-      WHEN pa.called_pickup_medicine_stamp IS NOT NULL
-      THEN pa.called_pickup_medicine_stamp
-      ELSE pa.completed_pickup_medicine_stamp
-    END
-  ) / 60.0, 1
-) AS verification_to_pickup_minutes
-FROM Doctor_Appointments da
-LEFT JOIN Verification_Task vt ON da.NOP = vt.NOP
-LEFT JOIN Pharmacy_Task pt ON da.NOP = pt.NOP
-LEFT JOIN Medicine_Task mt ON da.NOP = mt.NOP
-LEFT JOIN Pickup_Task pa ON da.NOP = pa.NOP
-WHERE Date(vt.waiting_verification_stamp) = CURRENT_DATE
-AND pt.lokasi = ?
-ORDER BY vt.waiting_verification_stamp;  `;
+        UNION ALL 
 
-      const [rows] = await conn.execute(query,[location]);
-      return rows;
-    } catch (error) {
-      throw error;
-    }finally {
-    conn.release(); // ?? Critical cleanup
+        SELECT 
+          gt.id as NOP,
+          NULL as patient_name,
+          gt.queue_number,
+          NULL as sep_no,
+          NULL as medical_record_no,
+          NULL as status_medicine,
+          NULL as total_medicine,
+          pa.waiting_pickup_medicine_stamp,
+          pa.called_pickup_medicine_stamp,
+          pa.recalled_pickup_medicine_stamp,
+          pa.pending_pickup_medicine_stamp,
+          pa.completed_pickup_medicine_stamp,
+          pt.status,
+          mt.waiting_medicine_stamp,
+          mt.completed_medicine_stamp,
+          vt.waiting_verification_stamp,
+          vt.called_verification_stamp,
+          vt.recalled_verification_stamp,
+          vt.pending_verification_stamp,
+          vt.processed_verification_stamp,
+          vt.completed_verification_stamp,
+          ROUND(
+            TIMESTAMPDIFF(SECOND, vt.completed_verification_stamp,
+              CASE
+                WHEN pa.called_pickup_medicine_stamp IS NOT NULL
+                THEN pa.called_pickup_medicine_stamp
+                ELSE pa.completed_pickup_medicine_stamp
+              END
+            ) / 60.0, 1
+          ) AS verification_to_pickup_minutes
+        FROM gmcb_farmasi_temp gt
+        LEFT JOIN Verification_Task vt ON gt.id = vt.NOP
+        LEFT JOIN Pharmacy_Task pt ON gt.id = pt.NOP
+        LEFT JOIN Medicine_Task mt ON gt.id = mt.NOP
+        LEFT JOIN Pickup_Task pa ON gt.id = pa.NOP
+        WHERE DATE(vt.waiting_verification_stamp) = CURRENT_DATE
+          AND pt.lokasi = ?
+
+        ORDER BY waiting_verification_stamp
+      `;
+      params = [location, location]; // ✅ Need TWO parameters for both WHERE clauses
+    } else {
+      query = `
+        SELECT 
+          da.NOP,
+          da.patient_name,
+          da.queue_number,
+          da.sep_no,
+          da.medical_record_no,
+          da.status_medicine,
+          da.total_medicine,
+          pa.waiting_pickup_medicine_stamp,
+          pa.called_pickup_medicine_stamp,
+          pa.recalled_pickup_medicine_stamp,
+          pa.pending_pickup_medicine_stamp,
+          pa.completed_pickup_medicine_stamp,
+          pt.status,
+          mt.waiting_medicine_stamp,
+          mt.completed_medicine_stamp,
+          vt.waiting_verification_stamp,
+          vt.called_verification_stamp,
+          vt.recalled_verification_stamp,
+          vt.pending_verification_stamp,
+          vt.processed_verification_stamp,
+          vt.completed_verification_stamp,
+          ROUND(
+            TIMESTAMPDIFF(SECOND, vt.completed_verification_stamp,
+              CASE
+                WHEN pa.called_pickup_medicine_stamp IS NOT NULL
+                THEN pa.called_pickup_medicine_stamp
+                ELSE pa.completed_pickup_medicine_stamp
+              END
+            ) / 60.0, 1
+          ) AS verification_to_pickup_minutes
+        FROM Doctor_Appointments da
+        LEFT JOIN Verification_Task vt ON da.NOP = vt.NOP
+        LEFT JOIN Pharmacy_Task pt ON da.NOP = pt.NOP
+        LEFT JOIN Medicine_Task mt ON da.NOP = mt.NOP
+        LEFT JOIN Pickup_Task pa ON da.NOP = pa.NOP
+        WHERE DATE(vt.waiting_verification_stamp) = CURRENT_DATE
+          AND pt.lokasi = ?
+        ORDER BY vt.waiting_verification_stamp
+      `;
+      params = [location];
+    }
+
+    const [rows] = await conn.execute(query, params);
+    return rows;
+  } catch (error) {
+    throw error;
+  } finally {
+    conn.release();
   }
-  }
+}
 static async getByTimePeriod(location,period) {
   const pool = await getDb();
   const conn = await pool.getConnection(); // ? Explicit connection
@@ -153,8 +244,11 @@ static async getByTimePeriod(location,period) {
             default: // today
                 dateCondition = "DATE(vt.waiting_verification_stamp) = CURDATE()";
         }
-
-        const query = `
+           let query;
+        let params = [];
+        if(location == "Lantai 1 BPJS"){
+       
+        query = `
         SELECT 
             da.NOP,
             da.patient_name,
@@ -197,7 +291,98 @@ static async getByTimePeriod(location,period) {
         pt.lokasi = ?
         ORDER BY vt.waiting_verification_stamp;`;
 
-        const [rows] = await conn.execute(query,[location]);
+        params = [location];
+        }
+        else{
+           query = `
+        SELECT 
+            gc.NOP,
+            gc.patient_name,
+            gc.queue_number,
+            gc.sep_no,
+            gc.medical_record_no,
+            gc.medicine_type as status_medicine,
+                gc.total_medicine,
+
+            pa.waiting_pickup_medicine_stamp,
+            pa.called_pickup_medicine_stamp,
+            pa.recalled_pickup_medicine_stamp,
+            pa.pending_pickup_medicine_stamp,
+            pa.completed_pickup_medicine_stamp,
+            pt.status,
+            mt.waiting_medicine_stamp,
+            mt.completed_medicine_stamp,
+            vt.waiting_verification_stamp,
+            vt.called_verification_stamp,
+            vt.recalled_verification_stamp,
+            vt.pending_verification_stamp,
+            vt.processed_verification_stamp,
+            vt.completed_verification_stamp,
+            TIMESTAMPDIFF(
+                MINUTE, 
+                vt.completed_verification_stamp, 
+                CASE 
+                    WHEN pa.called_pickup_medicine_stamp IS NOT NULL 
+                    THEN pa.called_pickup_medicine_stamp
+                    ELSE pa.completed_pickup_medicine_stamp
+                END
+            ) AS verification_to_pickup_minutes
+        FROM GMCB_Appointments gc
+        LEFT JOIN Verification_Task vt ON gc.NOP = vt.NOP
+        LEFT JOIN Pharmacy_Task pt ON gc.NOP = pt.NOP
+        LEFT JOIN Medicine_Task mt ON gc.NOP = mt.NOP
+        LEFT JOIN Pickup_Task pa ON gc.NOP = pa.NOP
+        WHERE ${dateCondition}
+        AND
+        pt.lokasi = ?
+
+        UNION ALL
+
+         SELECT 
+            gt.id as NOP,
+            NULL as patient_name,
+            gt.queue_number,
+            NULL as sep_no,
+            NULL as medical_record_no,
+            NULL as status_medicine,
+                NULL as total_medicine,
+
+            pa.waiting_pickup_medicine_stamp,
+            pa.called_pickup_medicine_stamp,
+            pa.recalled_pickup_medicine_stamp,
+            pa.pending_pickup_medicine_stamp,
+            pa.completed_pickup_medicine_stamp,
+            pt.status,
+            mt.waiting_medicine_stamp,
+            mt.completed_medicine_stamp,
+            vt.waiting_verification_stamp,
+            vt.called_verification_stamp,
+            vt.recalled_verification_stamp,
+            vt.pending_verification_stamp,
+            vt.processed_verification_stamp,
+            vt.completed_verification_stamp,
+            TIMESTAMPDIFF(
+                MINUTE, 
+                vt.completed_verification_stamp, 
+                CASE 
+                    WHEN pa.called_pickup_medicine_stamp IS NOT NULL 
+                    THEN pa.called_pickup_medicine_stamp
+                    ELSE pa.completed_pickup_medicine_stamp
+                END
+            ) AS verification_to_pickup_minutes
+        FROM gmcb_farmasi_temp gt
+        LEFT JOIN Verification_Task vt ON gt.id = vt.NOP
+        LEFT JOIN Pharmacy_Task pt ON gt.id = pt.NOP
+        LEFT JOIN Medicine_Task mt ON gt.id = mt.NOP
+        LEFT JOIN Pickup_Task pa ON gc.id = pa.NOP
+        WHERE ${dateCondition}
+        AND
+        pt.lokasi = ?
+        ORDER BY waiting_verification_stamp;`;
+
+        params = [location,location];
+        }
+        const [rows] = await conn.execute(query,params);
         return rows;
     } catch (error) {
         throw error;
@@ -218,7 +403,11 @@ static async getByDate(location,date) {
   const conn = await pool.getConnection(); // ? Explicit connection
 
     try {
-      const query = `
+      let query
+      let params = []
+
+      if(location == "Lantai 1 BPJS"){
+query = `
       SELECT 
     da.NOP,
     da.patient_name,
@@ -261,7 +450,102 @@ WHERE Date(vt.waiting_verification_stamp) = ?
 AND pt.lokasi = ?
 ORDER BY vt.waiting_verification_stamp;  `;
 
-      const [rows] = await conn.execute(query, [date,location]);
+params = [date,location];
+      }
+      else{
+        query = `
+      SELECT 
+    gc.NOP,
+    gc.patient_name,
+    gc.queue_number,
+    gc.sep_no,
+    gc.medical_record_no,
+    gc.medicine_type as status_medicine,
+    gc.total_medicine,
+    pa.waiting_pickup_medicine_stamp,
+    pa.called_pickup_medicine_stamp,
+    pa.recalled_pickup_medicine_stamp,
+    pa.pending_pickup_medicine_stamp,
+    pa.completed_pickup_medicine_stamp,
+    pt.status,
+    mt.waiting_medicine_stamp,
+    mt.completed_medicine_stamp,
+    vt.waiting_verification_stamp,
+    vt.called_verification_stamp,
+    vt.recalled_verification_stamp,
+    vt.pending_verification_stamp,
+    vt.processed_verification_stamp,
+    vt.completed_verification_stamp,
+   TIMESTAMPDIFF(
+        MINUTE, 
+        vt.completed_verification_stamp, 
+        CASE 
+            WHEN pa.called_pickup_medicine_stamp IS NOT NULL 
+            THEN pa.called_pickup_medicine_stamp
+            
+            ELSE pa.completed_pickup_medicine_stamp
+        END
+    ) AS verification_to_pickup_minutes
+    
+FROM GMCB_Appointments gc
+LEFT JOIN Verification_Task vt ON gc.NOP = vt.NOP
+LEFT JOIN Pharmacy_Task pt ON gc.NOP = pt.NOP
+LEFT JOIN Medicine_Task mt ON gc.NOP = mt.NOP
+LEFT JOIN Pickup_Task pa ON gc.NOP = pa.NOP
+WHERE Date(vt.waiting_verification_stamp) = ?
+AND pt.lokasi = ?
+
+UNION ALL
+
+  SELECT 
+ gt.id as NOP,
+            NULL as patient_name,
+            gt.queue_number,
+            NULL as sep_no,
+            NULL as medical_record_no,
+            NULL as status_medicine,
+                NULL as total_medicine,
+    pa.waiting_pickup_medicine_stamp,
+    pa.called_pickup_medicine_stamp,
+    pa.recalled_pickup_medicine_stamp,
+    pa.pending_pickup_medicine_stamp,
+    pa.completed_pickup_medicine_stamp,
+    pt.status,
+    mt.waiting_medicine_stamp,
+    mt.completed_medicine_stamp,
+    vt.waiting_verification_stamp,
+    vt.called_verification_stamp,
+    vt.recalled_verification_stamp,
+    vt.pending_verification_stamp,
+    vt.processed_verification_stamp,
+    vt.completed_verification_stamp,
+   TIMESTAMPDIFF(
+        MINUTE, 
+        vt.completed_verification_stamp, 
+        CASE 
+            WHEN pa.called_pickup_medicine_stamp IS NOT NULL 
+            THEN pa.called_pickup_medicine_stamp
+            
+            ELSE pa.completed_pickup_medicine_stamp
+        END
+    ) AS verification_to_pickup_minutes
+    
+FROM gmcb_farmasi_temp gt
+LEFT JOIN Verification_Task vt ON gt.id = vt.NOP
+LEFT JOIN Pharmacy_Task pt ON gt.id = pt.NOP
+LEFT JOIN Medicine_Task mt ON gt.id = mt.NOP
+LEFT JOIN Pickup_Task pa ON gt.id = pa.NOP
+WHERE Date(vt.waiting_verification_stamp) = ?
+AND pt.lokasi = ?
+
+
+ORDER BY waiting_verification_stamp;  `;
+
+params = [date,location,date,location];
+      }
+      
+
+      const [rows] = await conn.execute(query, params);
       return rows;
     } catch (error) {
       throw error;

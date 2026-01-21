@@ -18,6 +18,18 @@ const CreateAntrian = {
             throw error; 
         }
     },
+     createAntrianGMCB: async(medicineType,lokasi,origin) => {
+        try {
+            const data = { medicineType, lokasi, origin };
+            const response = await axios.post(`${BASE_URL}/api/create-farmasi/GMCB/`, data);
+            return response.data;
+
+            
+        } catch (error) {
+            console.error(`❌ Error Making Antrian Farmasi:`, error.response?.data || error.message);
+            throw error; 
+        }
+    }
     // 1. Check Queue by Booking ID
     
     

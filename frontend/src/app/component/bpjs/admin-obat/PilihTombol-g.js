@@ -7,6 +7,7 @@ import Swal from "sweetalert2";
 import { getSocket } from "@/app/utils/api/socket";
 import DoctorAppointmentAPI from "@/app/utils/api/Doctor_Appoinment";
 import WA_API from "@/app/utils/api/WA";
+import GMCBAppointmentAPI from "@/app/utils/api/GMCB_Appointment";
 
 const validStatus = {
   call: "called_pickup_medicine",
@@ -14,7 +15,14 @@ const validStatus = {
   complete: "completed_pickup_medicine",
   recall: "recalled_pickup_medicine",
 };
-
+     const getShortLocation = (loc) => {
+        const locationMap = {
+            "Lantai 1 BPJS": "bpjs",
+            "Lantai 1 GMCB": "gmcb",
+            "Lantai 3 GMCB": "lt3"
+        };
+        return locationMap[loc] || loc;
+    };
 const PilihAksiG = ({ location, selectedQueue, selectedQueueIds = [], setSelectedQueueIds, onStatusUpdate, setSelectedQueue2, selectedQueue2, selectedLoket }) => {
   const socket = getSocket();
   const [isCompleteServiceEnabled, setIsCompleteServiceEnabled] = useState(false);
@@ -79,30 +87,7 @@ const PilihAksiG = ({ location, selectedQueue, selectedQueueIds = [], setSelecte
   // ----------------------------------------------------
 
   // ✅ Fungsi untuk Update Status ke API Pickup & Pharmacy
-  const handleStatusUpdate = async (statusType) => {
-    
-    // 🛑 INTEGRATION: RUN STALE CHECK FIRST
-    const staleResult = await checkAndFlagStaleCalls(location);
-    
-    if (staleResult.count > 0) {
-        Swal.fire({
-            icon: "info",
-            title: "Antrian Diperbarui Otomatis",
-            text: `${staleResult.count} antrian yang melewati batas 5 menit telah ditandai sebagai 'Ditunda'.`,
-            toast: true,
-            position: "top-end",
-            showConfirmButton: false,
-            timer: 4000,
-            timerProgressBar: true,
-        });
-        // Force refresh the list to show the pending items before processing the user's new action
-        socket.emit('update_pickup', { location }); 
-        
-        // This is a design choice: either return here, or continue with the user's action
-        // For simplicity, we continue, assuming the user's new call is more important.
-    }
-    // ------------------------------------------
-
+ const handleStatusUpdate = async (statusType) => {
     if (!selectedQueue) {
       Swal.fire({
         icon: "warning",
@@ -118,9 +103,7 @@ const PilihAksiG = ({ location, selectedQueue, selectedQueueIds = [], setSelecte
 
     try {
       const status = validStatus[statusType];
-      const newDate = new Date().toISOString(); // Current timestamp
-
-      // Determine the timestamp field to update based on the statusType
+      const newDate = new Date().toISOString();
       const timestampField = `${statusType}_pickup_medicine_stamp`;
       
       // 1. Update status and timestamp for all selected queues
@@ -131,17 +114,14 @@ const PilihAksiG = ({ location, selectedQueue, selectedQueueIds = [], setSelecte
             medicine_type: queue.status_medicine,
           };
           
-          // Pickup task requires the status AND the timestamp update
           const pickupRequestBody = {
             status: status,
-            
-            // Dynamically set the timestamp field to the current time
+            location: location,
             [timestampField]: newDate, 
           };
 
           await Promise.all([
             PharmacyAPI.updatePharmacyTask(queue.NOP, pharmacyRequestBody), 
-            // Send the timestamp to Pickup Task
             PickupAPI.updatePickupTask(queue.NOP, pickupRequestBody), 
           ]);
         })
@@ -150,31 +130,30 @@ const PilihAksiG = ({ location, selectedQueue, selectedQueueIds = [], setSelecte
       // 2. Handle notifications (only for calling actions)
       if (statusType === "call" || statusType === "recall") {
         
-        // Emit socket for display
         const updatedQueues = selectedQueue2.map(queue => ({
           ...queue,
           loket: selectedLoket,
-          status: status, // Reflect new status for socket emit
+          status: status,
         }));
+        
+        console.log("🔔 Emitting call_queues_pickup:", updatedQueues);
         
         socket.emit('call_queues_pickup', {
           data: updatedQueues,
-          lokasi: "Lantai 1 BPJS" // Use correct location for display
+          lokasi: "Lantai 1 GMCB"
         });
         
-        // 3. Send WhatsApp notifications (simplified)
+        // 3. Send WhatsApp notifications
         for (const queue of selectedQueue2) {
-          const doctorResponse = await DoctorAppointmentAPI.getAppointmentByNOP(queue.NOP);
+          const doctorResponse = await GMCBAppointmentAPI.getAppointmentByNOP(queue.NOP);
           
           const payload = {
             phone_number: doctorResponse.data.phone_number,
             patient_name: doctorResponse.data.patient_name,
             loket: selectedLoket,
             location: location,
-            // ... other payload data ...
           };
 
-          // Update latest for display (first queue in selection)
           if (queue === selectedQueue2[0]) {
             socket.emit('update_latest_pickup', {
               message: "Update Pickup",
@@ -182,7 +161,6 @@ const PilihAksiG = ({ location, selectedQueue, selectedQueueIds = [], setSelecte
             });
           }
 
-          await WA_API.sendWAPickup(payload);
           await new Promise(resolve => setTimeout(resolve, 1000));
         }
       }
@@ -199,9 +177,19 @@ const PilihAksiG = ({ location, selectedQueue, selectedQueueIds = [], setSelecte
 
       setIsCompleteServiceEnabled(statusType === "call" || statusType === "recall");
 
+      // 🛑 RUN STALE CHECK AFTER SUCCESSFUL CALL
+      // This way it doesn't interfere with the current call
+      const staleResult = await checkAndFlagStaleCalls(location);
+      console.log("STALE CHECK (after call):", staleResult);
+      
+      if (staleResult.count > 0) {
+        console.info(`ℹ️ Auto-flagged ${staleResult.count} stale calls as pending`);
+        // Don't show Swal here to avoid interrupting the call flow
+      }
+
       // 4. Force global updates to refresh queue list
-      socket.emit('update_pickup', { location });
-      socket.emit('update_display', { location });
+      socket.emit('update_pickup', {location: getShortLocation(location)});
+      socket.emit('update_display', { location: getShortLocation(location) });
 
       setSelectedQueue2([]);
       setSelectedQueueIds([]);

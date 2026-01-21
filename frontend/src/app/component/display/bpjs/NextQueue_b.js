@@ -3,8 +3,7 @@ import VerificationAPI from "@/app/utils/api/Verification";
 import MedicineAPI from "@/app/utils/api/Medicine";
 import PickupAPI from "@/app/utils/api/Pickup";
 import { getSocket } from "@/app/utils/api/socket";
-import { Marquee } from "@devnomic/marquee";
-import "@devnomic/marquee/dist/index.css";
+
 import { queue } from "jquery";
 import { Carousel } from "antd";
 
@@ -50,6 +49,9 @@ const [times, setTimes] = useState({
 
 useEffect(() => {
   if (!socket) return; // Exit if socket is not initialized
+  socket.emit('join_room', { location });
+  console.log(`🚪 Joining room for location: ${location}`);
+
 socket.on('send_nameToggle', (payload) => {
   console.log("TOGGLE NAME",payload);
   if (hideName !== payload.data) {  // Only refresh if state actually changed
@@ -131,7 +133,6 @@ return () => {
 
   // Set up listener
    socket.on('get_responses', handleGetResponses);
-  socket.on('insert_appointment', handleGetResponses);
 
   // Request initial data
   socket.emit('get_initial_responses', { location }, console.log("GET INITIAL DATA"));
@@ -139,10 +140,13 @@ return () => {
   // Cleanup
   return () => {
     socket.off('get_responses', handleGetResponses);
-      socket.off('insert_appointment', handleGetResponses);
 
   };
 }, [socket, location]); // Re-run if `socket` or `location` changes
+
+
+
+
   // Status color helpers
   const getStatusColor = (status) => {
     switch(status) {

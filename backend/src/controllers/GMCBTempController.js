@@ -372,6 +372,24 @@ const updateAntrian = async (req,res)=>{
     });
   }
 }
+
+const verifyTempQueue = async (req, res) => {
+  try {
+    const { tempId,verificationData } = req.body;
+    const antrian = await GMCBTemp.verifyTempQueue(tempId, verificationData);
+    
+    res.status(200).json({ 
+      message: "Verified Antrian",
+      data: antrian
+    });
+  } catch (error) {
+    console.error("Error fetching antrian:", error);
+    res.status(500).json({ 
+      message: "Failed to fetch antrian", 
+      error: error.message 
+    });
+  }
+}
 module.exports = {
   getFarmasiList,
   updateAntrian,
@@ -380,5 +398,6 @@ module.exports = {
   getAppointment,
   deleteAppointment,
   getLatestAntrian,
-  createAppointment
+  createAppointment,
+  verifyTempQueue
 }

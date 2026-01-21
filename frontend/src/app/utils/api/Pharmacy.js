@@ -27,7 +27,16 @@ const PharmacyAPI = {
             throw error;
         }
     },
-
+getAllPharmacyTasksToday: async (category) => {
+    console.log("TESTTODAY",category);
+        try {
+            const response = await axios.get(`${BASE_URL}/api/pharmacy-tasks/today/${category}`);
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching all pharmacy tasks:', error);
+            throw error;
+        }
+    },
     // 2. Get Pharmacy Task by Booking ID
     getPharmacyTaskByNOP: async (NOP) => {
         try {

@@ -17,7 +17,14 @@ export default function BarcodeScanner({location, onScanResult }) {
      
     const inputRef = useRef(null);
     const socket = getSocket();
-
+     const getShortLocation = (loc) => {
+        const locationMap = {
+            "Lantai 1 BPJS": "bpjs",
+            "Lantai 1 GMCB": "gmcb",
+            "Lantai 3 GMCB": "lt3"
+        };
+        return locationMap[loc] || loc;
+    };
     const fetchDaftarAntrianList = async () => {
         try {
             const response = await PharmacyAPI.getAllPharmacyTasksByStatus(location,"waiting_medicine");
@@ -30,10 +37,14 @@ export default function BarcodeScanner({location, onScanResult }) {
 
     useEffect(() => {
         inputRef.current.focus();
+            const shortLocation = getShortLocation(location);
+    socket.emit('join_room', { location: shortLocation });
+    console.log(`🚪 [DaftarAntrian-Proses] Joined room_${shortLocation}`);
+    
         fetchDaftarAntrianList();
 
         // Set up socket listeners
-        socket.on('update_daftar_pickup', fetchDaftarAntrianList);
+        socket.on('update_daftar_pickup', fetchDaftarAntrianList,console.log("UPDATED VERIF PROSES"));
         socket.on('update_display', () => console.log("EMIT UPDATE"));
 
         // Clean up socket listeners on unmount

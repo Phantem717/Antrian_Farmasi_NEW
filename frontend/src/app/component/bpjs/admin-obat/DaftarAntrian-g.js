@@ -59,6 +59,15 @@ const DaftarAntrianG = ({location, selectedQueueIds, setSelectedQueueIds, setSel
   // Run this whenever queueList changes
   // ? Loket yang diizinkan untuk admin obat
   const allowedLokets = ["Loket 1", "Loket 4"];
+
+     const getShortLocation = (loc) => {
+        const locationMap = {
+            "Lantai 1 BPJS": "bpjs",
+            "Lantai 1 GMCB": "gmcb",
+            "Lantai 3 GMCB": "lt3"
+        };
+        return locationMap[loc] || loc;
+    };
   async function deleteAction() {
     if (!selectedQueue2 || !selectedQueueIds || selectedQueueIds.length === 0) {
       console.log("Queues Needed");
@@ -85,8 +94,8 @@ const DaftarAntrianG = ({location, selectedQueueIds, setSelectedQueueIds, setSel
              timer: 2000,
              timerProgressBar: true,
            });
-                 socket.emit('update_display');
-      socket.emit('update_pickup');
+                 socket.emit('update_display', {location: getShortLocation(location)});
+      socket.emit('update_pickup', {location: getShortLocation(location)});
 
      
     } catch (error) {
@@ -221,20 +230,27 @@ async function getInitalData(){
         console.error("Error processing queue:", error);
     }
 };
-
 useEffect(() => {
+      const shortLocation = getShortLocation(location);
+    socket.emit('join_room', { location: shortLocation });
     getInitalData();
-    socket.on('get_responses_pickup',(payload)=>{
-    console.log("PROCESSUS",payload);
-    processQueue(payload);
-    console.log("QUEUELIST2",queueList);
-  })
+    
+    // ✅ Handle the socket update with correct structure
+    socket.on('get_responses_pickup', (payload) => {
+      console.log("📥 Received get_responses_pickup:", payload);
+      
+      // ✅ Wrap payload in expected structure
+      const wrappedPayload = {
+        data: payload.data  // payload.data is already the array
+      };
+      
+      processQueue(wrappedPayload);
+    });
 
     return () => {
-            socket.off('get_responses_pickup');
-        };
-}, [ selectedLoketLocal, date]); // Add date to dependencies
-
+      socket.off('get_responses_pickup');
+    };
+}, [selectedLoketLocal, date]);
 // Add a clear date function
 const handleClearDate = () => {
   setDate(null);
@@ -344,25 +360,30 @@ const handleSearchClear = () => {
 
     }
   }
-
-  const handleColourChange = (status) => {
-    if(status.includes("called") || status.includes("recalled")){
-      return 'text-green-600';
-    }
-    
-    if(status.includes("pending")){
-      return 'text-red-600'
-    }
-
-    if(status.includes("waiting")){
-      return 'text-yellow-600'
-    }
-
-
-
-
+const handleColourChange = (status) => {
+  // Called or Recalled - Green
+  if (status === "called_pickup_medicine" || status === "recalled_pickup_medicine") {
+    return { color: '#16a34a' }; // green-600
+  }
+  
+  // Pending - Red
+  if (status === "pending_pickup_medicine") {
+    return { color: '#dc2626' }; // red-600
   }
 
+  // Waiting - Yellow/Orange
+  if (status === "waiting_pickup_medicine") {
+    return { color: '#ea580c' }; // orange-600 (more visible than yellow)
+  }
+
+  // Completed - Blue
+  if (status === "completed_pickup_medicine") {
+    return { color: '#2563eb' }; // blue-600
+  }
+
+  // Default - Gray
+  return { color: '#4b5563' }; // gray-600
+};
 
 const hasYesterdayItems = queueList.some(item => item.isYesterday);
   return (
@@ -569,15 +590,30 @@ const hasYesterdayItems = queueList.some(item => item.isYesterday);
           ) : null}
         </TableCell>
       )}
-<TableCell  align="center" className={`font-extrabold uppercase text-lg ${handleColourChange(item.status)}`}>
-  {/* Correct comparison (===) and grouping for OR condition */}
-  {item.status == "called_pickup_medicine" || item.status == "recalled_pickup_medicine" 
-    ? "Dipanggil" 
-    : item.status == "waiting_pickup_medicine" 
-      ? "Menunggu" 
-      : item.status == "pending_pickup_medicine" 
-        ? "Ditunda" 
-        : "-"}
+<TableCell 
+  align="center" 
+  sx={{
+    fontWeight: 'bold',
+    fontSize: '1.125rem',
+    textTransform: 'uppercase',
+    ...handleColourChange(item.status) // Spread the color object
+  }}
+>
+  {(() => {
+    switch(item.status) {
+      case "called_pickup_medicine":
+      case "recalled_pickup_medicine":
+        return "Dipanggil";
+      case "waiting_pickup_medicine":
+        return "Menunggu";
+      case "pending_pickup_medicine":
+        return "Ditunda";
+      case "completed_pickup_medicine":
+        return "Selesai";
+      default:
+        return "-";
+    }
+  })()}
 </TableCell>
                 <TableCell style={{ fontWeight: 'bold' }} align="center" className='font-bold'>{item.queue_number}</TableCell>
                 

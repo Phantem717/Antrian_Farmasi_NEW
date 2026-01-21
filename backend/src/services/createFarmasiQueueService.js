@@ -39,4 +39,39 @@ try {
 }
 }
 
-module.exports ={createAntrianFarmasi}
+async function createAntrianFarmasiGMCB(medicine_type,lokasi,origin){
+    
+try {
+ 
+    const { timestamp, signature } = generateSignature(consID2, password);
+ const url = `http://192.168.6.86/api/v1/visit/queue/pharmacy/create-queue2`;
+ console.log("medicine_type",medicine_type,lokasi,origin)
+// console.log("PHONE_NUMBER",phone_number);
+    const response = await axios.post(
+      url,
+      {
+        queue: {
+            sub_facility: medicine_type, 
+            location_id: lokasi,
+            origin_patient: origin
+        }
+      },
+      {
+        headers: {
+          'X-cons-id': consID2,
+          'X-timestamp': timestamp,
+          'X-signature': signature,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    console.log("ANRIAN RESPONSE:", response.data);
+    return response.data;
+} catch (error) {
+    console.error('Error QUEUE:', error.message);
+    throw error;
+}
+}
+
+module.exports ={createAntrianFarmasi, createAntrianFarmasiGMCB}

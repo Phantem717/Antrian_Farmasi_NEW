@@ -1,6 +1,6 @@
 // src/controllers/GMCBAppointmentsController.js
 const axios = require('axios');
-
+const {checkRegistrationInfo} = require('../services/checkRegistrationInfo')
 const generateSignature = require('../utils/signature');
 const password = process.env.PASSWORD ;
 const consID2 = process.env.CONS_ID_FARMASI;
@@ -460,6 +460,29 @@ const getDoctorTotalByDate= async (req,res) => {
     res.status(500).json({ message: 'Failed to retrieve Verification Task', error: error.message });
   }
 };
+
+const updatePaymentStatus = async (req, res) => {
+  try {
+    const { NOP} = req.params;
+    console.log("NOP PAYMENT",NOP);
+    const getData = await checkRegistrationInfo(NOP);
+    if (!getData) {
+      return res.status(404).json({ message: 'Data not found' });
+    }
+
+    const result = await GMCBAppointment.updatePaymentStatus(NOP, getData.LastPaymentDate);
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: 'Appointment not found or no changes made' });
+    }
+    res.status(200).json({
+      message: 'Payment status updated successfully',
+      data: result
+    });
+  } catch (error) {
+    console.error('Error updating payment status:', error);
+    res.status(500).json({ message: 'Failed to update payment status', error: error.message });
+  }
+}
 module.exports = {
   createAppointment,
   getAllAppointments,
@@ -474,5 +497,6 @@ module.exports = {
   updateTotalMedicineController,
   getDoctorTotalByDate,
   updateGMCBAppointmentController,
-  RouteUpdateDoubleController
+  RouteUpdateDoubleController,
+  updatePaymentStatus
 };

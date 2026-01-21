@@ -6,18 +6,28 @@ import { updateButtonStatus } from "@/app/utils/api/Button";
 import PharmacyAPI from "@/app/utils/api/Pharmacy";
 import MedicineAPI from "@/app/utils/api/Medicine";
 import DoctorAppointmentAPI from "@/app/utils/api/Doctor_Appoinment";
+import GMCBAppointmentAPI from "@/app/utils/api/GMCB_Appointment";
 import Swal from "sweetalert2";
 import {getSocket} from "@/app/utils/api/socket";
 import WA_API from "@/app/utils/api/WA";
 import BarcodeScanner from "./barcodescanner_v-v";
 import CreateAntrianAPI from "@/app/utils/api/createAntrian";
 import PrintAntrian from "@/app/utils/api/printAntrian";
+import VerifyModal from "../../gmcb/verifyModal";
 // import VerificationAPI from "../../../utils/api/Verification";
 
 const PilihAksi = ({location, selectedQueueIds = [], setSelectedQueueIds, selectedQueue2 = [] , setSelectedQueue2}) => {  
   const [isDeleted, setIsDeleted] = useState(false); // ✅ Untuk menghapus input scanner
    const [scanResult, setScanResult] = useState(""); // ✅ Simpan hasil scan
- 
+  const [visible,setVisible] = useState(false);
+       const getShortLocation = (loc) => {
+        const locationMap = {
+            "Lantai 1 BPJS": "bpjs",
+            "Lantai 1 GMCB": "gmcb",
+            "Lantai 3 GMCB": "lt3"
+        };
+        return locationMap[loc] || loc;
+    };
   // ✅ Fungsi untuk memanggil banyak nomor antrian sekaligus
  console.log("QUEUE4",selectedQueue2);
   const socket = getSocket();
@@ -48,15 +58,16 @@ const PilihAksi = ({location, selectedQueueIds = [], setSelectedQueueIds, select
     try {
       console.log("📡 Memanggil nomor:", selectedQueueIds, selectedQueue2);
       let lokasi;
-      if(location = "bpjs"){
+      if(location == "bpjs"){
                   lokasi = "Lantai 1 BPJS";
                 }
-                else if(location = "gmcb"){
+                if(location == "gmcb"){
                   lokasi = "Lantai 1 GMCB";
                 }
-                else if(location = "lt3"){
+                if(location == "lt3"){
                   lokasi = "Lantai 3 GMCB";
                 }
+      console.log("LOCATION",lokasi,location);
       socket.emit('call_queues_verif',{data: selectedQueue2, lokasi: lokasi});
       await Promise.all(
         selectedQueue2.map(async (queue) => {
@@ -85,6 +96,8 @@ const PilihAksi = ({location, selectedQueueIds = [], setSelectedQueueIds, select
         timer: 2000,
         timerProgressBar: true,
       });
+        socket.emit('update_verif', {location: getShortLocation(location)});
+        socket.emit('update_display', {location: getShortLocation(location)},console.log("EMIT UPDATE"));
 
       setSelectedQueueIds([]);
       setSelectedQueue2([]); // ✅ Reset pilihan setelah pemanggilan
@@ -135,13 +148,13 @@ const PilihAksi = ({location, selectedQueueIds = [], setSelectedQueueIds, select
               if(statusType == "recalled_verification"){
                 console.log("CHANGED STATUS");
                 let lokasi;
-                if(location = "bpjs"){
+                if(location == "bpjs"){
                   lokasi = "Lantai 1 BPJS";
                 }
-                else if(location = "gmcb"){
+                else if(location == "gmcb"){
                   lokasi = "Lantai 1 GMCB";
                 }
-                else if(location = "lt3"){
+                else if(location == "lt3"){
                   lokasi = "Lantai 3 GMCB";
                 }
                 socket.emit('call_queues_verif',{data: selectedQueue2, lokasi: lokasi});
@@ -168,7 +181,7 @@ const PilihAksi = ({location, selectedQueueIds = [], setSelectedQueueIds, select
       setSelectedQueue2([]); // ✅ Reset pilihan setelah pemanggilan
 
       setSelectedQueueIds([]); // ✅ Reset setelah update
-                socket.emit('update_verif', {location});
+                socket.emit('update_verif', {location: getShortLocation(location)});
 
     } catch (error) {
       console.error("❌ Error saat memperbarui status:", error);
@@ -274,7 +287,7 @@ const PilihAksi = ({location, selectedQueueIds = [], setSelectedQueueIds, select
         if(location == "bpjs"){
           lokasi = "Lantai 1 BPJS"
         }
-        else if ( location = "gmcb"){
+        if ( location == "gmcb"){
           lokasi = "Lantai 1 GMCB"
         }
         else{
@@ -333,8 +346,8 @@ const PilihAksi = ({location, selectedQueueIds = [], setSelectedQueueIds, select
 
         // === 6. Send WA notification
         console.log("Sending WA notification:", waPayload, printPayload);
-        const sendResponse = await WA_API.sendWAVerif(waPayload);
-        console.log("WA sent:", sendResponse);
+        // const sendResponse = await WA_API.sendWAVerif(waPayload);
+        // console.log("WA sent:", sendResponse);
 
         // Delay before printing
         await new Promise(resolve => setTimeout(resolve, 1000));
@@ -364,9 +377,9 @@ const PilihAksi = ({location, selectedQueueIds = [], setSelectedQueueIds, select
       // === 9. Emit socket events with delay to ensure updates propagate
       await new Promise(resolve => setTimeout(resolve, 500));
       
-      socket.emit("update_proses", { location });
-      socket.emit("update_verif", { location });
-      socket.emit("update_display", { location });
+      socket.emit("update_proses", { location: getShortLocation(location) });
+      socket.emit("update_verif", { location: getShortLocation(location) });
+      socket.emit("update_display", { location: getShortLocation(location) });
     }
 
     // === 10. Show results
@@ -420,10 +433,70 @@ const PilihAksi = ({location, selectedQueueIds = [], setSelectedQueueIds, select
       setScanResult("");
     }
   }, [isDeleted]);
+
+   const handleCloseBarcodeScanner = () => {
+    setVisible(false);
+  };
+
+  const handleVerify = (type) => {
+    
+        if(location != "bpjs"){
+          setVisible(true);
+        }
+        else{
+          const resp = handleBulkStatusUpdate(type)
+              console.log("RESP",resp);
+
+        }
+
+  }
+
+  const handleUpdateStatus = async (NOP) => {
+    try {
+      const resp = await GMCBAppointmentAPI.updatePaymentStatus(NOP);
+       Swal.fire({
+            icon: "success",
+            title: `Berhasil memperbarui`,
+            toast: true,
+            position: "top-end",
+            showConfirmButton: false,
+            timer: 2500,
+            timerProgressBar: true,
+          });
+          setSelectedQueueIds([]);
+     
+          socket.emit("update_verif", { location: getShortLocation(location) });
+
+    console.log("RESP",resp);
+    } catch (error) {
+       console.error("❌ Critical error in bulk pharmacy update:", error);
+    Swal.fire({
+      icon: "error",
+      title: "Gagal memperbarui data!",
+      text: error.message,
+      toast: true,
+      position: "top-end",
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true,
+    });
+      throw error
+    }
+    
+  }
   return (
     <div>
      <BarcodeScanner location={location}onScanResult={handleScanResult} handleBulkPharmacyUpdate = {handleBulkPharmacyUpdate} />
-
+      {
+        visible && location != "bpjs" && (
+          <VerifyModal
+          selectedQueue={selectedQueueIds}
+           location={location}  visible={visible} 
+        onClose={handleCloseBarcodeScanner}
+        
+          />
+        )
+      }
         <Box
       sx={{
         display: "grid",
@@ -469,14 +542,15 @@ const PilihAksi = ({location, selectedQueueIds = [], setSelectedQueueIds, select
     <Button
       variant="contained"
       sx={{ backgroundColor: "#1E88E5", color: "#ffffff", fontWeight: "bold", padding: "12px", height: "55px", fontSize: "0.95rem" }}
-      onClick={() => handleBulkStatusUpdate("processed_verification")}
+      onClick={() => handleVerify("processed_verification")}
       disabled={selectedQueueIds.length === 0}
     >
       PROSES VERIFIKASI
     </Button>
 
       {/* ✅ Racikan banyak nomor */}
-    <Button
+      {location == "bpjs" && (
+         <Button
       variant="contained"
       sx={{ backgroundColor: "#8E24AA", color: "#ffffff", fontWeight: "bold", padding: "12px", height: "55px", fontSize: "0.95rem" }}
       onClick={() => handleBulkPharmacyUpdate("Racikan")}
@@ -485,8 +559,11 @@ const PilihAksi = ({location, selectedQueueIds = [], setSelectedQueueIds, select
       RACIKAN
     </Button>
 
-     {/* ✅ Non-Racikan banyak nomor */}
-     <Button
+    
+      )}
+
+      {location == "bpjs" && (
+        <Button
       variant="contained"
       sx={{ backgroundColor: "#FF4081", color: "#ffffff", fontWeight: "bold", padding: "12px", height: "55px", fontSize: "0.95rem" }}
       onClick={() => handleBulkPharmacyUpdate("Non - Racikan")}
@@ -494,6 +571,22 @@ const PilihAksi = ({location, selectedQueueIds = [], setSelectedQueueIds, select
     >
       NON - RACIKAN
     </Button>
+      )}
+
+      {location != "bpjs" && (
+        <Button
+      variant="contained"
+      sx={{ backgroundColor: "#FF4081", color: "#ffffff", fontWeight: "bold", padding: "12px", height: "55px", fontSize: "0.95rem" }}
+      onClick={() => handleUpdateStatus(selectedQueueIds[0])}
+      disabled={selectedQueueIds.length === 0}
+    >
+      Update Status
+    </Button>
+      )}
+
+
+  
+   
   </Box>
     </div>
     

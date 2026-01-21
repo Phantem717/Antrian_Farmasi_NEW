@@ -10,7 +10,8 @@ const  {
     deleteAppointment,
     getLatestAntrian,
     getAllAppointmentsByLocation,
-    createAppointment
+    createAppointment,
+    verifyTempQueue
  
    
 } = require('../controllers/GMCBTempController')
@@ -53,5 +54,5 @@ router.patch('/update', updateAntrian);
 // Endpoint untuk menghapus appointment berdasarkan NOP
 router.delete('/:id', deleteAppointment);
 router.get('/:category',getAllAppointmentsByLocation);
-
+router.post('/verify',verifyTempQueue);
 module.exports = router;

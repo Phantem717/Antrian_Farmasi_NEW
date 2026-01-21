@@ -58,12 +58,15 @@ class PickupTask {
    * Mengambil record Pickup_Task berdasarkan NOP.
    * @param {number} NOP - ID task.
    */
-  static async findByNOP(NOP) {
+  static async findByNOP(NOP,location) {
   const pool = await getDb();
   const conn = await pool.getConnection(); // ? Explicit connection
 
     try {
-      const query = `
+        let query;
+  let params = [];
+      if(location == 'Lantai 1 BPJS'){
+ query = `
         SELECT
           pt.*, 
           da.patient_name,
@@ -79,7 +82,30 @@ class PickupTask {
           LEFT JOIN Pharmacy_Task ph ON pt.NOP = ph.NOP
         WHERE pt.NOP = ?
       `;
-      const [rows] = await conn.execute(query, [NOP]);
+
+      params = [NOP]
+      }
+      else{
+        query = `
+        SELECT
+          pt.*, 
+          gc.patient_name,
+          gc.sep_no,
+          gc.medical_record_no,
+          gc.queue_number,
+          gc.medicine_type as status_medicine,
+          ph.status,
+          ph.medicine_type
+        FROM Pickup_Task pt
+          LEFT JOIN GMCB_Appointments gc ON pt.NOP = gc.NOP
+          LEFT JOIN Pharmacy_Task ph ON pt.NOP = ph.NOP
+        WHERE pt.NOP = ?
+      `;
+
+      params = [NOP]
+      }
+    
+      const [rows] = await conn.execute(query, params);
       return rows[0];
     } catch (error) {
       throw error;
@@ -130,7 +156,10 @@ class PickupTask {
   const conn = await pool.getConnection(); // ? Explicit connection
 
     try {
-      const query = `
+      let query;
+      let params = [];
+      if(location == 'Lantai 1 BPJS'){
+query = `
         SELECT
           pt.*, 
           da.patient_name,
@@ -153,7 +182,37 @@ class PickupTask {
           ORDER BY 
     COALESCE(pt.called_pickup_medicine_stamp, pt.waiting_pickup_medicine_stamp) ASC;
       `;
-      const [rows] = await conn.execute(query,[location]);
+
+      params = [location]
+      }
+      else{
+       query = `
+        SELECT
+          pt.*, 
+          gc.patient_name,
+          gc.sep_no,
+          gc.medical_record_no,
+          gc.queue_number,
+           gc.phone_number,
+          gc.doctor_name,
+          gc.medicine_type as status_medicine,
+          ph.status,
+          ph.medicine_type
+        FROM Pickup_Task pt
+          LEFT JOIN GMCB_Appointments gc ON pt.NOP = gc.NOP
+          LEFT JOIN Pharmacy_Task ph ON pt.NOP = ph.NOP
+           WHERE date(pt.waiting_pickup_medicine_stamp) = CURRENT_DATE
+           AND (ph.status IS NULL OR 
+       (ph.status != 'completed_pickup_medicine' AND ph.status LIKE '%pickup%'))
+       AND pt.lokasi = ?
+          ORDER BY 
+    COALESCE(pt.called_pickup_medicine_stamp, pt.waiting_pickup_medicine_stamp) ASC;
+      `;
+
+      params = [location]
+      }
+      
+      const [rows] = await conn.execute(query,params);
       return rows;
     } catch (error) {
       throw error;
@@ -167,7 +226,11 @@ class PickupTask {
   const conn = await pool.getConnection(); // ? Explicit connection
 
     try {
-      const query = `
+      let query;
+      let params = [];
+
+      if(location == 'Lantai 1 BPJS'){
+       query = `
     SELECT
           pt.*, 
           da.patient_name,
@@ -178,8 +241,7 @@ class PickupTask {
           da.doctor_name,
           da.status_medicine,
           ph.status,
-          ph.medicine_type,
-          da.farmasi_queue_number
+          ph.medicine_type
         FROM Pickup_Task pt
           LEFT JOIN Doctor_Appointments da ON pt.NOP = da.NOP
           LEFT JOIN Pharmacy_Task ph ON pt.NOP = ph.NOP
@@ -190,7 +252,36 @@ class PickupTask {
           ORDER BY 
     COALESCE(pt.called_pickup_medicine_stamp, pt.waiting_pickup_medicine_stamp) ASC;
       `;
-      const [rows] = await conn.execute(query,[location]);
+      params = [location]
+      }
+      else{
+  query = `
+    SELECT
+          pt.*, 
+          gc.patient_name,
+          gc.sep_no,
+          gc.medical_record_no,
+          gc.queue_number,
+           gc.phone_number,
+          gc.doctor_name,
+          gc.medicine_type as status_medicine,
+          ph.status,
+          ph.medicine_type
+        FROM Pickup_Task pt
+          LEFT JOIN GMCB_Appointments gc ON pt.NOP = gc.NOP
+          LEFT JOIN Pharmacy_Task ph ON pt.NOP = ph.NOP
+           WHERE date(pt.waiting_pickup_medicine_stamp) = CURRENT_DATE
+           AND (ph.status IS NULL OR 
+       (ph.status != 'completed_pickup_medicine' AND ph.status LIKE '%pickup%'))
+       AND pt.lokasi = ?
+          ORDER BY 
+    COALESCE(pt.called_pickup_medicine_stamp, pt.waiting_pickup_medicine_stamp) ASC;
+      `;
+      params = [location]
+
+      }
+      
+      const [rows] = await conn.execute(query,params);
       return rows;
     } catch (error) {
       throw error;
@@ -204,7 +295,10 @@ class PickupTask {
   const conn = await pool.getConnection(); // ? Explicit connection
 
     try {
-      const query = `
+      let query;
+      let params;
+      if(location == 'Lantai 1 BPJS'){
+query = `
         SELECT
           pt.*, 
           da.patient_name,
@@ -228,13 +322,44 @@ class PickupTask {
           ORDER BY 
     COALESCE(pt.called_pickup_medicine_stamp, pt.waiting_pickup_medicine_stamp) ASC;
       `;
-      const values = [
+      params = [
         date,
         location
       ]
       
-      const [rows] = await conn.execute(query,values);
-      console.log("VALUES",values,rows);
+
+      }else{
+        query = `
+        SELECT
+          pt.*, 
+          gc.patient_name,
+          gc.sep_no,
+          gc.medical_record_no,
+          gc.queue_number,
+          gc.medicine_type as status_medicine,
+           gc.phone_number,
+          gc.doctor_name,
+          ph.status,
+          ph.medicine_type
+          
+        FROM Pickup_Task pt
+          LEFT JOIN GMCB_Appointments gc ON pt.NOP = gc.NOP
+          LEFT JOIN Pharmacy_Task ph ON pt.NOP = ph.NOP
+          WHERE date(pt.waiting_pickup_medicine_stamp) = ?
+           AND (ph.status IS NULL OR 
+       (ph.status != 'completed_pickup_medicine' AND ph.status LIKE '%pickup%'))
+              AND pt.lokasi = ?
+
+          ORDER BY 
+    COALESCE(pt.called_pickup_medicine_stamp, pt.waiting_pickup_medicine_stamp) ASC;
+      `;
+      params = [
+        date,
+        location
+      ]
+      }
+      
+      const [rows] = await conn.execute(query,params);
       return rows;
     } catch (error) {
       throw error;

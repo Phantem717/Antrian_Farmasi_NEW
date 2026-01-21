@@ -60,6 +60,14 @@ const DaftarAntrian = ({location, selectedQueueIds, setSelectedQueueIds, onSelec
   const socket = getSocket();
     const [date,setDate]= useState("");
   
+      const getShortLocation = (loc) => {
+    const locationMap = {
+      "Lantai 1 BPJS": "bpjs",
+      "Lantai 1 GMCB": "gmcb",
+      "Lantai 3 GMCB": "lt3"
+    };
+    return locationMap[loc] || loc;
+  };
   // ? Loket yang diizinkan untuk admin verifikasi
   const allowedLokets = ["Loket 2", "Loket 3"];
   // ? Fetch Loket dari API
@@ -83,7 +91,7 @@ const DaftarAntrian = ({location, selectedQueueIds, setSelectedQueueIds, onSelec
       if (activeLoket) {
         setSelectedLoketLocal(prev => prev || activeLoket.loket_name);
         setSelectedLoket(prev => prev || activeLoket.loket_name);
-        console.log("activeLoket.loket_name",activeLoket.loket_name);
+        // console.log("activeLoket.loket_name",activeLoket.loket_name);
       }
     } catch (error) {
       console.error("Error fetching lokets:", error);
@@ -112,14 +120,11 @@ const handleLoketUpdate = () => {
     let response;
     if (date) {
       response = await VerificationAPI.getVerificationTasksByDate(location,new Date(date).toISOString().split('T')[0]);
-      console.log("DATE")
     } else {
       response = await VerificationAPI.getVerificationTasksToday(location);
-      console.log("TODAY");
 
     }
 
-    console.log("RESPONSE", response);
     let filteredQueues = response.data;
 
     // Add status filtering here
@@ -161,10 +166,10 @@ const handleLoketUpdate = () => {
     console.error("Error fetching queue list:", error);
   }
 };
-
 useEffect(() => {
-  if ( !selectedStatus) return;
-  
+  if (!selectedStatus) return;
+       const shortLocation = getShortLocation(location);
+    socket.emit('join_room', { location: shortLocation });
   const fetchData = async () => {
     try {
       await fetchQueueList();
@@ -173,15 +178,62 @@ useEffect(() => {
     }
   };
 
-   fetchData();
-  socket.on('update_daftar_verif',fetchData);
+  fetchData();
+  
+  // ✅ Add listener for get_responses_verif
+  socket.on('get_responses_verif', (payload) => {
+    console.log("📥 [DaftarAntrian_v] Received get_responses_verif:", payload);
+    
+    // Process the payload similar to fetchQueueList
+    if (payload.data && Array.isArray(payload.data)) {
+      let filteredQueues = payload.data;
+      
+      // Apply status filter
+      if (selectedStatus) {
+        filteredQueues = filteredQueues.filter(item => item.status === selectedStatus);
+      }
+      
+      // Sort by timestamp
+      const getEarliestTimestamp = (item) => {
+        const timestamps = [
+          item.waiting_verification_stamp,
+          item.called_verification_stamp,
+          item.recalled_verification_stamp,
+          item.pending_verification_stamp,
+          item.processed_verification_stamp,
+        ]
+          .filter(Boolean)
+          .map((ts) => new Date(ts).getTime());
+        
+        return timestamps.length > 0 ? Math.min(...timestamps) : Infinity;
+      };
+      
+      filteredQueues = filteredQueues.sort(
+        (a, b) => getEarliestTimestamp(a) - getEarliestTimestamp(b)
+      );
+      
+      setRawQueueList(filteredQueues);
+      
+      if (!searchText) {
+        setQueueList(filteredQueues);
+      } else {
+        const filtered = filteredQueues.filter(item =>
+          item.patient_name?.toLowerCase().includes(searchText.toLowerCase())
+        );
+        setQueueList(filtered);
+      }
+    }
+  });
+  
+  socket.on('update_daftar_verif', fetchData);
+  socket.on('insert_appointment', fetchData);
 
-    return () => {
-            socket.off('update_daftar_verif', fetchData);
-        };
-
-
-}, [selectedStatus, selectedLoketLocal, date]);
+  return () => {
+    socket.off('get_responses_verif');
+    socket.off('update_daftar_verif', fetchData);
+    socket.off('insert_appointment', fetchData);
+  };
+}, [selectedStatus, selectedLoketLocal, date, searchText]);
 
 const handleLoketChange = async (loketName) => {
   setSelectedLoket(loketName);
@@ -279,8 +331,8 @@ const handleLoketChange = async (loketName) => {
 
       
       setSelectedQueueIds([]);
-      socket.emit('update_verif');
-      socket.emit('update_display');
+      socket.emit('update_verif',{ location: shortLocation});
+      socket.emit('update_display',{ location: shortLocation});
     } catch (error) {
       console.error("Error deleting tasks:", error);
     }
@@ -542,6 +594,21 @@ Swal.fire({
               {/* <TableCell align="center"><strong>Status</strong></TableCell> */}
               <TableCell align="center"><strong>Status Medicine</strong></TableCell> 
               <TableCell align="center"><strong>Phone Number</strong></TableCell>
+
+              {
+                 location != 'bpjs' && (
+              <TableCell align="center"><strong>Poliklinik</strong></TableCell>
+                )
+              
+              }
+
+              {
+                 location != 'bpjs' && (
+              <TableCell align="center"><strong>Cara Bayar</strong></TableCell>
+                )
+              
+              }
+             
                <TableCell align="center">
                                Timestamp
                               </TableCell>
@@ -599,6 +666,19 @@ return (
       </div>
    
     </TableCell>
+     {
+                 location != 'bpjs' && (
+              <TableCell align="center"><strong>{item.poliklinik}</strong></TableCell>
+                )
+              
+              }
+
+              {
+                 location != 'bpjs' && (
+              <TableCell align="center"><strong>{item.payment_type}</strong></TableCell>
+                )
+              
+              }
      <TableCell align="center" style={{ fontWeight: 'bold' }} className='font-bold'>
      {item.waiting_verification_stamp 
                       ? dayjs(item.waiting_verification_stamp , "YYYY-MM-DD HH:mm:ss").format("DD MMM YYYY HH:mm")

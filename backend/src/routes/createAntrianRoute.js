@@ -2,10 +2,12 @@
 const express = require('express');
 const router = express.Router();
 
-const {createAntrian} = require('../controllers/createAntrianFarmasiController');
+const {createAntrian,createAntrianGMCB} = require('../controllers/createAntrianFarmasiController');
 
 // Route untuk mengecek queue
 // Endpoint: GET /api/medapp/queue/check?booking_id={id}
+router.post('/GMCB', createAntrianGMCB);
+
 router.post('/:medicineType/:lokasi', createAntrian);
 
 module.exports = router;
