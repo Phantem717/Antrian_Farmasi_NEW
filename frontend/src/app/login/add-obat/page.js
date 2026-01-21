@@ -6,11 +6,7 @@ import { Layout, Button, Input, Typography, Form } from "antd";
 import Header from "@/app/component/Header";
 import MovingText from "@/app/component/bpjs/admin-verif/Movingtext_v";
 import Sidebar from "@/app/component/Sidebar-b";
-<<<<<<< HEAD
-import DoctorAppointmentAPI from "@/app/utils/api/Doctor_Appoinment";
-=======
 import GMCBAppointmentAPI from "@/app/utils/api/GMCB_Appointment";
->>>>>>> main
 import CheckRegistrationAPI from "@/app/utils/api/checkRegistrationInfo";
 import PharmacyAPI from "@/app/utils/api/Pharmacy";        // ✅ make sure these exist
 import VerificationAPI from "@/app/utils/api/Verification"; // ✅
@@ -20,29 +16,12 @@ import PrintAntrian from "@/app/utils/api/printAntrian";
 import BPJSBarcodeAPI from "@/app/utils/api/BPJS_Barcode";
 import { getSocket } from "@/app/utils/api/socket";
 const AddObat = () => {
-<<<<<<< HEAD
-=======
-
->>>>>>> main
   const { Content } = Layout;
   const [collapsed, setCollapsed] = useState(false);
   const siderWidth = collapsed ? 80 : 300;
   const socket = getSocket();
   const [name, setName] = useState("");
   const [inputValue, setInputValue] = useState("");
-<<<<<<< HEAD
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [NOP, setNOP] = useState("");
-  const [NIK, setNIK] = useState("");
-  const [DOB, setDOB] = useState("");
-  const [docter, setDocter] = useState("");
-  const [PRB, setPRB] = useState("");
-  const [medical_record_no, setMedical_record_no] = useState("");
-  const [totalMedicine, setTotalMedicine] = useState(0);
-  const [medType,setMedType] = useState("");
-  const [queueNumber,setQueueNumber] = useState("")
-=======
->>>>>>> main
   const inputRef = useRef(null);
 
   async function clearField() {
@@ -54,27 +33,6 @@ const AddObat = () => {
   async function insertAll(payload) {
     console.log("PAYlOAD", payload);
     const appointmentData = {
-<<<<<<< HEAD
-      sep_no: payload.sep_no || "-",
-      queue_number: payload.queue_number,
-      queue_status: payload.queue_status,
-      queue_type: payload.queue_type,
-      patient_name: payload.patient_name,
-      medical_record_no: payload.medical_record_no,
-      patient_date_of_birth: payload.patient_date_of_birth,
-      status_medicine: payload.status_medicine,
-      lokasi: payload.location,
-      phone_number: payload.phone_number,
-      doctor_name: payload.doctor_name,
-      nik: payload.nik,
-      farmasi_queue_number: payload.farmasi_queue_number,
-      NOP: payload.NOP,
-      PRB: payload.PRB,
-      total_medicine: payload.total_medicine,
-    };
-
-    console.log("APPOINTMENT DATA",appointmentData);
-=======
    sep_no: payload.sep_no || "-",
       queue_number: payload.queue_number || "-",
       queue_status: payload.queue_status  || "-",
@@ -96,7 +54,6 @@ const AddObat = () => {
 
     try {
         console.log("APPOINTMENT DATA",appointmentData);
->>>>>>> main
 
     const pharmacyPayload = {
       NOP: payload.NOP,
@@ -116,15 +73,6 @@ const AddObat = () => {
         console.log("PHARMACY DATA",pharmacyPayload);
 
     const [doctorAppointment, pharmacyData] = await Promise.all([
-<<<<<<< HEAD
-      DoctorAppointmentAPI.createAppointment(appointmentData),
-      PharmacyAPI.createPharmacyTask(pharmacyPayload),
-    ]);
-
-    const verificationData = await VerificationAPI.createVerificationTask(taskData);
-
-    return { doctorAppointment, pharmacyData, verificationData };
-=======
       GMCBAppointmentAPI.createAppointment(appointmentData),
       PharmacyAPI.createPharmacyTask(pharmacyPayload),
     ]);
@@ -156,7 +104,6 @@ const AddObat = () => {
     throw new Error('Failed to create records, Silakan coba lagi');
     }
   
->>>>>>> main
   }
 
   async function handleSubmit() {
@@ -171,30 +118,11 @@ const AddObat = () => {
       const data = await CheckRegistrationAPI.checkQueue(dataNOP.RegistrationNo);
       console.log("RESPONSE",response, data);
       // ✅ setState normally
-<<<<<<< HEAD
-      setName(data.PatientName);
-      setDOB(data.DateOfBirth);
-      setNIK(data.SSN);
-      setMedical_record_no(data.MedicalNo);
-      setPhoneNumber(data.MobilePhoneNo1);
-      setDocter(data.ParamedicName);
-      setPRB(data.ProlanisPRB);
-      setNOP(data.RegistrationNo);
-=======
->>>>>>> main
 
       Swal.fire({
         title: "Konfirmasi Data Pasien",
         html: `
           <div style="text-align: left; line-height: 1.8;" class="flex justify-center flex-col">
-<<<<<<< HEAD
-            <div class="font-bold text-lg"><strong>NOP:</strong> 🆔 ${data.RegistrationNo || "-"}</div>
-            <div class="font-bold text-lg"><strong>Patient Name:</strong> 👤 ${data.PatientName || "-"}</div>
-            <div class="font-bold text-lg"<strong>Dokter:</strong> 🩺 ${data.ParamedicName || "-"}</div>
-            <div class="font-bold text-lg"><strong>No. RM:</strong> 🚑 ${data.MedicalNo || "-"}</div>
-            <div class="font-bold text-lg"><strong>Phone Number:</strong> 📱 ${data.MobilePhoneNo1 || "-"}</div>
-            <div class="font-bold text-lg"><strong>NIK:</strong> 🆔 ${data.SSN || "-"}</div>
-=======
                    <div class="font-bold text-lg"><strong>NOP:</strong> 🆔 ${data.RegistrationNo || "-"}</div>
             <div class="font-bold text-lg"><strong>Patient Name:</strong> 👤 ${data.PatientName || "-"}</div>
             <div class="font-bold text-lg"><strong>Dokter:</strong> 🩺 ${data.ParamedicName || "-"}</div>
@@ -205,7 +133,6 @@ const AddObat = () => {
             <div class="font-bold text-lg"><strong>Service Unit Name:</strong> 👨‍⚕️ ${data.ServiceUnitName || "-"}</div>
             <div class="font-bold text-lg"><strong>Is Paid:</strong> 💰 ${data.LastPaymentDate == 1 ? "true" : "false" || "-"}</div>
 
->>>>>>> main
             
             <div style="margin-top: 20px;">
               <label style="font-weight: bold; display: block; margin-bottom: 8px;">
@@ -242,50 +169,14 @@ const AddObat = () => {
                 
                 // 2. Determine med_type locally
                 let med_type_local = (med_type_resp.message == "Tidak ada racikan") ? "Non - Racikan" : "Racikan";
-<<<<<<< HEAD
-
-                // 3. Create Queue and get queue number
-                const create_antrian_resp = await CreateAntrianAPI.createAntrian(med_type_local, apiLokasi);
-=======
                 let total_medicine = med_type_resp.data?.length ?? 0 ;
                 const origin = data.ServiceUnitName;
                 // 3. Create Queue and get queue number
                 const create_antrian_resp = await CreateAntrianAPI.createAntrianGMCB(med_type_local, apiLokasi,origin);
->>>>>>> main
                 const queueData = create_antrian_resp.data;
                 const queueNumber_local = queueData.data.queue_number;
                 console.log("QUEUE",queueData,queueNumber_local);
                 // 4. Update State (Optional, for UI display only)
-<<<<<<< HEAD
-                setMedType(med_type_local);
-                setQueueNumber(queueNumber_local);
-
-                // 5. CRITICAL: Build payload using LOCAL/IMMEDIATE variables
-                const payload = {
-                    queue_status: "Menunggu",
-                    queue_type: "Dokter",
-                    NOP: data.RegistrationNo,
-                    patient_name: data.PatientName,
-                    patient_date_of_birth: data.DateOfBirth,
-                    nik: data.SSN,
-                    medical_record_no: data.MedicalNo,
-                    phone_number: data.MobilePhoneNo1,
-                    doctor_name: data.ParamedicName,
-                    PRB: data.ProlanisPRB,
-                    
-                    // ✅ USE LOCAL VARIABLES
-                    status_medicine: med_type_local, 
-                    location: selectedLokasi,
-                    queue_number: queueNumber_local, // ✅ USE LOCAL VARIABLE
-                    farmasi_queue_number: queueNumber_local, // ✅ USE LOCAL VARIABLE
-                    total_medicine: 0,
-                };
-
-                
-
-
-                
-=======
          
                 // 5. CRITICAL: Build payload using LOCAL/IMMEDIATE variables
                 const payload = {
@@ -308,7 +199,6 @@ const AddObat = () => {
               poliklinik: data.ServiceUnitName
                 };
 
->>>>>>> main
                 return payload; // Return the fully constructed payload
             } catch (error) {
                 console.error("Error saat memproses:", error);
@@ -323,11 +213,7 @@ const AddObat = () => {
             const WAPayload = {
             phone_number: resultData.phone_number ?? "-",
             NOP: resultData.NOP ?? "-",
-<<<<<<< HEAD
-            docter: resultData.doctor_name??"-",
-=======
             docter: resultData.ParamedicName??"-",
->>>>>>> main
             nik: resultData.nik??"-",
             sep: "-",
             barcode: resultData.NOP ?? "-",
@@ -358,19 +244,10 @@ const AddObat = () => {
             lokasi: location
         }
             await insertAll(resultData);
-<<<<<<< HEAD
             const print_wa = await Promise.all([WA_API.sendWAAntrian(WAPayload),PrintAntrian.printAntrian(printPayload)]);
             console.log("PRINT_WA",print_wa);
             Swal.fire("Success!", "Data berhasil disimpan", "success");
-
-            socket.emit('update_verif',{location});
-            socket.emit('update_display',{location});
-=======
-            // const print_wa = await Promise.all([WA_API.sendWAAntrian(WAPayload),PrintAntrian.printAntrian(printPayload)]);
-            // console.log("PRINT_WA",print_wa);
-            Swal.fire("Success!", "Data berhasil disimpan", "success");
      
->>>>>>> main
 
           } catch (error) {
             console.error("Error:", error);

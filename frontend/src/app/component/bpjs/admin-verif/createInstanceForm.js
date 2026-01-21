@@ -370,12 +370,12 @@ const barcode = inputValue.replace(/\s+/g, ""); // Removes ALL whitespace
       socket.emit('update_verif',{location});
       socket.emit('update_display',{location});
 
-      // console.log("SEND WA_ANTRIAN", new Date().toISOString().split('T')[0]);
-      // const WARESP =await WA_API.sendWAAntrian(WAPayload);
-      // const PRINTRESP= await PrintAntrian.printAntrian(printPayload);
-      //             await new Promise(resolve => setTimeout(resolve, 1000)); // 1-second delay
+      console.log("SEND WA_ANTRIAN", new Date().toISOString().split('T')[0]);
+      const WARESP =await WA_API.sendWAAntrian(WAPayload);
+      const PRINTRESP= await PrintAntrian.printAntrian(printPayload);
+                  await new Promise(resolve => setTimeout(resolve, 1000)); // 1-second delay
 
-      // console.log("RESP ERROR",WARESP.data,PRINTRESP.data)
+      console.log("RESP ERROR",WARESP.data,PRINTRESP.data)
      
 
 

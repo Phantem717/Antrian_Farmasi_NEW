@@ -346,8 +346,8 @@ const PilihAksi = ({location, selectedQueueIds = [], setSelectedQueueIds, select
 
         // === 6. Send WA notification
         console.log("Sending WA notification:", waPayload, printPayload);
-        // const sendResponse = await WA_API.sendWAVerif(waPayload);
-        // console.log("WA sent:", sendResponse);
+        const sendResponse = await WA_API.sendWAVerif(waPayload);
+        console.log("WA sent:", sendResponse);
 
         // Delay before printing
         await new Promise(resolve => setTimeout(resolve, 1000));

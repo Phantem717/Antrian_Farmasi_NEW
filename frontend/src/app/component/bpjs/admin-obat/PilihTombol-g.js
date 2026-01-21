@@ -160,8 +160,10 @@ const PilihAksiG = ({ location, selectedQueue, selectedQueueIds = [], setSelecte
               data: payload
             });
           }
+             const sendResponse = await WA_API.sendWAPickup(payload);
+            await new Promise(resolve => setTimeout(resolve, 1000)); // 1-second delay
 
-          await new Promise(resolve => setTimeout(resolve, 1000));
+            console.log("WA SENT",sendResponse); 
         }
       }
 
