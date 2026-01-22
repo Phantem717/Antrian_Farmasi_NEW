@@ -64,3 +64,5 @@ networks:
 
 volumes:
   mysql_data:
+    external: true
+    name: backend_mysql_data_farmasi

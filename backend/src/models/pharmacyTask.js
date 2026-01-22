@@ -167,7 +167,7 @@ SELECT
   pt.status,
   pt.medicine_type
 FROM Pharmacy_Task pt
-JOIN gmcb_Appointments gc ON pt.NOP = gc.NOP
+JOIN gmcb_appointments gc ON pt.NOP = gc.NOP
 WHERE pt.status = ?
   AND pt.lokasi = ?
 
@@ -242,7 +242,7 @@ SELECT
   pt.status,
   pt.medicine_type
 FROM Pharmacy_Task pt
-JOIN gmcb_Appointments gc ON pt.NOP = gc.NOP
+JOIN gmcb_appointments gc ON pt.NOP = gc.NOP
       JOIN Verification_Task vt ON pt.NOP = vt.NOP
       WHERE date(vt.waiting_verification_stamp) = CURRENT_DATE
   AND pt.lokasi = ?
