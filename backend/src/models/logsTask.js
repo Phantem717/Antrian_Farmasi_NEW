@@ -112,7 +112,7 @@ static async getToday(location) {
               END
             ) / 60.0, 1
           ) AS verification_to_pickup_minutes
-        FROM GMCB_Appointments gc
+        FROM gmcb_appointments gc
         LEFT JOIN Verification_Task vt ON gc.NOP = vt.NOP
         LEFT JOIN Pharmacy_Task pt ON gc.NOP = pt.NOP
         LEFT JOIN Medicine_Task mt ON gc.NOP = mt.NOP
@@ -327,7 +327,7 @@ static async getByTimePeriod(location,period) {
                     ELSE pa.completed_pickup_medicine_stamp
                 END
             ) AS verification_to_pickup_minutes
-        FROM GMCB_Appointments gc
+        FROM gmcb_appointments gc
         LEFT JOIN Verification_Task vt ON gc.NOP = vt.NOP
         LEFT JOIN Pharmacy_Task pt ON gc.NOP = pt.NOP
         LEFT JOIN Medicine_Task mt ON gc.NOP = mt.NOP
@@ -487,7 +487,7 @@ params = [date,location];
         END
     ) AS verification_to_pickup_minutes
     
-FROM GMCB_Appointments gc
+FROM gmcb_appointments gc
 LEFT JOIN Verification_Task vt ON gc.NOP = vt.NOP
 LEFT JOIN Pharmacy_Task pt ON gc.NOP = pt.NOP
 LEFT JOIN Medicine_Task mt ON gc.NOP = mt.NOP
