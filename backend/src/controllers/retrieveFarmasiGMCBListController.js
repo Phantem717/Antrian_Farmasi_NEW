@@ -136,7 +136,7 @@ const getFarmasiList = async (req, res) => {
         medical_record_no: farmasiArray.payload.medical_record_no ?? null,
         patient_date_of_birth: farmasiArray.payload?.patient_date_of_birth ?? null,
         statusMedicine: statusMedicine,
-        location: "Lantai 1 BPJS",
+        location: "Lantai 1 GMCB",
         phone_number: farmasiArray.payload.phone_number ?? null,
         doctor_name: farmasiArray.payload.doctor_name ?? null,
         nik: farmasiArray.payload.nik ?? "-",
@@ -161,7 +161,7 @@ const getFarmasiList = async (req, res) => {
         patient_name: farmasiArray.payload.patient_name ?? "-",
         farmasi_queue_number: farmasiArray.payload.farmasi_queue_number ?? "-",
         medicine_type: statusMedicine ?? "-",
-        lokasi: "Lantai 1 BPJS",
+        lokasi: "Lantai 1 GMCB",
         SEP: farmasiArray.payload.sep_no ?? "-",
         tanggal_lahir: farmasiArray.payload?.patient_date_of_birth ?? null,
         queue_number: farmasiArray.payload.farmasi_queue_number ?? null,
@@ -189,7 +189,7 @@ const getFarmasiList = async (req, res) => {
             nik:  farmasiArray.payload.nik || "-",
             prev_queue_number: "-",
             switch_WA: "true",
-            location: "Lantai 1 BPJS"
+            location: "Lantai 1 GMCB"
 
         };
             const waResp = await sendWAAntrian(wa_payload);
@@ -209,7 +209,7 @@ const print = await retryOperation(
       }
 
     
-      const data = await getAllResponses("Lantai 1 BPJS");
+      const data = await getAllResponses("Lantai 1 GMCB");
 
        io.emit('insert_appointment', {
 
@@ -235,6 +235,7 @@ const print = await retryOperation(
     return res.status(500).json({ message: 'Internal server error', error: error.message });
   }
 }
+
 
 module.exports = {
   getFarmasiList

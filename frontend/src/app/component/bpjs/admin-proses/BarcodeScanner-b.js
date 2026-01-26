@@ -43,6 +43,7 @@ export default function BarcodeScanner({location, onScanResult }) {
     
         fetchDaftarAntrianList();
 
+
         // Set up socket listeners
         socket.on('update_daftar_pickup', fetchDaftarAntrianList,console.log("UPDATED VERIF PROSES"));
         socket.on('update_display', () => console.log("EMIT UPDATE"));

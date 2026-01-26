@@ -155,20 +155,20 @@ const getFarmasiList = async (req, res) => {
       result = await insertAll(payload);
       existingDoctorAppointment = result.doctorAppointment;
 
-      // const printPayload = {
-      //   phone_number: farmasiArray.payload.phone_number ?? "-",
-      //   barcode: farmasiArray.payload.id ?? "-",
-      //   patient_name: farmasiArray.payload.patient_name ?? "-",
-      //   farmasi_queue_number: farmasiArray.payload.farmasi_queue_number ?? "-",
-      //   medicine_type: statusMedicine ?? "-",
-      //   lokasi: "Lantai 1 GMCB",
-      //   SEP: farmasiArray.payload.sep_no ?? "-",
-      //   tanggal_lahir: farmasiArray.payload?.patient_date_of_birth ?? null,
-      //   queue_number: farmasiArray.payload.farmasi_queue_number ?? null,
-      //   PRB: farmasiArray.payload.PRB ?? null,
-      //   doctor_name: farmasiArray.payload.doctor_name ?? null
-      // }
- 
+      const printPayload = {
+        phone_number: farmasiArray.payload.phone_number ?? "-",
+        barcode: farmasiArray.payload.id ?? "-",
+        patient_name: farmasiArray.payload.patient_name ?? "-",
+        farmasi_queue_number: farmasiArray.payload.farmasi_queue_number ?? "-",
+        medicine_type: statusMedicine ?? "-",
+        lokasi: "Lantai 1 GMCB",
+        SEP: farmasiArray.payload.sep_no ?? "-",
+        tanggal_lahir: farmasiArray.payload?.patient_date_of_birth ?? null,
+        queue_number: farmasiArray.payload.farmasi_queue_number ?? null,
+        PRB: farmasiArray.payload.PRB ?? null,
+        doctor_name: farmasiArray.payload.doctor_name ?? null
+      }
+      
 // const print = await retryOperation(
 //     () => printAntrianFarmasi(printPayload),
 //     3, // max retries

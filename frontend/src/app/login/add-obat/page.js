@@ -234,14 +234,14 @@ const AddObat = () => {
             nik: resultData.nik??"-",
             barcode: resultData.NOP ?? "-",
             patient_name: resultData.patient_name ?? "-",
-            farmasi_queue_number: resultData.queue_number ?? "-",
-            medicine_type: resultData.status_medicine ?? "-",
-            SEP:  "-",
+            medicine_type: resultData.statusMedicine ?? "-",
+            SEP:  resultData.sep_no ?? "-",
             tanggal_lahir:  new Date(resultData.patient_date_of_birth).toISOString().split('T')[0]??"-",
             queue_number: resultData.queue_number  ?? null,
-            PRB: resultData.PRB,
             switch_WA: localStorage.getItem('waToggleState') || "true",
-            lokasi: location
+            lokasi: location,
+            poliklinik: resultData.poliklinik ?? "-"
+      
         }
             await insertAll(resultData);
             const print_wa = await Promise.all([WA_API.sendWAAntrian(WAPayload),PrintAntrian.printAntrian(printPayload)]);

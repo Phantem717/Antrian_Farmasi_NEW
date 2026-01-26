@@ -64,7 +64,11 @@ useEffect(() => {
     
     inputRef.current.focus();
     fetchQueueList();
-
+    
+        socket.on('insert_appointment', (data) => {
+        console.log("📥 New appointment inserted:", data);
+        fetchQueueList(); // ✅ Changed from fetchDaftarAntrianList
+    });
     // ✅ Listen to the correct socket event
     const handleVerifUpdate = (payload) => {
         console.log("📥 [BarcodeScanner] Received get_responses_verif:", payload);

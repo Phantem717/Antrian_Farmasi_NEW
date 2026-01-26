@@ -448,7 +448,6 @@ const PilihAksi = ({location, selectedQueueIds = [], setSelectedQueueIds, select
               console.log("RESP",resp);
 
         }
-
   }
 
   const handleUpdateStatus = async (NOP) => {

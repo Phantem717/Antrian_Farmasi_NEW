@@ -153,15 +153,19 @@ const getFarmasiList = async (req, res) => {
         phone_number: farmasiArray.payload.phone_number ?? "-",
         barcode: farmasiArray.payload.NOP ?? "-",
         patient_name: farmasiArray.payload.patient_name ?? "-",
-        farmasi_queue_number: farmasiArray.payload.farmasi_queue_number ?? "-",
         medicine_type: statusMedicine ?? "-",
         lokasi: "Lantai 1 GMCB",
         SEP: farmasiArray.payload.sep_no ?? "-",
         tanggal_lahir: farmasiArray.payload?.patient_date_of_birth ?? null,
         queue_number: farmasiArray.payload.farmasi_queue_number ?? null,
-        PRB: farmasiArray.payload.PRB ?? null,
-        doctor_name: farmasiArray.payload.doctor_name ?? null
+        doctor_name: farmasiArray.payload.doctor_name ?? null,
+        nik: farmasiArray.payload.nik ?? "-",
+        payment_type: farmasiArray.payload.payment_type ?? null,
+        isPaid: farmasiArray.payload.isPaid ?? false,
+        location_from: farmasiArray.payload.location_from ?? null,
+        poliklinik: farmasiArray.payload.poliklinik ?? null
       }
+
       let new_phone_number;
         if (farmasiArray.payload.phone_number.startsWith("0")) {
       new_phone_number = "62" + farmasiArray.payload.phone_number.slice(1);
@@ -213,7 +217,14 @@ const getFarmasiList = async (req, res) => {
   });
     }
   
+          io.to(roomName).emit('update_daftar_verif', { // ✅ Add this
+  message: 'New appointment added',
+  data: data
+});
 
+io.to(roomName).emit('get_responses_verif', { // ✅ Add this
+  data: data
+});
 
     return res.status(201).json({
       message: "Data berhasil diproses",
@@ -230,6 +241,10 @@ const getFarmasiList = async (req, res) => {
     return res.status(500).json({ message: 'Internal server error', error: error.message });
   }
 }
+
+
+
+
 
 module.exports = {
   getFarmasiList

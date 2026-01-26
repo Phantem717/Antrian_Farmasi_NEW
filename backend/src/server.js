@@ -78,7 +78,7 @@ app.use('/api/GMCB-appointment',GMCBListRoute);
 app.use('/api/GMCB-temp',GMCBTempRoutes);
   // Menjalankan server pada semua network interfaces
   const PORT = process.env.PORT || 5000;
-  const HOST =  '0.0.0.0'
+  const HOST =  '172.16.158.22'
   server.listen(PORT,HOST, () => {
     console.log(`✅ Server berjalan pada ${PORT}`,loginRoutes);
   });

@@ -211,7 +211,15 @@ const getFarmasiList = async (req, res) => {
         message: 'Doctor Created Successfully',
         data: data
       });
-      
+      io.to(roomName).emit('update_daftar_verif', { // ✅ Add this
+  message: 'New appointment added',
+  data: data
+});
+
+io.to(roomName).emit('get_responses_verif', { // ✅ Add this
+  data: data
+});
+
       console.log(`📤 Sent insert_appointment to room: ${roomName}`);
     }
 

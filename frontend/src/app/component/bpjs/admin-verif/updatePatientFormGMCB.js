@@ -11,7 +11,7 @@ import DoctorAppointmentAPI from "@/app/utils/api/Doctor_Appoinment";
 import WA_API from "@/app/utils/api/WA";
 import { getSocket } from "@/app/utils/api/socket";
 import { updateButtonStatus } from "@/app/utils/api/Button";
-
+import PrintAntrian from "@/app/utils/api/printAntrian";
 export default function BarcodeScanner({selectedQueue,location, onScanResult, handleBulkPharmacyUpdate }) {
     const [inputValue, setInputValue] = useState("");
     const [daftarAntrian, setDaftarAntrian] = useState([]);
@@ -139,13 +139,35 @@ useEffect(() => {
 
         };
 
+        
+           const printPayload = {
+            phone_number: phoneNumber ?? "-",
+            NOP: inputValue ?? "-",
+            doctor_name: docter??"-",
+            nik: NIK??"-",
+            barcode: inputValue ?? "-",
+            patient_name:  name ?? "-",
+            medicine_type: medType ?? "-",
+            SEP:  SEP ?? "-",
+            tanggal_lahir: new Date(DOB).toISOString().split('T')[0] ?? "-",
+            queue_number: queueNumberData.data.queue_number ?? null,
+            switch_WA: localStorage.getItem('waToggleState') || "true",
+            lokasi: location,
+                   payment_type: payment_type,
+        location_from: location_from,
+        isPaid: LastPayment,
+        poliklinik: location_from
+        }
+
         // Send WA notification with retry
                 setDaftarAntrian(prev => prev.filter(item => item.NOP !== NOP));
             console.log("WA_PAYLOAD1",payload)
 
         const sendResponse = await retryOperation(() => WA_API.sendWAVerif(payload));
         console.log("WA response:", sendResponse);
-
+             const PRINTRESP= await PrintAntrian.printAntrian(printPayload);
+                          await new Promise(resolve => setTimeout(resolve, 1000)); // 1-second delay
+        
         // Emit socket events
        
         // Update local state by removing processed item
