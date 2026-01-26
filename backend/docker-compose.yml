@@ -31,6 +31,9 @@ services:
       - DB_USER=root
       - DB_PASSWORD=secret
       - DB_NAME=farmasi_queue_db
+      - MYSQL_USER=root
+      - MYSQL_ROOT_PASSWORD=secret
+      - MYSQL_DATABASE=farmasi_queue_db
       - API_URL_WA=https://carolus.3dolphins.ai:9443/dolphin/apiv1/graph/broadcast/whatsapp
       - WA_TOKEN=Basic YXBpQGlubW90aW9uLmNvLmlkOmFkbWluQERvbHBoaW4xMjM=
     depends_on:
@@ -43,3 +46,23 @@ services:
   db:
     image: mysql:8.0
     container_name: mysql_container_farmasi
+    networks:
+      - farmasi_network
+    environment:
+      - MYSQL_ROOT_PASSWORD=secret
+      - MYSQL_DATABASE=farmasi_queue_db
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+  
+networks:
+  farmasi_network:
+    driver: bridge
+
+volumes:
+  mysql_data:
+    external: true
+    name: backend_mysql_data_farmasi

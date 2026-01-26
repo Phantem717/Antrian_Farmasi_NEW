@@ -226,6 +226,10 @@ io.to(roomName).emit('get_responses_verif', { // ✅ Add this
   data: data
 });
 
+io.to(roomName).emit('get_responses_verif', { // ✅ Add this
+  data: data
+});
+
     return res.status(201).json({
       message: "Data berhasil diproses",
       doctor_appointment: existingDoctorAppointment,

@@ -64,7 +64,6 @@ useEffect(() => {
     
     inputRef.current.focus();
     fetchQueueList();
-    
         socket.on('insert_appointment', (data) => {
         console.log("📥 New appointment inserted:", data);
         fetchQueueList(); // ✅ Changed from fetchDaftarAntrianList
