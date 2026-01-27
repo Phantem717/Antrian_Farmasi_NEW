@@ -216,6 +216,7 @@ const getFarmasiList = async (req, res) => {
     data: data
   });
     }
+      const roomName = 'room_gmcb'; // Since location is "Lantai 1 BPJS"
   
           io.to(roomName).emit('update_daftar_verif', { // ✅ Add this
   message: 'New appointment added',
