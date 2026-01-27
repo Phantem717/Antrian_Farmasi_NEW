@@ -209,15 +209,16 @@ const getFarmasiList = async (req, res) => {
 
     
       const data = await getAllResponses("Lantai 1 GMCB");
+      const roomName = 'room_gmcb'; // Since location is "Lantai 1 BPJS"
 
        io.emit('insert_appointment', {
 
     message: 'Doctor Created Successfully',
     data: data
   });
-    }
+
   
-          io.to(roomName).emit('update_daftar_verif', { // ✅ Add this
+  io.to(roomName).emit('update_daftar_verif', { // ✅ Add this
   message: 'New appointment added',
   data: data
 });
@@ -226,10 +227,10 @@ io.to(roomName).emit('get_responses_verif', { // ✅ Add this
   data: data
 });
 
-io.to(roomName).emit('get_responses_verif', { // ✅ Add this
-  data: data
-});
 
+
+    }
+  
     return res.status(201).json({
       message: "Data berhasil diproses",
       doctor_appointment: existingDoctorAppointment,
