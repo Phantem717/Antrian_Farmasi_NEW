@@ -216,7 +216,6 @@ const getFarmasiList = async (req, res) => {
     message: 'Doctor Created Successfully',
     data: data
   });
-
   
   io.to(roomName).emit('update_daftar_verif', { // ✅ Add this
   message: 'New appointment added',

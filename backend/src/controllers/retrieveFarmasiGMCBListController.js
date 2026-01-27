@@ -210,6 +210,7 @@ const print = await retryOperation(
 
     
       const data = await getAllResponses("Lantai 1 GMCB");
+      const roomName = 'room_gmcb'; // Since location is "Lantai 1 BPJS"
 
        io.emit('insert_appointment', {
 
