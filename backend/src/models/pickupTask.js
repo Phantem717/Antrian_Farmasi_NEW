@@ -97,7 +97,7 @@ class PickupTask {
           ph.status,
           ph.medicine_type
         FROM Pickup_Task pt
-          LEFT JOIN GMCB_Appointments gc ON pt.NOP = gc.NOP
+          LEFT JOIN gmcb_appointments gc ON pt.NOP = gc.NOP
           LEFT JOIN Pharmacy_Task ph ON pt.NOP = ph.NOP
         WHERE pt.NOP = ?
       `;
