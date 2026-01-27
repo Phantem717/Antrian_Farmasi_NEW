@@ -217,7 +217,7 @@ AND (pt.status IS NULL OR
           pt.medicine_type,
           gc.isPaid
         FROM Medicine_Task mt
-        LEFT JOIN GMCB_appointments gc ON mt.NOP = gc.NOP
+        LEFT JOIN gmcb_appointments gc ON mt.NOP = gc.NOP
         LEFT JOIN Pharmacy_Task pt ON mt.NOP = pt.NOP
         WHERE date(mt.waiting_medicine_stamp) = CURRENT_DATE
 AND (pt.status IS NULL OR 

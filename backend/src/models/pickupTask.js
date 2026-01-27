@@ -199,7 +199,7 @@ query = `
           ph.status,
           ph.medicine_type
         FROM Pickup_Task pt
-          LEFT JOIN GMCB_Appointments gc ON pt.NOP = gc.NOP
+          LEFT JOIN gmcb_appointments gc ON pt.NOP = gc.NOP
           LEFT JOIN Pharmacy_Task ph ON pt.NOP = ph.NOP
            WHERE date(pt.waiting_pickup_medicine_stamp) = CURRENT_DATE
            AND (ph.status IS NULL OR 
@@ -268,7 +268,7 @@ query = `
           ph.status,
           ph.medicine_type
         FROM Pickup_Task pt
-          LEFT JOIN GMCB_Appointments gc ON pt.NOP = gc.NOP
+          LEFT JOIN gmcb_appointments gc ON pt.NOP = gc.NOP
           LEFT JOIN Pharmacy_Task ph ON pt.NOP = ph.NOP
            WHERE date(pt.waiting_pickup_medicine_stamp) = CURRENT_DATE
            AND (ph.status IS NULL OR 
@@ -343,7 +343,7 @@ query = `
           ph.medicine_type
           
         FROM Pickup_Task pt
-          LEFT JOIN GMCB_Appointments gc ON pt.NOP = gc.NOP
+          LEFT JOIN gmcb_appointments gc ON pt.NOP = gc.NOP
           LEFT JOIN Pharmacy_Task ph ON pt.NOP = ph.NOP
           WHERE date(pt.waiting_pickup_medicine_stamp) = ?
            AND (ph.status IS NULL OR 

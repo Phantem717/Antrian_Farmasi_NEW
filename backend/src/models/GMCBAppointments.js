@@ -342,7 +342,7 @@ static async updatePaymentStatus(NOP, isPaid) {
   
       try {
         const query = `
-          UPDATE GMCB_Appointments 
+          UPDATE gmcb_appointments 
           SET isPaid = ?
           WHERE NOP = ?
         `;
