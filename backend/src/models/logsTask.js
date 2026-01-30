@@ -374,7 +374,7 @@ static async getByTimePeriod(location,period) {
         LEFT JOIN Verification_Task vt ON gt.id = vt.NOP
         LEFT JOIN Pharmacy_Task pt ON gt.id = pt.NOP
         LEFT JOIN Medicine_Task mt ON gt.id = mt.NOP
-        LEFT JOIN Pickup_Task pa ON gc.id = pa.NOP
+        LEFT JOIN Pickup_Task pa ON gt.id = pa.NOP
         WHERE ${dateCondition}
         AND
         pt.lokasi = ?
@@ -559,7 +559,12 @@ params = [date,location,date,location];
   const conn = await pool.getConnection(); // ? Explicit connection
 
     try {
-      const query = `  
+        let query;
+  let params=[];
+      console.log("LOCATION1",location);
+
+      if(location == 'Lantai 1 BPJS'){
+    query = `  
       SELECT 
     da.status_medicine,
     COUNT(DISTINCT da.NOP) as booking_count
@@ -573,7 +578,30 @@ LEFT JOIN Pickup_Task pa ON da.NOP = pa.NOP
 WHERE pt.medicine_type LIKE 'Non - Racikan' OR pt.medicine_type LIKE 'Racikan'
 AND pt.lokasi = ?
 GROUP BY da.status_medicine`;
-          const [rows] = await conn.execute(query,[location]);
+params = [location]
+      }
+      else{
+          query = `  
+      SELECT 
+    gc.medicine_type as status_medicine,
+    COUNT(DISTINCT gc.NOP) as booking_count
+
+FROM gmcb_appointments gc
+LEFT JOIN Verification_Task vt ON gc.NOP = vt.NOP
+LEFT JOIN Pharmacy_Task pt ON gc.NOP = pt.NOP
+LEFT JOIN Medicine_Task mt ON gc.NOP = mt.NOP
+LEFT JOIN Pickup_Task pa ON gc.NOP = pa.NOP
+
+WHERE pt.medicine_type LIKE 'Non - Racikan' OR pt.medicine_type LIKE 'Racikan'
+AND pt.lokasi = ?
+GROUP BY gc.medicine_type`;
+
+params = [location]
+
+      }
+   
+          const [rows] = await conn.execute(query,params);
+          console.log("ROW",rows);
           return rows;
     } catch (error) {
       return error;
@@ -586,9 +614,14 @@ GROUP BY da.status_medicine`;
    static async getTodayMedicineType(location){
   const pool = await getDb();
   const conn = await pool.getConnection(); // ? Explicit connection
-
+ 
     try {
-      const query = `  
+              let query;
+  let params=[];
+      console.log("LOCATION1",location);
+
+      if(location == 'Lantai 1 BPJS'){
+        query = `  
       SELECT 
     AVG(CASE WHEN da.status_medicine = 'Racikan' 
              THEN TIMESTAMPDIFF(MINUTE, vt.waiting_verification_stamp, pa.completed_pickup_medicine_stamp) 
@@ -605,7 +638,30 @@ LEFT JOIN Pickup_Task pa ON da.NOP = pa.NOP
 WHERE pt.medicine_type LIKE 'Non - Racikan' OR pt.medicine_type LIKE 'Racikan'
 AND pt.lokasi = ?
 `;
-          const [rows] = await conn.execute(query,[location]);
+params= [location]
+      }
+      else{
+          query = `  
+      SELECT 
+    AVG(CASE WHEN gc.status_medicine = 'Racikan' 
+             THEN TIMESTAMPDIFF(MINUTE, vt.waiting_verification_stamp, pa.completed_pickup_medicine_stamp) 
+             ELSE NULL END) AS 'AVG PROCESSING TIME - RACIKAN (MINUTES)',
+    AVG(CASE WHEN gc.medicine_type != 'Racikan' OR gc.medicine_type IS NULL
+             THEN TIMESTAMPDIFF(MINUTE, vt.waiting_verification_stamp, pa.completed_pickup_medicine_stamp) 
+             ELSE NULL END) AS 'AVG PROCESSING TIME - NON-RACIKAN (MINUTES)'
+    
+FROM gmcb_appointments gc
+LEFT JOIN Verification_Task vt ON gc.NOP = vt.NOP
+LEFT JOIN Pharmacy_Task pt ON gc.NOP = pt.NOP
+LEFT JOIN Medicine_Task mt ON gc.NOP = mt.NOP
+LEFT JOIN Pickup_Task pa ON gc.NOP = pa.NOP
+WHERE pt.medicine_type LIKE 'Non - Racikan' OR pt.medicine_type LIKE 'Racikan'
+AND pt.lokasi = ?
+`;
+params= [location]
+      }
+       
+          const [rows] = await conn.execute(query,params);
           return rows;
     } catch (error) {
       return error;
@@ -620,7 +676,12 @@ AND pt.lokasi = ?
   const conn = await pool.getConnection(); // ? Explicit connection
 
     try {
-      const query = `SELECT 
+              let query;
+  let params=[];
+      console.log("LOCATION1",location);
+
+      if(location == 'Lantai 1 BPJS'){
+   query = `SELECT 
     AVG(CASE WHEN da.status_medicine = 'Racikan' 
              THEN TIMESTAMPDIFF(MINUTE, vt.waiting_verification_stamp, pa.completed_pickup_medicine_stamp) 
              ELSE NULL END) AS 'AVG PROCESSING TIME - RACIKAN (MINUTES)',
@@ -636,8 +697,30 @@ LEFT JOIN Pickup_Task pa ON da.NOP = pa.NOP
 WHERE pt.status = 'completed_pickup_medicine'
 AND pt.lokasi = ?
   `;
+  params = [location]
+      }
+      else{
+          query = `SELECT 
+    AVG(CASE WHEN gc.medicine_type = 'Racikan' 
+             THEN TIMESTAMPDIFF(MINUTE, vt.waiting_verification_stamp, pa.completed_pickup_medicine_stamp) 
+             ELSE NULL END) AS 'AVG PROCESSING TIME - RACIKAN (MINUTES)',
+    AVG(CASE WHEN gc.medicine_type != 'Racikan' OR gc.medicine_type IS NULL
+             THEN TIMESTAMPDIFF(MINUTE, vt.waiting_verification_stamp, pa.completed_pickup_medicine_stamp) 
+             ELSE NULL END) AS 'AVG PROCESSING TIME - NON-RACIKAN (MINUTES)'
+    
+FROM gmcb_appointments gc
+LEFT JOIN Verification_Task vt ON gc.NOP = vt.NOP
+LEFT JOIN Pharmacy_Task pt ON gc.NOP = pt.NOP
+LEFT JOIN Medicine_Task mt ON gc.NOP = mt.NOP
+LEFT JOIN Pickup_Task pa ON gc.NOP = pa.NOP
+WHERE pt.status = 'completed_pickup_medicine'
+AND pt.lokasi = ?
+  `;
+  params = [location]
+      }
+   
   
-  const [rows] = await conn.execute(query,[location]);
+  const [rows] = await conn.execute(query,params);
   return rows;
     } catch (error) {
       return error;
@@ -655,7 +738,12 @@ AND pt.lokasi = ?
   const conn = await pool.getConnection(); // ? Explicit connection
 
     try {
-      const query = `SELECT
+              let query;
+  let params=[];
+      console.log("LOCATION1",location);
+
+      if(location == 'Lantai 1 BPJS'){
+   query = `SELECT
   AVG(CASE WHEN da.status_medicine = 'Racikan' 
     THEN TIMESTAMPDIFF(MINUTE, vt.waiting_verification_stamp, pa.completed_pickup_medicine_stamp)
     ELSE NULL END) AS 'AVG PROCESSING TIME - RACIKAN (MINUTES)',
@@ -671,8 +759,30 @@ WHERE pt.status = 'completed_pickup_medicine'
 AND pt.lokasi = ?
 AND (DATE(vt.waiting_verification_stamp) BETWEEN ? AND ?);
   `;
+  params = [location,fromDate,toDate]
+      }
+      else{
+          query = `SELECT
+  AVG(CASE WHEN gc.medicine_type = 'Racikan' 
+    THEN TIMESTAMPDIFF(MINUTE, vt.waiting_verification_stamp, pa.completed_pickup_medicine_stamp)
+    ELSE NULL END) AS 'AVG PROCESSING TIME - RACIKAN (MINUTES)',
+  AVG(CASE WHEN gc.medicine_type != 'Racikan' OR gc.medicine_type IS NULL
+    THEN TIMESTAMPDIFF(MINUTE, vt.waiting_verification_stamp, pa.completed_pickup_medicine_stamp)
+    ELSE NULL END) AS 'AVG PROCESSING TIME - NON-RACIKAN (MINUTES)'
+FROM gmcb_appointments gc
+LEFT JOIN Verification_Task vt ON gc.NOP = vt.NOP
+LEFT JOIN Pharmacy_Task pt ON gc.NOP = pt.NOP
+LEFT JOIN Medicine_Task mt ON gc.NOP = mt.NOP
+LEFT JOIN Pickup_Task pa ON gc.NOP = pa.NOP
+WHERE pt.status = 'completed_pickup_medicine' 
+AND pt.lokasi = ?
+AND (DATE(vt.waiting_verification_stamp) BETWEEN ? AND ?);
+  `;
+  params = [location,fromDate,toDate]
+      }
+   
   
-  const [rows] = await conn.execute(query,[location,fromDate,toDate]);
+  const [rows] = await conn.execute(query,params);
   return rows;
     } catch (error) {
       return error;
@@ -689,17 +799,23 @@ AND (DATE(vt.waiting_verification_stamp) BETWEEN ? AND ?);
   const conn = await pool.getConnection(); // ? Explicit connection
 
     try {
+              let query;
+  let params=[];
+      console.log("LOCATION2",location);
 
-
-      const query = `SELECT 
+ query = `SELECT 
       HOUR(completed_pickup_medicine_stamp) AS hour_of_day,
       COUNT(*) AS record_count
   FROM Pickup_Task as pt
   WHERE completed_pickup_medicine_stamp IS NOT NULL
-   
+     AND pt.lokasi = ?
+
   GROUP BY HOUR(completed_pickup_medicine_stamp)
   ORDER BY hour_of_day`;
-  const [rows] = await conn.execute(query,[location]);
+
+  params = [location]
+
+  const [rows] = await conn.execute(query,params);
   return rows;
     } catch (error) {
       return error;
@@ -715,8 +831,11 @@ const pool = await getDb();
   const conn = await pool.getConnection(); // ? Explicit connection
 
     try {
+        let query;
+  let params=[];
+      console.log("LOCATION1",location);
 
-      const query = `SELECT 
+    query = `SELECT 
       HOUR(completed_pickup_medicine_stamp) AS hour_of_day,
       COUNT(*) AS record_count
   FROM Pickup_Task as pt
@@ -726,7 +845,12 @@ const pool = await getDb();
   AND (Date(vt.waiting_verification_stamp) BETWEEN ? AND ?)
   GROUP BY HOUR(completed_pickup_medicine_stamp)
   ORDER BY hour_of_day`;
-  const [rows] = await conn.execute(query,[location,fromDate,toDate]);
+
+  params = [location,fromDate,toDate]
+  
+      
+   
+  const [rows] = await conn.execute(query,params);
   return rows;
     } catch (error) {
       return error;
@@ -742,7 +866,12 @@ const pool = await getDb();
   const conn = await pool.getConnection(); // ? Explicit connection
 
     try {
-      const query = `  
+              let query;
+  let params=[];
+      console.log("LOCATION1",location);
+
+      if(location == 'Lantai 1 BPJS'){
+query = `  
     SELECT 
     da.status_medicine,
     COUNT(DISTINCT da.NOP) AS booking_count
@@ -756,8 +885,28 @@ WHERE
     AND DATE(vt.waiting_verification_stamp) BETWEEN ? AND ?
 GROUP BY 
     da.status_medicine;`;
-          const values = [location,fromDate,toDate];
-          const [rows] = await conn.execute(query,values);
+
+    params = [location,fromDate,toDate];
+      }
+      else{
+      query = `  
+    SELECT 
+    gc.medicine_type,
+    COUNT(DISTINCT gc.NOP) AS booking_count
+FROM 
+    gmcb_appointments gc
+    INNER JOIN Pharmacy_Task pt ON gc.NOP = pt.NOP
+    INNER JOIN Verification_Task vt ON gc.NOP = vt.NOP
+WHERE 
+    pt.medicine_type IN ('Non - Racikan', 'Racikan')
+    AND pt.lokasi = ?
+    AND DATE(vt.waiting_verification_stamp) BETWEEN ? AND ?
+GROUP BY 
+    gc.medicine_type;`;
+        params = [location,fromDate,toDate];
+
+      }
+          const [rows] = await conn.execute(query,params);
           return rows;
     } catch (error) {
       return error;
@@ -773,7 +922,11 @@ GROUP BY
     try {
 const pool = await getDb();
   const conn = await pool.getConnection(); // ? Explicit connection
-      const query = `  
+  let query;
+  let params = [];
+
+  if(location == 'Lantai 1 BPJS'){
+    query = `  
       SELECT 
     AVG(CASE WHEN da.status_medicine = 'Racikan' 
              THEN TIMESTAMPDIFF(MINUTE, vt.waiting_verification_stamp, pa.completed_pickup_medicine_stamp) 
@@ -790,7 +943,32 @@ LEFT JOIN Pickup_Task pa ON da.NOP = pa.NOP
 WHERE pt.medicine_type LIKE 'Non - Racikan' OR pt.medicine_type LIKE 'Racikan'
 AND pt.lokasi = ?
 `;
-          const [rows] = await conn.execute(query,[location]);
+
+params = [location]
+  }
+  else{
+       query = `  
+      SELECT 
+    AVG(CASE WHEN gc.medicine_type = 'Racikan' 
+             THEN TIMESTAMPDIFF(MINUTE, vt.waiting_verification_stamp, pa.completed_pickup_medicine_stamp) 
+             ELSE NULL END) AS 'AVG PROCESSING TIME - RACIKAN (MINUTES)',
+    AVG(CASE WHEN gc.medicine_type != 'Racikan' OR gc.medicine_type IS NULL
+             THEN TIMESTAMPDIFF(MINUTE, vt.waiting_verification_stamp, pa.completed_pickup_medicine_stamp) 
+             ELSE NULL END) AS 'AVG PROCESSING TIME - NON-RACIKAN (MINUTES)'
+    
+FROM gmcb_appointments gc
+LEFT JOIN Verification_Task vt ON gc.NOP = vt.NOP
+LEFT JOIN Pharmacy_Task pt ON gc.NOP = pt.NOP
+LEFT JOIN Medicine_Task mt ON gc.NOP = mt.NOP
+LEFT JOIN Pickup_Task pa ON gc.NOP = pa.NOP
+WHERE pt.medicine_type LIKE 'Non - Racikan' OR pt.medicine_type LIKE 'Racikan'
+AND pt.lokasi = ?
+`;
+
+params = [location]
+  }
+  
+          const [rows] = await conn.execute(query,params);
           return rows;
     } catch (error) {
       return error;
