@@ -163,10 +163,10 @@ useEffect(() => {
                 setDaftarAntrian(prev => prev.filter(item => item.NOP !== NOP));
             console.log("WA_PAYLOAD1",payload)
 
-        const sendResponse = await retryOperation(() => WA_API.sendWAVerif(payload));
-        console.log("WA response:", sendResponse);
-             const PRINTRESP= await PrintAntrian.printAntrian(printPayload);
-                          await new Promise(resolve => setTimeout(resolve, 1000)); // 1-second delay
+        // const sendResponse = await retryOperation(() => WA_API.sendWAVerif(payload));
+        // console.log("WA response:", sendResponse);
+            //  const PRINTRESP= await PrintAntrian.printAntrian(printPayload);
+                        //   await new Promise(resolve => setTimeout(resolve, 1000)); // 1-second delay
         
         // Emit socket events
        

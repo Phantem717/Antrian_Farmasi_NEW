@@ -6,6 +6,8 @@ const cors = require("cors"); // 🔥 Tambahkan CORS
 const { initDb } = require('./config/db');
 const { setupDatabase } = require('./setupDatabase');
 require('dotenv').config({ path: './.env' }); // Or just require('dotenv').config();
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('./swagger-output.json');
 
 const app = express();
 const server = http.createServer(app);
@@ -76,9 +78,11 @@ app.use('/api/status',statusRoute);
 app.use('/api/create-queue',queueRoute);
 app.use('/api/GMCB-appointment',GMCBListRoute);
 app.use('/api/GMCB-temp',GMCBTempRoutes);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
   // Menjalankan server pada semua network interfaces
   const PORT = process.env.PORT || 5000;
-  const HOST =  '0.0.0.0'
+  const HOST =  process.env.HOST
   server.listen(PORT,HOST, () => {
     console.log(`✅ Server berjalan pada ${PORT}`,loginRoutes);
   });

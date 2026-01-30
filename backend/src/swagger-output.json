@@ -1,0 +1,3713 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Farmasi Queue API",
+    "version": "1.0.0",
+    "description": "API documentation for Antrian Farmasi system"
+  },
+  "host": "192.168.6.106:5000",
+  "basePath": "/",
+  "tags": [
+    {
+      "name": "Pharmacy",
+      "description": "Pharmacy operations"
+    },
+    {
+      "name": "Doctor Appointments",
+      "description": "Doctor appointment management"
+    },
+    {
+      "name": "Verification",
+      "description": "Verification tasks"
+    },
+    {
+      "name": "Medicine",
+      "description": "Medicine task operations"
+    },
+    {
+      "name": "Pickup",
+      "description": "Pickup operations"
+    },
+    {
+      "name": "Print",
+      "description": "Print operations"
+    },
+    {
+      "name": "Responses",
+      "description": "Responses operations"
+    },
+    {
+      "name": "WA",
+      "description": "Whats App operations"
+    },
+    {
+      "name": "Loket",
+      "description": "Loket operations"
+    },
+    {
+      "name": "Logs",
+      "description": "Table Logs operations"
+    },
+    {
+      "name": "Login",
+      "description": "Login operations"
+    },
+    {
+      "name": "GMCB TEMP",
+      "description": "Temp GMCB operations"
+    },
+    {
+      "name": "Get List",
+      "description": "Get List Farmasi operations"
+    },
+    {
+      "name": "GMCB",
+      "description": "GMCB operations"
+    },
+    {
+      "name": "Button",
+      "description": "Button operations"
+    },
+    {
+      "name": "Queue",
+      "description": "Create Queue operations"
+    },
+    {
+      "name": "Barcode",
+      "description": "Barcode operations"
+    },
+    {
+      "name": "Check",
+      "description": "Check Registration operations"
+    },
+    {
+      "name": "Status",
+      "description": "Status operations"
+    }
+  ],
+  "schemes": [
+    "http"
+  ],
+  "paths": {
+    "/api/doctor-appointments/antrian": {
+      "get": {
+        "tags": [
+          "Doctor Appointments"
+        ],
+        "summary": "Get Antrian",
+        "description": "Get Antrian",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/doctor-appointments/": {
+      "post": {
+        "tags": [
+          "Doctor Appointments"
+        ],
+        "summary": "Create a new appointment",
+        "description": "Creates a new appointment",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "lokasi": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Doctor Appointments"
+        ],
+        "summary": "Get All Appointment",
+        "description": "Get All Appointment",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/doctor-appointments/{NOP}": {
+      "get": {
+        "tags": [
+          "Doctor Appointments"
+        ],
+        "summary": "Get By NOP",
+        "description": "Get By NOP",
+        "parameters": [
+          {
+            "name": "NOP",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Doctor Appointments"
+        ],
+        "summary": "Delete By NOP",
+        "description": "Delete By NOP",
+        "parameters": [
+          {
+            "name": "NOP",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/doctor-appointments/{NOP}/phone_number": {
+      "put": {
+        "tags": [
+          "Doctor Appointments"
+        ],
+        "summary": "Update By NOP",
+        "description": "Update By NOP",
+        "parameters": [
+          {
+            "name": "NOP",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "phone_number": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/doctor-appointments/update/{NOP}": {
+      "patch": {
+        "tags": [
+          "Doctor Appointments"
+        ],
+        "summary": "Update By NOP",
+        "description": "Update By NOP",
+        "parameters": [
+          {
+            "name": "NOP",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "queue_number": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/doctor-appointments/total_medicine": {
+      "patch": {
+        "tags": [
+          "Doctor Appointments"
+        ],
+        "summary": "Update total medicine by NOP",
+        "description": "",
+        "parameters": [
+          {
+            "name": "x-cons-id",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "x-timestamp",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "x-signature",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "NOP": {
+                  "example": "any"
+                },
+                "total_medicine": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/doctor-appointments/type/{NOP}": {
+      "put": {
+        "tags": [
+          "Doctor Appointments"
+        ],
+        "summary": "Update By NOP",
+        "description": "Update By NOP",
+        "parameters": [
+          {
+            "name": "NOP",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status_medicine": {
+                  "example": "any"
+                },
+                "farmasi_queue_number": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/doctor-appointments/{NOP}/status_medicine": {
+      "patch": {
+        "tags": [
+          "Doctor Appointments"
+        ],
+        "summary": "Update By NOP",
+        "description": "Update By NOP",
+        "parameters": [
+          {
+            "name": "NOP",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status_medicine": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/doctor-appointments/by-date/{date}/{category}": {
+      "get": {
+        "tags": [
+          "Doctor Appointments"
+        ],
+        "summary": "Get By Date",
+        "description": "Get All Task By Date",
+        "parameters": [
+          {
+            "name": "date",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "category",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/doctor-appointments/{category}": {
+      "get": {
+        "tags": [
+          "Doctor Appointments"
+        ],
+        "summary": "Get By Category",
+        "description": "Get By Category",
+        "parameters": [
+          {
+            "name": "category",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/bpjs/barcode/check": {
+      "get": {
+        "tags": [
+          "Barcode"
+        ],
+        "summary": "Check Queue",
+        "description": "Check Queue",
+        "parameters": [
+          {
+            "name": "NOP",
+            "in": "query",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/bpjs/barcode/insert": {
+      "post": {
+        "tags": [
+          "Barcode"
+        ],
+        "summary": "Process Queue and Insert Data",
+        "description": "Process Queue and Insert Data",
+        "parameters": [
+          {
+            "name": "NOP",
+            "in": "query",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/bpjs/barcode/update/{NOP}": {
+      "post": {
+        "tags": [
+          "Barcode"
+        ],
+        "summary": "Update Barcode Task",
+        "description": "Update Barcode Task",
+        "parameters": [
+          {
+            "name": "NOP",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "user_id": {
+                  "example": "any"
+                },
+                "name": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/bpjs/registration": {
+      "post": {
+        "tags": [
+          "Barcode"
+        ],
+        "summary": "Get Registration Data",
+        "description": "Get Registration Data",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "registrationNo": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/bpjs/barcode/send": {
+      "post": {
+        "tags": [
+          "Barcode"
+        ],
+        "summary": "Send To WA",
+        "description": "Send To WA",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "phone_number": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/loket/": {
+      "post": {
+        "tags": [
+          "Loket"
+        ],
+        "summary": "Create Loket",
+        "description": "Create Loket",
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Loket"
+        ],
+        "summary": "Get All Loket",
+        "description": "Get All Loket",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/loket/{loket_id}": {
+      "get": {
+        "tags": [
+          "Loket"
+        ],
+        "summary": "Get Loket By Id",
+        "description": "Get Loket By Id",
+        "parameters": [
+          {
+            "name": "loket_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Loket"
+        ],
+        "summary": "Update Loket",
+        "description": "Update Loket",
+        "parameters": [
+          {
+            "name": "loket_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Loket"
+        ],
+        "summary": "Delete Loket",
+        "description": "Delete Loket",
+        "parameters": [
+          {
+            "name": "loket_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/verification-task/": {
+      "post": {
+        "tags": [
+          "Verification"
+        ],
+        "summary": "Create a new verification task",
+        "description": "Creates a new verification task",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "NOP": {
+                  "example": "any"
+                },
+                "Executor": {
+                  "example": "any"
+                },
+                "Executor_Names": {
+                  "example": "any"
+                },
+                "status": {
+                  "example": "any"
+                },
+                "location": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Verification"
+        ],
+        "summary": "Get All Verification Task",
+        "description": "Get All Verification Task",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/verification-task/{NOP}": {
+      "get": {
+        "tags": [
+          "Verification"
+        ],
+        "summary": "Get By NOP",
+        "description": "Get By NOP",
+        "parameters": [
+          {
+            "name": "NOP",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Verification"
+        ],
+        "summary": "Update By NOP",
+        "description": "Update By NOP",
+        "parameters": [
+          {
+            "name": "NOP",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "Executor": {
+                  "example": "any"
+                },
+                "Executor_Names": {
+                  "example": "any"
+                },
+                "status": {
+                  "example": "any"
+                },
+                "loket": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Verification"
+        ],
+        "summary": "Delete",
+        "description": "Delete Verification Task By NOP",
+        "parameters": [
+          {
+            "name": "NOP",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/verification-task/now/today/{category}": {
+      "get": {
+        "tags": [
+          "Verification"
+        ],
+        "summary": "Get Verification Today",
+        "description": "Get Verification Today",
+        "parameters": [
+          {
+            "name": "category",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/verification-task/by-date/{date}/{category}": {
+      "get": {
+        "tags": [
+          "Verification"
+        ],
+        "summary": "Get By Date",
+        "description": "Get All Task By Date",
+        "parameters": [
+          {
+            "name": "date",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "category",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/medicine-task/": {
+      "post": {
+        "tags": [
+          "Medicine"
+        ],
+        "summary": "Create a new medicine task",
+        "description": "Creates a new medicine task",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "lokasi": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Medicine"
+        ],
+        "summary": "Get All Medicine Task",
+        "description": "Get All Medicine Task",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/medicine-task/{NOP}": {
+      "get": {
+        "tags": [
+          "Medicine"
+        ],
+        "summary": "Get By NOP",
+        "description": "Get By NOP",
+        "parameters": [
+          {
+            "name": "NOP",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Medicine"
+        ],
+        "summary": "Update By NOP",
+        "description": "Update By NOP",
+        "parameters": [
+          {
+            "name": "NOP",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "Executor": {
+                  "example": "any"
+                },
+                "Executor_Names": {
+                  "example": "any"
+                },
+                "status": {
+                  "example": "any"
+                },
+                "loket": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Medicine"
+        ],
+        "summary": "Delete By NOP",
+        "description": "Delete By NOP",
+        "parameters": [
+          {
+            "name": "NOP",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/medicine-task/today/now/{category}": {
+      "get": {
+        "tags": [
+          "Medicine"
+        ],
+        "summary": "Get Medicine Today",
+        "description": "Get Medicine Today",
+        "parameters": [
+          {
+            "name": "category",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/medicine-task/by-date/{date}/{category}": {
+      "get": {
+        "tags": [
+          "Medicine"
+        ],
+        "summary": "Get By Date",
+        "description": "Get All Task By Date",
+        "parameters": [
+          {
+            "name": "date",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "category",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/pickup-task/": {
+      "post": {
+        "tags": [
+          "Pickup"
+        ],
+        "summary": "Create a new pickup task",
+        "description": "Creates a new pickup task",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "lokasi": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Pickup"
+        ],
+        "summary": "Get All Pickup Tasks",
+        "description": "Get All Pickup Tasks",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/pickup-task/{NOP}": {
+      "get": {
+        "tags": [
+          "Pickup"
+        ],
+        "summary": "Get By NOP",
+        "description": "Get By NOP",
+        "parameters": [
+          {
+            "name": "NOP",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Pickup"
+        ],
+        "summary": "Update By NOP",
+        "description": "Update By NOP",
+        "parameters": [
+          {
+            "name": "NOP",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "example": "any"
+                },
+                "Executor": {
+                  "example": "any"
+                },
+                "Executor_Names": {
+                  "example": "any"
+                },
+                "loket": {
+                  "example": "any"
+                },
+                "location": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Pickup"
+        ],
+        "summary": "Delete By NOP",
+        "description": "Delete By NOP",
+        "parameters": [
+          {
+            "name": "NOP",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/pickup-task/today/now/{category}": {
+      "get": {
+        "tags": [
+          "Pickup"
+        ],
+        "summary": "Get Today",
+        "description": "Get All Task Today",
+        "parameters": [
+          {
+            "name": "category",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/pickup-task/by-date/{date}/{category}": {
+      "get": {
+        "tags": [
+          "Pickup"
+        ],
+        "summary": "Get By Date",
+        "description": "Get All Task By Date",
+        "parameters": [
+          {
+            "name": "date",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "category",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/pharmacy-tasks/": {
+      "post": {
+        "tags": [
+          "Pharmacy"
+        ],
+        "summary": "Create a new pharmacy task",
+        "description": "Creates a new pharmacy task",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "NOP": {
+                  "example": "any"
+                },
+                "status": {
+                  "example": "any"
+                },
+                "medicine_type": {
+                  "example": "any"
+                },
+                "lokasi": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Pharmacy"
+        ],
+        "summary": "Get All Pharmacy Task",
+        "description": "Get All Pharmacy Task",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/pharmacy-tasks/{NOP}": {
+      "get": {
+        "tags": [
+          "Pharmacy"
+        ],
+        "summary": "Get By NOP",
+        "description": "Get Pharmacy Task By NOP",
+        "parameters": [
+          {
+            "name": "NOP",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Pharmacy"
+        ],
+        "summary": "Update",
+        "description": "Update Pharmacy Task By NOP",
+        "parameters": [
+          {
+            "name": "NOP",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Pharmacy"
+        ],
+        "summary": "Delete",
+        "description": "Delete Pharmacy Task By NOP",
+        "parameters": [
+          {
+            "name": "NOP",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/pharmacy-tasks/today/{category}": {
+      "get": {
+        "tags": [
+          "Pharmacy"
+        ],
+        "summary": "Get Today",
+        "description": "Get All Task Today",
+        "parameters": [
+          {
+            "name": "category",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/pharmacy-tasks/status/{status}/{category}": {
+      "get": {
+        "tags": [
+          "Pharmacy"
+        ],
+        "summary": "Get Status",
+        "description": "Get All Task By Status",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "category",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/button/update/medicine-type": {
+      "post": {
+        "tags": [
+          "Button"
+        ],
+        "summary": "Update Medicine Type",
+        "description": "Update Medicine Type",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "NOP": {
+                  "example": "any"
+                },
+                "status": {
+                  "example": "any"
+                },
+                "user_id": {
+                  "example": "any"
+                },
+                "name": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/logs/": {
+      "get": {
+        "tags": [
+          "Logs"
+        ],
+        "summary": "Get All Logs",
+        "description": "Get All Logs",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/logs/by-date/{date}/{category}": {
+      "get": {
+        "tags": [
+          "Logs"
+        ],
+        "summary": "Get By Date",
+        "description": "Get All Task By Date",
+        "parameters": [
+          {
+            "name": "date",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "category",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/logs/service-time/{fromDate}/{toDate}/{category}": {
+      "get": {
+        "tags": [
+          "Logs"
+        ],
+        "summary": "Get By Date",
+        "description": "Get All Task By Date",
+        "parameters": [
+          {
+            "name": "fromDate",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "toDate",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "category",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/logs/data-per-hour/{fromDate}/{toDate}/{category}": {
+      "get": {
+        "tags": [
+          "Logs"
+        ],
+        "summary": "Get By Date",
+        "description": "Get All Task By Date",
+        "parameters": [
+          {
+            "name": "fromDate",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "toDate",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "category",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/logs/total-medicine/{fromDate}/{toDate}/{category}": {
+      "get": {
+        "tags": [
+          "Logs"
+        ],
+        "summary": "Get By Date",
+        "description": "Get All Task By Date",
+        "parameters": [
+          {
+            "name": "fromDate",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "toDate",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "category",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/logs/total-medicine/{category}": {
+      "get": {
+        "tags": [
+          "Logs"
+        ],
+        "summary": "Get By Date",
+        "description": "Get All Task By Date",
+        "parameters": [
+          {
+            "name": "category",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/logs/service-time/{category}": {
+      "get": {
+        "tags": [
+          "Logs"
+        ],
+        "summary": "Get By Date",
+        "description": "Get All Task By Date",
+        "parameters": [
+          {
+            "name": "category",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/logs/data-per-hour/{category}": {
+      "get": {
+        "tags": [
+          "Logs"
+        ],
+        "summary": "Get By Date",
+        "description": "Get All Task By Date",
+        "parameters": [
+          {
+            "name": "category",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/logs/today/now/{category}": {
+      "get": {
+        "tags": [
+          "Logs"
+        ],
+        "summary": "Get By Date",
+        "description": "Get All Task By Date",
+        "parameters": [
+          {
+            "name": "category",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/logs/period/{period}/{category}": {
+      "get": {
+        "tags": [
+          "Logs"
+        ],
+        "summary": "Get By Date",
+        "description": "Get All Task By Date",
+        "parameters": [
+          {
+            "name": "period",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "category",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/responses/{location}": {
+      "get": {
+        "tags": [
+          "Responses"
+        ],
+        "summary": "Get All Responses",
+        "description": "Get All Responses",
+        "parameters": [
+          {
+            "name": "location",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/responses/verify/{location}": {
+      "get": {
+        "tags": [
+          "Responses"
+        ],
+        "summary": "Get Verification Responses",
+        "description": "Get Verification Responses",
+        "parameters": [
+          {
+            "name": "location",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/responses/medicine/{location}": {
+      "get": {
+        "tags": [
+          "Responses"
+        ],
+        "summary": "Get Medicine Responses",
+        "description": "Get Medicine Responses",
+        "parameters": [
+          {
+            "name": "location",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/responses/pickup/{location}": {
+      "get": {
+        "tags": [
+          "Responses"
+        ],
+        "summary": "Get Pickup Responses",
+        "description": "Get Pickup Responses",
+        "parameters": [
+          {
+            "name": "location",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/send/WA/verif": {
+      "post": {
+        "tags": [
+          "WA"
+        ],
+        "summary": "Send WA Verif",
+        "description": "Send WA Verif",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "phone_number": {
+                  "example": "any"
+                },
+                "NOP": {
+                  "example": "any"
+                },
+                "queue_number": {
+                  "example": "any"
+                },
+                "patient_name": {
+                  "example": "any"
+                },
+                "docter": {
+                  "example": "any"
+                },
+                "nik": {
+                  "example": "any"
+                },
+                "rm": {
+                  "example": "any"
+                },
+                "sep": {
+                  "example": "any"
+                },
+                "medicine_type": {
+                  "example": "any"
+                },
+                "prev_queue_number": {
+                  "example": "any"
+                },
+                "switch_WA": {
+                  "example": "any"
+                },
+                "location": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/send/WA/proses": {
+      "post": {
+        "tags": [
+          "WA"
+        ],
+        "summary": "Send WA Proses",
+        "description": "Send WA Proses",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "phone_number": {
+                  "example": "any"
+                },
+                "NOP": {
+                  "example": "any"
+                },
+                "queue_number": {
+                  "example": "any"
+                },
+                "patient_name": {
+                  "example": "any"
+                },
+                "docter": {
+                  "example": "any"
+                },
+                "nik": {
+                  "example": "any"
+                },
+                "rm": {
+                  "example": "any"
+                },
+                "sep": {
+                  "example": "any"
+                },
+                "medicine_type": {
+                  "example": "any"
+                },
+                "switch_WA": {
+                  "example": "any"
+                },
+                "location": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/send/WA/antrian": {
+      "post": {
+        "tags": [
+          "WA"
+        ],
+        "summary": "Send WA Antrian",
+        "description": "Send WA Antrian",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "phone_number": {
+                  "example": "any"
+                },
+                "NOP": {
+                  "example": "any"
+                },
+                "queue_number": {
+                  "example": "any"
+                },
+                "patient_name": {
+                  "example": "any"
+                },
+                "docter": {
+                  "example": "any"
+                },
+                "nik": {
+                  "example": "any"
+                },
+                "rm": {
+                  "example": "any"
+                },
+                "sep": {
+                  "example": "any"
+                },
+                "medicine_type": {
+                  "example": "any"
+                },
+                "switch_WA": {
+                  "example": "any"
+                },
+                "location": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/send/WA/pickup": {
+      "post": {
+        "tags": [
+          "WA"
+        ],
+        "summary": "Send WA Pickup",
+        "description": "Send WA Pickup",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "phone_number": {
+                  "example": "any"
+                },
+                "NOP": {
+                  "example": "any"
+                },
+                "queue_number": {
+                  "example": "any"
+                },
+                "patient_name": {
+                  "example": "any"
+                },
+                "docter": {
+                  "example": "any"
+                },
+                "nik": {
+                  "example": "any"
+                },
+                "rm": {
+                  "example": "any"
+                },
+                "sep": {
+                  "example": "any"
+                },
+                "medicine_type": {
+                  "example": "any"
+                },
+                "switch_WA": {
+                  "example": "any"
+                },
+                "loket": {
+                  "example": "any"
+                },
+                "location": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/send/WA/custom": {
+      "post": {
+        "tags": [
+          "WA"
+        ],
+        "summary": "Send WA Custom",
+        "description": "Send WA Custom",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "phone_number": {
+                  "example": "any"
+                },
+                "patient_name": {
+                  "example": "any"
+                },
+                "message": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/print/": {
+      "post": {
+        "tags": [
+          "Print"
+        ],
+        "summary": "Print Farmasi",
+        "description": "Print Farmasi",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "phone_number": {
+                  "example": "any"
+                },
+                "barcode": {
+                  "example": "any"
+                },
+                "patient_name": {
+                  "example": "any"
+                },
+                "medicine_type": {
+                  "example": "any"
+                },
+                "queue_number": {
+                  "example": "any"
+                },
+                "lokasi": {
+                  "example": "any"
+                },
+                "waiting_verification_stamp": {
+                  "example": "any"
+                },
+                "position": {
+                  "example": "any"
+                },
+                "timestamp": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/queue/GMCB": {
+      "post": {
+        "tags": [
+          "Queue"
+        ],
+        "summary": "Create Antrian GMCB",
+        "description": "Create Antrian GMCB",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "medicineType": {
+                  "example": "any"
+                },
+                "lokasi": {
+                  "example": "any"
+                },
+                "origin": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/queue/{medicineType}/{lokasi}": {
+      "post": {
+        "tags": [
+          "Queue"
+        ],
+        "summary": "Create Antrian",
+        "description": "Create Antrian",
+        "parameters": [
+          {
+            "name": "medicineType",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "lokasi",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/login/": {
+      "post": {
+        "tags": [
+          "Login"
+        ],
+        "summary": "Login",
+        "description": "Login",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "username": {
+                  "example": "any"
+                },
+                "password": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "api/APIResponse/": {
+      "post": {
+        "description": "",
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/retrieve/": {
+      "post": {
+        "tags": [
+          "Get List"
+        ],
+        "summary": "Get Farmasi List",
+        "description": "Get Farmasi List",
+        "parameters": [
+          {
+            "name": "x-cons-id",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "x-timestamp",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "x-signature",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "payload": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/create-farmasi/GMCB": {
+      "post": {
+        "tags": [
+          "Queue"
+        ],
+        "summary": "Create Antrian GMCB",
+        "description": "Create Antrian GMCB",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "medicineType": {
+                  "example": "any"
+                },
+                "lokasi": {
+                  "example": "any"
+                },
+                "origin": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/create-farmasi/{medicineType}/{lokasi}": {
+      "post": {
+        "tags": [
+          "Queue"
+        ],
+        "summary": "Create Antrian",
+        "description": "Create Antrian",
+        "parameters": [
+          {
+            "name": "medicineType",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "lokasi",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/pharmacy-status/": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "x-cons-id",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "x-timestamp",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "x-signature",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "input": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/check/reg_no/{registrationNo}": {
+      "get": {
+        "tags": [
+          "Check"
+        ],
+        "summary": "Check Registration",
+        "description": "Check Registration",
+        "parameters": [
+          {
+            "name": "registrationNo",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/check/{sepNo}": {
+      "get": {
+        "tags": [
+          "Check"
+        ],
+        "summary": "Check Registration SEP",
+        "description": "Check Registration SEP",
+        "parameters": [
+          {
+            "name": "sepNo",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/check/": {
+      "get": {
+        "tags": [
+          "Check"
+        ],
+        "summary": "Check Registration ERM",
+        "description": "Check Registration ERM",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "mr_no",
+            "in": "query",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/status/": {
+      "post": {
+        "tags": [
+          "Status"
+        ],
+        "summary": "Get Status",
+        "description": "Get Status",
+        "parameters": [
+          {
+            "name": "x-cons-id",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "x-timestamp",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "x-signature",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "phone_number": {
+                  "example": "any"
+                },
+                "full_name": {
+                  "example": "any"
+                },
+                "nik": {
+                  "example": "any"
+                },
+                "location": {
+                  "example": "any"
+                },
+                "date_of_birth": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/status/nop": {
+      "post": {
+        "tags": [
+          "Status"
+        ],
+        "summary": "Get Pharmacy NOP",
+        "description": "Get Pharmacy NOP",
+        "parameters": [
+          {
+            "name": "x-cons-id",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "x-timestamp",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "x-signature",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "NOP": {
+                  "example": "any"
+                },
+                "location": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/status/timestamp": {
+      "post": {
+        "tags": [
+          "Status"
+        ],
+        "summary": "Get Timestamp",
+        "description": "Get Timestamp",
+        "parameters": [
+          {
+            "name": "x-cons-id",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "x-timestamp",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "x-signature",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "phone_number": {
+                  "example": "any"
+                },
+                "full_name": {
+                  "example": "any"
+                },
+                "nik": {
+                  "example": "any"
+                },
+                "location": {
+                  "example": "any"
+                },
+                "date_of_birth": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/create-queue/{type}": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "type",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/api/GMCB-appointment/": {
+      "post": {
+        "tags": [
+          "GMCB"
+        ],
+        "summary": "Create a new appointment",
+        "description": "Creates a new appointment",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "lokasi": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "GMCB"
+        ],
+        "summary": "Get All Appointment",
+        "description": "Get All Appointment",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/GMCB-appointment/get-list": {
+      "post": {
+        "tags": [
+          "GMCB"
+        ],
+        "summary": "Get Farmasi List",
+        "description": "Get Farmasi List",
+        "parameters": [
+          {
+            "name": "x-cons-id",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "x-timestamp",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "x-signature",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "payload": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/GMCB-appointment/antrian": {
+      "get": {
+        "tags": [
+          "GMCB"
+        ],
+        "summary": "Get Antrian",
+        "description": "Get Antrian",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/GMCB-appointment/{NOP}": {
+      "get": {
+        "tags": [
+          "GMCB"
+        ],
+        "summary": "Get By NOP",
+        "description": "Get By NOP",
+        "parameters": [
+          {
+            "name": "NOP",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "GMCB"
+        ],
+        "summary": "Delete By NOP",
+        "description": "Delete By NOP",
+        "parameters": [
+          {
+            "name": "NOP",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/GMCB-appointment/{NOP}/phone_number": {
+      "put": {
+        "tags": [
+          "GMCB"
+        ],
+        "summary": "Update By NOP",
+        "description": "Update By NOP",
+        "parameters": [
+          {
+            "name": "NOP",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "phone_number": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/GMCB-appointment/update_status/{NOP}": {
+      "patch": {
+        "tags": [
+          "GMCB"
+        ],
+        "summary": "Update By NOP",
+        "description": "Update By NOP",
+        "parameters": [
+          {
+            "name": "NOP",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/GMCB-appointment/update/{NOP}": {
+      "patch": {
+        "tags": [
+          "GMCB"
+        ],
+        "summary": "Update By NOP",
+        "description": "Update By NOP",
+        "parameters": [
+          {
+            "name": "NOP",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "queue_number": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/GMCB-appointment/total_medicine": {
+      "patch": {
+        "tags": [
+          "GMCB"
+        ],
+        "summary": "Update total medicine by NOP",
+        "description": "Update total medicine by NOP",
+        "parameters": [
+          {
+            "name": "x-cons-id",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "x-timestamp",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "x-signature",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "NOP": {
+                  "example": "any"
+                },
+                "total_medicine": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/GMCB-appointment/type/{NOP}": {
+      "put": {
+        "tags": [
+          "GMCB"
+        ],
+        "summary": "Update By NOP",
+        "description": "Update By NOP",
+        "parameters": [
+          {
+            "name": "NOP",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status_medicine": {
+                  "example": "any"
+                },
+                "farmasi_queue_number": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/GMCB-appointment/{NOP}/status_medicine": {
+      "patch": {
+        "tags": [
+          "GMCB"
+        ],
+        "summary": "Update By NOP",
+        "description": "Update By NOP",
+        "parameters": [
+          {
+            "name": "NOP",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status_medicine": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/GMCB-appointment/by-date/{date}/{category}": {
+      "get": {
+        "tags": [
+          "GMCB"
+        ],
+        "summary": "Get By Date",
+        "description": "Get All Task By Date",
+        "parameters": [
+          {
+            "name": "date",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "category",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/GMCB-appointment/{category}": {
+      "get": {
+        "tags": [
+          "GMCB"
+        ],
+        "summary": "Get By Category",
+        "description": "Get By Category",
+        "parameters": [
+          {
+            "name": "category",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/GMCB-temp/": {
+      "post": {
+        "tags": [
+          "GMCB TEMP"
+        ],
+        "summary": "Create a new appointment",
+        "description": "Creates a new appointment",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "lokasi": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "GMCB TEMP"
+        ],
+        "summary": "Get All Appointment",
+        "description": "Get All Appointment",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/GMCB-temp/get-list": {
+      "post": {
+        "tags": [
+          "GMCB TEMP"
+        ],
+        "summary": "Get Farmasi List",
+        "description": "Get Farmasi List",
+        "parameters": [
+          {
+            "name": "x-cons-id",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "x-timestamp",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "x-signature",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "payload": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/GMCB-temp/antrian": {
+      "get": {
+        "tags": [
+          "GMCB TEMP"
+        ],
+        "summary": "Get Antrian",
+        "description": "Get Antrian",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/GMCB-temp/{id}": {
+      "get": {
+        "tags": [
+          "GMCB TEMP"
+        ],
+        "summary": "Get By NOP",
+        "description": "Get By NOP",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "GMCB TEMP"
+        ],
+        "summary": "Delete By NOP",
+        "description": "Delete By NOP",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/GMCB-temp/update": {
+      "patch": {
+        "tags": [
+          "GMCB TEMP"
+        ],
+        "summary": "Update By NOP",
+        "description": "Update By NOP",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "queue_status": {
+                  "example": "any"
+                },
+                "id": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/GMCB-temp/{category}": {
+      "get": {
+        "tags": [
+          "GMCB TEMP"
+        ],
+        "summary": "Get By Category",
+        "description": "Get By Category",
+        "parameters": [
+          {
+            "name": "category",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/GMCB-temp/verify": {
+      "post": {
+        "tags": [
+          "GMCB TEMP"
+        ],
+        "summary": "Verify Temp Queue",
+        "description": "Verify Temp Queue",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "tempId": {
+                  "example": "any"
+                },
+                "verificationData": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    }
+  }
+}

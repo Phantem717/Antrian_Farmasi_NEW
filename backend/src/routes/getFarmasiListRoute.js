@@ -26,7 +26,11 @@ const {
     
 // Endpoint untuk membuat appointment baru
 
-router.post('/',authenticate, getFarmasiList);
+router.post('/',authenticate, (req,res)=>{
+    // #swagger.tags = ['Get List']
+    // #swagger.summary = 'Get Farmasi List'
+    // #swagger.description = 'Get Farmasi List'
+    getFarmasiList(req,res)});
 
 
 module.exports = router;

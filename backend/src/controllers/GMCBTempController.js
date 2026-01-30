@@ -160,7 +160,7 @@ const getFarmasiList = async (req, res) => {
         barcode: farmasiArray.payload.id ?? "-",
         patient_name: farmasiArray.payload.patient_name ?? "-",
         farmasi_queue_number: farmasiArray.payload.farmasi_queue_number ?? "-",
-        medicine_type: statusMedicine ?? "-",
+        medicine_type: "-",
         lokasi: "Lantai 1 GMCB",
         SEP: farmasiArray.payload.sep_no ?? "-",
         tanggal_lahir: farmasiArray.payload?.patient_date_of_birth ?? null,

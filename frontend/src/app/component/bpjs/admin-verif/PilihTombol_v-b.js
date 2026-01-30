@@ -346,16 +346,16 @@ const PilihAksi = ({location, selectedQueueIds = [], setSelectedQueueIds, select
 
         // === 6. Send WA notification
         console.log("Sending WA notification:", waPayload, printPayload);
-        const sendResponse = await WA_API.sendWAVerif(waPayload);
+        // const sendResponse = await WA_API.sendWAVerif(waPayload);
         console.log("WA sent:", sendResponse);
 
         // Delay before printing
         await new Promise(resolve => setTimeout(resolve, 1000));
 
         // === 7. Print slip
-        console.log("Printing slip:", printPayload);
-        const printResp = await PrintAntrian.printAntrian(printPayload);
-        console.log("Print response:", printResp);
+        // console.log("Printing slip:", printPayload);
+        // const printResp = await PrintAntrian.printAntrian(printPayload);
+        // console.log("Print response:", printResp);
 
         results.success.push(queue.NOP);
         

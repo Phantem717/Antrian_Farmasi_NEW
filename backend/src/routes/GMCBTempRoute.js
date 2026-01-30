@@ -35,24 +35,61 @@ const authenticate = (req,res,next) => {
 }
 
 // Endpoint untuk membuat appointment baru
-router.post('/', createAppointment);
-router.get('/', getAllAppointments);
+router.post('/', (req,res) =>{
+    // #swagger.tags = ['GMCB TEMP']
+    // #swagger.summary = 'Create a new appointment'
+    // #swagger.description = 'Creates a new appointment'
+    createAppointment(req,res)});
+router.get('/', (req,res) => {
+    // #swagger.tags = ['GMCB TEMP']
+    // #swagger.summary = 'Get All Appointment'
+    // #swagger.description = 'Get All Appointment'
+    getAllAppointments(req,res)} );
 
-router.post('/get-list',authenticate, getFarmasiList);
-router.get('/antrian', getLatestAntrian);
+router.post('/get-list',authenticate, (req,res)=>{
+    // #swagger.tags = ['GMCB TEMP']
+    // #swagger.summary = 'Get Farmasi List'
+    // #swagger.description = 'Get Farmasi List'
+    getFarmasiList(req,res)} );
+
+router.get('/antrian', (req,res)=>{
+    // #swagger.tags = ['GMCB TEMP']
+    // #swagger.summary = 'Get Antrian'
+    // #swagger.description = 'Get Antrian'
+    getLatestAntrian(req,res)} );
 
 
 // Endpoint untuk mengambil appointment berdasarkan NOP
-router.get('/:id', getAppointment);
+router.get('/:id', (req,res) => { 
+    // #swagger.tags = ['GMCB TEMP']
+    // #swagger.summary = 'Get By NOP'
+    // #swagger.description = 'Get By NOP'
+    getAppointment(req,res)});
 
 // Endpoint untuk mengambil appointment 
 
 
 // Endpoint untuk memperbarui appointment berdasarkan NOP
 // router.put('/:NOP', updateAppointment);
-router.patch('/update', updateAntrian);
+router.patch('/update', (req,res) => {
+    // #swagger.tags = ['GMCB TEMP']
+    // #swagger.summary = 'Update By NOP'
+    // #swagger.description = 'Update By NOP'
+    updateAntrian(req,res)});
 // Endpoint untuk menghapus appointment berdasarkan NOP
-router.delete('/:id', deleteAppointment);
-router.get('/:category',getAllAppointmentsByLocation);
-router.post('/verify',verifyTempQueue);
+router.delete('/:id', (req,res)=>{
+    // #swagger.tags = ['GMCB TEMP']
+    // #swagger.summary = 'Delete By NOP'
+    // #swagger.description = 'Delete By NOP'
+    deleteAppointment(req,res)});
+router.get('/:category',(req, res) => {
+    // #swagger.tags = ['GMCB TEMP']
+    // #swagger.summary = 'Get By Category'
+    // #swagger.description = 'Get By Category'
+    getAllAppointmentsByLocation(req,res)});
+router.post('/verify',(req,res)=>{
+    // #swagger.tags = ['GMCB TEMP']
+    // #swagger.summary = 'Verify Temp Queue'
+    // #swagger.description = 'Verify Temp Queue'
+    verifyTempQueue(req,res)});
 module.exports = router;

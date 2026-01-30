@@ -6,6 +6,6 @@ const {createQueuePatient} = require('../controllers/createQueuePatientControlle
 
 // Route untuk mengecek queue
 // Endpoint: GET /api/medapp/queue/check?booking_id={id}
-router.post('/:type', createQueuePatient);
+router.post('/:type',  createQueuePatient);
 
 module.exports = router;

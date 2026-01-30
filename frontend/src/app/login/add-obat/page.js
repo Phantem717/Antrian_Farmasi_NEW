@@ -244,8 +244,8 @@ const AddObat = () => {
       
         }
             await insertAll(resultData);
-            const print_wa = await Promise.all([WA_API.sendWAAntrian(WAPayload),PrintAntrian.printAntrian(printPayload)]);
-            console.log("PRINT_WA",print_wa);
+            // const print_wa = await Promise.all([WA_API.sendWAAntrian(WAPayload),PrintAntrian.printAntrian(printPayload)]);
+            // console.log("PRINT_WA",print_wa);
             Swal.fire("Success!", "Data berhasil disimpan", "success");
      
 
